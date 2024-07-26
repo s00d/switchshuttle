@@ -4,6 +4,12 @@
 
 SwitchShuttle is a cross-platform system tray application that allows users to run predefined commands in various terminal applications. It supports macOS, Windows, and Linux, offering a simple and customizable way to manage and execute your frequently used commands.
 
+
+## About
+
+SwitchShuttle is a reimagining and extension of the [Shuttle](https://github.com/fitztrev/shuttle) application. While Shuttle provides a simple and effective way to manage commands shortcuts in macOS, SwitchShuttle expands upon this concept, offering support for multiple operating systems and terminal emulators, along with enhanced configuration capabilities and user customization options.
+
+
 ## Features
 
 - Supports multiple terminal applications: iTerm, Terminal, Warp, Starship.
