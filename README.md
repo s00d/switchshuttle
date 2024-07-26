@@ -53,21 +53,21 @@ Here is an example of the configuration file:
 
 ### Configuration Parameters
 
-| Parameter  | Type    | Description                                      | Valid Values                           |
-|------------|---------|--------------------------------------------------|----------------------------------------|
-| terminal   | String  | The terminal application to use                  | "iterm", "terminal", "warp", "starship"|
-| launch_in  | String  | Where to launch the command                      | "current", "new_tab", "new_window"     |
-| theme      | String  | The theme to use (if supported by the terminal)  | Any string value representing a theme  |
-| title      | String  | The title to set for the terminal window/tab     | Any string value                       |
-| commands   | Array   | List of command configurations                   | See below for command parameters       |
+| Parameter | Type   | Description                                     | Valid Values                            |
+|-----------|--------|-------------------------------------------------|-----------------------------------------|
+| terminal  | String | The terminal application to use                 | "iterm", "terminal", "warp", "starship" |
+| launch_in | String | Where to launch the command                     | "current", "new_tab", "new_window"      |
+| theme     | String | The theme to use (if supported by the terminal) | Any string value representing a theme   |
+| title     | String | The title to set for the terminal window/tab    | Any string value                        |
+| commands  | Array  | List of command configurations                  | See below for command parameters        |
 
 ### Command Parameters
 
-| Parameter  | Type          | Description                                      | Valid Values                           |
-|------------|---------------|--------------------------------------------------|----------------------------------------|
-| name       | String        | The name of the command or submenu               | Any string value                       |
-| command    | String (Optional) | The command to execute (if this is a command) | Any string value representing a command|
-| submenu    | Array (Optional) | List of subcommands (if this is a submenu)     | See above for command parameters       |
+| Parameter | Type              | Description                                   | Valid Values                            |
+|-----------|-------------------|-----------------------------------------------|-----------------------------------------|
+| name      | String            | The name of the command or submenu            | Any string value                        |
+| command   | String (Optional) | The command to execute (if this is a command) | Any string value representing a command |
+| submenu   | Array (Optional)  | List of subcommands (if this is a submenu)    | See above for command parameters        |
 
 ## How to Use
 
@@ -108,6 +108,23 @@ To create submenus, set the `command` field to `null` and provide a list of subc
 ## Download
 
 The latest version of SwitchShuttle can be downloaded from the [GitHub Releases](https://github.com/s00d/switchshuttle/releases) page.
+
+### macOS Sign
+
+If you are on macOS, you may need to sign the application before running it. Here are the steps:
+
+1. Make the binary executable:
+
+    ```bash
+    chmod +x ./rocksdb_cli
+    ```
+
+2. Clear extended attributes and sign the binary:
+
+    ```bash
+    xattr -cr ./rocksdb_cli && codesign --force --deep --sign - ./rocksdb_cli
+    ```
+
 
 ## Contributing
 

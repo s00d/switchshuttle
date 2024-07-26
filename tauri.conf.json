@@ -1,5 +1,6 @@
 {
   "build": {
+    "distDir": "./src",
     "withGlobalTauri": true
   },
   "package": {
