@@ -107,7 +107,7 @@ To create submenus, set the `command` field to `null` and provide a list of subc
 
 ## Download
 
-The latest version of SwitchShuttle can be downloaded from the [GitHub Releases](https://github.com/s00d/switchshuttle![img.png](img.png)/releases) page.
+The latest version of SwitchShuttle can be downloaded from the [GitHub Releases](https://github.com/s00d/switchshuttle/releases) page.
 
 ## Contributing
 
