@@ -1,10 +1,10 @@
 [package]
 name = "SwitchShuttle"
-version = "0.1.0"
+version = "1.0.1"
 edition = "2021"
 
 [dependencies]
-tauri = { version = "1.7.1", features = [ "system-tray", "shell-open", "wry"] }
+tauri = { version = "1.7.1", features = [ "system-tray", "shell-open", "wry", "updater" ] }
 serde = { version = "1.0.204", features = ["derive"] }
 serde_json = "1.0.120"
 dirs = "5.0.1"

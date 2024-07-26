@@ -52,7 +52,7 @@ impl Config {
     fn default_config() -> Self {
         Config::new(
             "iterm",
-            "new_tab",
+            "current",
             "Homebrew",
             "New tab",
             vec![
@@ -230,7 +230,6 @@ fn read_script(script_path: &str) -> Option<String> {
 
 fn execute_command(command_config: &CommandConfig, terminal: &str, launch_in: &str, theme: &String, title: &String) {
     if cfg!(target_os = "macos") {
-        println!("{}, {}", terminal, launch_in);
         let script_path = match (terminal, launch_in) {
             ("iterm", "current") => "iTerm-Current.scpt",
             ("iterm", "new_tab") => "iTerm-Tab.scpt",
@@ -266,8 +265,6 @@ fn execute_command(command_config: &CommandConfig, terminal: &str, launch_in: &s
         let script = script_content.replace("{command}", command)
             .replace("{theme}", theme)
             .replace("{title}", title);
-
-        println!("{}", script);
 
         Command::new("osascript")
             .arg("-e")
