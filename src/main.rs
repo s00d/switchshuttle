@@ -415,9 +415,13 @@ fn main() {
     let system_tray_menu = create_system_tray_menu();
 
     let app = tauri::Builder::default()
-        .setup(|app|
-            Ok(app.set_activation_policy(tauri::ActivationPolicy::Accessory))
-        )
+        .setup(|app| {
+            #[cfg(target_os = "macos")]
+            {
+                app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+            }
+            Ok(())
+        })
         .system_tray(SystemTray::new().with_menu(system_tray_menu))
         .on_system_tray_event(move |app, event| {
             if let SystemTrayEvent::MenuItemClick { id, .. } = event {
