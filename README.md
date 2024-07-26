@@ -1,4 +1,4 @@
-[//]: # (![SwitchShuttle]&#40;https://file-6z1BYuyxBowpGqz8W6YfCARc&#41;)
+![SwitchShuttle](https://raw.githubusercontent.com/s00d/switchshuttle/main/logo.webp)
 
 # SwitchShuttle
 
