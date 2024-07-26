@@ -116,13 +116,13 @@ If you are on macOS, you may need to sign the application before running it. Her
 1. Make the binary executable:
 
     ```bash
-    chmod +x ./rocksdb_cli
+    chmod +x ./switch-shuttle.app
     ```
 
 2. Clear extended attributes and sign the binary:
 
     ```bash
-    xattr -cr ./rocksdb_cli && codesign --force --deep --sign - ./rocksdb_cli
+    xattr -cr ./switch-shuttle.app && codesign --force --deep --sign - ./switch-shuttle.app
     ```
 
 
