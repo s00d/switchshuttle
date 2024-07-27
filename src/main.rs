@@ -5,13 +5,14 @@ mod about;
 mod config;
 mod helpers;
 
+use std::fs;
+use std::path::PathBuf;
 use tauri::{CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem, SystemTraySubmenu};
 use crate::about::{check_for_updates, show_about_dialog};
 use auto_launch::*;
 use tauri::utils::platform::current_exe;
 use crate::config::{CommandConfig, Config};
 use crate::helpers::{execute_command, get_config_path, open_folder_in_default_explorer, open_in_default_editor};
-
 
 fn load_config() -> Config {
     let config_path = get_config_path();
@@ -22,6 +23,24 @@ fn load_config() -> Config {
     config.validate()
 }
 
+fn load_all_configs(config_dir: &PathBuf) -> Vec<Config> {
+    let mut configs = Vec::new();
+    if let Ok(entries) = fs::read_dir(config_dir) {
+        for entry in entries {
+            if let Ok(entry) = entry {
+                if let Ok(file_type) = entry.file_type() {
+                    if file_type.is_file() {
+                        if let Ok(config) = Config::load(&entry.path()) {
+                            configs.push(config.validate());
+                        }
+                    }
+                }
+            }
+        }
+    }
+    configs
+}
+
 fn create_command_menu(command_config: &CommandConfig) -> SystemTrayMenu {
     let mut menu = SystemTrayMenu::new();
     if let Some(submenu) = &command_config.submenu {
@@ -30,7 +49,10 @@ fn create_command_menu(command_config: &CommandConfig) -> SystemTrayMenu {
                 let submenu_item = create_command_menu(subcommand);
                 menu = menu.add_submenu(SystemTraySubmenu::new(subcommand.name.clone(), submenu_item));
             } else {
-                let item = CustomMenuItem::new(subcommand.name.clone(), subcommand.name.clone());
+                let mut item = CustomMenuItem::new(subcommand.name.clone(), subcommand.name.clone());
+                if let Some(hotkey) = &subcommand.hotkey {
+                    item = item.accelerator(hotkey);
+                }
                 menu = menu.add_item(item);
             }
         }
@@ -39,22 +61,30 @@ fn create_command_menu(command_config: &CommandConfig) -> SystemTrayMenu {
 }
 
 fn create_system_tray_menu(autostart: bool) -> SystemTrayMenu {
-    let config = load_config();
-
-    let mut command_menu = SystemTrayMenu::new();
-
-    for command in &config.commands {
-        if let Some(_submenu) = &command.submenu {
-            let submenu_item = create_command_menu(command);
-            command_menu = command_menu.add_submenu(SystemTraySubmenu::new(command.name.clone(), submenu_item));
-        } else {
-            let item = CustomMenuItem::new(command.name.clone(), command.name.clone());
-            command_menu = command_menu.add_item(item);
-        }
-    }
+    let config_path = get_config_path();
+    let config_dir = config_path.parent().unwrap().to_path_buf();
+    let configs = load_all_configs(&config_dir);
 
     let mut tray_menu = SystemTrayMenu::new();
-    tray_menu = tray_menu.add_submenu(SystemTraySubmenu::new("Commands", command_menu));
+    for config in &configs {
+        let mut command_menu = SystemTrayMenu::new();
+
+        for command in &config.commands {
+            if let Some(_submenu) = &command.submenu {
+                let submenu_item = create_command_menu(command);
+                command_menu = command_menu.add_submenu(SystemTraySubmenu::new(command.name.clone(), submenu_item));
+            } else {
+                let mut item = CustomMenuItem::new(command.name.clone(), command.name.clone());
+                if let Some(hotkey) = &command.hotkey {
+                    item = item.accelerator(hotkey);
+                }
+                command_menu = command_menu.add_item(item);
+            }
+        }
+
+        tray_menu = tray_menu.add_submenu(SystemTraySubmenu::new(&config.menu_title, command_menu));
+    }
+
     tray_menu = tray_menu.add_native_item(SystemTrayMenuItem::Separator);
     tray_menu = tray_menu.add_item(CustomMenuItem::new("edit_config".to_string(), "Edit Config"));
     tray_menu = tray_menu.add_item(CustomMenuItem::new("open_config_folder".to_string(), "Open Config Folder"));
@@ -77,6 +107,7 @@ fn create_system_tray_menu(autostart: bool) -> SystemTrayMenu {
     tray_menu
 }
 
+
 fn main() {
     let config_path = get_config_path();
     Config::ensure_default(&config_path).expect("Failed to ensure default config");
@@ -89,10 +120,14 @@ fn main() {
             {
                 app.set_activation_policy(tauri::ActivationPolicy::Accessory);
             }
+
             Ok(())
         })
         .system_tray(SystemTray::new().with_menu(system_tray_menu))
         .on_system_tray_event(move |app, event| {
+            let config_path = get_config_path();
+            let config_dir = config_path.parent().unwrap().to_path_buf();
+            let configs = load_all_configs(&config_dir);
 
             let app_name = &app.package_info().name;
             let current_exe = current_exe().unwrap();
@@ -120,7 +155,7 @@ fn main() {
                         app.tray_handle().set_menu(new_system_tray_menu).unwrap();
                     },
                     "about" => {
-                        let tauri_version = app.package_info().version.to_string(); // Используйте для получения версии Tauri
+                        let tauri_version = app.package_info().version.to_string();
                         let about_text = format!("SwitchShuttle v{} \n\n by s00d.", tauri_version);
                         show_about_dialog(app, about_text);
                     },
@@ -133,18 +168,17 @@ fn main() {
                         check_for_updates(app, tauri_version.to_string());
                     },
                     _ => {
-                        let config = load_config();
-                        if let Some(command_config) = config.commands.iter().find(|c| c.name == id.as_str()) {
-                            execute_command(command_config, &config.terminal, &config.launch_in, &config.theme, &config.title);
-                        } else {
-                            println!("Command not found: {}", id);
+                        for config in &configs {
+                            if let Some(command_config) = config.commands.iter().find(|c| c.name == id.as_str()) {
+                                execute_command(command_config, &config.terminal, &config.launch_in, &config.theme, &config.title);
+                                break;
+                            }
                         }
                     }
                 }
 
             }
 
-            // Recreate the tray menu for all menu item clicks
             let new_system_tray_menu = create_system_tray_menu(auto_start.is_enabled().unwrap());
             app.tray_handle().set_menu(new_system_tray_menu).unwrap();
         })
@@ -153,8 +187,6 @@ fn main() {
 
     app.run(|_app_handle, _event| {});
 }
-
-
 
 
 

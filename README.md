@@ -21,59 +21,86 @@ SwitchShuttle is a reimagining and extension of the [Shuttle](https://github.com
 
 ## Configuration
 
-The configuration is stored in a JSON file located in the user's configuration directory. The default path is `~/.config/switch-shuttle/config.json` on Linux and macOS, and `C:\Users\<Username>\AppData\Roaming\switch-shuttle\config.json` on Windows.
+The configuration is stored in JSON files located in the user's configuration directory. The default path is `~/.config/switch-shuttle/` on Linux and macOS, and `C:\Users\<Username>\AppData\Roaming\switch-shuttle\` on Windows. You can store multiple configuration files in this directory, each representing a different set of commands and settings.
 
-Here is an example of the configuration file:
+Here is an example of a configuration file:
 
 ```json
 {
-  "terminal": "iterm",
-  "launch_in": "new_tab",
-  "theme": "Homebrew",
-  "title": "New tab",
-  "commands": [
-    {
-      "name": "Example Command",
-      "command": "echo Hello, world!",
-      "submenu": null
-    },
-    {
-      "name": "Example Submenu",
-      "command": null,
-      "submenu": [
-        {
-          "name": "Subcommand 1",
-          "command": "echo Subcommand 1",
-          "submenu": null
-        },
-        {
-          "name": "Subcommand 2",
-          "command": "echo Subcommand 2",
-          "submenu": null
-        }
-      ]
-    }
-  ]
+   "menu_title": "My Custom Commands",
+   "terminal": "iterm",
+   "launch_in": "new_tab",
+   "theme": "Homebrew",
+   "title": "New tab",
+   "commands": [
+      {
+         "name": "Example Command",
+         "command": "echo Hello, world!",
+         "submenu": null,
+         "hotkey": "Ctrl+Shift+R"
+      },
+      {
+         "name": "Example Submenu",
+         "command": null,
+         "hotkey": null,
+         "submenu": [
+            {
+               "name": "Subcommand 1",
+               "command": "echo Subcommand 1",
+               "submenu": null,
+               "hotkey": null
+            },
+            {
+               "name": "Subcommand 2",
+               "command": "echo Subcommand 2",
+               "submenu": null,
+               "hotkey": null
+            }
+         ]
+      }
+   ]
 }
 ```
 
 ### Configuration Parameters
 
-| Parameter | Type   | Description                                     | Valid Values                            |
-|-----------|--------|-------------------------------------------------|-----------------------------------------|
-| terminal  | String | The terminal application to use                 | "iterm", "terminal", "warp", "starship" |
-| launch_in | String | Where to launch the command                     | "current", "new_tab", "new_window"      |
-| theme     | String | The theme to use (if supported by the terminal) | Any string value representing a theme   |
-| title     | String | The title to set for the terminal window/tab    | Any string value                        |
-| commands  | Array  | List of command configurations                  | See below for command parameters        |
+| Parameter  | Type   | Description                                     | Valid Values                            |
+|------------|--------|-------------------------------------------------|-----------------------------------------|
+| menu_title | String | The title for the menu representing this config | Any string value                        |
+| terminal   | String | The terminal application to use                 | "iterm", "terminal", "warp", "starship" |
+| launch_in  | String | Where to launch the command                     | "current", "new_tab", "new_window"      |
+| theme      | String | The theme to use (if supported by the terminal) | Any string value representing a theme   |
+| title      | String | The title to set for the terminal window/tab    | Any string value                        |
+| commands   | Array  | List of command configurations                  | See below for command parameters        |
 
 ### Command Parameters
 
-| Parameter | Type              | Description                                   | Valid Values                            |
-|-----------|-------------------|-----------------------------------------------|-----------------------------------------|
-| name      | String            | The name of the command or submenu            | Any string value                        |
-| command   | String (Optional) | The command to execute (if this is a command) | Any string value representing a command |
-| submenu   | Array (Optional)  | List of subcommands (if this is a submenu)    | See above for command parameters        |
+| Parameter | Type              | Description                                   | Valid Values                                       |
+|-----------|-------------------|-----------------------------------------------|----------------------------------------------------|
+| name      | String            | The name of the command or submenu            | Any string value                                   |
+| command   | String (Optional) | The command to execute (if this is a command) | Any string value representing a command            |
+| submenu   | Array (Optional)  | List of subcommands (if this is a submenu)    | See above for command parameters                   |
+| hotkey    | String (Optional) | The global hotkey to trigger the command      | Any valid hotkey combination, e.g., "Ctrl+Shift+E" |
+
+### Hotkeys
+
+You can assign global hotkeys to commands by adding the `hotkey` parameter to the command configuration. The hotkey combination must follow the format of modifier keys (Ctrl, Shift, Alt, Win) combined with a key (A-Z, 0-9, etc.). For example, to set "Ctrl+Shift+E" as a hotkey for a command:
+
+```json
+{
+  "name": "Example Command",
+  "command": "echo Hello, world!",
+  "submenu": null,
+  "hotkey": "Ctrl+Shift+E"
+}
+```
+
+The hotkey parameter is optional. If it is not specified, the command will not have a global hotkey associated with it.
+
+### How to Use Hotkeys
+
+1. **Assign Hotkeys**: Edit the configuration file to include the `hotkey` parameter for the commands you want to trigger with global hotkeys.
+2. **Use Hotkeys**: After restarting the application, use the assigned hotkeys to trigger the corresponding commands, no matter which application is currently in focus.
 
 ## How to Use
 

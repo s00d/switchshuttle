@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct Config {
+    pub menu_title: String,
     pub terminal: String,
     pub launch_in: String,
     pub theme: String,
@@ -16,11 +17,13 @@ pub struct CommandConfig {
     pub name: String,
     pub command: Option<String>,
     pub submenu: Option<Vec<CommandConfig>>,
+    pub hotkey: Option<String>, // Добавлено поле для горячей клавиши
 }
 
 impl Config {
-    fn new(terminal: &str, launch_in: &str, theme: &str, title: &str, commands: Vec<CommandConfig>) -> Self {
+    fn new(terminal: &str, launch_in: &str, theme: &str, title: &str, menu_title: &str, commands: Vec<CommandConfig>) -> Self {
         Config {
+            menu_title: menu_title.to_string(),
             terminal: terminal.to_string(),
             launch_in: launch_in.to_string(),
             theme: theme.to_string(),
@@ -47,25 +50,30 @@ impl Config {
             "current",
             "Homebrew",
             "New tab",
+            "Commands",
             vec![
                 CommandConfig {
                     name: "Example Command".to_string(),
                     command: Some("echo Hello, world!".to_string()),
                     submenu: None,
+                    hotkey: Some("Ctrl+Shift+E".to_string()),
                 },
                 CommandConfig {
                     name: "Example Submenu".to_string(),
                     command: None,
+                    hotkey: None,
                     submenu: Some(vec![
                         CommandConfig {
                             name: "Subcommand 1".to_string(),
                             command: Some("echo Subcommand 1".to_string()),
                             submenu: None,
+                            hotkey: Some("Ctrl+Shift+S".to_string()),
                         },
                         CommandConfig {
                             name: "Subcommand 2".to_string(),
                             command: Some("echo Subcommand 2".to_string()),
                             submenu: None,
+                            hotkey: None,
                         },
                     ]),
                 },
@@ -99,22 +107,45 @@ impl Config {
             "new_tab".to_string()
         };
 
+        let theme = if self.theme.is_empty() {
+            println!("Theme is empty. Using default 'Homebrew'.");
+            "Homebrew".to_string()
+        } else {
+            self.theme.clone()
+        };
+
+        let title = if self.title.is_empty() {
+            println!("Title is empty. Using default 'New tab'.");
+            "New tab".to_string()
+        } else {
+            self.title.clone()
+        };
+
+        let menu_title = if self.menu_title.is_empty() {
+            println!("Menu title is empty. Using default 'Commands'.");
+            "Commands".to_string()
+        } else {
+            self.menu_title.clone()
+        };
+
         let commands: Vec<CommandConfig> = self.commands.iter().map(|command| {
             if command.name.is_empty() || (command.command.is_none() && command.submenu.is_none()) {
                 CommandConfig {
                     name: "Example Command".to_string(),
                     command: Some("echo Hello, world!".to_string()),
                     submenu: None,
+                    hotkey: None,
                 }
             } else {
                 CommandConfig {
                     name: command.name.clone(),
                     command: command.command.clone(),
                     submenu: command.submenu.clone(),
+                    hotkey: command.hotkey.clone(),
                 }
             }
         }).collect();
 
-        Config::new(&terminal, &launch_in, &self.theme, &self.title, commands)
+        Config::new(&terminal, &launch_in, &theme, &title, &menu_title, commands)
     }
 }
