@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Config Editor</title>
+    <link rel="stylesheet" href="assets/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/styles.css">
+    <script src="assets/vue2.js"></script>
+</head>
+<body>
+<div id="app" class="container mt-5">
+    <button class="close-btn btn btn-danger btn-sm" @click="cancel">×</button>
+    <h1 class="text-center mb-4">Config Editor</h1>
+
+    <div id="notification" :class="notificationClass" class="alert" v-if="notificationMessage" v-text="notificationMessage"></div>
+
+    <div class="form-group">
+        <label for="config-select">Select Config</label>
+        <div class="d-flex gap-2">
+            <select id="config-select" class="form-control" v-model="currentConfig" @change="loadConfig">
+                <option v-for="file in configFiles" :value="file.path" :key="file.path" v-text="file.name"></option>
+            </select>
+            <button class="btn btn-primary" @click="showAddConfigModal">+</button>
+            <button class="btn btn-danger" @click="showDeleteConfigModal">x</button>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="menu-title">Menu Title</label>
+        <input type="text" id="menu-title" class="form-control" v-model="config.menu_title">
+    </div>
+
+    <div class="form-group">
+        <label for="terminal">Terminal</label>
+        <select id="terminal" class="form-control" v-model="config.terminal">
+            <option value="iterm">iTerm</option>
+            <option value="terminal">Terminal</option>
+            <option value="warp">Warp</option>
+            <option value="starship">Starship</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="launch-in">Launch In</label>
+        <select id="launch-in" class="form-control" v-model="config.launch_in">
+            <option value="current">Current</option>
+            <option value="new_tab">New Tab</option>
+            <option value="new_window">New Window</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="theme">Theme</label>
+        <input type="text" id="theme" class="form-control" v-model="config.theme">
+    </div>
+
+    <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" id="title" class="form-control" v-model="config.title">
+    </div>
+
+    <table id="commands-table" class="table table-striped mt-4">
+        <thead>
+        <tr>
+            <th>Command Name</th>
+            <th>Command</th>
+            <th>Hotkey</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(command, index) in config.commands" :key="index" :data-index="index">
+            <td><input type="text" class="form-control" v-model="command.name"></td>
+            <td><input type="text" class="form-control" v-model="command.command"></td>
+            <td>
+                <div class="d-flex align-items-center">
+                    <input type="checkbox" class="mr-2" :checked="command.hotkey !== null" @change="toggleHotkeyInput(index, command.hotkey)">
+                    <input type="text" class="form-control" v-model="command.hotkey" v-if="command.hotkey !== null" @keydown="hotkeyHandler($event, index)">
+                </div>
+            </td>
+            <td><button class="btn btn-danger" @click="deleteCommand(index)">Delete</button></td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="table-actions text-center">
+        <button class="btn btn-primary" @click="addCommand">Add Command</button>
+    </div>
+
+    <div class="button-group d-flex justify-content-between mt-4">
+        <button class="btn btn-success" @click="saveConfig">Save</button>
+        <button class="btn btn-danger" @click="cancel">Cancel</button>
+    </div>
+
+
+    <div id="add-config-modal" v-if="addConfigModal" class="modal" tabindex="-1" role="dialog" style="display: block">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Config</h5>
+                    <button type="button" class="close" @click="closeAddConfigModal">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="new-config-name">Config Name</label>
+                        <input type="text" id="new-config-name" class="form-control" v-model="newConfigName">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" @click="addNewConfig">Add</button>
+                    <button type="button" class="btn btn-secondary" @click="closeAddConfigModal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="delete-config-modal" v-if="deleteConfigModal" class="modal" tabindex="-1" role="dialog" style="display: block;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button type="button" class="close" @click="closeDeleteConfigModal">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this config?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" @click="deleteConfig">Delete</button>
+                    <button type="button" class="btn btn-secondary" @click="closeDeleteConfigModal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const { listen } = window.__TAURI__.event;
+    const { writeTextFile, readTextFile, exists, readDir, removeFile } = window.__TAURI__.fs;
+    const path = window.__TAURI__.path;
+    const appWindow = window.__TAURI__.window;
+
+    new Vue({
+        el: '#app',
+        data: {
+            configFiles: [],
+            currentConfig: '',
+            config: {
+                menu_title: '',
+                terminal: 'iterm',
+                launch_in: 'current',
+                theme: '',
+                title: '',
+                commands: []
+            },
+            newConfigName: '',
+            notificationMessage: '',
+            notificationClass: '',
+            addConfigModal: false,
+            deleteConfigModal: false
+        },
+        methods: {
+            async loadConfigs() {
+                const configDir = await path.configDir();
+                const configFiles = await readDir(configDir + '/switch-shuttle');
+                this.configFiles = configFiles.filter(file => file.name.endsWith('.json')).map(file => ({ path: file.path, name: file.name.replace('.json', '') }));
+                if (this.configFiles.length > 0) {
+                    this.currentConfig = this.configFiles[0].path;
+                    this.loadConfig();
+                }
+            },
+            async loadConfig() {
+                if (await exists(this.currentConfig)) {
+                    const configContent = await readTextFile(this.currentConfig);
+                    this.config = JSON.parse(configContent);
+                }
+            },
+            async saveConfig() {
+                try {
+                    await writeTextFile(this.currentConfig, JSON.stringify(this.config, null, 2));
+                    this.showNotification('Config saved successfully', 'success');
+                    this.cancel();
+                } catch (error) {
+                    this.showNotification('Failed to save config', 'error');
+                }
+            },
+            addCommand() {
+                this.config.commands.push({ name: '', command: '', hotkey: '', hotkeyEnabled: false });
+            },
+            deleteCommand(index) {
+                this.config.commands.splice(index, 1);
+            },
+            toggleHotkeyInput(index, isEnabled) {
+                const command = this.config.commands[index];
+                if (isEnabled !== null) {
+                    command.hotkey = null;
+                } else {
+                    command.hotkey = '';
+                }
+            },
+            hotkeyHandler(event, index) {
+                event.preventDefault();
+                const command = this.config.commands[index];
+                let hotkey = [];
+                if (event.ctrlKey) hotkey.push('Ctrl');
+                if (event.shiftKey) hotkey.push('Shift');
+                if (event.altKey) hotkey.push('Alt');
+                if (event.metaKey) hotkey.push('Command');
+                if (event.key && !['Control', 'Shift', 'Alt', 'Meta'].includes(event.key)) hotkey.push(event.key);
+                command.hotkey = hotkey.join('+');
+            },
+            showNotification(message, type) {
+                this.notificationMessage = message;
+                this.notificationClass = `alert-${type}`;
+                setTimeout(() => {
+                    this.notificationMessage = '';
+                    this.notificationClass = '';
+                }, 3000);
+            },
+            showAddConfigModal() {
+                this.addConfigModal = true;
+            },
+            closeAddConfigModal() {
+                this.addConfigModal = false;
+            },
+            showDeleteConfigModal() {
+                this.deleteConfigModal = true;
+            },
+            closeDeleteConfigModal() {
+                this.deleteConfigModal = false;
+            },
+            async addNewConfig() {
+                if (!this.newConfigName) {
+                    this.showNotification('Config name cannot be empty', 'error');
+                    return;
+                }
+                const configDir = await path.configDir();
+                const newConfigPath = `${configDir}/switch-shuttle/${this.newConfigName}.json`;
+                const defaultConfig = {
+                    menu_title: "Commands",
+                    terminal: "iterm",
+                    launch_in: "current",
+                    theme: "Homebrew",
+                    title: "New tab",
+                    commands: []
+                };
+                try {
+                    await writeTextFile(newConfigPath, JSON.stringify(defaultConfig, null, 2));
+                    this.showNotification('New config added successfully', 'success');
+                    this.closeAddConfigModal();
+                    this.loadConfigs();
+                } catch (error) {
+                    this.showNotification('Failed to add new config', 'error');
+                }
+            },
+            async deleteConfig() {
+                if (!this.currentConfig) {
+                    this.showNotification('No config selected to delete', 'error');
+                    return;
+                }
+                try {
+                    await removeFile(this.currentConfig);
+                    this.showNotification('Config deleted successfully', 'success');
+                    this.closeDeleteConfigModal();
+                    this.loadConfigs();
+                } catch (error) {
+                    this.showNotification('Failed to delete config', 'error');
+                }
+            },
+            cancel() {
+                appWindow.getCurrent().hide();
+            }
+        },
+        mounted() {
+            this.loadConfigs();
+        }
+    });
+</script>
+</body>
+</html>
