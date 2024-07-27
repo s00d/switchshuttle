@@ -14,15 +14,6 @@ use tauri::utils::platform::current_exe;
 use crate::config::{CommandConfig, Config};
 use crate::helpers::{execute_command, get_config_path, open_folder_in_default_explorer, open_in_default_editor};
 
-fn load_config() -> Config {
-    let config_path = get_config_path();
-    let config = Config::load(&config_path).unwrap_or_else(|err| {
-        println!("Failed to load config: {}. Using default config.", err);
-        Config::default_config()
-    });
-    config.validate()
-}
-
 fn load_all_configs(config_dir: &PathBuf) -> Vec<Config> {
     let mut configs = Vec::new();
     if let Ok(entries) = fs::read_dir(config_dir) {
