@@ -1,6 +1,7 @@
 {
   "build": {
-    "distDir": "./src",
+    "distDir": "src",
+    "devPath": "src",
     "withGlobalTauri": true
   },
   "package": {
@@ -8,14 +9,57 @@
     "version": "1.0.2"
   },
   "tauri": {
+    "windows": [
+      {
+        "label": "loading",
+        "title": "Loading",
+        "url": "loading.html",
+        "width": 400,
+        "height": 200,
+        "fullscreen": false,
+        "resizable": false,
+        "decorations": false,
+        "visible": false,
+        "alwaysOnTop": true
+      },
+      {
+        "label": "about",
+        "url": "about.html",
+        "title": "About",
+        "fullscreen": false,
+        "resizable": false,
+        "decorations": true,
+        "width": 400,
+        "height": 200,
+        "visible": false,
+        "alwaysOnTop": true
+      },
+      {
+        "label": "update",
+        "url": "update.html",
+        "title": "Update",
+        "fullscreen": false,
+        "resizable": false,
+        "decorations": true,
+        "width": 400,
+        "height": 200,
+        "visible": false,
+        "alwaysOnTop": true
+      }
+    ],
     "systemTray": {
       "iconPath": "icons/icon.png",
       "iconAsTemplate": true
     },
     "allowlist": {
       "all": false,
+      "window": {
+        "all": true
+      },
       "shell": {
         "all": false,
+        "execute": true,
+        "sidecar": true,
         "open": true
       }
     },
