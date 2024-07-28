@@ -149,13 +149,13 @@ If you are on macOS, you may need to sign the application before running it. Her
 1. Make the binary executable:
 
 ```bash
-chmod +x ./switch-shuttle.app
+chmod +x /Applications/switch-shuttle.app
 ```
 
 2. Clear extended attributes and sign the binary:
 
 ```bash
-xattr -cr ./switch-shuttle.app && codesign --force --deep --sign - ./switch-shuttle.app
+xattr -cr /Applications/switch-shuttle.app && codesign --force --deep --sign - /Applications/switch-shuttle.app
 ```
 
 
