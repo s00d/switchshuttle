@@ -1,6 +1,7 @@
 on run
     set argsCmd to "{command}"
-    scriptRun(argsCmd)
+    set argsTitle to "{title}"
+    scriptRun(argsCmd, argsTitle)
 end run
 
 on scriptRun(argsCmd, argsTitle)

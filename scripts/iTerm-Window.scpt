@@ -1,13 +1,11 @@
 on run
     set argsCmd to "{command}"
-    set argsTheme to "{theme}"
     set argsTitle to "Custom title"
-    scriptRun(argsCmd, argsTheme, argsTitle)
+    scriptRun(argsCmd, argsTitle)
 end run
 
 on scriptRun(argsCmd, argsTitle)
     set withCmd to (argsCmd)
-    -- set withTheme to (argsTheme)
     set theTitle to (argsTitle)
     CommandRun(withCmd, theTitle)
 end scriptRun

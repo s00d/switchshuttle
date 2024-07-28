@@ -23,9 +23,6 @@ pub fn execute_command(command_config: &CommandConfig, terminal: &str, launch_in
             ("warp", "current") => "Warp-Current.scpt",
             ("warp", "new_tab") => "Warp-Tab.scpt",
             ("warp", "new_window") => "Warp-Window.scpt",
-            ("starship", "current") => "Starship-Current.scpt",
-            ("starship", "new_tab") => "Starship-Tab.scpt",
-            ("starship", "new_window") => "Starship-Window.scpt",
             _ => "",
         };
 

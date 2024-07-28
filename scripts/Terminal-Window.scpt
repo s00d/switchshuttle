@@ -1,8 +1,7 @@
 on run
     set argsCmd to "{command}"
-    set argsTheme to "{theme}"
     set argsTitle to "{title}"
-    CommandRun(argsCmd, argsTheme, argsTitle)
+    CommandRun(argsCmd, argsTitle)
 end run
 
 on scriptRun(argsCmd, argsTitle)

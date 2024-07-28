@@ -90,7 +90,7 @@ impl Config {
     }
 
     pub(crate) fn validate(&self) -> Config {
-        let valid_terminals = vec!["iterm", "terminal", "warp", "starship"];
+        let valid_terminals = vec!["iterm", "terminal", "warp"];
         let valid_launch_in = vec!["current", "new_tab", "new_window"];
 
         let terminal = if valid_terminals.contains(&self.terminal.as_str()) {

@@ -12,7 +12,7 @@ SwitchShuttle is a reimagining and extension of the [Shuttle](https://github.com
 
 ## Features
 
-- Supports multiple terminal applications: iTerm, Terminal, Warp, Starship.
+- Supports multiple terminal applications: iTerm, Terminal, Warp.
 - Run commands in different modes: current window, new tab, new window.
 - Toggle launch at login.
 - Edit configuration directly from the tray menu.
@@ -64,14 +64,14 @@ Here is an example of a configuration file:
 
 ### Configuration Parameters
 
-| Parameter  | Type   | Description                                     | Valid Values                            |
-|------------|--------|-------------------------------------------------|-----------------------------------------|
-| menu_title | String | The title for the menu representing this config | Any string value                        |
-| terminal   | String | The terminal application to use                 | "iterm", "terminal", "warp", "starship" |
-| launch_in  | String | Where to launch the command                     | "current", "new_tab", "new_window"      |
-| theme      | String | The theme to use (if supported by the terminal) | Any string value representing a theme   |
-| title      | String | The title to set for the terminal window/tab    | Any string value                        |
-| commands   | Array  | List of command configurations                  | See below for command parameters        |
+| Parameter  | Type   | Description                                     | Valid Values                          |
+|------------|--------|-------------------------------------------------|---------------------------------------|
+| menu_title | String | The title for the menu representing this config | Any string value                      |
+| terminal   | String | The terminal application to use                 | "iterm", "terminal", "warp"           |
+| launch_in  | String | Where to launch the command                     | "current", "new_tab", "new_window"    |
+| theme      | String | The theme to use (if supported by the terminal) | Any string value representing a theme |
+| title      | String | The title to set for the terminal window/tab    | Any string value                      |
+| commands   | Array  | List of command configurations                  | See below for command parameters      |
 
 ### Command Parameters
 
