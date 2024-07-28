@@ -6,14 +6,14 @@
   },
   "package": {
     "productName": "switch-shuttle",
-    "version": "1.0.6"
+    "version": "1.0.7"
   },
   "tauri": {
     "windows": [
       {
         "label": "loading",
         "title": "Loading",
-        "url": "loading.html",
+        "url": "ui/loading.html",
         "width": 400,
         "height": 200,
         "fullscreen": false,
@@ -24,7 +24,7 @@
       },
       {
         "label": "about",
-        "url": "about.html",
+        "url": "ui/about.html",
         "title": "About",
         "fullscreen": false,
         "resizable": false,
@@ -36,7 +36,7 @@
       },
       {
         "label": "update",
-        "url": "update.html",
+        "url": "ui/update.html",
         "title": "Update",
         "fullscreen": false,
         "resizable": false,
@@ -48,7 +48,7 @@
       },
       {
         "label": "config_editor",
-        "url": "editor.html",
+        "url": "ui/editor.html",
         "title": "Config Editor",
         "fullscreen": false,
         "resizable": false,

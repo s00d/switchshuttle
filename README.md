@@ -37,7 +37,8 @@ Here is an example of a configuration file:
          "name": "Example Command",
          "command": "echo Hello, world!",
          "submenu": null,
-         "hotkey": "Ctrl+Shift+R"
+         "hotkey": "Ctrl+Shift+R",
+         "commands": null
       },
       {
          "name": "Example Submenu",
@@ -48,14 +49,28 @@ Here is an example of a configuration file:
                "name": "Subcommand 1",
                "command": "echo Subcommand 1",
                "submenu": null,
-               "hotkey": null
+               "hotkey": null,
+               "commands": null
             },
             {
                "name": "Subcommand 2",
                "command": "echo Subcommand 2",
                "submenu": null,
-               "hotkey": null
+               "hotkey": null,
+               "commands": null
             }
+         ],
+         "commands": null
+      },
+      {
+         "name": "Example Multi-Command",
+         "command": null,
+         "hotkey": "Ctrl+Shift+M",
+         "submenu": null,
+         "commands": [
+            "export MY_VAR=$(echo 'Step 1: Initialize')",
+            "RESULT=$(echo 'Step 2: Process' && echo $MY_VAR)",
+            "echo Step 3: Finalize && echo $RESULT"
          ]
       }
    ]
@@ -81,6 +96,33 @@ Here is an example of a configuration file:
 | command   | String (Optional) | The command to execute (if this is a command) | Any string value representing a command            |
 | submenu   | Array (Optional)  | List of subcommands (if this is a submenu)    | See above for command parameters                   |
 | hotkey    | String (Optional) | The global hotkey to trigger the command      | Any valid hotkey combination, e.g., "Ctrl+Shift+E" |
+| commands  | Array (Optional)  | List of commands to execute sequentially      | Any array of strings, each string a command        |
+
+### Command Execution Logic
+
+SwitchShuttle supports defining a single command using the `command` parameter, a list of commands using the `commands` parameter, or both. If both `command` and `commands` are specified, the single command will be executed first, followed by the commands in the list.
+
+#### Example Execution Flow
+
+1. **Single Command**: If only `command` is specified, that command is executed.
+2. **Multiple Commands**: If only `commands` is specified, each command in the list is executed sequentially.
+3. **Both Command and Commands**: If both `command` and `commands` are specified, the single command is executed first, followed by each command in the `commands` list.
+
+### Example Configuration with Both Command and Commands
+
+```json
+{
+  "name": "Example Combined Command",
+  "command": "echo Starting sequence...",
+  "hotkey": "Ctrl+Shift+C",
+  "submenu": null,
+  "commands": [
+    "echo Step 1: Initialize",
+    "echo Step 2: Process",
+    "echo Step 3: Finalize"
+  ]
+}
+```
 
 ### Hotkeys
 
@@ -91,7 +133,8 @@ You can assign global hotkeys to commands by adding the `hotkey` parameter to th
   "name": "Example Command",
   "command": "echo Hello, world!",
   "submenu": null,
-  "hotkey": "Ctrl+Shift+E"
+  "hotkey": "Ctrl+Shift+E",
+  "commands": null
 }
 ```
 
