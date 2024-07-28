@@ -16,6 +16,7 @@ pub struct Config {
 pub struct CommandConfig {
     pub name: String,
     pub command: Option<String>,
+    pub commands: Option<Vec<String>>,
     pub submenu: Option<Vec<CommandConfig>>,
     pub hotkey: Option<String>, // Добавлено поле для горячей клавиши
 }
@@ -55,23 +56,38 @@ impl Config {
                 CommandConfig {
                     name: "Example Command".to_string(),
                     command: Some("echo Hello, world!".to_string()),
+                    commands: None,
                     submenu: None,
                     hotkey: Some("Ctrl+Shift+E".to_string()),
                 },
                 CommandConfig {
+                    name: "Example Multi-Command".to_string(),
+                    command: None,
+                    submenu: None,
+                    hotkey: Some("Ctrl+Shift+M".to_string()),
+                    commands: Some(vec![
+                        "export MY_VAR=$(echo 'Step 1: Initialize')".to_string(), // Создание переменной
+                        "RESULT=$(echo 'Step 2: Process' && echo $MY_VAR)".to_string(), // Использование переменной
+                        "echo Step 3: Finalize && echo $RESULT".to_string(), // Вывод результата
+                    ]),
+                },
+                CommandConfig {
                     name: "Example Submenu".to_string(),
                     command: None,
+                    commands: None,
                     hotkey: None,
                     submenu: Some(vec![
                         CommandConfig {
                             name: "Subcommand 1".to_string(),
                             command: Some("echo Subcommand 1".to_string()),
+                            commands: None,
                             submenu: None,
                             hotkey: Some("Ctrl+Shift+S".to_string()),
                         },
                         CommandConfig {
                             name: "Subcommand 2".to_string(),
                             command: Some("echo Subcommand 2".to_string()),
+                            commands: None,
                             submenu: None,
                             hotkey: None,
                         },
@@ -129,12 +145,13 @@ impl Config {
         };
 
         let commands: Vec<CommandConfig> = self.commands.iter().map(|command| {
-            if command.name.is_empty() || (command.command.is_none() && command.submenu.is_none()) {
+            if command.name.is_empty() || (command.command.is_none() && command.submenu.is_none() && command.commands.is_none()) {
                 CommandConfig {
                     name: "Example Command".to_string(),
                     command: Some("echo Hello, world!".to_string()),
                     submenu: None,
                     hotkey: None,
+                    commands: None,
                 }
             } else {
                 CommandConfig {
@@ -142,6 +159,7 @@ impl Config {
                     command: command.command.clone(),
                     submenu: command.submenu.clone(),
                     hotkey: command.hotkey.clone(),
+                    commands: command.commands.clone(),
                 }
             }
         }).collect();

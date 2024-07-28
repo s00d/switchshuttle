@@ -11,6 +11,16 @@ fn read_script(script_path: &str) -> Option<String> {
 }
 
 pub fn execute_command(command_config: &CommandConfig, terminal: &str, launch_in: &str, theme: &String, title: &String) {
+    let mut commands_to_execute = Vec::new();
+
+    if let Some(command) = &command_config.command {
+        commands_to_execute.push(command.clone());
+    }
+
+    if let Some(commands) = &command_config.commands {
+        commands_to_execute.extend(commands.clone());
+    }
+
     if cfg!(target_os = "macos") {
         let script_path = match (terminal, launch_in) {
             ("iterm", "current") => "iTerm-Current.scpt",
@@ -19,7 +29,6 @@ pub fn execute_command(command_config: &CommandConfig, terminal: &str, launch_in
             ("terminal", "current") => "Terminal-Current.scpt",
             ("terminal", "new_tab") => "Terminal-Tab.scpt",
             ("terminal", "new_window") => "Terminal-Window.scpt",
-
             ("warp", "current") => "Warp-Current.scpt",
             ("warp", "new_tab") => "Warp-Tab.scpt",
             ("warp", "new_window") => "Warp-Window.scpt",
@@ -39,34 +48,50 @@ pub fn execute_command(command_config: &CommandConfig, terminal: &str, launch_in
             }
         };
 
-        let command = command_config.command.as_deref().unwrap_or("");
+        for command in commands_to_execute {
+            let script = script_content.replace("{command}", &command)
+                .replace("{theme}", theme)
+                .replace("{title}", title);
 
-        let script = script_content.replace("{command}", command)
-            .replace("{theme}", theme)
-            .replace("{title}", title);
-
-        Command::new("osascript")
-            .arg("-e")
-            .arg(script)
-            .spawn()
-            .expect("Failed to execute command");
-    } else if cfg!(target_os = "windows") {
-        if let Some(command) = &command_config.command {
-            Command::new("cmd")
-                .args(&["/C", command])
-                .spawn()
+            let status = Command::new("osascript")
+                .arg("-e")
+                .arg(&script)
+                .status()
                 .expect("Failed to execute command");
+
+            if !status.success() {
+                println!("Command failed: {}", command);
+                break;
+            }
+        }
+    } else if cfg!(target_os = "windows") {
+        for command in commands_to_execute {
+            let status = Command::new("cmd")
+                .args(&["/C", &command])
+                .status()
+                .expect("Failed to execute command");
+
+            if !status.success() {
+                println!("Command failed: {}", command);
+                break;
+            }
         }
     } else if cfg!(target_os = "linux") {
-        if let Some(command) = &command_config.command {
-            Command::new("sh")
+        for command in commands_to_execute {
+            let status = Command::new("sh")
                 .arg("-c")
-                .arg(command)
-                .spawn()
+                .arg(&command)
+                .status()
                 .expect("Failed to execute command");
+
+            if !status.success() {
+                println!("Command failed: {}", command);
+                break;
+            }
         }
     }
 }
+
 
 pub fn open_in_default_editor(path: &PathBuf) {
     #[cfg(target_os = "macos")]
