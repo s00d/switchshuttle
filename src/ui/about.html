@@ -48,16 +48,19 @@
     <button onclick="onClose()">OK</button>
 </div>
 <script>
-    const { emit, listen } = window.__TAURI__.event;
-    const appWindow = window.__TAURI__.window;
+    const { invoke } = window.__TAURI__.tauri;
+    const { getCurrent } = window.__TAURI__.window;
 
-    listen("about_message", ev => {
-        document.getElementById('message').innerText = ev.payload;
-    });
+    async function loadMessage() {
+        const message = await invoke('get_about_message');
+        document.getElementById('message').innerText = message;
+    }
 
     function onClose() {
-        appWindow.getCurrent().hide();
+        getCurrent().close();
     }
+
+    loadMessage();
 </script>
 </body>
 </html>

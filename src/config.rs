@@ -1,10 +1,10 @@
 use std::{fs, io};
+use std::collections::HashMap;
 use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct Config {
-    pub menu_title: String,
     pub terminal: String,
     pub launch_in: String,
     pub theme: String,
@@ -12,9 +12,10 @@ pub struct Config {
     pub commands: Vec<CommandConfig>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct CommandConfig {
     pub name: String,
+    pub inputs: Option<HashMap<String, String>>,
     pub command: Option<String>,
     pub commands: Option<Vec<String>>,
     pub submenu: Option<Vec<CommandConfig>>,
@@ -22,9 +23,8 @@ pub struct CommandConfig {
 }
 
 impl Config {
-    fn new(terminal: &str, launch_in: &str, theme: &str, title: &str, menu_title: &str, commands: Vec<CommandConfig>) -> Self {
+    fn new(terminal: &str, launch_in: &str, theme: &str, title: &str, commands: Vec<CommandConfig>) -> Self {
         Config {
-            menu_title: menu_title.to_string(),
             terminal: terminal.to_string(),
             launch_in: launch_in.to_string(),
             theme: theme.to_string(),
@@ -39,7 +39,7 @@ impl Config {
         Ok(config)
     }
 
-    fn save(&self, path: &PathBuf) -> io::Result<()> {
+    pub(crate) fn save(&self, path: &PathBuf) -> io::Result<()> {
         let config_data = serde_json::to_string_pretty(&self)?;
         fs::write(path, config_data)?;
         Ok(())
@@ -51,47 +51,63 @@ impl Config {
             "current",
             "Homebrew",
             "New tab",
-            "Commands",
             vec![
                 CommandConfig {
-                    name: "Example Command".to_string(),
-                    command: Some("echo Hello, world!".to_string()),
-                    commands: None,
-                    submenu: None,
-                    hotkey: Some("Ctrl+Shift+E".to_string()),
-                },
-                CommandConfig {
-                    name: "Example Multi-Command".to_string(),
+                    name: "Command".to_string(),
                     command: None,
-                    submenu: None,
-                    hotkey: Some("Ctrl+Shift+M".to_string()),
-                    commands: Some(vec![
-                        "export MY_VAR=$(echo 'Step 1: Initialize')".to_string(), // Создание переменной
-                        "RESULT=$(echo 'Step 2: Process' && echo $MY_VAR)".to_string(), // Использование переменной
-                        "echo Step 3: Finalize && echo $RESULT".to_string(), // Вывод результата
-                    ]),
-                },
-                CommandConfig {
-                    name: "Example Submenu".to_string(),
-                    command: None,
+                    inputs: None,
                     commands: None,
-                    hotkey: None,
                     submenu: Some(vec![
                         CommandConfig {
-                            name: "Subcommand 1".to_string(),
-                            command: Some("echo Subcommand 1".to_string()),
+                            name: "Example Command".to_string(),
+                            command: Some("echo Hello, world!".to_string()),
+                            inputs: None,
                             commands: None,
                             submenu: None,
-                            hotkey: Some("Ctrl+Shift+S".to_string()),
+                            hotkey: Some("Ctrl+Shift+E".to_string()),
                         },
                         CommandConfig {
-                            name: "Subcommand 2".to_string(),
-                            command: Some("echo Subcommand 2".to_string()),
-                            commands: None,
+                            name: "Example Multi-Command with input".to_string(),
+                            command: None,
                             submenu: None,
+                            hotkey: Some("Ctrl+Shift+M".to_string()),
+                            commands: Some(vec![
+                                "export MY_VAR=$(echo 'Step 1: [key1]')".to_string(),
+                                "RESULT=$(echo 'Step 2: [key2]' && echo $MY_VAR)".to_string(),
+                                "echo Step 3: Finalize && echo $RESULT".to_string(),
+                            ]),
+                            inputs: Some(HashMap::from([
+                                ("key1".to_string(), "default1".to_string()),
+                                ("key2".to_string(), "default2".to_string())
+                            ])),
+                        },
+                        CommandConfig {
+                            name: "Example Submenu".to_string(),
+                            inputs: None,
+                            command: None,
+                            commands: None,
                             hotkey: None,
+                            submenu: Some(vec![
+                                CommandConfig {
+                                    name: "Subcommand 1".to_string(),
+                                    inputs: None,
+                                    command: Some("echo Subcommand 1".to_string()),
+                                    commands: None,
+                                    submenu: None,
+                                    hotkey: Some("Ctrl+Shift+S".to_string()),
+                                },
+                                CommandConfig {
+                                    name: "Subcommand 2".to_string(),
+                                    inputs: None,
+                                    command: Some("echo Subcommand 2".to_string()),
+                                    commands: None,
+                                    submenu: None,
+                                    hotkey: None,
+                                },
+                            ]),
                         },
                     ]),
+                    hotkey: None,
                 },
             ],
         )
@@ -137,13 +153,6 @@ impl Config {
             self.title.clone()
         };
 
-        let menu_title = if self.menu_title.is_empty() {
-            println!("Menu title is empty. Using default 'Commands'.");
-            "Commands".to_string()
-        } else {
-            self.menu_title.clone()
-        };
-
         let commands: Vec<CommandConfig> = self.commands.iter().map(|command| {
             if command.name.is_empty() || (command.command.is_none() && command.submenu.is_none() && command.commands.is_none()) {
                 CommandConfig {
@@ -152,6 +161,7 @@ impl Config {
                     submenu: None,
                     hotkey: None,
                     commands: None,
+                    inputs: None,
                 }
             } else {
                 CommandConfig {
@@ -160,10 +170,11 @@ impl Config {
                     submenu: command.submenu.clone(),
                     hotkey: command.hotkey.clone(),
                     commands: command.commands.clone(),
+                    inputs: command.inputs.clone(),
                 }
             }
         }).collect();
 
-        Config::new(&terminal, &launch_in, &theme, &title, &menu_title, commands)
+        Config::new(&terminal, &launch_in, &theme, &title, commands)
     }
 }

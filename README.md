@@ -4,11 +4,9 @@
 
 SwitchShuttle is a cross-platform system tray application that allows users to run predefined commands in various terminal applications. It supports macOS, Windows, and Linux, offering a simple and customizable way to manage and execute your frequently used commands.
 
-
 ## About
 
 SwitchShuttle is a reimagining and extension of the [Shuttle](https://github.com/fitztrev/shuttle) application. While Shuttle provides a simple and effective way to manage commands shortcuts in macOS, SwitchShuttle expands upon this concept, offering support for multiple operating systems and terminal emulators, along with enhanced configuration capabilities and user customization options.
-
 
 ## Features
 
@@ -18,6 +16,7 @@ SwitchShuttle is a reimagining and extension of the [Shuttle](https://github.com
 - Edit configuration directly from the tray menu.
 - Open configuration folder from the tray menu.
 - Supports submenus for better organization of commands.
+- Supports dynamic inputs for commands.
 
 ## Configuration
 
@@ -27,76 +26,92 @@ Here is an example of a configuration file:
 
 ```json
 {
-   "menu_title": "My Custom Commands",
-   "terminal": "iterm",
-   "launch_in": "new_tab",
-   "theme": "Homebrew",
-   "title": "New tab",
-   "commands": [
-      {
-         "name": "Example Command",
-         "command": "echo Hello, world!",
-         "submenu": null,
-         "hotkey": "Ctrl+Shift+R",
-         "commands": null
-      },
-      {
-         "name": "Example Submenu",
-         "command": null,
-         "hotkey": null,
-         "submenu": [
+  "terminal": "iterm",
+  "launch_in": "current",
+  "theme": "Homebrew",
+  "title": "New tab",
+  "commands": [
+    {
+      "name": "Command",
+      "inputs": null,
+      "command": null,
+      "commands": null,
+      "hotkey": null,
+      "submenu": [
+        {
+          "name": "Example Command",
+          "inputs": null,
+          "command": "echo Hello, world!",
+          "commands": null,
+          "submenu": null,
+          "hotkey": "Ctrl+Shift+E"
+        },
+        {
+          "name": "Example Multi-Command with input",
+          "inputs": {
+            "key1": "default1",
+            "key2": "default2"
+          },
+          "command": null,
+          "commands": [
+            "export MY_VAR=$(echo 'Step 1: [key1]')",
+            "RESULT=$(echo 'Step 2: [key2]' && echo $MY_VAR)",
+            "echo Step 3: Finalize && echo $RESULT"
+          ],
+          "submenu": null,
+          "hotkey": "Ctrl+Shift+M"
+        },
+        {
+          "name": "Example Submenu",
+          "inputs": null,
+          "command": null,
+          "commands": null,
+          "submenu": [
             {
-               "name": "Subcommand 1",
-               "command": "echo Subcommand 1",
-               "submenu": null,
-               "hotkey": null,
-               "commands": null
+              "name": "Subcommand 1",
+              "inputs": null,
+              "command": "echo Subcommand 1",
+              "commands": null,
+              "submenu": null,
+              "hotkey": "Ctrl+Shift+S"
             },
             {
-               "name": "Subcommand 2",
-               "command": "echo Subcommand 2",
-               "submenu": null,
-               "hotkey": null,
-               "commands": null
+              "name": "Subcommand 2",
+              "inputs": null,
+              "command": "echo Subcommand 2",
+              "commands": null,
+              "submenu": null,
+              "hotkey": null
             }
-         ],
-         "commands": null
-      },
-      {
-         "name": "Example Multi-Command",
-         "command": null,
-         "hotkey": "Ctrl+Shift+M",
-         "submenu": null,
-         "commands": [
-            "export MY_VAR=$(echo 'Step 1: Initialize')",
-            "RESULT=$(echo 'Step 2: Process' && echo $MY_VAR)",
-            "echo Step 3: Finalize && echo $RESULT"
-         ]
-      }
-   ]
+          ],
+          "hotkey": null
+        }
+      ]
+    }
+  ]
 }
 ```
 
 ### Configuration Parameters
 
-| Parameter  | Type   | Description                                     | Valid Values                          |
-|------------|--------|-------------------------------------------------|---------------------------------------|
-| menu_title | String | The title for the menu representing this config | Any string value                      |
-| terminal   | String | The terminal application to use                 | "iterm", "terminal", "warp"           |
-| launch_in  | String | Where to launch the command                     | "current", "new_tab", "new_window"    |
-| theme      | String | The theme to use (if supported by the terminal) | Any string value representing a theme |
-| title      | String | The title to set for the terminal window/tab    | Any string value                      |
-| commands   | Array  | List of command configurations                  | See below for command parameters      |
+| Parameter | Type   | Description                                      | Valid Values                          |
+|-----------|--------|--------------------------------------------------|---------------------------------------|
+| terminal  | String | The terminal application to use                  | "iterm", "terminal", "warp"           |
+| launch_in | String | Where to launch the command                      | "current", "new_tab", "new_window"    |
+| theme     | String | The theme to use (if supported by the terminal)  | Any string value representing a theme |
+| title     | String | The title to set for the terminal window/tab     | Any string value                      |
+| commands  | Array  | List of command configurations                   | See below for command parameters      |
 
 ### Command Parameters
 
-| Parameter | Type              | Description                                   | Valid Values                                       |
-|-----------|-------------------|-----------------------------------------------|----------------------------------------------------|
-| name      | String            | The name of the command or submenu            | Any string value                                   |
-| command   | String (Optional) | The command to execute (if this is a command) | Any string value representing a command            |
-| submenu   | Array (Optional)  | List of subcommands (if this is a submenu)    | See above for command parameters                   |
-| hotkey    | String (Optional) | The global hotkey to trigger the command      | Any valid hotkey combination, e.g., "Ctrl+Shift+E" |
-| commands  | Array (Optional)  | List of commands to execute sequentially      | Any array of strings, each string a command        |
+| Parameter | Type              | Description                                    | Valid Values                                       |
+|-----------|-------------------|------------------------------------------------|----------------------------------------------------|
+| name      | String            | The name of the command or submenu             | Any string value                                   |
+| inputs    | Object (Optional) | Key-value pairs for inputs                     | {"key1": "default1", "key2": "default2"}           |
+| command   | String (Optional) | The command to execute (if this is a command)  | Any string value representing a command            |
+| commands  | Array (Optional)  | List of commands to execute sequentially       | Any array of strings, each string a command        |
+| submenu   | Array (Optional)  | List of subcommands (if this is a submenu)     | See above for command parameters                   |
+| hotkey    | String (Optional) | The global hotkey to trigger the command       | Any valid hotkey combination, e.g., "Ctrl+Shift+E" |
 
 ### Command Execution Logic
 
@@ -108,19 +123,27 @@ SwitchShuttle supports defining a single command using the `command` parameter, 
 2. **Multiple Commands**: If only `commands` is specified, each command in the list is executed sequentially.
 3. **Both Command and Commands**: If both `command` and `commands` are specified, the single command is executed first, followed by each command in the `commands` list.
 
-### Example Configuration with Both Command and Commands
+### Dynamic Inputs
+
+SwitchShuttle allows you to define dynamic inputs for commands. These inputs will be requested from the user before the command is executed. You can define inputs using the `inputs` parameter in the command configuration.
+
+#### Example Configuration with Inputs
 
 ```json
 {
-  "name": "Example Combined Command",
-  "command": "echo Starting sequence...",
-  "hotkey": "Ctrl+Shift+C",
-  "submenu": null,
+  "name": "Example Multi-Command with input",
+  "inputs": {
+    "key1": "default1",
+    "key2": "default2"
+  },
+  "command": null,
   "commands": [
-    "echo Step 1: Initialize",
-    "echo Step 2: Process",
-    "echo Step 3: Finalize"
-  ]
+    "export MY_VAR=$(echo 'Step 1: [key1]')",
+    "RESULT=$(echo 'Step 2: [key2]' && echo $MY_VAR)",
+    "echo Step 3: Finalize && echo $RESULT"
+  ],
+  "submenu": null,
+  "hotkey": "Ctrl+Shift+M"
 }
 ```
 
@@ -195,12 +218,13 @@ If you are on macOS, you may need to sign the application before running it. Her
 chmod +x /Applications/switch-shuttle.app
 ```
 
-2. Clear extended attributes and sign the binary:
+2. Clear extended attributes
+
+and sign the binary:
 
 ```bash
 xattr -cr /Applications/switch-shuttle.app && codesign --force --deep --sign - /Applications/switch-shuttle.app
 ```
-
 
 ## Contributing
 

@@ -1,7 +1,8 @@
-use std::fs;
+use std::{fs};
 use std::path::PathBuf;
 use std::process::Command;
 use include_dir::{Dir, include_dir};
+use tauri::{Manager, WindowBuilder, WindowUrl};
 use crate::config::CommandConfig;
 
 static SCRIPTS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/scripts");
@@ -127,6 +128,7 @@ pub fn get_config_path() -> PathBuf {
     config_path
 }
 
+
 pub fn open_folder_in_default_explorer(path: &PathBuf) {
     #[cfg(target_os = "macos")]
     {
@@ -150,5 +152,35 @@ pub fn open_folder_in_default_explorer(path: &PathBuf) {
             .arg(path)
             .spawn()
             .expect("Failed to open folder in default explorer");
+    }
+}
+
+pub fn create_window(app: &tauri::AppHandle, label: &str, title: &str, url: &str, width: f64, height: f64) -> tauri::Window {
+    match app.get_window(label) {
+        Some(window) => {
+            window.show().unwrap_or_else(|e| println!("Failed to show window: {:?}", e));
+            window.set_focus().expect("Failed to set focus on window");
+            window
+        },
+        None => {
+            let window = WindowBuilder::new(
+                app,
+                label,
+                WindowUrl::App(url.into())
+            )
+                .title(title)
+                .fullscreen(false)
+                .resizable(false)
+                .decorations(false)
+                .inner_size(width, height)
+                .always_on_top(true)
+                .build()
+                .expect("Failed to create window");
+
+            window.show().unwrap_or_else(|e| println!("Failed to show window: {:?}", e));
+            window.set_focus().expect("Failed to set focus on window");
+
+            window
+        }
     }
 }

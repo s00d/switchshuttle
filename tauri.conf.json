@@ -6,57 +6,33 @@
   },
   "package": {
     "productName": "switch-shuttle",
-    "version": "1.0.7"
+    "version": "1.1.0"
   },
   "tauri": {
     "windows": [
       {
-        "label": "loading",
-        "title": "Loading",
-        "url": "ui/loading.html",
+        "label": "main",
+        "title": "Main",
+        "url": "ui/main.html",
         "width": 400,
         "height": 200,
         "fullscreen": false,
         "resizable": false,
         "decorations": false,
         "visible": false,
-        "alwaysOnTop": true
+        "alwaysOnTop": false
       },
       {
-        "label": "about",
-        "url": "ui/about.html",
-        "title": "About",
-        "fullscreen": false,
-        "resizable": false,
-        "decorations": false,
+        "label": "input_window",
+        "title": "Provide Inputs",
+        "url": "ui/inputs.html",
         "width": 400,
-        "height": 200,
-        "visible": false,
-        "alwaysOnTop": true
-      },
-      {
-        "label": "update",
-        "url": "ui/update.html",
-        "title": "Update",
+        "height": 400,
         "fullscreen": false,
         "resizable": false,
         "decorations": false,
-        "width": 400,
-        "height": 200,
         "visible": false,
-        "alwaysOnTop": true
-      },
-      {
-        "label": "config_editor",
-        "url": "ui/editor.html",
-        "title": "Config Editor",
-        "fullscreen": false,
-        "resizable": false,
-        "decorations": false,
-        "width": 800,
-        "height": 600,
-        "visible": false,
-        "alwaysOnTop": true
+        "alwaysOnTop": false
       }
     ],
     "systemTray": {
