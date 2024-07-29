@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Config</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px 30px;
+            text-align: center;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 24px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            margin: 10px 5px;
+            flex: 1;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .cancel-button {
+            background-color: #dc3545;
+        }
+
+        .cancel-button:hover {
+            background-color: #c82333;
+        }
+
+        #error-message {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Create New Config</h1>
+    <form id="configForm">
+        <label for="fileName">File Name:</label>
+        <input type="text" id="fileName" name="fileName" placeholder="Enter file name (without .json)" required>
+        <div id="error-message"></div>
+        <div class="buttons">
+            <button type="submit">Create</button>
+            <button type="button" class="cancel-button" onclick="onClose()">Cancel</button>
+        </div>
+    </form>
+
+</div>
+<script>
+    document.getElementById('configForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const fileName = document.getElementById('fileName').value;
+        window.__TAURI__.invoke('create_new_config', { fileName }).then(() => {
+            onClose();
+        }).catch((error) => {
+            document.getElementById('error-message').innerText = error;
+        });
+    });
+
+    function onClose() {
+        window.__TAURI__.window.getCurrent().close();
+    }
+</script>
+</body>
+</html>
