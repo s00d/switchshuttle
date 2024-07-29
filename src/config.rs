@@ -10,6 +10,7 @@ pub struct Config {
     pub theme: String,
     pub title: String,
     pub commands: Vec<CommandConfig>,
+    pub menu_hotkey: Option<String>
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -23,12 +24,13 @@ pub struct CommandConfig {
 }
 
 impl Config {
-    fn new(terminal: &str, launch_in: &str, theme: &str, title: &str, commands: Vec<CommandConfig>) -> Self {
+    fn new(terminal: &str, launch_in: &str, theme: &str, title: &str, menu_hotkey: Option<String>, commands: Vec<CommandConfig>) -> Self {
         Config {
             terminal: terminal.to_string(),
             launch_in: launch_in.to_string(),
             theme: theme.to_string(),
             title: title.to_string(),
+            menu_hotkey,
             commands,
         }
     }
@@ -51,6 +53,7 @@ impl Config {
             "current",
             "Homebrew",
             "New tab",
+            Some("Ctrl+Shift+M".parse().unwrap()),
             vec![
                 CommandConfig {
                     name: "Command".to_string(),
@@ -153,6 +156,12 @@ impl Config {
             self.title.clone()
         };
 
+        let menu_hotkey = if self.menu_hotkey.is_none() {
+            None
+        } else {
+            self.menu_hotkey.clone()
+        };
+
         let commands: Vec<CommandConfig> = self.commands.iter().map(|command| {
             if command.name.is_empty() || (command.command.is_none() && command.submenu.is_none() && command.commands.is_none()) {
                 CommandConfig {
@@ -175,6 +184,7 @@ impl Config {
             }
         }).collect();
 
-        Config::new(&terminal, &launch_in, &theme, &title, commands)
+        Config::new(&terminal, &launch_in, &theme, &title, menu_hotkey, commands)
     }
 }
+

@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2024-07-30
+### Added
+- Introduced context menu triggered by a hotkey. Users can now open a context menu at the cursor's position using a predefined hotkey.
+
+### Fixed
+- Fixed hotkey event handling to only trigger actions on key release, ensuring more precise and expected behavior.
+
 ## [1.1.0] - 2024-07-29
 ### Added
 - Introduced input fields for commands. Now commands can have input fields specified in the configuration file. When a command with inputs is triggered, a form will be displayed to the user to provide the necessary values. These values are then substituted into the command before execution.

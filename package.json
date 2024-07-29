@@ -1,0 +1,15 @@
+{
+  "name": "switchshuttle",
+  "version": "1.0.0",
+  "description": "![SwitchShuttle](https://raw.githubusercontent.com/s00d/switchshuttle/main/logo.webp)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tauri-apps/api": "^1.6.0",
+    "tauri-plugin-context-menu": "^0.8.0"
+  }
+}
