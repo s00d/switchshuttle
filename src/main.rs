@@ -3,20 +3,23 @@
 
 mod config;
 mod helpers;
+mod commands;
 
 use std::{fs, collections::HashMap, sync::Mutex, thread};
 use std::path::PathBuf;
 use std::str::FromStr;
-use tauri::{CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem, SystemTraySubmenu};
+use tauri::{CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem, SystemTraySubmenu, Window};
 use auto_launch::*;
 use tauri::utils::platform::current_exe;
 use crate::config::{CommandConfig, Config};
 use crate::helpers::{create_window, execute_command, get_config_path, open_folder_in_default_explorer, open_in_default_editor};
-use global_hotkey::{GlobalHotKeyManager, GlobalHotKeyEvent, hotkey::{HotKey}};
+use global_hotkey::{GlobalHotKeyManager, GlobalHotKeyEvent, hotkey::{HotKey}, HotKeyState};
+use mouse_position::mouse_position::Mouse;
 use once_cell::sync::Lazy;
-use reqwest::blocking::Client;
-use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
 use serde::Deserialize;
+use serde_json::json;
+use crate::commands::{check_for_updates, create_new_config, execute, execute_command_with_inputs, get_about_message, get_menu_data, get_version};
+
 
 #[derive(Deserialize)]
 struct GitHubRelease {
@@ -125,161 +128,17 @@ fn create_system_tray_menu(autostart: bool) -> SystemTrayMenu {
 }
 
 #[tauri::command]
-fn create_new_config(file_name: String) -> std::result::Result<(), String> {
-    if file_name.ends_with(".json") {
-        return Err("File name should not include the .json extension".into());
-    }
-
-    let config_path = get_config_path();
-    let config_dir = config_path.parent().unwrap().to_path_buf();
-
-    let new_config_path = config_dir.join(format!("{}.json", file_name));
-
-    if new_config_path.exists() {
-        return Err("File already exists".into());
-    }
-
-    let new_config = Config::default_config();
-    new_config.save(&new_config_path).map_err(|e| e.to_string())?;
-    open_in_default_editor(&new_config_path);
-
-    Ok(())
-}
-
-#[tauri::command]
-fn get_about_message(app: tauri::AppHandle) -> String {
-    let tauri_version = app.package_info().version.to_string();
-    format!("SwitchShuttle v{} \n\n by s00d.", tauri_version)
-}
-
-
-#[tauri::command]
-fn check_for_updates(app: tauri::AppHandle) -> std::result::Result<(String, String), String> {
-    let current_version = app.package_info().version.to_string();
-    let latest_release_url = "https://api.github.com/repos/s00d/switchshuttle/releases/latest";
-
-    let mut headers = HeaderMap::new();
-    headers.insert(USER_AGENT, HeaderValue::from_str("switchshuttle").unwrap());
-
-    let client = Client::builder()
-        .default_headers(headers)
-        .build()
-        .map_err(|e| e.to_string())?;
-
-    let response = client.get(latest_release_url).send().map_err(|e| e.to_string())?;
-
-    let latest_release: GitHubRelease = response.json().map_err(|e| e.to_string())?;
-
-    let version = latest_release.tag_name.replace("app-v", "");
-    if version != current_version {
-        let update_message = format!(
-            "A new version (v{}) is available! You are currently using v{}.",
-            version, current_version
-        );
-        Ok((update_message, latest_release.html_url))
-    } else {
-        Err("You are using the latest version.".to_string())
-    }
-}
-
-#[tauri::command]
-fn get_version(app: tauri::AppHandle) -> String {
-    app.package_info().version.to_string()
-}
-
-#[tauri::command]
-fn execute_command_with_inputs(inputs: HashMap<String, String>, command: String) -> std::result::Result<(), String> {
-    println!("execute_command_with_inputs {:?} {:?}", inputs, command);
-
-    let config_path = get_config_path();
-    let config_dir = config_path.parent().unwrap().to_path_buf();
-    let (_files, configs) = load_all_configs(&config_dir);
-
-    let mut command_found = false;
-
-    for config in configs {
-        if let Some(mut command) = config.commands.iter().find(|c| c.name == command).cloned() {
-            command_found = true;
-
-            if let Some(ref mut cmd) = command.command {
-                for (key, value) in &inputs {
-                    *cmd = cmd.replace(&format!("[{}]", key), value);
-                }
-            }
-
-            if let Some(ref mut cmds) = command.commands {
-                for cmd in cmds {
-                    for (key, value) in &inputs {
-                        *cmd = cmd.replace(&format!("[{}]", key), value);
-                    }
-                }
-            }
-
-            println!("execute_command_with_inputs {:?}", command);
-
-            execute_command(&command, &config.terminal, &config.launch_in, &config.theme, &config.title);
-        }
-    }
-
-    if command_found {
-        Ok(())
-    } else {
-        Err("Command not found".to_string())
-    }
+fn show_context_menu(window: Window, x: i32, y: i32) {
+    window.set_position(tauri::Position::Physical(tauri::PhysicalPosition::new(0, 0))).unwrap();
+    // window.show().unwrap();
+    // window.set_focus().unwrap();
+    window.emit("show_context_menu", {}).unwrap();
+    window.emit("menu-did-open", json!({ "x": x, "y": y })).unwrap();
 }
 
 fn main() {
     let config_path = get_config_path();
     Config::ensure_default(&config_path).expect("Failed to ensure default config");
-
-    thread::spawn(move || {
-        // Регистрация глобальных горячих клавиш в основном потоке
-        let manager = GlobalHotKeyManager::new().unwrap();
-
-        // Регистрация глобальных горячих клавиш
-        let config_dir = config_path.parent().unwrap().to_path_buf();
-        let (_files, configs) = load_all_configs(&config_dir);
-        for config in configs {
-            for command in config.commands {
-                if let Some(hotkey) = &command.hotkey {
-
-                    let hotkey = match HotKey::from_str(hotkey) {
-                        Ok(hk) => hk,
-                        Err(err) => {
-                            eprintln!("Failed to parse hotkey {}: {}", hotkey, err);
-                            continue;
-                        }
-                    };
-
-                    manager.register(hotkey).unwrap();
-
-                    // Сохранение команды и конфигурации для вызова по горячей клавише
-                    HOTKEY_COMMAND_MAP.lock().unwrap().insert(hotkey.id(), (
-                        command.clone(),
-                        config.terminal.clone(),
-                        config.launch_in.clone(),
-                        config.theme.clone(),
-                        config.title.clone()
-                    ));
-                }
-            }
-        }
-        loop {
-            if let Ok(event) = GlobalHotKeyEvent::receiver().try_recv() {
-                println!("{:?}", event);
-            }
-            match GlobalHotKeyEvent::receiver().try_recv() {
-                Ok(event) => {
-                    println!("{:?}", event);
-                    if let Some((command, terminal, launch_in, theme, title)) = HOTKEY_COMMAND_MAP.lock().unwrap().get(&event.id) {
-                        execute_command(command, terminal, launch_in, theme, title);
-                    }
-                }
-                _ => {}
-            }
-        }
-
-    });
 
     let system_tray_menu = create_system_tray_menu(false);
 
@@ -293,8 +152,9 @@ fn main() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![create_new_config, get_about_message, check_for_updates, get_version, execute_command_with_inputs])
+        .invoke_handler(tauri::generate_handler![create_new_config, get_about_message, check_for_updates, get_version, execute_command_with_inputs, get_menu_data, execute])
         .system_tray(SystemTray::new().with_menu(system_tray_menu))
+        .plugin(tauri_plugin_context_menu::init())
         .on_system_tray_event(move |app, event| {
             let config_path = get_config_path();
             let config_dir = config_path.parent().unwrap().to_path_buf();
@@ -375,6 +235,96 @@ fn main() {
         })
         .build(tauri::generate_context!())
         .expect("error while running tauri application");
+
+
+    let app_handle = app.app_handle();
+
+    thread::spawn(move || {
+        let app_handle = app_handle.clone();
+        // Регистрация глобальных горячих клавиш в основном потоке
+        let manager = GlobalHotKeyManager::new().unwrap();
+
+        // Регистрация глобальных горячих клавиш
+        let config_dir = config_path.parent().unwrap().to_path_buf();
+        let (_files, configs) = load_all_configs(&config_dir);
+        for config in configs {
+            for command in config.commands {
+                if let Some(hotkey) = &command.hotkey {
+
+                    let hotkey = match HotKey::from_str(hotkey) {
+                        Ok(hk) => hk,
+                        Err(err) => {
+                            eprintln!("Failed to parse hotkey {}: {}", hotkey, err);
+                            continue;
+                        }
+                    };
+
+                    manager.register(hotkey).unwrap();
+
+                    // Сохранение команды и конфигурации для вызова по горячей клавише
+                    HOTKEY_COMMAND_MAP.lock().unwrap().insert(hotkey.id(), (
+                        command.clone(),
+                        config.terminal.clone(),
+                        config.launch_in.clone(),
+                        config.theme.clone(),
+                        config.title.clone()
+                    ));
+                }
+            }
+
+            if let Some(menu_hotkey) = config.menu_hotkey {
+                let hotkey = match HotKey::from_str(&menu_hotkey) {
+                    Ok(hk) => hk,
+                    Err(err) => {
+                        eprintln!("Failed to parse hotkey {}: {}", menu_hotkey, err);
+                        continue;
+                    }
+                };
+                manager.register(hotkey).unwrap();
+
+                HOTKEY_COMMAND_MAP.lock().unwrap().insert(hotkey.id(), (
+                    CommandConfig {
+                        name: "show_context_menu".to_string(),
+                        command: None,
+                        submenu: None,
+                        hotkey: Some(menu_hotkey),
+                        commands: None,
+                        inputs: None,
+                    },
+                    "".to_string(),
+                    "".to_string(),
+                    "".to_string(),
+                    "".to_string()
+                ));
+            }
+        }
+        loop {
+            match GlobalHotKeyEvent::receiver().try_recv() {
+                Ok(event) => {
+                    println!("{:?}", event);
+                    if event.state == HotKeyState::Released {
+                        if let Some((command, terminal, launch_in, theme, title)) = HOTKEY_COMMAND_MAP.lock().unwrap().get(&event.id) {
+                            if command.name == "show_context_menu" {
+                                // Получение позиции курсора
+
+                                let position = Mouse::get_mouse_position();
+                                match position {
+                                    Mouse::Position { x, y } => {
+                                        let app_handle = app_handle.clone();
+                                        show_context_menu(app_handle.get_window("main").unwrap(), x, y);
+                                    },
+                                    Mouse::Error => println!("Error getting mouse position"),
+                                }
+                            } else {
+                                execute_command(command, terminal, launch_in, theme, title);
+                            }
+                        }
+                    }
+                }
+                _ => {}
+            }
+        }
+    });
 
     app.run(|_app_handle, _event| {});
 }

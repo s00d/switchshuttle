@@ -1,6 +1,4 @@
-![SwitchShuttle](https://raw.githubusercontent.com/s00d/switchshuttle/main/logo.webp)
-
-# SwitchShuttle
+## SwitchShuttle
 
 SwitchShuttle is a cross-platform system tray application that allows users to run predefined commands in various terminal applications. It supports macOS, Windows, and Linux, offering a simple and customizable way to manage and execute your frequently used commands.
 
@@ -17,10 +15,13 @@ SwitchShuttle is a reimagining and extension of the [Shuttle](https://github.com
 - Open configuration folder from the tray menu.
 - Supports submenus for better organization of commands.
 - Supports dynamic inputs for commands.
+- **New**: Trigger context menu with a hotkey.
 
 ## Configuration
 
 The configuration is stored in JSON files located in the user's configuration directory. The default path is `~/.config/switch-shuttle/` on Linux and macOS, and `C:\Users\<Username>\AppData\Roaming\switch-shuttle\` on Windows. You can store multiple configuration files in this directory, each representing a different set of commands and settings.
+
+**Note:** It is recommended to give unique names to all commands to ensure all functionalities work correctly.
 
 Here is an example of a configuration file:
 
@@ -30,6 +31,7 @@ Here is an example of a configuration file:
   "launch_in": "current",
   "theme": "Homebrew",
   "title": "New tab",
+  "menu_hotkey": "Ctrl+Shift+M",
   "commands": [
     {
       "name": "Command",
@@ -94,13 +96,14 @@ Here is an example of a configuration file:
 
 ### Configuration Parameters
 
-| Parameter | Type   | Description                                      | Valid Values                          |
-|-----------|--------|--------------------------------------------------|---------------------------------------|
-| terminal  | String | The terminal application to use                  | "iterm", "terminal", "warp"           |
-| launch_in | String | Where to launch the command                      | "current", "new_tab", "new_window"    |
-| theme     | String | The theme to use (if supported by the terminal)  | Any string value representing a theme |
-| title     | String | The title to set for the terminal window/tab     | Any string value                      |
-| commands  | Array  | List of command configurations                   | See below for command parameters      |
+| Parameter   | Type              | Description                                     | Valid Values                                       |
+|-------------|-------------------|-------------------------------------------------|----------------------------------------------------|
+| terminal    | String            | The terminal application to use                 | "iterm", "terminal", "warp"                        |
+| launch_in   | String            | Where to launch the command                     | "current", "new_tab", "new_window"                 |
+| theme       | String            | The theme to use (if supported by the terminal) | Any string value representing a theme              |
+| title       | String            | The title to set for the terminal window/tab    | Any string value                                   |
+| menu_hotkey | String (Optional) | The global hotkey to trigger the context menu   | Any valid hotkey combination, e.g., "Ctrl+Shift+M" |
+| commands    | Array             | List of command configurations                  | See below for command parameters                   |
 
 ### Command Parameters
 
@@ -208,7 +211,9 @@ To create submenus, set the `command` field to `null` and provide a list of subc
 
 The latest version of SwitchShuttle can be downloaded from the [GitHub Releases](https://github.com/s00d/switchshuttle/releases) page.
 
-### macOS Sign
+### mac
+
+OS Sign
 
 If you are on macOS, you may need to sign the application before running it. Here are the steps:
 
