@@ -4,7 +4,7 @@ use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
 use serde_json::json;
 use crate::config::{CommandConfig, Config};
 use crate::{GitHubRelease, load_all_configs};
-use crate::helpers::{execute_command, get_config_path, open_in_default_editor};
+use crate::helpers::{execute_command, find_command_config, get_config_path, open_in_default_editor};
 
 #[tauri::command]
 pub fn create_new_config(file_name: String) -> std::result::Result<(), String> {
@@ -83,16 +83,19 @@ pub fn execute_command_with_inputs(inputs: HashMap<String, String>, command: Str
     let mut command_found = false;
 
     for config in configs {
-        if let Some(mut command) = config.commands.iter().find(|c| c.name == command).cloned() {
+        if let Some(command) = find_command_config(command.as_str(), &config.commands) {
             command_found = true;
 
-            if let Some(ref mut cmd) = command.command {
+            let mut cmd = command.command.clone();
+            let mut cmds = command.commands.clone();
+
+            if let Some(ref mut cmd) = cmd {
                 for (key, value) in &inputs {
                     *cmd = cmd.replace(&format!("[{}]", key), value);
                 }
             }
 
-            if let Some(ref mut cmds) = command.commands {
+            if let Some(ref mut cmds) = cmds {
                 for cmd in cmds {
                     for (key, value) in &inputs {
                         *cmd = cmd.replace(&format!("[{}]", key), value);
@@ -100,9 +103,18 @@ pub fn execute_command_with_inputs(inputs: HashMap<String, String>, command: Str
                 }
             }
 
-            println!("execute_command_with_inputs {:?}", command);
+            let updated_command = CommandConfig {
+                name: command.name.clone(),
+                inputs: command.inputs.clone(),
+                command: cmd,
+                commands: cmds,
+                submenu: command.submenu.clone(),
+                hotkey: command.hotkey.clone(),
+            };
 
-            execute_command(&command, &config.terminal, &config.launch_in, &config.theme, &config.title);
+            println!("execute_command_with_inputs {:?}", updated_command);
+
+            execute_command(&updated_command, &config.terminal, &config.launch_in, &config.theme, &config.title);
         }
     }
 
@@ -165,7 +177,7 @@ pub fn execute(command: String) -> Result<String, String> {
     let (_files, configs) = load_all_configs(&config_dir);
 
     for config in configs {
-        if let Some(command_config) = config.commands.iter().find(|c| c.name == command) {
+        if let Some(command_config) = find_command_config(command.as_str(), &config.commands) {
             execute_command(command_config, &config.terminal, &config.launch_in, &config.theme, &config.title);
             return Ok("ok".to_string());
         }
