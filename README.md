@@ -24,8 +24,6 @@ SwitchShuttle is a reimagining and extension of the [Shuttle](https://github.com
 
 The configuration is stored in JSON files located in the user's configuration directory. The default path is `~/.config/switch-shuttle/` on Linux and macOS, and `C:\Users\<Username>\AppData\Roaming\switch-shuttle\` on Windows. You can store multiple configuration files in this directory, each representing a different set of commands and settings.
 
-**Note:** It is recommended to give unique names to all commands to ensure all functionalities work correctly.
-
 Here is an example of a configuration file:
 
 ```json
