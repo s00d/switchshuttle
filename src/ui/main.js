@@ -6,6 +6,7 @@ function registerListenersForMenuItems(items) {
     items.forEach(command => {
         if (command.event) {
             tauriEvent.listen(command.event, (event) => {
+                console.log('execute', { command: event.payload })
                 tauriApi.invoke('execute', { command: event.payload }).catch((error) => {
                     console.log('error', error);
                 });

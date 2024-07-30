@@ -1,26 +1,102 @@
 use std::{fs, io};
 use std::collections::HashMap;
 use std::path::PathBuf;
+use std::sync::Arc;
 use serde::{Deserialize, Serialize};
+use std::sync::atomic::{AtomicUsize, Ordering};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Config {
     pub terminal: String,
     pub launch_in: String,
     pub theme: String,
     pub title: String,
     pub commands: Vec<CommandConfig>,
-    pub menu_hotkey: Option<String>
+    pub menu_hotkey: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct CommandConfig {
+    pub id: Option<String>,
     pub name: String,
     pub inputs: Option<HashMap<String, String>>,
     pub command: Option<String>,
     pub commands: Option<Vec<String>>,
     pub hotkey: Option<String>,
     pub submenu: Option<Vec<CommandConfig>>,
+}
+
+#[derive(Clone, Debug)]
+pub struct ConfigManager {
+    pub configs: Vec<Config>,
+    pub config_paths: Vec<PathBuf>,
+    counter: Arc<AtomicUsize>
+}
+
+
+impl ConfigManager {
+    pub fn new() -> Self {
+        ConfigManager {
+            configs: Vec::new(),
+            config_paths: Vec::new(),
+            counter: Arc::new(AtomicUsize::new(0)),
+        }
+    }
+
+    pub fn load_configs(&mut self) -> io::Result<()> {
+        self.counter = Arc::new(AtomicUsize::new(0));
+
+        let config_path = get_config_path();
+        let config_dir = config_path.parent().unwrap().to_path_buf();
+
+        self.configs.clear();
+        self.config_paths.clear();
+
+        let mut has_configs = false;
+
+        if let Ok(entries) = fs::read_dir(&config_dir) {
+            let mut paths: Vec<_> = entries.filter_map(|entry| {
+                entry.ok().and_then(|e| {
+                    let path = e.path();
+                    if path.is_file() {
+                        Some(path)
+                    } else {
+                        None
+                    }
+                })
+            }).collect();
+
+            paths.sort();
+
+            for path in paths {
+                if let Ok(mut config) = Config::load(&path) {
+                    config.assign_ids(&self.counter);
+                    self.config_paths.push(path);
+                    self.configs.push(config);
+                    has_configs = true;
+                }
+            }
+        }
+
+        if !has_configs {
+            let mut default_config = Config::default_config();
+            let default_config_path = config_dir.join("default_config.json");
+            default_config.save(&default_config_path)?;
+            self.config_paths.push(default_config_path);
+            self.configs.push(default_config);
+        }
+
+        Ok(())
+    }
+
+    pub fn find_command_by_id(&self, id: &str) -> Option<(&CommandConfig, &Config)> {
+        for config in &self.configs {
+            if let Some(command) = config.find_command_by_id(id) {
+                return Some((command, config));
+            }
+        }
+        None
+    }
 }
 
 impl Config {
@@ -35,19 +111,21 @@ impl Config {
         }
     }
 
-    pub(crate) fn load(path: &PathBuf) -> io::Result<Self> {
+    pub fn load(path: &PathBuf) -> io::Result<Self> {
         let config_data = fs::read_to_string(path)?;
-        let config: Config = serde_json::from_str(&config_data)?;
+        let mut config: Config = serde_json::from_str(&config_data)?;
+        config.clear_ids();
         Ok(config)
     }
 
-    pub(crate) fn save(&self, path: &PathBuf) -> io::Result<()> {
+    pub fn save(&mut self, path: &PathBuf) -> io::Result<()> {
+        self.clear_ids();
         let config_data = serde_json::to_string_pretty(&self)?;
         fs::write(path, config_data)?;
         Ok(())
     }
 
-    pub(crate) fn default_config() -> Self {
+    pub fn default_config() -> Self {
         Config::new(
             "iterm",
             "current",
@@ -56,12 +134,14 @@ impl Config {
             Some("Ctrl+Shift+M".parse().unwrap()),
             vec![
                 CommandConfig {
+                    id: None,
                     name: "Command".to_string(),
                     command: None,
                     inputs: None,
                     commands: None,
                     submenu: Some(vec![
                         CommandConfig {
+                            id: None,
                             name: "Example Command".to_string(),
                             command: Some("echo Hello, world!".to_string()),
                             inputs: None,
@@ -70,6 +150,7 @@ impl Config {
                             hotkey: Some("Ctrl+Shift+E".to_string()),
                         },
                         CommandConfig {
+                            id: None,
                             name: "Example Multi-Command with input".to_string(),
                             command: None,
                             submenu: None,
@@ -85,6 +166,7 @@ impl Config {
                             ])),
                         },
                         CommandConfig {
+                            id: None,
                             name: "Example Submenu".to_string(),
                             inputs: None,
                             command: None,
@@ -92,6 +174,7 @@ impl Config {
                             hotkey: None,
                             submenu: Some(vec![
                                 CommandConfig {
+                                    id: None,
                                     name: "Subcommand 1".to_string(),
                                     inputs: None,
                                     command: Some("echo Subcommand 1".to_string()),
@@ -100,6 +183,7 @@ impl Config {
                                     hotkey: Some("Ctrl+Shift+S".to_string()),
                                 },
                                 CommandConfig {
+                                    id: None,
                                     name: "Subcommand 2".to_string(),
                                     inputs: None,
                                     command: Some("echo Subcommand 2".to_string()),
@@ -116,75 +200,78 @@ impl Config {
         )
     }
 
-    pub(crate) fn ensure_default(path: &PathBuf) -> io::Result<()> {
+    pub fn ensure_default(path: &PathBuf) -> io::Result<()> {
         if !path.exists() {
-            let config = Config::default_config();
+            let mut config = Config::default_config();
             config.save(path)?;
         }
         Ok(())
     }
 
-    pub(crate) fn validate(&self) -> Config {
-        let valid_terminals = vec!["iterm", "terminal", "warp"];
-        let valid_launch_in = vec!["current", "new_tab", "new_window"];
+    pub fn assign_ids(&mut self, counter: &Arc<AtomicUsize>) {
+        for command in &mut self.commands {
+            command.assign_id(counter);
+        }
+    }
 
-        let terminal = if valid_terminals.contains(&self.terminal.as_str()) {
-            self.terminal.clone()
-        } else {
-            println!("Invalid terminal: {}. Using default 'iterm'.", self.terminal);
-            "iterm".to_string()
-        };
-
-        let launch_in = if valid_launch_in.contains(&self.launch_in.as_str()) {
-            self.launch_in.clone()
-        } else {
-            println!("Invalid launch_in: {}. Using default 'new_tab'.", self.launch_in);
-            "new_tab".to_string()
-        };
-
-        let theme = if self.theme.is_empty() {
-            println!("Theme is empty. Using default 'Homebrew'.");
-            "Homebrew".to_string()
-        } else {
-            self.theme.clone()
-        };
-
-        let title = if self.title.is_empty() {
-            println!("Title is empty. Using default 'New tab'.");
-            "New tab".to_string()
-        } else {
-            self.title.clone()
-        };
-
-        let menu_hotkey = if self.menu_hotkey.is_none() {
-            None
-        } else {
-            self.menu_hotkey.clone()
-        };
-
-        let commands: Vec<CommandConfig> = self.commands.iter().map(|command| {
-            if command.name.is_empty() || (command.command.is_none() && command.submenu.is_none() && command.commands.is_none()) {
-                CommandConfig {
-                    name: "Example Command".to_string(),
-                    command: Some("echo Hello, world!".to_string()),
-                    submenu: None,
-                    hotkey: None,
-                    commands: None,
-                    inputs: None,
-                }
-            } else {
-                CommandConfig {
-                    name: command.name.clone(),
-                    command: command.command.clone(),
-                    submenu: command.submenu.clone(),
-                    hotkey: command.hotkey.clone(),
-                    commands: command.commands.clone(),
-                    inputs: command.inputs.clone(),
-                }
+    fn find_command_by_id(&self, id: &str) -> Option<&CommandConfig> {
+        for command in &self.commands {
+            if let Some(found) = command.find_by_id(id) {
+                return Some(found);
             }
-        }).collect();
+        }
+        None
+    }
 
-        Config::new(&terminal, &launch_in, &theme, &title, menu_hotkey, commands)
+    fn clear_ids(&mut self) {
+        for command in &mut self.commands {
+            command.clear_id();
+        }
     }
 }
 
+impl CommandConfig {
+    fn assign_id(&mut self, counter: &Arc<AtomicUsize>) {
+        self.id = Some(format!("cmd_{}", counter.fetch_add(1, Ordering::SeqCst)));
+
+        if let Some(submenu) = &mut self.submenu {
+            for command in submenu {
+                command.assign_id(counter);
+            }
+        }
+    }
+
+    fn clear_id(&mut self) {
+        self.id = None;
+
+        if let Some(submenu) = &mut self.submenu {
+            for command in submenu {
+                command.clear_id();
+            }
+        }
+    }
+
+    fn find_by_id(&self, id: &str) -> Option<&CommandConfig> {
+        if self.id.as_deref() == Some(id) {
+            return Some(self);
+        }
+
+        if let Some(submenu) = &self.submenu {
+            for command in submenu {
+                if let Some(found) = command.find_by_id(id) {
+                    return Some(found);
+                }
+            }
+        }
+
+        None
+    }
+}
+
+pub fn get_config_path() -> PathBuf {
+    let mut config_path = dirs::config_dir().unwrap();
+    config_path.push("switch-shuttle");
+    fs::create_dir_all(&config_path).unwrap();
+    config_path.push("config.json");
+    config_path
+}

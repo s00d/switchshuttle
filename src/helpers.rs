@@ -221,18 +221,3 @@ pub fn create_window(app: &tauri::AppHandle, label: &str, title: &str, url: &str
         }
     }
 }
-
-pub fn find_command_config<'a>(id: &str, configs: &'a [CommandConfig]) -> Option<&'a CommandConfig> {
-    for config in configs {
-        if config.name == id {
-            return Some(config);
-        }
-
-        if let Some(submenu) = &config.submenu {
-            if let Some(found) = find_command_config(id, submenu) {
-                return Some(found);
-            }
-        }
-    }
-    None
-}
