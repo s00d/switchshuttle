@@ -16,7 +16,7 @@ use global_hotkey::{GlobalHotKeyManager, GlobalHotKeyEvent, hotkey::{HotKey}, Ho
 use mouse_position::mouse_position::Mouse;
 use once_cell::sync::Lazy;
 use serde::Deserialize;
-use crate::commands::{check_for_updates, create_new_config, execute, execute_command_with_inputs, get_about_message, get_menu_data, get_version, show_context_menu};
+use crate::commands::{check_for_updates, create_new_config, execute, execute_command_with_inputs, about_message, get_menu_data, get_version, show_context_menu};
 
 
 #[derive(Deserialize)]
@@ -68,7 +68,7 @@ fn create_system_tray_menu(autostart: bool, config_manager: &ConfigManager) -> S
     tray_menu = tray_menu.add_native_item(SystemTrayMenuItem::Separator);
 
     let mut edit_config_submenu = SystemTrayMenu::new();
-    edit_config_submenu = edit_config_submenu.add_item(CustomMenuItem::new("add_new_config".to_string(), "Add New Config"));
+    edit_config_submenu = edit_config_submenu.add_item(CustomMenuItem::new("add_new_config".to_string(), "Create New Config"));
     edit_config_submenu = edit_config_submenu.add_native_item(SystemTrayMenuItem::Separator);
     for path in &config_manager.config_paths {
         let file_name = path.file_name().unwrap().to_string_lossy().to_string();
@@ -76,8 +76,8 @@ fn create_system_tray_menu(autostart: bool, config_manager: &ConfigManager) -> S
     }
 
     edit_config_submenu = edit_config_submenu.add_native_item(SystemTrayMenuItem::Separator);
-    edit_config_submenu = edit_config_submenu.add_item(CustomMenuItem::new("open_config_folder".to_string(), "Open Config Folder"));
-    edit_config_submenu = edit_config_submenu.add_item(CustomMenuItem::new("open_config_editor".to_string(), "Editor"));
+    edit_config_submenu = edit_config_submenu.add_item(CustomMenuItem::new("open_config_folder".to_string(), "Show Config Folder"));
+    edit_config_submenu = edit_config_submenu.add_item(CustomMenuItem::new("open_config_editor".to_string(), "Open Visual Editor"));
 
     tray_menu = tray_menu.add_submenu(SystemTraySubmenu::new("Edit Config", edit_config_submenu));
 
@@ -117,7 +117,7 @@ fn main() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![create_new_config, get_about_message, check_for_updates, get_version, execute_command_with_inputs, get_menu_data, execute])
+        .invoke_handler(tauri::generate_handler![create_new_config, about_message, check_for_updates, get_version, execute_command_with_inputs, get_menu_data, execute])
         .system_tray(SystemTray::new().with_menu(system_tray_menu))
         .plugin(tauri_plugin_context_menu::init())
         .on_system_tray_event(move |app, event| {
@@ -158,14 +158,14 @@ fn main() {
                         app.tray_handle().set_menu(new_system_tray_menu).unwrap();
                     },
                     "about" => {
-                        create_window(&app, "about", "About", "ui/about.html", 400.0, 200.0);
+                        create_window(&app, "about", "About", "ui/about.html", 400.0, 180.0);
                     },
                     "homepage" => {
                         let homepage_url = "https://github.com/s00d/SwitchShuttle";
                         tauri::api::shell::open(&app.shell_scope(), homepage_url, None).unwrap();
                     },
                     "check_updates" => {
-                        create_window(&app, "update", "Update Available", "ui/update.html", 400.0, 250.0);
+                        create_window(&app, "update", "Update Available", "ui/update.html", 400.0, 220.0);
                     },
                     "add_new_config" => {
                         create_window(&app, "new_config_window", "Create New Config", "ui/create.html", 400.0, 250.0);
