@@ -183,7 +183,7 @@ The hotkey parameter is optional. If it is not specified, the command will not h
 
 ### Creating Submenus
 
-To create submenus, set the `command` field to `null` and provide a list of subcommands in the `submenu` field. Subcommands can also have their own submenus, allowing for nested menus.
+To create submenus, set the `command` and `commands` field to `null` and provide a list of subcommands in the `submenu` field. Subcommands can also have their own submenus, allowing for nested menus.
 
 ## Building the Application
 
