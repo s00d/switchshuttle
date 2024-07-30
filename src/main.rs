@@ -5,20 +5,18 @@ mod config;
 mod helpers;
 mod commands;
 
-use std::{fs, collections::HashMap, sync::Mutex, thread};
-use std::path::PathBuf;
+use std::{collections::HashMap, sync::Mutex, thread};
 use std::str::FromStr;
-use tauri::{CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem, SystemTraySubmenu, Window};
+use tauri::{CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem, SystemTraySubmenu};
 use auto_launch::*;
 use tauri::utils::platform::current_exe;
-use crate::config::{CommandConfig, Config};
-use crate::helpers::{create_window, execute_command, find_command_config, get_config_path, open_folder_in_default_explorer, open_in_default_editor};
+use crate::config::{CommandConfig, ConfigManager};
+use crate::helpers::{create_window, execute_command, get_config_path, open_folder_in_default_explorer, open_in_default_editor};
 use global_hotkey::{GlobalHotKeyManager, GlobalHotKeyEvent, hotkey::{HotKey}, HotKeyState};
 use mouse_position::mouse_position::Mouse;
 use once_cell::sync::Lazy;
 use serde::Deserialize;
-use serde_json::json;
-use crate::commands::{check_for_updates, create_new_config, execute, execute_command_with_inputs, get_about_message, get_menu_data, get_version};
+use crate::commands::{check_for_updates, create_new_config, execute, execute_command_with_inputs, get_about_message, get_menu_data, get_version, show_context_menu};
 
 
 #[derive(Deserialize)]
@@ -29,27 +27,6 @@ struct GitHubRelease {
 
 static HOTKEY_COMMAND_MAP: Lazy<Mutex<HashMap<u32, (CommandConfig, String, String, String, String)>>> = Lazy::new(|| Mutex::new(HashMap::new()));
 
-fn load_all_configs(config_dir: &PathBuf) -> (Vec<PathBuf>, Vec<Config>) {
-    let mut paths = Vec::new();
-    let mut configs = Vec::new();
-    if let Ok(entries) = fs::read_dir(config_dir) {
-        for entry in entries {
-            if let Ok(entry) = entry {
-                if let Ok(file_type) = entry.file_type() {
-                    if file_type.is_file() {
-                        let path = entry.path();
-                        if let Ok(config) = Config::load(&path) {
-                            paths.push(path);
-                            configs.push(config.validate());
-                        }
-                    }
-                }
-            }
-        }
-    }
-    (paths, configs)
-}
-
 fn create_command_menu(command_config: &CommandConfig) -> SystemTrayMenu {
     let mut menu = SystemTrayMenu::new();
     if let Some(submenu) = &command_config.submenu {
@@ -58,7 +35,8 @@ fn create_command_menu(command_config: &CommandConfig) -> SystemTrayMenu {
                 let submenu_item = create_command_menu(subcommand);
                 menu = menu.add_submenu(SystemTraySubmenu::new(subcommand.name.clone(), submenu_item));
             } else {
-                let mut item = CustomMenuItem::new(subcommand.name.clone(), subcommand.name.clone());
+                let id = subcommand.id.clone().unwrap_or(subcommand.name.clone());
+                let mut item = CustomMenuItem::new(id, subcommand.name.clone());
                 if let Some(hotkey) = &subcommand.hotkey {
                     item = item.accelerator(hotkey);
                 }
@@ -69,19 +47,16 @@ fn create_command_menu(command_config: &CommandConfig) -> SystemTrayMenu {
     menu
 }
 
-fn create_system_tray_menu(autostart: bool) -> SystemTrayMenu {
-    let config_path = get_config_path();
-    let config_dir = config_path.parent().unwrap().to_path_buf();
-    let (files, configs) = load_all_configs(&config_dir);
-
+fn create_system_tray_menu(autostart: bool, config_manager: &ConfigManager) -> SystemTrayMenu {
     let mut tray_menu = SystemTrayMenu::new();
-    for config in &configs {
+    for config in &config_manager.configs {
         for command in &config.commands {
             if let Some(_submenu) = &command.submenu {
                 let submenu_item = create_command_menu(command);
                 tray_menu = tray_menu.add_submenu(SystemTraySubmenu::new(command.name.clone(), submenu_item));
             } else {
-                let mut item = CustomMenuItem::new(command.name.clone(), command.name.clone());
+                let id = command.id.clone().unwrap_or(command.name.clone());
+                let mut item = CustomMenuItem::new(id, command.name.clone());
                 if let Some(hotkey) = &command.hotkey {
                     item = item.accelerator(hotkey);
                 }
@@ -95,7 +70,7 @@ fn create_system_tray_menu(autostart: bool) -> SystemTrayMenu {
     let mut edit_config_submenu = SystemTrayMenu::new();
     edit_config_submenu = edit_config_submenu.add_item(CustomMenuItem::new("add_new_config".to_string(), "Add New Config"));
     edit_config_submenu = edit_config_submenu.add_native_item(SystemTrayMenuItem::Separator);
-    for path in files {
+    for path in &config_manager.config_paths {
         let file_name = path.file_name().unwrap().to_string_lossy().to_string();
         edit_config_submenu = edit_config_submenu.add_item(CustomMenuItem::new(format!("edit_{}", file_name), file_name.clone()));
     }
@@ -103,7 +78,6 @@ fn create_system_tray_menu(autostart: bool) -> SystemTrayMenu {
     edit_config_submenu = edit_config_submenu.add_native_item(SystemTrayMenuItem::Separator);
     edit_config_submenu = edit_config_submenu.add_item(CustomMenuItem::new("open_config_folder".to_string(), "Open Config Folder"));
     edit_config_submenu = edit_config_submenu.add_item(CustomMenuItem::new("open_config_editor".to_string(), "Editor"));
-
 
     tray_menu = tray_menu.add_submenu(SystemTraySubmenu::new("Edit Config", edit_config_submenu));
 
@@ -127,20 +101,11 @@ fn create_system_tray_menu(autostart: bool) -> SystemTrayMenu {
     tray_menu
 }
 
-#[tauri::command]
-fn show_context_menu(window: Window, x: i32, y: i32) {
-    window.set_position(tauri::Position::Physical(tauri::PhysicalPosition::new(0, 0))).unwrap();
-    // window.show().unwrap();
-    // window.set_focus().unwrap();
-    window.emit("show_context_menu", {}).unwrap();
-    window.emit("menu-did-open", json!({ "x": x, "y": y })).unwrap();
-}
-
 fn main() {
-    let config_path = get_config_path();
-    Config::ensure_default(&config_path).expect("Failed to ensure default config");
+    let mut config_manager = ConfigManager::new();
+    config_manager.load_configs().expect("Failed to load configs");
 
-    let system_tray_menu = create_system_tray_menu(false);
+    let system_tray_menu = create_system_tray_menu(false, &config_manager);
 
     let app = tauri::Builder::default()
         .setup(move |app| {
@@ -157,8 +122,7 @@ fn main() {
         .plugin(tauri_plugin_context_menu::init())
         .on_system_tray_event(move |app, event| {
             let config_path = get_config_path();
-            let config_dir = config_path.parent().unwrap().to_path_buf();
-            let (_files, configs) = load_all_configs(&config_dir);
+
 
             let app_name = &app.package_info().name;
             let current_exe = current_exe().unwrap();
@@ -170,7 +134,9 @@ fn main() {
                 .build()
                 .unwrap();
 
-            let new_system_tray_menu = create_system_tray_menu(auto_start.is_enabled().unwrap());
+            let mut config_manager = ConfigManager::new();
+            config_manager.load_configs().expect("Failed to reload configs");
+            let new_system_tray_menu = create_system_tray_menu(auto_start.is_enabled().unwrap(), &config_manager);
             app.tray_handle().set_menu(new_system_tray_menu).unwrap();
 
             if let SystemTrayEvent::MenuItemClick { id, .. } = event {
@@ -188,7 +154,7 @@ fn main() {
                         } else {
                             auto_start.enable().unwrap();
                         }
-                        let new_system_tray_menu = create_system_tray_menu(enabled);
+                        let new_system_tray_menu = create_system_tray_menu(enabled, &config_manager);
                         app.tray_handle().set_menu(new_system_tray_menu).unwrap();
                     },
                     "about" => {
@@ -218,41 +184,17 @@ fn main() {
                         } else {
                             println!("Processing configs for ID: {}", id);
 
-
-
-                            for config in &configs {
-                                println!("Checking config: {:?}", config);
-
-                                if let Some(command_config) = find_command_config(id.as_str(), &config.commands) {
-                                    println!("Found matching command config: {:?}", command_config);
-
-                                    if let Some(inputs) = &command_config.inputs {
-                                        println!("Command requires inputs: {:?}", inputs);
-
+                            match config_manager.find_command_by_id(id.as_str()) {
+                                Some((command, config)) => {
+                                    if let Some(inputs) = &command.inputs {
                                         let window = create_window(&app, "input_window", "Provide Inputs", "ui/inputs.html", 400.0, 300.0);
-                                        println!("Created input window");
-
-                                        match window.emit("input_data", (id.clone(), inputs.clone())) {
-                                            Ok(_) => println!("Successfully emitted input data"),
-                                            Err(e) => println!("Failed to emit input data: {}", e),
-                                        }
+                                        window.emit("input_data", (id.clone(), inputs.clone())).unwrap();
                                     } else {
-                                        println!("Executing command without inputs");
-
-                                        execute_command(
-                                            command_config,
-                                            &config.terminal,
-                                            &config.launch_in,
-                                            &config.theme,
-                                            &config.title
-                                        );
-
-                                        println!("Command execution completed");
+                                        execute_command(command, &config.terminal, &config.launch_in, &config.theme, &config.title);
                                     }
-                                    break;
-                                } else {
-                                    println!("No matching command config found for ID: {}", id);
-                                }
+
+                                },
+                                None => eprintln!("Command '{}' not found", id),
                             }
                         }
                     }
@@ -278,10 +220,13 @@ fn main() {
         let manager = GlobalHotKeyManager::new().unwrap();
 
         // Регистрация глобальных горячих клавиш
-        let config_dir = config_path.parent().unwrap().to_path_buf();
-        let (_files, configs) = load_all_configs(&config_dir);
-        for config in configs {
-            for command in config.commands {
+        let mut config_manager = ConfigManager::new();
+        config_manager.load_configs().expect("Failed to load configs");
+
+        let mut hotkey = false;
+
+        for config in &config_manager.configs {
+            for command in &config.commands {
                 if let Some(hotkey) = &command.hotkey {
 
                     let hotkey = match HotKey::from_str(hotkey) {
@@ -305,7 +250,11 @@ fn main() {
                 }
             }
 
-            if let Some(menu_hotkey) = config.menu_hotkey {
+            if let Some(menu_hotkey) = &config.menu_hotkey {
+                if hotkey {
+                    continue;
+                }
+                hotkey = true;
                 let hotkey = match HotKey::from_str(&menu_hotkey) {
                     Ok(hk) => hk,
                     Err(err) => {
@@ -317,17 +266,18 @@ fn main() {
 
                 HOTKEY_COMMAND_MAP.lock().unwrap().insert(hotkey.id(), (
                     CommandConfig {
+                        id: None,
                         name: "show_context_menu".to_string(),
                         command: None,
                         submenu: None,
-                        hotkey: Some(menu_hotkey),
+                        hotkey: Some(menu_hotkey.clone()),
                         commands: None,
                         inputs: None,
                     },
                     "".to_string(),
                     "".to_string(),
                     "".to_string(),
-                    "".to_string()
+                    "".to_string(),
                 ));
             }
         }
@@ -344,7 +294,7 @@ fn main() {
                                 match position {
                                     Mouse::Position { x, y } => {
                                         let app_handle = app_handle.clone();
-                                        show_context_menu(app_handle.get_window("main").unwrap(), x, y);
+                                        let _ = show_context_menu(app_handle.get_window("main").unwrap(), x, y);
                                     },
                                     Mouse::Error => println!("Error getting mouse position"),
                                 }

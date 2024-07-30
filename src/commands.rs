@@ -2,12 +2,13 @@ use std::collections::HashMap;
 use reqwest::blocking::Client;
 use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
 use serde_json::json;
-use crate::config::{CommandConfig, Config};
-use crate::{GitHubRelease, load_all_configs};
-use crate::helpers::{execute_command, find_command_config, get_config_path, open_in_default_editor};
+use tauri::Window;
+use crate::config::{CommandConfig, Config, ConfigManager};
+use crate::{GitHubRelease};
+use crate::helpers::{execute_command, get_config_path, open_in_default_editor};
 
 #[tauri::command]
-pub fn create_new_config(file_name: String) -> std::result::Result<(), String> {
+pub fn create_new_config(file_name: String) -> Result<(), String> {
     if file_name.ends_with(".json") {
         return Err("File name should not include the .json extension".into());
     }
@@ -37,9 +38,8 @@ pub fn get_about_message(app: tauri::AppHandle) -> String {
     format!("SwitchShuttle v{} \n\n by s00d.", tauri_version)
 }
 
-
 #[tauri::command]
-pub fn check_for_updates(app: tauri::AppHandle) -> std::result::Result<(String, String), String> {
+pub fn check_for_updates(app: tauri::AppHandle) -> Result<(String, String), String> {
     let current_version = app.package_info().version.to_string();
     let latest_release_url = "https://api.github.com/repos/s00d/switchshuttle/releases/latest";
 
@@ -73,63 +73,54 @@ pub fn get_version(app: tauri::AppHandle) -> String {
 }
 
 #[tauri::command]
-pub fn execute_command_with_inputs(inputs: HashMap<String, String>, command: String) -> std::result::Result<(), String> {
+pub fn execute_command_with_inputs(inputs: HashMap<String, String>, command: String) -> Result<String, String> {
     println!("execute_command_with_inputs {:?} {:?}", inputs, command);
 
-    let config_path = get_config_path();
-    let config_dir = config_path.parent().unwrap().to_path_buf();
-    let (_files, configs) = load_all_configs(&config_dir);
+    let mut config_manager = ConfigManager::new();
+    config_manager.load_configs().map_err(|e| e.to_string())?;
 
-    let mut command_found = false;
+    let (command, config) = match config_manager.find_command_by_id(&command) {
+        Some((cmd, cfg)) => (cmd, cfg),
+        None => return Err("Command not found".to_string()),
+    };
 
-    for config in configs {
-        if let Some(command) = find_command_config(command.as_str(), &config.commands) {
-            command_found = true;
+    let mut cmd = command.command.clone();
+    let mut cmds = command.commands.clone();
 
-            let mut cmd = command.command.clone();
-            let mut cmds = command.commands.clone();
-
-            if let Some(ref mut cmd) = cmd {
-                for (key, value) in &inputs {
-                    *cmd = cmd.replace(&format!("[{}]", key), value);
-                }
-            }
-
-            if let Some(ref mut cmds) = cmds {
-                for cmd in cmds {
-                    for (key, value) in &inputs {
-                        *cmd = cmd.replace(&format!("[{}]", key), value);
-                    }
-                }
-            }
-
-            let updated_command = CommandConfig {
-                name: command.name.clone(),
-                inputs: command.inputs.clone(),
-                command: cmd,
-                commands: cmds,
-                submenu: command.submenu.clone(),
-                hotkey: command.hotkey.clone(),
-            };
-
-            println!("execute_command_with_inputs {:?}", updated_command);
-
-            execute_command(&updated_command, &config.terminal, &config.launch_in, &config.theme, &config.title);
+    if let Some(ref mut cmd) = cmd {
+        for (key, value) in &inputs {
+            *cmd = cmd.replace(&format!("[{}]", key), value);
         }
     }
 
-    if command_found {
-        Ok(())
-    } else {
-        Err("Command not found".to_string())
+    if let Some(ref mut cmds) = cmds {
+        for cmd in cmds {
+            for (key, value) in &inputs {
+                *cmd = cmd.replace(&format!("[{}]", key), value);
+            }
+        }
     }
+
+    let updated_command = CommandConfig {
+        id: command.id.clone(),
+        name: command.name.clone(),
+        inputs: command.inputs.clone(),
+        command: cmd,
+        commands: cmds,
+        submenu: command.submenu.clone(),
+        hotkey: command.hotkey.clone(),
+    };
+
+    println!("execute_command_with_inputs {:?}", updated_command);
+
+    execute_command(command, &config.terminal, &config.launch_in, &config.theme, &config.title);
+    Ok("Ok".to_string())
 }
 
 #[tauri::command]
 pub fn get_menu_data() -> Result<String, String> {
-    let config_path = get_config_path();
-    let config_dir = config_path.parent().unwrap().to_path_buf();
-    let (_files, configs) = load_all_configs(&config_dir);
+    let mut config_manager = ConfigManager::new();
+    config_manager.load_configs().map_err(|e| e.to_string())?;
 
     fn build_menu_items(commands: &Vec<CommandConfig>) -> Vec<serde_json::Value> {
         let mut items = Vec::new();
@@ -146,7 +137,7 @@ pub fn get_menu_data() -> Result<String, String> {
                 "label": command.name,
                 "disabled": false,
                 "event": format!("command_{}", event_name),
-                "payload": command.name.clone(),
+                "payload": command.id.clone(),
                 "shortcut": command.hotkey.clone().unwrap_or_default()
             });
 
@@ -161,7 +152,7 @@ pub fn get_menu_data() -> Result<String, String> {
     }
 
     let mut all_items = Vec::new();
-    for config in &configs {
+    for config in &config_manager.configs {
         all_items.extend(build_menu_items(&config.commands));
     }
 
@@ -172,16 +163,23 @@ pub fn get_menu_data() -> Result<String, String> {
 pub fn execute(command: String) -> Result<String, String> {
     println!("Executing command: {}", command);
 
-    let config_path = get_config_path();
-    let config_dir = config_path.parent().unwrap().to_path_buf();
-    let (_files, configs) = load_all_configs(&config_dir);
+    let mut config_manager = ConfigManager::new();
+    config_manager.load_configs().map_err(|e| e.to_string())?;
 
-    for config in configs {
-        if let Some(command_config) = find_command_config(command.as_str(), &config.commands) {
-            execute_command(command_config, &config.terminal, &config.launch_in, &config.theme, &config.title);
-            return Ok("ok".to_string());
+    match config_manager.find_command_by_id(&command) {
+        Some((command, config)) => {
+            execute_command(command, &config.terminal, &config.launch_in, &config.theme, &config.title);
+            Ok("Ok".to_string())
         }
+        None => Err(format!("Command '{}' not found", command)),
     }
+}
 
-    Err(format!("Command '{}' not found", command))
+#[tauri::command]
+pub fn show_context_menu(window: Window, x: i32, y: i32) {
+    window.set_position(tauri::Position::Physical(tauri::PhysicalPosition::new(0, 0))).unwrap();
+    // window.show().unwrap();
+    // window.set_focus().unwrap();
+    window.emit("show_context_menu", {}).unwrap();
+    window.emit("menu-did-open", json!({ "x": x, "y": y })).unwrap();
 }
