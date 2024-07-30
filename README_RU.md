@@ -195,20 +195,21 @@ SwitchShuttle позволяет определить динамические �
 ### Шаги
 
 1. Клонируйте репозиторий:
-   ```sh
-   git clone https://github.com/s00d/switchshuttle.git
-   cd switchshuttle
-   ```
+```sh
+git clone https://github.com/s00d/switchshuttle.git
+cd switchshuttle
+npm i
+```
 
 2. Соберите приложение:
-   ```sh
-   cargo build --release
-   ```
+```sh
+cargo tauri build
+```
 
 3. Запустите приложение:
-   ```sh
-   cargo run
-   ```
+```sh
+cargo tauri dev
+```
 
 ## Загрузка
 

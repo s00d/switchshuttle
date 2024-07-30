@@ -197,20 +197,21 @@ SwitchShuttle 允许您为命令定义动态输入。在执行命令之前，这
 ### 步骤
 
 1. 克隆存储库：
-   ```sh
-   git clone https://github.com/s00d/switchshuttle.git
-   cd switchshuttle
-   ```
+```sh
+git clone https://github.com/s00d/switchshuttle.git
+cd switchshuttle
+npm i
+```
 
 2. 构建应用程序：
-   ```sh
-   cargo build --release
-   ```
+```sh
+cargo tauri build
+```
 
 3. 运行应用程序：
-   ```sh
-   cargo run
-   ```
+```sh
+cargo tauri dev
+```
 
 ## 下载
 

@@ -195,20 +195,21 @@ To create submenus, set the `command` and `commands` field to `null` and provide
 ### Steps
 
 1. Clone the repository:
-   ```sh
-   git clone https://github.com/s00d/switchshuttle.git
-   cd switchshuttle
-   ```
+```sh
+git clone https://github.com/s00d/switchshuttle.git
+cd switchshuttle
+npm i
+```
 
 2. Build the application:
-   ```sh
-   cargo build --release
-   ```
+```sh
+cargo tauri build
+```
 
 3. Run the application:
-   ```sh
-   cargo run
-   ```
+```sh
+cargo tauri dev
+```
 
 ## Download
 
