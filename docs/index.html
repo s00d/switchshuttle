@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwitchShuttle Documentation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+    <div class="logo">
+        <img src="https://github.com/s00d/switchshuttle/blob/main/icons/128x128_white.png?raw=true" alt="SwitchShuttle Logo">
+    </div>
+    <nav>
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#getting-started">Getting Started</a></li>
+            <li><a href="#configuration">Configuration</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#download">Download</a></li>
+            <li><a href="#contributing">Contributing</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+</header>
+<div class="container">
+    <aside>
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#getting-started">Getting Started</a></li>
+            <li><a href="#configuration">Configuration</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#download">Download</a></li>
+            <li><a href="#contributing">Contributing</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </aside>
+    <main>
+        <section id="home">
+            <h1>Welcome to SwitchShuttle Documentation</h1>
+            <img src="https://raw.githubusercontent.com/s00d/switchshuttle/main/icons/logo.webp" style="width: 80%" alt="SwitchShuttle">
+            <p>SwitchShuttle is a cross-platform system tray application that allows users to run predefined commands in various terminal applications. It supports macOS, Windows, and Linux, offering a simple and customizable way to manage and execute your frequently used commands.</p>
+            <img src="https://github.com/s00d/switchshuttle/blob/main/icons/intro.gif?raw=true" style="width: 80%" alt="Intro">
+        </section>
+        <section id="about">
+            <h2>About</h2>
+            <p>SwitchShuttle is a reimagining and extension of the <a href="https://github.com/fitztrev/shuttle">Shuttle</a> application. While Shuttle provides a simple and effective way to manage commands shortcuts in macOS, SwitchShuttle expands upon this concept, offering support for multiple operating systems and terminal emulators, along with enhanced configuration capabilities and user customization options.</p>
+        </section>
+        <section id="features">
+            <h2>Features</h2>
+            <ul>
+                <li>Supports multiple terminal applications: iTerm, Terminal, Warp.</li>
+                <li>Run commands in different modes: current window, new tab, new window.</li>
+                <li>Toggle launch at login.</li>
+                <li>Edit configuration directly from the tray menu.</li>
+                <li>Open configuration folder from the tray menu.</li>
+                <li>Supports submenus for better organization of commands.</li>
+                <li>Supports dynamic inputs for commands.</li>
+                <li><strong>New</strong>: Trigger context menu with a hotkey.</li>
+            </ul>
+        </section>
+        <section id="configuration">
+            <h2>Configuration</h2>
+            <p>The configuration is stored in JSON files located in the user's configuration directory. The default path is <code>~/.config/switch-shuttle/</code> on Linux and macOS, and <code>C:\Users\<Username>\AppData\Roaming\switch-shuttle\</code> on Windows. You can store multiple configuration files in this directory, each representing a different set of commands and settings.</p>
+            <p><strong>Note:</strong> It is recommended to give unique names to all commands to ensure all functionalities work correctly.</p>
+            <h3>Example Configuration File</h3>
+            <pre><code>{
+  "terminal": "iterm",
+  "launch_in": "current",
+  "theme": "Homebrew",
+  "title": "New tab",
+  "menu_hotkey": "Ctrl+Shift+M",
+  "commands": [
+    {
+      "name": "Command",
+      "inputs": null,
+      "command": null,
+      "commands": null,
+      "hotkey": null,
+      "submenu": [
+        {
+          "name": "Example Command",
+          "inputs": null,
+          "command": "echo Hello, world!",
+          "commands": null,
+          "submenu": null,
+          "hotkey": "Ctrl+Shift+E"
+        },
+        {
+          "name": "Example Multi-Command with input",
+          "inputs": {
+            "key1": "default1",
+            "key2": "default2"
+          },
+          "command": null,
+          "commands": [
+            "export MY_VAR=$(echo 'Step 1: [key1]')",
+            "RESULT=$(echo 'Step 2: [key2]' && echo $MY_VAR)",
+            "echo Step 3: Finalize && echo $RESULT"
+          ],
+          "submenu": null,
+          "hotkey": "Ctrl+Shift+M"
+        },
+        {
+          "name": "Example Submenu",
+          "inputs": null,
+          "command": null,
+          "commands": null,
+          "submenu": [
+            {
+              "name": "Subcommand 1",
+              "inputs": null,
+              "command": "echo Subcommand 1",
+              "commands": null,
+              "submenu": null,
+              "hotkey": "Ctrl+Shift+S"
+            },
+            {
+              "name": "Subcommand 2",
+              "inputs": null,
+              "command": "echo Subcommand 2",
+              "commands": null,
+              "submenu": null,
+              "hotkey": null
+            }
+          ],
+          "hotkey": null
+        }
+      ]
+    }
+  ]
+}
+                </code></pre>
+        </section>
+        <section id="dynamic-inputs">
+            <h2>Dynamic Inputs</h2>
+            <p>SwitchShuttle allows you to define dynamic inputs for commands. These inputs will be requested from the user before the command is executed. You can define inputs using the <code>inputs</code> parameter in the command configuration.</p>
+            <h3>Example Configuration with Inputs</h3>
+            <pre><code>{
+  "name": "Example Multi-Command with input",
+  "inputs": {
+    "key1": "default1",
+    "key2": "default2"
+  },
+  "command": null,
+  "commands": [
+    "export MY_VAR=$(echo 'Step 1: [key1]')",
+    "RESULT=$(echo 'Step 2: [key2]' && echo $MY_VAR)",
+    "echo Step 3: Finalize && echo $RESULT"
+  ],
+  "submenu": null,
+  "hotkey": "Ctrl+Shift+M"
+}
+                </code></pre>
+        </section>
+        <section id="hotkeys">
+            <h2>Hotkeys</h2>
+            <p>You can assign global hotkeys to commands by adding the <code>hotkey</code> parameter to the command configuration. The hotkey combination must follow the format of modifier keys (Ctrl, Shift, Alt, Win) combined with a key (A-Z, 0-9, etc.). For example, to set "Ctrl+Shift+E" as a hotkey for a command:</p>
+            <pre><code>{
+  "name": "Example Command",
+  "command": "echo Hello, world!",
+  "submenu": null,
+  "hotkey": "Ctrl+Shift+E",
+  "commands": null
+}
+                </code></pre>
+            <h3>How to Use Hotkeys</h3>
+            <ol>
+                <li><strong>Assign Hotkeys</strong>: Edit the configuration file to include the <code>hotkey</code> parameter for the commands you want to trigger with global hotkeys.</li>
+                <li><strong>Use Hotkeys</strong>: After restarting the application, use the assigned hotkeys to trigger the corresponding commands, no matter which application is currently in focus.</li>
+            </ol>
+        </section>
+        <section id="how-to-use">
+            <h2>How to Use</h2>
+            <ol>
+                <li><strong>Edit Config</strong>: Right-click the tray icon and select "Edit Config" to open the configuration file in your default editor. Modify the configuration as needed.</li>
+                <li><strong>Open Config Folder</strong>: Right-click the tray icon and select "Open Config Folder" to open the configuration directory in your file explorer.</li>
+                <li><strong>Toggle Launch at Login</strong>: Right-click the tray icon and select "Toggle Launch at Login" to enable or disable the application to start at login.</li>
+                <li><strong>Execute Command</strong>: Left-click the tray icon and select the command you want to run from the menu. The command will be executed in the specified terminal application.</li>
+            </ol>
+        </section>
+        <section id="building">
+            <h2>Building the Application</h2>
+            <h3>Prerequisites</h3>
+            <ul>
+                <li><a href="https://www.rust-lang.org/tools/install">Rust</a></li>
+                <li><a href="https://tauri.app/v1/guides/getting-started/prerequisites/">Tauri</a></li>
+            </ul>
+            <h3>Steps</h3>
+            <ol>
+                <li>Clone the repository:
+                    <pre><code>git clone https://github.com/yourusername/switchshuttle.git
+cd switchshuttle
+                        </code></pre>
+                </li>
+                <li>Build the application:
+                    <pre><code>cargo build --release
+                        </code></pre>
+                </li>
+                <li>Run the application:
+                    <pre><code>cargo run
+                        </code></pre>
+                </li>
+            </ol>
+        </section>
+        <section id="download">
+            <h2>Download</h2>
+            <p>The latest version of SwitchShuttle can be downloaded from the <a href="https://github.com/s00d/switchshuttle/releases">GitHub Releases</a> page.</p>
+            <h3>macOS</h3>
+            <p>If you are on macOS, you may need to sign the application before running it. Here are the steps:</p>
+            <ol>
+                <li>Make the binary executable:
+                    <pre><code>chmod +x /Applications/switch-shuttle.app
+                        </code></pre>
+                </li>
+                <li>Clear extended attributes and sign the binary:
+                    <pre><code>xattr -cr /Applications/switch-shuttle.app && codesign --force --deep --sign - /Applications/switch-shuttle.app
+                        </code></pre>
+                </li>
+            </ol>
+        </section>
+        <section id="contributing">
+            <h2>Contributing</h2>
+            <p>Contributions are welcome! Please feel free to submit a pull request or open an issue on GitHub.</p>
+        </section>
+        <section id="license">
+            <h2>License</h2>
+            <p>This project is licensed under the MIT License. See the <a href="LICENSE">LICENSE</a> file for details.</p>
+        </section>
+        <section id="getting-started">
+            <h2>Getting Started</h2>
+            <p>To get started with SwitchShuttle, follow these steps:</p>
+            <ol>
+                <li>Download the latest version from the <a href="https://github.com/s00d/switchshuttle/releases">GitHub Releases</a> page.</li>
+                <li>Install the application following the instructions for your operating system.</li>
+                <li>Edit the configuration file to set up your commands and preferences.</li>
+                <li>Launch SwitchShuttle and start managing your terminal commands easily!</li>
+            </ol>
+        </section>
+        <section id="contact">
+            <h2>Contact</h2>
+            <p>If you have any questions, feedback, or need assistance, feel free to reach out:</p>
+            <ul>
+                <li>Email: support@switchshuttle.com</li>
+                <li>GitHub Issues: <a href="https://github.com/s00d/switchshuttle/issues">Submit an issue</a></li>
+            </ul>
+        </section>
+    </main>
+</div>
+</body>
+</html>
