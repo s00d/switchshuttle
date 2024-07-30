@@ -294,7 +294,7 @@
     <div data-tauri-drag-region class="title-bar">
         <div data-tauri-drag-region class="title">Config Editor</div>
         <div class="buttons">
-            <div onclick="cancel()"></div>
+            <div @click="cancel"></div>
         </div>
     </div>
     <div  class="container">
@@ -386,42 +386,7 @@
                 </tr>
                 <tr v-if="command.submenu" :key="'sub' + index">
                     <td colspan="5">
-                        <table class="nested-table">
-                            <thead>
-                            <tr>
-                                <th>Subcommand Name</th>
-                                <th>Single Command</th>
-                                <th>Commands</th>
-                                <th>Hotkey</th>
-                                <th>Actions</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <template v-for="(subCommand, subIndex) in command.submenu">
-                                <tr :key="'sub' + subIndex" :data-index="subIndex">
-                                    <td><input type="text" class="form-control" v-model="subCommand.name"></td>
-                                    <td><input type="text" class="form-control" v-model="subCommand.command" :disabled="subCommand.commands && subCommand.commands.length"></td>
-                                    <td>
-                                        <div v-if="!command.submenu" v-for="(cmd, cmdIndex) in subCommand.commands" :key="cmdIndex" class="d-flex align-items-center">
-                                            <input type="text" class="form-control" v-model="subCommand.commands[cmdIndex]">
-                                            <button class="cancel-button" @click="deleteInnerSubCommand(index, subIndex, cmdIndex)">Delete</button>
-                                        </div>
-                                        <button v-if="!command.submenu" class="button-blue" @click="addInnerSubCommand(index, subIndex)">+</button>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <input type="checkbox" class="mr-2" :checked="subCommand.hotkey !== null" @change="toggleHotkeyInput(index, subIndex, true)">
-                                            <input type="text" class="form-control" v-model="subCommand.hotkey" v-if="subCommand.hotkey !== null" @keydown="hotkeyHandler($event, index, subIndex)">
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <button class="button-blue" @click="addSubCommand(index, subIndex)">+</button>
-                                        <button class="cancel-button" @click="deleteSubCommand(index, subIndex)">x</button>
-                                    </td>
-                                </tr>
-                            </template>
-                            </tbody>
-                        </table>
+                        <subcommand-table :subcommands="command.submenu" :command-index="index" @add-inner-subcommand="addInnerSubCommand" @delete-inner-subcommand="deleteInnerSubCommand" @toggle-hotkey-input="toggleHotkeyInput" @hotkey-handler="hotkeyHandler" @delete-subcommand="deleteSubCommand" @add-subcommand="addSubCommand"></subcommand-table>
                     </td>
                 </tr>
             </template>
@@ -488,6 +453,48 @@
     const path = window.__TAURI__.path;
     const appWindow = window.__TAURI__.window;
 
+    Vue.component('subcommand-table', {
+        props: ['subcommands', 'command-index'],
+        template: `
+            <table class="nested-table">
+                <thead>
+                    <tr>
+                        <th>Subcommand Name</th>
+                        <th>Single Command</th>
+                        <th>Commands</th>
+                        <th>Hotkey</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template v-for="(subCommand, subIndex) in subcommands">
+                        <tr :key="'sub' + subIndex" :data-index="subIndex">
+                            <td><input type="text" class="form-control" v-model="subCommand.name"></td>
+                            <td><input type="text" class="form-control" v-model="subCommand.command" :disabled="subCommand.commands && subCommand.commands.length"></td>
+                            <td>
+                                <div v-if="!subCommand.submenu" v-for="(cmd, cmdIndex) in subCommand.commands" :key="cmdIndex" class="d-flex align-items-center">
+                                    <input type="text" class="form-control" v-model="subCommand.commands[cmdIndex]">
+                                    <button class="cancel-button" @click="$emit('delete-inner-subcommand', commandIndex, subIndex, cmdIndex)">x</button>
+                                </div>
+                                <button v-if="!subCommand.submenu" class="button-blue" @click="$emit('add-inner-subcommand', commandIndex, subIndex)">+</button>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <input type="checkbox" class="mr-2" :checked="subCommand.hotkey !== null" @change="$emit('toggle-hotkey-input', commandIndex, subIndex, true)">
+                                    <input type="text" class="form-control" v-model="subCommand.hotkey" v-if="subCommand.hotkey !== null" @keydown="$emit('hotkey-handler', $event, commandIndex, subIndex)">
+                                </div>
+                            </td>
+                            <td>
+                                <button class="button-blue" @click="$emit('add-subcommand', commandIndex, subIndex)">+</button>
+                                <button class="cancel-button" @click="$emit('delete-subcommand', commandIndex, subIndex)">x</button>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        `
+    });
+
     new Vue({
         el: '#app',
         data: {
@@ -534,7 +541,7 @@
                 }
             },
             addCommand() {
-                this.config.commands.push({ name: '', command: '', hotkey: '', hotkeyEnabled: false, submenu: [], commands: [] });
+                this.config.commands.push({ name: '', command: '', hotkey: null, hotkeyEnabled: false, submenu: [], commands: [] });
             },
             deleteCommand(index) {
                 this.config.commands.splice(index, 1);
@@ -549,10 +556,10 @@
             addSubCommand(index, subIndex = null) {
                 if (subIndex === null) {
                     this.config.commands[index].submenu = this.config.commands[index].submenu || [];
-                    this.config.commands[index].submenu.push({ name: '', command: '', hotkey: '', submenu: [], commands: [] });
+                    this.config.commands[index].submenu.push({ name: '', command: '', hotkey: null, submenu: [], commands: [] });
                 } else {
                     this.config.commands[index].submenu[subIndex].submenu = this.config.commands[index].submenu[subIndex].submenu || [];
-                    this.config.commands[index].submenu[subIndex].submenu.push({ name: '', command: '', hotkey: '', submenu: [], commands: [] });
+                    this.config.commands[index].submenu[subIndex].submenu.push({ name: '', command: '', hotkey: null, submenu: [], commands: [] });
                 }
             },
             deleteSubCommand(index, subIndex) {
