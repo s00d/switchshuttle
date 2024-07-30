@@ -33,9 +33,9 @@ pub fn create_new_config(file_name: String) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub fn get_about_message(app: tauri::AppHandle) -> String {
+pub fn about_message(app: tauri::AppHandle) -> Result<String, String> {
     let tauri_version = app.package_info().version.to_string();
-    format!("SwitchShuttle v{} \n\n by s00d.", tauri_version)
+    Ok(format!("SwitchShuttle v{} \n\n by s00d.", tauri_version))
 }
 
 #[tauri::command]
