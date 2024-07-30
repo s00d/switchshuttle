@@ -1,4 +1,5 @@
-![SwitchShuttle](https://raw.githubusercontent.com/s00d/switchshuttle/main/logo.webp)
+![SwitchShuttle](https://raw.githubusercontent.com/s00d/switchshuttle/main/icons/logo.webp)
+![intro](https://github.com/s00d/switchshuttle/blob/main/icons/intro.gif?raw=true)
 
 ## SwitchShuttle
 
