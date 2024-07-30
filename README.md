@@ -196,7 +196,7 @@ To create submenus, set the `command` and `commands` field to `null` and provide
 
 1. Clone the repository:
    ```sh
-   git clone https://github.com/yourusername/switchshuttle.git
+   git clone https://github.com/s00d/switchshuttle.git
    cd switchshuttle
    ```
 

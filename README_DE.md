@@ -196,7 +196,7 @@ Um Untermenüs zu erstellen, setzen Sie das Feld `command` auf `null` und geben 
 
 1. Klonen Sie das Repository:
    ```sh
-   git clone https://github.com/yourusername/switchshuttle.git
+   git clone https://github.com/s00d/switchshuttle.git
    cd switchshuttle
    ```
 

@@ -196,7 +196,7 @@ SwitchShuttle позволяет определить динамические �
 
 1. Клонируйте репозиторий:
    ```sh
-   git clone https://github.com/yourusername/switchshuttle.git
+   git clone https://github.com/s00d/switchshuttle.git
    cd switchshuttle
    ```
 
