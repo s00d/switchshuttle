@@ -1,7 +1,3 @@
-もちろん、SwitchShuttleの紹介を日本語に翻訳いたします。
-
----
-
 ![SwitchShuttle](https://raw.githubusercontent.com/s00d/switchshuttle/main/icons/logo.webp)
 ![intro](https://github.com/s00d/switchshuttle/blob/main/icons/intro.gif?raw=true)
 
@@ -37,57 +33,57 @@ SwitchShuttleは、[Shuttle](https://github.com/fitztrev/shuttle)アプリケー
   "terminal": "iterm",
   "launch_in": "current",
   "theme": "Homebrew",
-  "title": "New tab",
+  "title": "新しいタブ",
   "menu_hotkey": "Ctrl+Shift+M",
   "commands": [
     {
-      "name": "Command",
+      "name": "コマンド",
       "inputs": null,
       "command": null,
       "commands": null,
       "hotkey": null,
       "submenu": [
         {
-          "name": "Example Command",
+          "name": "例のコマンド",
           "inputs": null,
-          "command": "echo Hello, world!",
+          "command": "echo こんにちは、世界！",
           "commands": null,
           "submenu": null,
           "hotkey": "Ctrl+Shift+E"
         },
         {
-          "name": "Example Multi-Command with input",
+          "name": "入力付きの例のマルチコマンド",
           "inputs": {
-            "key1": "default1",
-            "key2": "default2"
+            "key1": "デフォルト1",
+            "key2": "デフォルト2"
           },
           "command": null,
           "commands": [
-            "export MY_VAR=$(echo 'Step 1: [key1]')",
-            "RESULT=$(echo 'Step 2: [key2]' && echo $MY_VAR)",
-            "echo Step 3: Finalize && echo $RESULT"
+            "export MY_VAR=$(echo 'ステップ1: [key1]')",
+            "RESULT=$(echo 'ステップ2: [key2]' && echo $MY_VAR)",
+            "echo ステップ3: 完了 && echo $RESULT"
           ],
           "submenu": null,
           "hotkey": "Ctrl+Shift+M"
         },
         {
-          "name": "Example Submenu",
+          "name": "例のサブメニュー",
           "inputs": null,
           "command": null,
           "commands": null,
           "submenu": [
             {
-              "name": "Subcommand 1",
+              "name": "サブコマンド1",
               "inputs": null,
-              "command": "echo Subcommand 1",
+              "command": "echo サブコマンド1",
               "commands": null,
               "submenu": null,
               "hotkey": "Ctrl+Shift+S"
             },
             {
-              "name": "Subcommand 2",
+              "name": "サブコマンド2",
               "inputs": null,
-              "command": "echo Subcommand 2",
+              "command": "echo サブコマンド2",
               "commands": null,
               "submenu": null,
               "hotkey": null
@@ -141,35 +137,35 @@ SwitchShuttleでは、コマンドの実行前にユーザーからの入力を�
 
 ```json
 {
-  "name": "Example Multi-Command with input",
+  "name": "入力付きの例のマルチコマンド",
   "inputs": {
-    "key1": "default1",
-    "key2": "default2"
+    "key1": "デフォルト1",
+    "key2": "デフォルト2"
   },
   "command": null,
   "commands": [
-    "export MY_VAR=$(echo 'Step 1: [key1]')",
-    "RESULT=$(echo 'Step 2: [key2]' && echo $MY_VAR)",
-    "echo Step 3: Finalize && echo $RESULT"
+    "export MY_VAR=$(echo 'ステップ1: [key1]')",
+    "RESULT=$(echo 'ステップ2: [key2]' && echo $MY_VAR)",
+    "echo ステップ3: 完了 && echo $RESULT"
   ],
   "submenu": null,
+
+
   "hotkey": "Ctrl+Shift+M"
 }
 ```
 
 ### ホットキー
 
-コマンド設定に`hotkey`パラメータを追加することで、コマンドにグローバルホットキーを割り
-
-当てることができます。ホットキーの組み合わせは、修飾キー（Ctrl、Shift、Alt、Win）とキー（A-Z、0-9など）を組み合わせた形式でなければなりません。例えば、コマンドに「Ctrl+Shift+E」をホットキーとして設定するには：
+コマンド設定に`hotkey`パラメータを追加することで、コマンドにグローバルホットキーを割り当てることができます。ホットキーの組み合わせは、修飾キー（Ctrl、Shift、Alt、Win）とキー（A-Z、0-9など）を組み合わせた形式でなければなりません。例えば、コマンドに「Ctrl+Shift+E」をホットキーとして設定するには：
 
 ```json
 {
-  "name": "Example Command",
-  "command": "echo Hello, world!",
-  "submenu": null,
-  "hotkey": "Ctrl+Shift+E",
-  "commands": null
+   "name": "例のコマンド",
+   "command": "echo こんにちは、世界！",
+   "submenu": null,
+   "hotkey": "Ctrl+Shift+E",
+   "commands": null
 }
 ```
 
