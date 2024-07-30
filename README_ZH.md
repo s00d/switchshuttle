@@ -198,7 +198,7 @@ SwitchShuttle 允许您为命令定义动态输入。在执行命令之前，这
 
 1. 克隆存储库：
    ```sh
-   git clone https://github.com/yourusername/switchshuttle.git
+   git clone https://github.com/s00d/switchshuttle.git
    cd switchshuttle
    ```
 

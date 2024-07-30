@@ -198,7 +198,7 @@ SwitchShuttleでは、コマンドの実行前にユーザーからの入力を�
 
 1. リポジトリをクローンする:
    ```sh
-   git clone https://github.com/yourusername/switchshuttle.git
+   git clone https://github.com/s00d/switchshuttle.git
    cd switchshuttle
    ```
 
