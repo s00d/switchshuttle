@@ -197,20 +197,21 @@ SwitchShuttleでは、コマンドの実行前にユーザーからの入力を�
 ### 手順
 
 1. リポジトリをクローンする:
-   ```sh
-   git clone https://github.com/s00d/switchshuttle.git
-   cd switchshuttle
-   ```
+```sh
+git clone https://github.com/s00d/switchshuttle.git
+cd switchshuttle
+npm i
+```
 
 2. アプリケーションをビルドする:
-   ```sh
-   cargo build --release
-   ```
+```sh
+cargo tauri build
+```
 
 3. アプリケーションを実行する:
-   ```sh
-   cargo run
-   ```
+```sh
+cargo tauri dev
+```
 
 ## ダウンロード
 

@@ -195,20 +195,21 @@ Um Untermenüs zu erstellen, setzen Sie das Feld `command` auf `null` und geben 
 ### Schritte
 
 1. Klonen Sie das Repository:
-   ```sh
-   git clone https://github.com/s00d/switchshuttle.git
-   cd switchshuttle
-   ```
+```sh
+git clone https://github.com/s00d/switchshuttle.git
+cd switchshuttle
+npm i
+```
 
 2. Bauen Sie die Anwendung:
-   ```sh
-   cargo build --release
-   ```
+```sh
+cargo tauri build
+```
 
 3. Führen Sie die Anwendung aus:
-   ```sh
-   cargo run
-   ```
+```sh
+cargo tauri dev
+```
 
 ## Download
 
