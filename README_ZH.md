@@ -99,25 +99,25 @@ SwitchShuttle 是对 [Shuttle](https://github.com/fitztrev/shuttle) 应用程序
 
 ### 配置参数
 
-| 参数        | 类型              | 描述                                         | 有效值                                            |
-|-------------|-------------------|----------------------------------------------|--------------------------------------------------|
-| terminal    | String            | 使用的终端应用程序                           | "iterm", "terminal", "warp"                      |
-| launch_in   | String            | 命令启动位置                                 | "current", "new_tab", "new_window"               |
-| theme       | String            | 终端支持的主题                               | 表示主题的任何字符串值                           |
-| title       | String            | 终端窗口/标签页的标题                        | 任何字符串值                                     |
-| menu_hotkey | String (Optional) | 触发上下文菜单的全局热键                     | 任何有效的热键组合，例如 "Ctrl+Shift+M"          |
-| commands    | Array             | 命令配置列表                                 | 参见下方的命令参数                               |
+| 参数          | 类型                | 描述           | 有效值                                |
+|-------------|-------------------|--------------|------------------------------------|
+| terminal    | String            | 使用的终端应用程序    | "iterm", "terminal", "warp"        |
+| launch_in   | String            | 命令启动位置       | "current", "new_tab", "new_window" |
+| theme       | String            | 终端支持的主题      | 表示主题的任何字符串值                        |
+| title       | String            | 终端窗口/标签页的标题  | 任何字符串值                             |
+| menu_hotkey | String (Optional) | 触发上下文菜单的全局热键 | 任何有效的热键组合，例如 "Ctrl+Shift+M"        |
+| commands    | Array             | 命令配置列表       | 参见下方的命令参数                          |
 
 ### 命令参数
 
-| 参数       | 类型              | 描述                                       | 有效值                                            |
-|------------|-------------------|--------------------------------------------|--------------------------------------------------|
-| name       | String            | 命令或子菜单的名称                         | 任何字符串值                                     |
-| inputs     | Object (Optional) | 输入的键值对                               | {"key1": "default1", "key2": "default2"}         |
-| command    | String (Optional) | 要执行的命令（如果这是一个命令）           | 表示命令的任何字符串值                           |
-| commands   | Array (Optional)  | 顺序执行的命令列表                         | 任何字符串数组，每个字符串都是一个命令           |
-| submenu    | Array (Optional)  | 子命令列表（如果这是一个子菜单）           | 参见上方的命令参数                               |
-| hotkey     | String (Optional) | 触发命令的全局热键                         | 任何有效的热键组合，例如 "Ctrl+Shift+E"          |
+| 参数       | 类型                | 描述               | 有效值                                      |
+|----------|-------------------|------------------|------------------------------------------|
+| name     | String            | 命令或子菜单的名称        | 任何字符串值                                   |
+| inputs   | Object (Optional) | 输入的键值对           | {"key1": "default1", "key2": "default2"} |
+| command  | String (Optional) | 要执行的命令（如果这是一个命令） | 表示命令的任何字符串值                              |
+| commands | Array (Optional)  | 顺序执行的命令列表        | 任何字符串数组，每个字符串都是一个命令                      |
+| submenu  | Array (Optional)  | 子命令列表（如果这是一个子菜单） | 参见上方的命令参数                                |
+| hotkey   | String (Optional) | 触发命令的全局热键        | 任何有效的热键组合，例如 "Ctrl+Shift+E"              |
 
 ### 命令执行逻辑
 
@@ -176,10 +176,10 @@ SwitchShuttle 允许您为命令定义动态输入。在执行命令之前，这
 
 ## 如何使用
 
-1. **编辑配置**：右键单击托盘图标并选择 "Edit Config" 以在默认编辑器中打开配置文件。根据需要修改配置。
-2. **打开配置文件夹**：右键单击托盘图标并选择 "Open Config Folder" 以在文件管理器中打开配置目录。
-3. **切换登录时启动**：右键单击托盘图标并选择 "Toggle Launch at Login" 以启用或禁用应用程序在登录时启动。
-4. **执行命令**：左键单击托盘图标并从菜单
+1. **Edit Config**：右键单击托盘图标并选择 "Edit Config" 以在默认编辑器中打开配置文件。根据需要修改配置。
+2. **Show Config Folder**：右键单击托盘图标并选择 "Show Config Folder" 以在文件管理器中打开配置目录。
+3. **Toggle Launch at Login**：右键单击托盘图标并选择 "Toggle Launch at Login" 以启用或禁用应用程序在登录时启动。
+4. **Execute Command**：左键单击托盘图标并从菜单
 
 中选择您要执行的命令。该命令将在指定的终端应用程序中执行。
 
