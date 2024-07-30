@@ -33,57 +33,57 @@ SwitchShuttle 是对 [Shuttle](https://github.com/fitztrev/shuttle) 应用程序
   "terminal": "iterm",
   "launch_in": "current",
   "theme": "Homebrew",
-  "title": "New tab",
+  "title": "新标签页",
   "menu_hotkey": "Ctrl+Shift+M",
   "commands": [
     {
-      "name": "Command",
+      "name": "命令",
       "inputs": null,
       "command": null,
       "commands": null,
       "hotkey": null,
       "submenu": [
         {
-          "name": "Example Command",
+          "name": "示例命令",
           "inputs": null,
-          "command": "echo Hello, world!",
+          "command": "echo 你好，世界！",
           "commands": null,
           "submenu": null,
           "hotkey": "Ctrl+Shift+E"
         },
         {
-          "name": "Example Multi-Command with input",
+          "name": "带输入的示例多命令",
           "inputs": {
-            "key1": "default1",
-            "key2": "default2"
+            "key1": "默认值1",
+            "key2": "默认值2"
           },
           "command": null,
           "commands": [
-            "export MY_VAR=$(echo 'Step 1: [key1]')",
-            "RESULT=$(echo 'Step 2: [key2]' && echo $MY_VAR)",
-            "echo Step 3: Finalize && echo $RESULT"
+            "export MY_VAR=$(echo '步骤1: [key1]')",
+            "RESULT=$(echo '步骤2: [key2]' && echo $MY_VAR)",
+            "echo 步骤3: 完成 && echo $RESULT"
           ],
           "submenu": null,
           "hotkey": "Ctrl+Shift+M"
         },
         {
-          "name": "Example Submenu",
+          "name": "示例子菜单",
           "inputs": null,
           "command": null,
           "commands": null,
           "submenu": [
             {
-              "name": "Subcommand 1",
+              "name": "子命令1",
               "inputs": null,
-              "command": "echo Subcommand 1",
+              "command": "echo 子命令1",
               "commands": null,
               "submenu": null,
               "hotkey": "Ctrl+Shift+S"
             },
             {
-              "name": "Subcommand 2",
+              "name": "子命令2",
               "inputs": null,
-              "command": "echo Subcommand 2",
+              "command": "echo 子命令2",
               "commands": null,
               "submenu": null,
               "hotkey": null
@@ -137,16 +137,16 @@ SwitchShuttle 允许您为命令定义动态输入。在执行命令之前，这
 
 ```json
 {
-  "name": "Example Multi-Command with input",
+  "name": "带输入的示例多命令",
   "inputs": {
-    "key1": "default1",
-    "key2": "default2"
+    "key1": "默认值1",
+    "key2": "默认值2"
   },
   "command": null,
   "commands": [
-    "export MY_VAR=$(echo 'Step 1: [key1]')",
-    "RESULT=$(echo 'Step 2: [key2]' && echo $MY_VAR)",
-    "echo Step 3: Finalize && echo $RESULT"
+    "export MY_VAR=$(echo '步骤1: [key1]')",
+    "RESULT=$(echo '步骤2: [key2]' && echo $MY_VAR)",
+    "echo 步骤3: 完成 && echo $RESULT"
   ],
   "submenu": null,
   "hotkey": "Ctrl+Shift+M"
@@ -159,8 +159,8 @@ SwitchShuttle 允许您为命令定义动态输入。在执行命令之前，这
 
 ```json
 {
-  "name": "Example Command",
-  "command": "echo Hello, world!",
+  "name": "示例命令",
+  "command": "echo 你好，世界！",
   "submenu": null,
   "hotkey": "Ctrl+Shift+E",
   "commands": null
@@ -179,13 +179,13 @@ SwitchShuttle 允许您为命令定义动态输入。在执行命令之前，这
 1. **编辑配置**：右键单击托盘图标并选择 "Edit Config" 以在默认编辑器中打开配置文件。根据需要修改配置。
 2. **打开配置文件夹**：右键单击托盘图标并选择 "Open Config Folder" 以在文件管理器中打开配置目录。
 3. **切换登录时启动**：右键单击托盘图标并选择 "Toggle Launch at Login" 以启用或禁用应用程序在登录时启动。
-4. **执行命令**：左键单击托盘图标并从菜单中选择您要执行的命令。该命令将在指定的终端应用程序中执行。
+4. **执行命令**：左键单击托盘图标并从菜单
+
+中选择您要执行的命令。该命令将在指定的终端应用程序中执行。
 
 ### 创建子菜单
 
-要创建子菜单，请将 `command` 字段设置为 `null` 并在 `submenu` 字段中提供子命令列表。子命令也可以有自己的子菜单，从而允许嵌套
-
-菜单。
+要创建子菜单，请将 `command` 字段设置为 `null` 并在 `submenu` 字段中提供子命令列表。子命令也可以有自己的子菜单，从而允许嵌套菜单。
 
 ## 构建应用程序
 
