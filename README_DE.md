@@ -99,25 +99,25 @@ Hier ist ein Beispiel für eine Konfigurationsdatei:
 
 ### Konfigurationsparameter
 
-| Parameter   | Typ               | Beschreibung                                     | Gültige Werte                                     |
-|-------------|-------------------|--------------------------------------------------|---------------------------------------------------|
-| terminal    | String            | Das zu verwendende Terminalprogramm              | "iterm", "terminal", "warp"                       |
-| launch_in   | String            | Wo der Befehl gestartet werden soll              | "current", "new_tab", "new_window"                |
-| theme       | String            | Das zu verwendende Thema (falls unterstützt)     | Jeder Zeichenfolgenwert, der ein Thema darstellt  |
-| title       | String            | Der Titel für das Terminalfenster/-tab           | Jeder Zeichenfolgenwert                           |
+| Parameter   | Typ               | Beschreibung                                                       | Gültige Werte                                        |
+|-------------|-------------------|--------------------------------------------------------------------|------------------------------------------------------|
+| terminal    | String            | Das zu verwendende Terminalprogramm                                | "iterm", "terminal", "warp"                          |
+| launch_in   | String            | Wo der Befehl gestartet werden soll                                | "current", "new_tab", "new_window"                   |
+| theme       | String            | Das zu verwendende Thema (falls unterstützt)                       | Jeder Zeichenfolgenwert, der ein Thema darstellt     |
+| title       | String            | Der Titel für das Terminalfenster/-tab                             | Jeder Zeichenfolgenwert                              |
 | menu_hotkey | String (Optional) | Die globale Hotkey-Tastenkombination zum Aufrufen des Kontextmenüs | Jede gültige Hotkey-Kombination, z.B. "Ctrl+Shift+M" |
-| commands    | Array             | Liste der Befehlskonfigurationen                 | Siehe unten für Befehl-Parameter                  |
+| commands    | Array             | Liste der Befehlskonfigurationen                                   | Siehe unten für Befehl-Parameter                     |
 
 ### Befehl-Parameter
 
-| Parameter | Typ               | Beschreibung                                    | Gültige Werte                                     |
-|-----------|-------------------|-------------------------------------------------|---------------------------------------------------|
-| name      | String            | Der Name des Befehls oder Untermenüs            | Jeder Zeichenfolgenwert                           |
-| inputs    | Object (Optional) | Schlüssel-Wert-Paare für Eingaben               | {"key1": "default1", "key2": "default2"}          |
-| command   | String (Optional) | Der auszuführende Befehl (falls dies ein Befehl ist) | Jeder Zeichenfolgenwert, der einen Befehl darstellt |
-| commands  | Array (Optional)  | Liste der nacheinander auszuführenden Befehle   | Jeder Array von Zeichenfolgen, jede Zeichenfolge ist ein Befehl |
-| submenu   | Array (Optional)  | Liste der Unterbefehle (falls dies ein Untermenü ist) | Siehe oben für Befehl-Parameter                  |
-| hotkey    | String (Optional) | Die globale Hotkey-Tastenkombination zum Auslösen des Befehls | Jede gültige Hotkey-Kombination, z.B. "Ctrl+Shift+E" |
+| Parameter | Typ               | Beschreibung                                                  | Gültige Werte                                                   |
+|-----------|-------------------|---------------------------------------------------------------|-----------------------------------------------------------------|
+| name      | String            | Der Name des Befehls oder Untermenüs                          | Jeder Zeichenfolgenwert                                         |
+| inputs    | Object (Optional) | Schlüssel-Wert-Paare für Eingaben                             | {"key1": "default1", "key2": "default2"}                        |
+| command   | String (Optional) | Der auszuführende Befehl (falls dies ein Befehl ist)          | Jeder Zeichenfolgenwert, der einen Befehl darstellt             |
+| commands  | Array (Optional)  | Liste der nacheinander auszuführenden Befehle                 | Jeder Array von Zeichenfolgen, jede Zeichenfolge ist ein Befehl |
+| submenu   | Array (Optional)  | Liste der Unterbefehle (falls dies ein Untermenü ist)         | Siehe oben für Befehl-Parameter                                 |
+| hotkey    | String (Optional) | Die globale Hotkey-Tastenkombination zum Auslösen des Befehls | Jede gültige Hotkey-Kombination, z.B. "Ctrl+Shift+E"            |
 
 ### Ausführungslogik für Befehle
 
@@ -176,12 +176,10 @@ Der Parameter `hotkey` ist optional. Wenn er nicht angegeben ist, hat der Befehl
 
 ## Anwendung
 
-1. **Konfiguration bearbeiten**: Klicken Sie mit der rechten Maustaste auf das Tray-Symbol und wählen Sie "Edit Config", um die Konfig
-
-urationsdatei in Ihrem Standardeditor zu öffnen. Passen Sie die Konfiguration nach Bedarf an.
-2. **Konfigurationsordner öffnen**: Klicken Sie mit der rechten Maustaste auf das Tray-Symbol und wählen Sie "Open Config Folder", um das Konfigurationsverzeichnis in Ihrem Dateimanager zu öffnen.
-3. **Start beim Login umschalten**: Klicken Sie mit der rechten Maustaste auf das Tray-Symbol und wählen Sie "Toggle Launch at Login", um das automatische Starten der Anwendung beim Login zu aktivieren oder zu deaktivieren.
-4. **Befehl ausführen**: Klicken Sie mit der linken Maustaste auf das Tray-Symbol und wählen Sie den Befehl aus, den Sie ausführen möchten, aus dem Menü. Der Befehl wird im angegebenen Terminalprogramm ausgeführt.
+1. **Edit Config**: Klicken Sie mit der rechten Maustaste auf das Tray-Symbol und wählen Sie Konfiguration, um die Konfigurationsdatei in Ihrem Standardeditor zu öffnen. Passen Sie die Konfiguration nach Bedarf an.
+2. **KShow Config Folder**: Klicken Sie mit der rechten Maustaste auf das Tray-Symbol und wählen Sie "Show Config Folder", um das Konfigurationsverzeichnis in Ihrem Dateimanager zu öffnen.
+3. **Toggle Launch at Logi**: Klicken Sie mit der rechten Maustaste auf das Tray-Symbol und wählen Sie "Toggle Launch at Login", um das automatische Starten der Anwendung beim Login zu aktivieren oder zu deaktivieren.
+4. **Execute Command**: Klicken Sie mit der linken Maustaste auf das Tray-Symbol und wählen Sie den Befehl aus, den Sie ausführen möchten, aus dem Menü. Der Befehl wird im angegebenen Terminalprogramm ausgeführt.
 
 ### Erstellen von Untermenüs
 

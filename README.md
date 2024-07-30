@@ -176,8 +176,8 @@ The hotkey parameter is optional. If it is not specified, the command will not h
 
 ## How to Use
 
-1. **Edit Config**: Right-click the tray icon and select "Edit Config" to open the configuration file in your default editor. Modify the configuration as needed.
-2. **Open Config Folder**: Right-click the tray icon and select "Open Config Folder" to open the configuration directory in your file explorer.
+1. **Edit Config**: Right-click the tray icon and select config to open the configuration file in your default editor. Modify the configuration as needed.
+2. **Show Config Folder**: Right-click the tray icon and select "Show Config Folder" to open the configuration directory in your file explorer.
 3. **Toggle Launch at Login**: Right-click the tray icon and select "Toggle Launch at Login" to enable or disable the application to start at login.
 4. **Execute Command**: Left-click the tray icon and select the command you want to run from the menu. The command will be executed in the specified terminal application.
 
