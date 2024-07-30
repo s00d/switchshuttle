@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
     pub terminal: String,
     pub launch_in: String,
@@ -19,8 +19,8 @@ pub struct CommandConfig {
     pub inputs: Option<HashMap<String, String>>,
     pub command: Option<String>,
     pub commands: Option<Vec<String>>,
+    pub hotkey: Option<String>,
     pub submenu: Option<Vec<CommandConfig>>,
-    pub hotkey: Option<String>, // Добавлено поле для горячей клавиши
 }
 
 impl Config {

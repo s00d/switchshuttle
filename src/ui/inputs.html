@@ -100,10 +100,10 @@
     let inputs = {};
 
     listen("input_data", ev => {
-        console.log(1111, ev.payload)
         command = ev.payload[0];
         inputs = ev.payload[1];
         const form = document.getElementById('inputForm');
+        form.innerHTML = '';
         for (const [key, value] of Object.entries(inputs)) {
             const label = document.createElement('label');
             label.textContent = key;

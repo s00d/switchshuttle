@@ -12,7 +12,7 @@ use tauri::{CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu
 use auto_launch::*;
 use tauri::utils::platform::current_exe;
 use crate::config::{CommandConfig, Config};
-use crate::helpers::{create_window, execute_command, get_config_path, open_folder_in_default_explorer, open_in_default_editor};
+use crate::helpers::{create_window, execute_command, find_command_config, get_config_path, open_folder_in_default_explorer, open_in_default_editor};
 use global_hotkey::{GlobalHotKeyManager, GlobalHotKeyEvent, hotkey::{HotKey}, HotKeyState};
 use mouse_position::mouse_position::Mouse;
 use once_cell::sync::Lazy;
@@ -206,19 +206,52 @@ fn main() {
                     },
                     _ => {
                         if id.starts_with("edit_") {
+                            println!("ID starts with 'edit_': {}", id);
+
                             let config_file_name = id.replacen("edit_", "", 1); // Remove "edit_" prefix
-                            let config_file_path = config_path.parent().unwrap().join(config_file_name);
+                            println!("Config file name after removing 'edit_' prefix: {}", config_file_name);
+
+                            let config_file_path = config_path.parent().unwrap().join(&config_file_name);
+                            println!("Full config file path: {:?}", config_file_path);
+
                             open_in_default_editor(&config_file_path);
                         } else {
+                            println!("Processing configs for ID: {}", id);
+
+
+
                             for config in &configs {
-                                if let Some(command_config) = config.commands.iter().find(|c| c.name == id) {
+                                println!("Checking config: {:?}", config);
+
+                                if let Some(command_config) = find_command_config(id.as_str(), &config.commands) {
+                                    println!("Found matching command config: {:?}", command_config);
+
                                     if let Some(inputs) = &command_config.inputs {
+                                        println!("Command requires inputs: {:?}", inputs);
+
                                         let window = create_window(&app, "input_window", "Provide Inputs", "ui/inputs.html", 400.0, 300.0);
-                                        window.emit("input_data", (id.clone(), inputs.clone())).unwrap();
+                                        println!("Created input window");
+
+                                        match window.emit("input_data", (id.clone(), inputs.clone())) {
+                                            Ok(_) => println!("Successfully emitted input data"),
+                                            Err(e) => println!("Failed to emit input data: {}", e),
+                                        }
                                     } else {
-                                        execute_command(command_config, &config.terminal, &config.launch_in, &config.theme, &config.title);
+                                        println!("Executing command without inputs");
+
+                                        execute_command(
+                                            command_config,
+                                            &config.terminal,
+                                            &config.launch_in,
+                                            &config.theme,
+                                            &config.title
+                                        );
+
+                                        println!("Command execution completed");
                                     }
                                     break;
+                                } else {
+                                    println!("No matching command config found for ID: {}", id);
                                 }
                             }
                         }

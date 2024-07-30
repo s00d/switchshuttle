@@ -14,15 +14,25 @@ fn read_script(script_path: &str) -> Option<String> {
 pub fn execute_command(command_config: &CommandConfig, terminal: &str, launch_in: &str, theme: &String, title: &String) {
     let mut commands_to_execute = Vec::new();
 
+    // Дебаг: Инициализация commands_to_execute
+    println!("Initializing commands_to_execute...");
+
     if let Some(command) = &command_config.command {
+        println!("Adding single command: {}", command);
         commands_to_execute.push(command.clone());
     }
 
     if let Some(commands) = &command_config.commands {
+        println!("Adding multiple commands: {:?}", commands);
         commands_to_execute.extend(commands.clone());
     }
 
+    // Дебаг: Печать списка команд
+    println!("Commands to execute: {:?}", commands_to_execute);
+
     if cfg!(target_os = "macos") {
+        println!("Detected macOS");
+
         let script_path = match (terminal, launch_in) {
             ("iterm", "current") => "iTerm-Current.scpt",
             ("iterm", "new_tab") => "iTerm-Tab.scpt",
@@ -41,6 +51,9 @@ pub fn execute_command(command_config: &CommandConfig, terminal: &str, launch_in
             return;
         }
 
+        // Дебаг: Печать пути к скрипту
+        println!("Script path: {}", script_path);
+
         let script_content = match read_script(script_path) {
             Some(content) => content,
             None => {
@@ -54,42 +67,66 @@ pub fn execute_command(command_config: &CommandConfig, terminal: &str, launch_in
                 .replace("{theme}", theme)
                 .replace("{title}", title);
 
-            let status = Command::new("osascript")
+            // println!("Executing script: {}", script);
+
+            let output = Command::new("osascript")
                 .arg("-e")
                 .arg(&script)
-                .status()
+                .output()
                 .expect("Failed to execute command");
 
-            if !status.success() {
+            // Дебаг: Печать результата выполнения
+            if output.status.success() {
+                println!("Command succeeded: {}", command);
+                println!("Standard Output: {}", String::from_utf8_lossy(&output.stdout));
+            } else {
                 println!("Command failed: {}", command);
+                println!("Standard Output: {}", String::from_utf8_lossy(&output.stdout));
+                println!("Standard Error: {}", String::from_utf8_lossy(&output.stderr));
                 break;
             }
         }
     } else if cfg!(target_os = "windows") {
+        println!("Detected Windows");
+
         for command in commands_to_execute {
+            println!("Executing command: {}", command);
+
             let status = Command::new("cmd")
                 .args(&["/C", &command])
                 .status()
                 .expect("Failed to execute command");
 
-            if !status.success() {
+            // Дебаг: Печать результата выполнения
+            if status.success() {
+                println!("Command succeeded: {}", command);
+            } else {
                 println!("Command failed: {}", command);
                 break;
             }
         }
     } else if cfg!(target_os = "linux") {
+        println!("Detected Linux");
+
         for command in commands_to_execute {
+            println!("Executing command: {}", command);
+
             let status = Command::new("sh")
                 .arg("-c")
                 .arg(&command)
                 .status()
                 .expect("Failed to execute command");
 
-            if !status.success() {
+            // Дебаг: Печать результата выполнения
+            if status.success() {
+                println!("Command succeeded: {}", command);
+            } else {
                 println!("Command failed: {}", command);
                 break;
             }
         }
+    } else {
+        println!("Unsupported operating system");
     }
 }
 
@@ -183,4 +220,19 @@ pub fn create_window(app: &tauri::AppHandle, label: &str, title: &str, url: &str
             window
         }
     }
+}
+
+pub fn find_command_config<'a>(id: &str, configs: &'a [CommandConfig]) -> Option<&'a CommandConfig> {
+    for config in configs {
+        if config.name == id {
+            return Some(config);
+        }
+
+        if let Some(submenu) = &config.submenu {
+            if let Some(found) = find_command_config(id, submenu) {
+                return Some(found);
+            }
+        }
+    }
+    None
 }
