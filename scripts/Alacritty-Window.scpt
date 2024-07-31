@@ -9,6 +9,7 @@ on scriptRun(argsCmd)
 end scriptRun
 
 on CommandRun(withCmd)
+  set currentClipboard to do shell script "pbpaste"
   tell application "Alacritty"
     activate
     tell application "System Events"
@@ -19,4 +20,5 @@ on CommandRun(withCmd)
       key code 36 -- entr
     end tell
   end tell
+  do shell script "echo " & quoted form of currentClipboard & " | pbcopy"
 end CommandRun
