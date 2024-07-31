@@ -73,11 +73,11 @@ pub fn get_version(app: tauri::AppHandle) -> String {
 }
 
 #[tauri::command]
-pub fn execute_command_with_inputs(inputs: HashMap<String, String>, command: String) -> Result<String, String> {
+pub fn execute_command_with_inputs(window: Window, inputs: HashMap<String, String>, command: String) -> Result<String, String> {
     println!("execute_command_with_inputs {:?} {:?}", inputs, command);
 
     let mut config_manager = ConfigManager::new();
-    config_manager.load_configs().map_err(|e| e.to_string())?;
+    config_manager.load_configs(Some(&window)).map_err(|e| e.to_string())?;
 
     let (command, config) = match config_manager.find_command_by_id(&command) {
         Some((cmd, cfg)) => (cmd, cfg),
@@ -118,9 +118,9 @@ pub fn execute_command_with_inputs(inputs: HashMap<String, String>, command: Str
 }
 
 #[tauri::command]
-pub fn get_menu_data() -> Result<String, String> {
+pub fn get_menu_data(window: Window) -> Result<String, String> {
     let mut config_manager = ConfigManager::new();
-    config_manager.load_configs().map_err(|e| e.to_string())?;
+    config_manager.load_configs(Some(&window)).map_err(|e| e.to_string())?;
 
     fn build_menu_items(commands: &Vec<CommandConfig>) -> Vec<serde_json::Value> {
         let mut items = Vec::new();
@@ -160,11 +160,11 @@ pub fn get_menu_data() -> Result<String, String> {
 }
 
 #[tauri::command]
-pub fn execute(command: String) -> Result<String, String> {
+pub fn execute(window: Window, command: String) -> Result<String, String> {
     println!("Executing command: {}", command);
 
     let mut config_manager = ConfigManager::new();
-    config_manager.load_configs().map_err(|e| e.to_string())?;
+    config_manager.load_configs(Some(&window)).map_err(|e| e.to_string())?;
 
     match config_manager.find_command_by_id(&command) {
         Some((command, config)) => {
