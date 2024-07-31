@@ -15,6 +15,11 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 98%;
 }
 
 header .logo img {
@@ -88,6 +93,7 @@ header nav ul .dropdown-content a.selected {
 .container {
     display: flex;
     height: calc(100vh - 3em); /* Adjust based on header height */
+    padding-top: 76px;
 }
 
 aside {
