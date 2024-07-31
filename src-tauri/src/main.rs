@@ -145,7 +145,7 @@ fn main() {
                     "edit_config" => open_in_default_editor(&config_path),
                     "open_config_folder" => open_folder_in_default_explorer(&config_path.parent().unwrap().to_path_buf()),
                     "open_config_editor" => {
-                        create_window(&app, "config_editor", "Config Editor", "ui/editor.html", 800.0, 600.0);
+                        create_window(&app, "config_editor", "Config Editor", "editor", 800.0, 600.0, true);
                     },
                     "toggle_launch_at_login" => {
                         let enabled = auto_start.is_enabled().unwrap();
@@ -158,17 +158,17 @@ fn main() {
                         app.tray_handle().set_menu(new_system_tray_menu).unwrap();
                     },
                     "about" => {
-                        create_window(&app, "about", "About", "ui/about.html", 400.0, 180.0);
+                        create_window(&app, "main", "About", "about", 400.0, 180.0, true);
                     },
                     "homepage" => {
                         let homepage_url = "https://github.com/s00d/SwitchShuttle";
                         tauri::api::shell::open(&app.shell_scope(), homepage_url, None).unwrap();
                     },
                     "check_updates" => {
-                        create_window(&app, "update", "Update Available", "ui/update.html", 400.0, 220.0);
+                        create_window(&app, "update", "Update Available", "update", 400.0, 300.0, true);
                     },
                     "add_new_config" => {
-                        create_window(&app, "new_config_window", "Create New Config", "ui/create.html", 400.0, 250.0);
+                        create_window(&app, "new_config_window", "Create New Config", "create", 400.0, 300.0, true);
                     },
                     _ => {
                         if id.starts_with("edit_") {
@@ -187,7 +187,7 @@ fn main() {
                             match config_manager.find_command_by_id(id.as_str()) {
                                 Some((command, config)) => {
                                     if let Some(inputs) = &command.inputs {
-                                        let window = create_window(&app, "input_window", "Provide Inputs", "ui/inputs.html", 400.0, 300.0);
+                                        let window = create_window(&app, "input_window", "Provide Inputs", "inputs", 400.0, 300.0, true);
                                         window.emit("input_data", (id.clone(), inputs.clone())).unwrap();
                                     } else {
                                         execute_command(command, &config.terminal, &config.launch_in, &config.theme, &config.title);

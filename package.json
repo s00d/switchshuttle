@@ -1,20 +1,31 @@
 {
   "name": "switchshuttle",
-  "version": "1.0.0",
-  "description": "![SwitchShuttle](https://raw.githubusercontent.com/s00d/switchshuttle/main/logo.webp)",
-  "main": "index.js",
+  "version": "0.0.0",
+  "description": "SwitchShuttle is a cross-platform system tray application that allows users to run predefined commands in various terminal applications. It supports macOS, Windows, and Linux, offering a simple and customizable way to manage and execute your frequently used commands.",
+  "type": "module",
   "scripts": {
     "generate:html": "node generate-html.js",
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@tauri-apps/api": "^1.6.0",
-    "tauri-plugin-context-menu": "^0.8.0"
+    "@tauri-apps/api": "^1",
+    "tauri-plugin-context-menu": "^0.8.0",
+    "vue": "^3.3.4",
+    "vue-router": "^4.4.0"
   },
-  "packageManager": "yarn@3.7.0+sha256.7bf0c78a106332886ea4e59641fd819b1af953edcd72c4d93a32b1c71000ee67",
   "devDependencies": {
-    "marked": "^12.0.2"
-  }
+    "@tauri-apps/cli": "^1",
+    "@vitejs/plugin-vue": "^5.0.5",
+    "marked": "^12.0.2",
+    "typescript": "^5.2.2",
+    "vite": "^5.3.1",
+    "vue-tsc": "^2.0.22"
+  },
+  "packageManager": "yarn@3.7.0+sha256.7bf0c78a106332886ea4e59641fd819b1af953edcd72c4d93a32b1c71000ee67"
 }
