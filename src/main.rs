@@ -103,7 +103,7 @@ fn create_system_tray_menu(autostart: bool, config_manager: &ConfigManager) -> S
 
 fn main() {
     let mut config_manager = ConfigManager::new();
-    config_manager.load_configs().expect("Failed to load configs");
+    config_manager.load_configs(None).expect("Failed to load configs");
 
     let system_tray_menu = create_system_tray_menu(false, &config_manager);
 
@@ -135,7 +135,7 @@ fn main() {
                 .unwrap();
 
             let mut config_manager = ConfigManager::new();
-            config_manager.load_configs().expect("Failed to reload configs");
+            config_manager.load_configs(Some(&app.get_window("main").unwrap())).expect("Failed to reload configs");
             let new_system_tray_menu = create_system_tray_menu(auto_start.is_enabled().unwrap(), &config_manager);
             app.tray_handle().set_menu(new_system_tray_menu).unwrap();
 
@@ -221,7 +221,7 @@ fn main() {
 
         // Регистрация глобальных горячих клавиш
         let mut config_manager = ConfigManager::new();
-        config_manager.load_configs().expect("Failed to load configs");
+        config_manager.load_configs(Some(&app_handle.get_window("main").unwrap())).expect("Failed to load configs");
 
         let mut hotkey = false;
 

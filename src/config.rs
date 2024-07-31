@@ -4,6 +4,8 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use serde::{Deserialize, Serialize};
 use std::sync::atomic::{AtomicUsize, Ordering};
+use tauri::api::dialog::message;
+use tauri::Window;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Config {
@@ -43,7 +45,7 @@ impl ConfigManager {
         }
     }
 
-    pub fn load_configs(&mut self) -> io::Result<()> {
+    pub fn load_configs(&mut self, window: Option<&Window>) -> io::Result<()> {
         self.counter = Arc::new(AtomicUsize::new(0));
 
         let config_path = get_config_path();
@@ -58,7 +60,7 @@ impl ConfigManager {
             let mut paths: Vec<_> = entries.filter_map(|entry| {
                 entry.ok().and_then(|e| {
                     let path = e.path();
-                    if path.is_file() {
+                    if path.is_file() && path.extension().and_then(|ext| ext.to_str()) == Some("json") {
                         Some(path)
                     } else {
                         None
@@ -66,14 +68,23 @@ impl ConfigManager {
                 })
             }).collect();
 
+
             paths.sort();
 
             for path in paths {
-                if let Ok(mut config) = Config::load(&path) {
-                    config.assign_ids(&self.counter);
-                    self.config_paths.push(path);
-                    self.configs.push(config);
-                    has_configs = true;
+                match Config::load(&path) {
+                    Ok(mut config) => {
+                        config.assign_ids(&self.counter);
+                        self.config_paths.push(path);
+                        self.configs.push(config);
+                        has_configs = true;
+                    }
+                    Err(err) => {
+                        eprintln!("Failed to load config from {}: {}", path.display(), err);
+                        if let Some(w) = window {
+                            message(Some(w), "Error", &format!("Failed to parse config from {}: {}", path.display(), err));
+                        }
+                    }
                 }
             }
         }
@@ -113,9 +124,17 @@ impl Config {
 
     pub fn load(path: &PathBuf) -> io::Result<Self> {
         let config_data = fs::read_to_string(path)?;
-        let mut config: Config = serde_json::from_str(&config_data)?;
-        config.clear_ids();
-        Ok(config)
+        match serde_json::from_str(&config_data) {
+            Ok(config) => {
+                let mut config: Config = config;
+                config.clear_ids();
+                Ok(config)
+            }
+            Err(err) => {
+                eprintln!("Failed to parse config from {}: {}", path.display(), err);
+                Err(io::Error::new(io::ErrorKind::InvalidData, err))
+            }
+        }
     }
 
     pub fn save(&mut self, path: &PathBuf) -> io::Result<()> {
