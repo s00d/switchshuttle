@@ -1,0 +1,325 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwitchShuttle Documentation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+    <div class="logo">
+        <a href="https://github.com/s00d/switchshuttle/">
+            <img src="https://github.com/s00d/switchshuttle/blob/main/icons/128x128_white.png?raw=true" alt="SwitchShuttle Logo">
+        </a>
+    </div>
+    <nav>
+        <ul>
+            <li><a href="https://github.com/s00d/switchshuttle/">GitHub</a></li>
+            <li><a href="https://github.com/s00d/switchshuttle/issues">Issues</a></li>
+            <li class="dropdown">
+                <a href="javascript:void(0)" class="dropbtn">Language</a>
+                <div class="dropdown-content">
+                    <a href="index.html" class="">English</a>
+                    <a href="index_de.html" class="">Deutsch</a>
+                    <a href="index_ja.html" class="selected">日本語</a>
+                    <a href="index_ru.html" class="">Русский</a>
+                    <a href="index_zh.html" class="">中文</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+</header>
+<div class="container">
+    <aside>
+        <ul id="aside-menu">
+            <li class="level-2"><a href="#switchshuttle">SwitchShuttle</a></li>
+<li class="level-2"><a href="#概要">概要</a></li>
+<li class="level-2"><a href="#機能">機能</a></li>
+<li class="level-2"><a href="#設定">設定</a></li>
+<li class="level-3"><a href="#設定パラメータ">設定パラメータ</a></li>
+<li class="level-3"><a href="#コマンドパラメータ">コマンドパラメータ</a></li>
+<li class="level-3"><a href="#コマンド実行ロジック">コマンド実行ロジック</a></li>
+<li class="level-4"><a href="#実行フローの例">実行フローの例</a></li>
+<li class="level-3"><a href="#動的入力">動的入力</a></li>
+<li class="level-4"><a href="#入力付き設定の例">入力付き設定の例</a></li>
+<li class="level-3"><a href="#ホットキー">ホットキー</a></li>
+<li class="level-3"><a href="#ホットキーの使用方法">ホットキーの使用方法</a></li>
+<li class="level-2"><a href="#使用方法">使用方法</a></li>
+<li class="level-3"><a href="#サブメニューの作成">サブメニューの作成</a></li>
+<li class="level-2"><a href="#アプリケーションのビルド">アプリケーションのビルド</a></li>
+<li class="level-3"><a href="#前提条件">前提条件</a></li>
+<li class="level-3"><a href="#手順">手順</a></li>
+<li class="level-2"><a href="#ダウンロード">ダウンロード</a></li>
+<li class="level-3"><a href="#macosの場合">macOSの場合</a></li>
+<li class="level-2"><a href="#コントリビューション">コントリビューション</a></li>
+<li class="level-2"><a href="#ライセンス">ライセンス</a></li>
+        </ul>
+    </aside>
+    <main id="content">
+        <p><img src="https://raw.githubusercontent.com/s00d/switchshuttle/main/icons/logo.webp" alt="SwitchShuttle">
+<img src="https://github.com/s00d/switchshuttle/blob/main/icons/intro.gif?raw=true" alt="intro"></p>
+<h2 id="switchshuttle">SwitchShuttle</h2><p>SwitchShuttleは、事前定義されたコマンドをさまざまなターミナルアプリケーションで実行できるクロスプラットフォームのシステムトレイアプリケーションです。macOS、Windows、Linuxをサポートし、頻繁に使用するコマンドを管理および実行するためのシンプルでカスタマイズ可能な方法を提供します。</p>
+<h2 id="概要">概要</h2><p>SwitchShuttleは、<a href="https://github.com/fitztrev/shuttle">Shuttle</a>アプリケーションの再構築および拡張版です。ShuttleがmacOSでコマンドショートカットを管理するためのシンプルで効果的な方法を提供するのに対し、SwitchShuttleは複数のオペレーティングシステムとターミナルエミュレータのサポートを提供し、拡張された設定機能とユーザーのカスタマイズオプションを備えています。</p>
+<h2 id="機能">機能</h2><ul>
+<li>複数のターミナルアプリケーションをサポート: iTerm, Terminal, Warp, Alacritty, Hyper。</li>
+<li>異なるモードでコマンドを実行: 現在のウィンドウ、新しいタブ、新しいウィンドウ。</li>
+<li>起動時に自動起動を切り替える。</li>
+<li>トレイメニューから直接設定を編集。</li>
+<li>トレイメニューから設定フォルダを開く。</li>
+<li>コマンドの整理に役立つサブメニューをサポート。</li>
+<li>コマンドの動的入力をサポート。</li>
+<li><strong>新機能</strong>: ホットキーでコンテキストメニューをトリガー。</li>
+</ul>
+<h2 id="設定">設定</h2><p>設定はユーザーの設定ディレクトリにあるJSONファイルに保存されます。デフォルトのパスは、LinuxとmacOSでは<code>~/.config/switch-shuttle/</code>、Windowsでは<code>C:\Users\&lt;Username&gt;\AppData\Roaming\switch-shuttle\</code>です。このディレクトリには複数の設定ファイルを保存でき、それぞれが異なるコマンドや設定のセットを表します。</p>
+<p>設定ファイルの例は以下の通りです：</p>
+<pre><code class="language-json">{
+  &quot;terminal&quot;: &quot;iterm&quot;,
+  &quot;launch_in&quot;: &quot;current&quot;,
+  &quot;theme&quot;: &quot;Homebrew&quot;,
+  &quot;title&quot;: &quot;新しいタブ&quot;,
+  &quot;menu_hotkey&quot;: &quot;Ctrl+Shift+M&quot;,
+  &quot;commands&quot;: [
+    {
+      &quot;name&quot;: &quot;コマンド&quot;,
+      &quot;inputs&quot;: null,
+      &quot;command&quot;: null,
+      &quot;commands&quot;: null,
+      &quot;hotkey&quot;: null,
+      &quot;submenu&quot;: [
+        {
+          &quot;name&quot;: &quot;例のコマンド&quot;,
+          &quot;inputs&quot;: null,
+          &quot;command&quot;: &quot;echo こんにちは、世界！&quot;,
+          &quot;commands&quot;: null,
+          &quot;submenu&quot;: null,
+          &quot;hotkey&quot;: &quot;Ctrl+Shift+E&quot;
+        },
+        {
+          &quot;name&quot;: &quot;入力付きの例のマルチコマンド&quot;,
+          &quot;inputs&quot;: {
+            &quot;key1&quot;: &quot;デフォルト1&quot;,
+            &quot;key2&quot;: &quot;デフォルト2&quot;
+          },
+          &quot;command&quot;: null,
+          &quot;commands&quot;: [
+            &quot;export MY_VAR=$(echo &#39;ステップ1: [key1]&#39;)&quot;,
+            &quot;RESULT=$(echo &#39;ステップ2: [key2]&#39; &amp;&amp; echo $MY_VAR)&quot;,
+            &quot;echo ステップ3: 完了 &amp;&amp; echo $RESULT&quot;
+          ],
+          &quot;submenu&quot;: null,
+          &quot;hotkey&quot;: &quot;Ctrl+Shift+M&quot;
+        },
+        {
+          &quot;name&quot;: &quot;例のサブメニュー&quot;,
+          &quot;inputs&quot;: null,
+          &quot;command&quot;: null,
+          &quot;commands&quot;: null,
+          &quot;submenu&quot;: [
+            {
+              &quot;name&quot;: &quot;サブコマンド1&quot;,
+              &quot;inputs&quot;: null,
+              &quot;command&quot;: &quot;echo サブコマンド1&quot;,
+              &quot;commands&quot;: null,
+              &quot;submenu&quot;: null,
+              &quot;hotkey&quot;: &quot;Ctrl+Shift+S&quot;
+            },
+            {
+              &quot;name&quot;: &quot;サブコマンド2&quot;,
+              &quot;inputs&quot;: null,
+              &quot;command&quot;: &quot;echo サブコマンド2&quot;,
+              &quot;commands&quot;: null,
+              &quot;submenu&quot;: null,
+              &quot;hotkey&quot;: null
+            }
+          ],
+          &quot;hotkey&quot;: null
+        }
+      ]
+    }
+  ]
+}
+</code></pre>
+<h3 id="設定パラメータ">設定パラメータ</h3><table>
+<thead>
+<tr>
+<th>パラメータ</th>
+<th>タイプ</th>
+<th>説明</th>
+<th>有効な値</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>terminal</td>
+<td>String</td>
+<td>使用するターミナルアプリケーション</td>
+<td>&quot;iterm&quot;, &quot;terminal&quot;, &quot;warp&quot;</td>
+</tr>
+<tr>
+<td>launch_in</td>
+<td>String</td>
+<td>コマンドを起動する場所</td>
+<td>&quot;current&quot;, &quot;new_tab&quot;, &quot;new_window&quot;</td>
+</tr>
+<tr>
+<td>theme</td>
+<td>String</td>
+<td>使用するテーマ（ターミナルがサポートする場合）</td>
+<td>テーマを表す任意の文字列</td>
+</tr>
+<tr>
+<td>title</td>
+<td>String</td>
+<td>ターミナルウィンドウ/タブのタイトル</td>
+<td>任意の文字列</td>
+</tr>
+<tr>
+<td>menu_hotkey</td>
+<td>String (Optional)</td>
+<td>コンテキストメニューをトリガーするグローバルホットキー</td>
+<td>有効なホットキーの組み合わせ, 例: &quot;Ctrl+Shift+M&quot;</td>
+</tr>
+<tr>
+<td>commands</td>
+<td>Array</td>
+<td>コマンド設定のリスト</td>
+<td>コマンドパラメータを参照</td>
+</tr>
+</tbody></table>
+<h3 id="コマンドパラメータ">コマンドパラメータ</h3><table>
+<thead>
+<tr>
+<th>パラメータ</th>
+<th>タイプ</th>
+<th>説明</th>
+<th>有効な値</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>name</td>
+<td>String</td>
+<td>コマンドまたはサブメニューの名前</td>
+<td>任意の文字列</td>
+</tr>
+<tr>
+<td>inputs</td>
+<td>Object (Optional)</td>
+<td>入力のキーとデフォルト値</td>
+<td>{&quot;key1&quot;: &quot;default1&quot;, &quot;key2&quot;: &quot;default2&quot;}</td>
+</tr>
+<tr>
+<td>command</td>
+<td>String (Optional)</td>
+<td>実行するコマンド（コマンドの場合）</td>
+<td>コマンドを表す任意の文字列</td>
+</tr>
+<tr>
+<td>commands</td>
+<td>Array (Optional)</td>
+<td>順次実行するコマンドのリスト</td>
+<td>各コマンドが文字列である任意の配列</td>
+</tr>
+<tr>
+<td>submenu</td>
+<td>Array (Optional)</td>
+<td>サブコマンドのリスト（サブメニューの場合）</td>
+<td>コマンドパラメータを参照</td>
+</tr>
+<tr>
+<td>hotkey</td>
+<td>String (Optional)</td>
+<td>コマンドをトリガーするグローバルホットキー</td>
+<td>有効なホットキーの組み合わせ, 例: &quot;Ctrl+Shift+E&quot;</td>
+</tr>
+</tbody></table>
+<h3 id="コマンド実行ロジック">コマンド実行ロジック</h3><p>SwitchShuttleは、<code>command</code>パラメータを使用して単一のコマンドを定義する方法、<code>commands</code>パラメータを使用してコマンドのリストを定義する方法、またはその両方をサポートします。<code>command</code>と<code>commands</code>の両方が指定されている場合、単一のコマンドが最初に実行され、その後にリスト内のコマンドが順次実行されます。</p>
+<h4 id="実行フローの例">実行フローの例</h4><ol>
+<li><strong>単一コマンド</strong>: <code>command</code>のみが指定されている場合、そのコマンドが実行されます。</li>
+<li><strong>複数コマンド</strong>: <code>commands</code>のみが指定されている場合、リスト内の各コマンドが順次実行されます。</li>
+<li><strong>コマンドとコマンドリストの両方</strong>: <code>command</code>と<code>commands</code>の両方が指定されている場合、単一のコマンドが最初に実行され、その後リスト内の各コマンドが実行されます。</li>
+</ol>
+<h3 id="動的入力">動的入力</h3><p>SwitchShuttleでは、コマンドの実行前にユーザーからの入力を求める動的入力を定義できます。<code>inputs</code>パラメータを使用してコマンド設定に入力を定義できます。</p>
+<h4 id="入力付き設定の例">入力付き設定の例</h4><pre><code class="language-json">{
+  &quot;name&quot;: &quot;入力付きの例のマルチコマンド&quot;,
+  &quot;inputs&quot;: {
+    &quot;key1&quot;: &quot;デフォルト1&quot;,
+    &quot;key2&quot;: &quot;デフォルト2&quot;
+  },
+  &quot;command&quot;: null,
+  &quot;commands&quot;: [
+    &quot;export MY_VAR=$(echo &#39;ステップ1: [key1]&#39;)&quot;,
+    &quot;RESULT=$(echo &#39;ステップ2: [key2]&#39; &amp;&amp; echo $MY_VAR)&quot;,
+    &quot;echo ステップ3: 完了 &amp;&amp; echo $RESULT&quot;
+  ],
+  &quot;submenu&quot;: null,
+
+
+  &quot;hotkey&quot;: &quot;Ctrl+Shift+M&quot;
+}
+</code></pre>
+<h3 id="ホットキー">ホットキー</h3><p>コマンド設定に<code>hotkey</code>パラメータを追加することで、コマンドにグローバルホットキーを割り当てることができます。ホットキーの組み合わせは、修飾キー（Ctrl、Shift、Alt、Win）とキー（A-Z、0-9など）を組み合わせた形式でなければなりません。例えば、コマンドに「Ctrl+Shift+E」をホットキーとして設定するには：</p>
+<pre><code class="language-json">{
+   &quot;name&quot;: &quot;例のコマンド&quot;,
+   &quot;command&quot;: &quot;echo こんにちは、世界！&quot;,
+   &quot;submenu&quot;: null,
+   &quot;hotkey&quot;: &quot;Ctrl+Shift+E&quot;,
+   &quot;commands&quot;: null
+}
+</code></pre>
+<p>ホットキーパラメータはオプションです。指定しない場合、そのコマンドにはグローバルホットキーが割り当てられません。</p>
+<h3 id="ホットキーの使用方法">ホットキーの使用方法</h3><ol>
+<li><strong>ホットキーの割り当て</strong>: 設定ファイルを編集して、トリガーしたいコマンドに<code>hotkey</code>パラメータを追加します。</li>
+<li><strong>ホットキーの使用</strong>: アプリケーションを再起動した後、設定したホットキーを使用して、フォーカスしているアプリケーションに関係なく対応するコマンドをトリガーします。</li>
+</ol>
+<h2 id="使用方法">使用方法</h2><ol>
+<li><strong>Edit Config</strong>: トレイアイコンを右クリックして「設定の編集」を選択し、デフォルトのエディタで設定ファイルを開きます。必要に応じて設定を変更します。</li>
+<li><strong>Show Config Folder</strong>: トレイアイコンを右クリックして「設定フォルダを開く」を選択し、ファイルエクスプローラで設定ディレクトリを開きます。</li>
+<li><strong>Toggle Launch at Login</strong>: トレイアイコンを右クリックして「ログイン時に自動起動を切り替える」を選択し、アプリケーションがログイン時に起動するかどうかを切り替えます。</li>
+<li><strong>Execute Command</strong>: トレイアイコンを左クリックしてメニューから実行したいコマンドを選択します。指定されたターミナルアプリケーションでコマンドが実行されます。</li>
+</ol>
+<h3 id="サブメニューの作成">サブメニューの作成</h3><p>サブメニューを作成するには、<code>command</code>フィールドを<code>null</code>に設定し、<code>submenu</code>フィールドにサブコマンドのリストを提供します。サブコマンドも独自のサブメニューを持つことができ、ネストされたメニューが可能です。</p>
+<h2 id="アプリケーションのビルド">アプリケーションのビルド</h2><h3 id="前提条件">前提条件</h3><ul>
+<li><a href="https://www.rust-lang.org/tools/install">Rust</a></li>
+<li><a href="https://tauri.app/v1/guides/getting-started/prerequisites/">Tauri</a></li>
+</ul>
+<h3 id="手順">手順</h3><ol>
+<li>リポジトリをクローンする:</li>
+</ol>
+<pre><code class="language-sh">git clone https://github.com/s00d/switchshuttle.git
+cd switchshuttle
+npm i
+</code></pre>
+<ol start="2">
+<li>アプリケーションをビルドする:</li>
+</ol>
+<pre><code class="language-sh">cargo tauri build
+</code></pre>
+<ol start="3">
+<li>アプリケーションを実行する:</li>
+</ol>
+<pre><code class="language-sh">cargo tauri dev
+</code></pre>
+<h2 id="ダウンロード">ダウンロード</h2><p>最新バージョンのSwitchShuttleは<a href="https://github.com/s00d/switchshuttle/releases">GitHub Releases</a>ページからダウンロードできます。</p>
+<h3 id="macosの場合">macOSの場合</h3><p>アプリケーションを実行する前に、サインが必要な場合があります。以下の手順でサインを行ってください：</p>
+<ol>
+<li>バイナリを実行可能にする:</li>
+</ol>
+<pre><code class="language-bash">chmod +x /Applications/switch-shuttle.app
+</code></pre>
+<ol start="2">
+<li>拡張属性をクリアし、バイナリにサインする:</li>
+</ol>
+<pre><code class="language-bash">xattr -cr /Applications/switch-shuttle.app &amp;&amp; codesign --force --deep --sign - /Applications/switch-shuttle.app
+</code></pre>
+<h2 id="コントリビューション">コントリビューション</h2><p>貢献は大歓迎です！GitHubでプルリクエストを提出するか、イシューをオープンしてください。</p>
+<h2 id="ライセンス">ライセンス</h2><p>このプロジェクトはMITライセンスの下でライセンスされています。詳細は<a href="LICENSE">LICENSE</a>ファイルを参照してください。</p>
+<hr>
+<p>SwitchShuttleを使用してターミナルコマンドを簡単に管理しましょう！</p>
+<hr>
+<p>この翻訳が役立つことを願っています。</p>
+
+    </main>
+</div>
+</body>
+</html>

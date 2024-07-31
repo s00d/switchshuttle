@@ -1,7 +1,9 @@
 ![SwitchShuttle](https://raw.githubusercontent.com/s00d/switchshuttle/main/icons/logo.webp)
 ![intro](https://github.com/s00d/switchshuttle/blob/main/icons/intro.gif?raw=true)
 
+<span class="locale">
 [[English](README.md)] [[中文](README_ZH.md)] [[Русский](README_RU.md)] [[Deutsch](README_DE.md)] [[日本語](README_JA.md)]
+</span>
 
 ## SwitchShuttle
 

@@ -4,6 +4,7 @@
   "description": "![SwitchShuttle](https://raw.githubusercontent.com/s00d/switchshuttle/main/logo.webp)",
   "main": "index.js",
   "scripts": {
+    "generate:html": "node generate-html.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -12,5 +13,8 @@
     "@tauri-apps/api": "^1.6.0",
     "tauri-plugin-context-menu": "^0.8.0"
   },
-  "packageManager": "yarn@3.7.0+sha256.7bf0c78a106332886ea4e59641fd819b1af953edcd72c4d93a32b1c71000ee67"
+  "packageManager": "yarn@3.7.0+sha256.7bf0c78a106332886ea4e59641fd819b1af953edcd72c4d93a32b1c71000ee67",
+  "devDependencies": {
+    "marked": "^12.0.2"
+  }
 }

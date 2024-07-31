@@ -1,0 +1,323 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwitchShuttle Documentation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+    <div class="logo">
+        <a href="https://github.com/s00d/switchshuttle/">
+            <img src="https://github.com/s00d/switchshuttle/blob/main/icons/128x128_white.png?raw=true" alt="SwitchShuttle Logo">
+        </a>
+    </div>
+    <nav>
+        <ul>
+            <li><a href="https://github.com/s00d/switchshuttle/">GitHub</a></li>
+            <li><a href="https://github.com/s00d/switchshuttle/issues">Issues</a></li>
+            <li class="dropdown">
+                <a href="javascript:void(0)" class="dropbtn">Language</a>
+                <div class="dropdown-content">
+                    <a href="index.html" class="">English</a>
+                    <a href="index_de.html" class="">Deutsch</a>
+                    <a href="index_ja.html" class="">日本語</a>
+                    <a href="index_ru.html" class="">Русский</a>
+                    <a href="index_zh.html" class="selected">中文</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+</header>
+<div class="container">
+    <aside>
+        <ul id="aside-menu">
+            <li class="level-2"><a href="#switchshuttle">SwitchShuttle</a></li>
+<li class="level-2"><a href="#关于">关于</a></li>
+<li class="level-2"><a href="#功能">功能</a></li>
+<li class="level-2"><a href="#配置">配置</a></li>
+<li class="level-3"><a href="#配置参数">配置参数</a></li>
+<li class="level-3"><a href="#命令参数">命令参数</a></li>
+<li class="level-3"><a href="#命令执行逻辑">命令执行逻辑</a></li>
+<li class="level-4"><a href="#执行示例流程">执行示例流程</a></li>
+<li class="level-3"><a href="#动态输入">动态输入</a></li>
+<li class="level-4"><a href="#带有输入的示例配置">带有输入的示例配置</a></li>
+<li class="level-3"><a href="#热键">热键</a></li>
+<li class="level-3"><a href="#如何使用热键">如何使用热键</a></li>
+<li class="level-2"><a href="#如何使用">如何使用</a></li>
+<li class="level-3"><a href="#创建子菜单">创建子菜单</a></li>
+<li class="level-2"><a href="#构建应用程序">构建应用程序</a></li>
+<li class="level-3"><a href="#先决条件">先决条件</a></li>
+<li class="level-3"><a href="#步骤">步骤</a></li>
+<li class="level-2"><a href="#下载">下载</a></li>
+<li class="level-3"><a href="#macos">macOS</a></li>
+<li class="level-2"><a href="#贡献">贡献</a></li>
+<li class="level-2"><a href="#许可证">许可证</a></li>
+        </ul>
+    </aside>
+    <main id="content">
+        <p><img src="https://raw.githubusercontent.com/s00d/switchshuttle/main/icons/logo.webp" alt="SwitchShuttle">
+<img src="https://github.com/s00d/switchshuttle/blob/main/icons/intro.gif?raw=true" alt="intro"></p>
+<h2 id="switchshuttle">SwitchShuttle</h2><p>SwitchShuttle 是一个跨平台系统托盘应用程序，允许用户在各种终端应用程序中运行预定义的命令。它支持 macOS、Windows 和 Linux，提供了一种简单且可定制的方式来管理和执行您经常使用的命令。</p>
+<h2 id="关于">关于</h2><p>SwitchShuttle 是对 <a href="https://github.com/fitztrev/shuttle">Shuttle</a> 应用程序的重新构想和扩展。虽然 Shuttle 提供了一种简单有效的方式来管理 macOS 中的命令快捷方式，但 SwitchShuttle 在这一概念基础上进行了扩展，提供对多种操作系统和终端模拟器的支持，并增强了配置和用户自定义功能。</p>
+<h2 id="功能">功能</h2><ul>
+<li>支持多种终端应用程序：iTerm、Terminal、Warp, Alacritty, Hyper。</li>
+<li>在不同模式下运行命令：当前窗口、新标签页、新窗口。</li>
+<li>切换登录时启动。</li>
+<li>直接从托盘菜单编辑配置。</li>
+<li>从托盘菜单打开配置文件夹。</li>
+<li>支持子菜单以更好地组织命令。</li>
+<li>支持命令的动态输入。</li>
+<li><strong>新功能</strong>：通过热键触发上下文菜单。</li>
+</ul>
+<h2 id="配置">配置</h2><p>配置存储在用户配置目录中的 JSON 文件中。默认路径为 Linux 和 macOS 上的 <code>~/.config/switch-shuttle/</code>，Windows 上的 <code>C:\Users\&lt;Username&gt;\AppData\Roaming\switch-shuttle\</code>。您可以在该目录中存储多个配置文件，每个配置文件代表一组不同的命令和设置。</p>
+<p>以下是一个配置文件示例：</p>
+<pre><code class="language-json">{
+  &quot;terminal&quot;: &quot;iterm&quot;,
+  &quot;launch_in&quot;: &quot;current&quot;,
+  &quot;theme&quot;: &quot;Homebrew&quot;,
+  &quot;title&quot;: &quot;新标签页&quot;,
+  &quot;menu_hotkey&quot;: &quot;Ctrl+Shift+M&quot;,
+  &quot;commands&quot;: [
+    {
+      &quot;name&quot;: &quot;命令&quot;,
+      &quot;inputs&quot;: null,
+      &quot;command&quot;: null,
+      &quot;commands&quot;: null,
+      &quot;hotkey&quot;: null,
+      &quot;submenu&quot;: [
+        {
+          &quot;name&quot;: &quot;示例命令&quot;,
+          &quot;inputs&quot;: null,
+          &quot;command&quot;: &quot;echo 你好，世界！&quot;,
+          &quot;commands&quot;: null,
+          &quot;submenu&quot;: null,
+          &quot;hotkey&quot;: &quot;Ctrl+Shift+E&quot;
+        },
+        {
+          &quot;name&quot;: &quot;带输入的示例多命令&quot;,
+          &quot;inputs&quot;: {
+            &quot;key1&quot;: &quot;默认值1&quot;,
+            &quot;key2&quot;: &quot;默认值2&quot;
+          },
+          &quot;command&quot;: null,
+          &quot;commands&quot;: [
+            &quot;export MY_VAR=$(echo &#39;步骤1: [key1]&#39;)&quot;,
+            &quot;RESULT=$(echo &#39;步骤2: [key2]&#39; &amp;&amp; echo $MY_VAR)&quot;,
+            &quot;echo 步骤3: 完成 &amp;&amp; echo $RESULT&quot;
+          ],
+          &quot;submenu&quot;: null,
+          &quot;hotkey&quot;: &quot;Ctrl+Shift+M&quot;
+        },
+        {
+          &quot;name&quot;: &quot;示例子菜单&quot;,
+          &quot;inputs&quot;: null,
+          &quot;command&quot;: null,
+          &quot;commands&quot;: null,
+          &quot;submenu&quot;: [
+            {
+              &quot;name&quot;: &quot;子命令1&quot;,
+              &quot;inputs&quot;: null,
+              &quot;command&quot;: &quot;echo 子命令1&quot;,
+              &quot;commands&quot;: null,
+              &quot;submenu&quot;: null,
+              &quot;hotkey&quot;: &quot;Ctrl+Shift+S&quot;
+            },
+            {
+              &quot;name&quot;: &quot;子命令2&quot;,
+              &quot;inputs&quot;: null,
+              &quot;command&quot;: &quot;echo 子命令2&quot;,
+              &quot;commands&quot;: null,
+              &quot;submenu&quot;: null,
+              &quot;hotkey&quot;: null
+            }
+          ],
+          &quot;hotkey&quot;: null
+        }
+      ]
+    }
+  ]
+}
+</code></pre>
+<h3 id="配置参数">配置参数</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>类型</th>
+<th>描述</th>
+<th>有效值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>terminal</td>
+<td>String</td>
+<td>使用的终端应用程序</td>
+<td>&quot;iterm&quot;, &quot;terminal&quot;, &quot;warp&quot;</td>
+</tr>
+<tr>
+<td>launch_in</td>
+<td>String</td>
+<td>命令启动位置</td>
+<td>&quot;current&quot;, &quot;new_tab&quot;, &quot;new_window&quot;</td>
+</tr>
+<tr>
+<td>theme</td>
+<td>String</td>
+<td>终端支持的主题</td>
+<td>表示主题的任何字符串值</td>
+</tr>
+<tr>
+<td>title</td>
+<td>String</td>
+<td>终端窗口/标签页的标题</td>
+<td>任何字符串值</td>
+</tr>
+<tr>
+<td>menu_hotkey</td>
+<td>String (Optional)</td>
+<td>触发上下文菜单的全局热键</td>
+<td>任何有效的热键组合，例如 &quot;Ctrl+Shift+M&quot;</td>
+</tr>
+<tr>
+<td>commands</td>
+<td>Array</td>
+<td>命令配置列表</td>
+<td>参见下方的命令参数</td>
+</tr>
+</tbody></table>
+<h3 id="命令参数">命令参数</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>类型</th>
+<th>描述</th>
+<th>有效值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>name</td>
+<td>String</td>
+<td>命令或子菜单的名称</td>
+<td>任何字符串值</td>
+</tr>
+<tr>
+<td>inputs</td>
+<td>Object (Optional)</td>
+<td>输入的键值对</td>
+<td>{&quot;key1&quot;: &quot;default1&quot;, &quot;key2&quot;: &quot;default2&quot;}</td>
+</tr>
+<tr>
+<td>command</td>
+<td>String (Optional)</td>
+<td>要执行的命令（如果这是一个命令）</td>
+<td>表示命令的任何字符串值</td>
+</tr>
+<tr>
+<td>commands</td>
+<td>Array (Optional)</td>
+<td>顺序执行的命令列表</td>
+<td>任何字符串数组，每个字符串都是一个命令</td>
+</tr>
+<tr>
+<td>submenu</td>
+<td>Array (Optional)</td>
+<td>子命令列表（如果这是一个子菜单）</td>
+<td>参见上方的命令参数</td>
+</tr>
+<tr>
+<td>hotkey</td>
+<td>String (Optional)</td>
+<td>触发命令的全局热键</td>
+<td>任何有效的热键组合，例如 &quot;Ctrl+Shift+E&quot;</td>
+</tr>
+</tbody></table>
+<h3 id="命令执行逻辑">命令执行逻辑</h3><p>SwitchShuttle 支持使用 <code>command</code> 参数定义单个命令，使用 <code>commands</code> 参数定义命令列表，或同时使用这两个参数。如果同时指定了 <code>command</code> 和 <code>commands</code>，则先执行单个命令，然后执行列表中的命令。</p>
+<h4 id="执行示例流程">执行示例流程</h4><ol>
+<li><strong>单个命令</strong>：如果仅指定了 <code>command</code>，则执行该命令。</li>
+<li><strong>多个命令</strong>：如果仅指定了 <code>commands</code>，则按顺序执行列表中的每个命令。</li>
+<li><strong>同时指定</strong>：如果同时指定了 <code>command</code> 和 <code>commands</code>，则先执行单个命令，然后按顺序执行 <code>commands</code> 列表中的每个命令。</li>
+</ol>
+<h3 id="动态输入">动态输入</h3><p>SwitchShuttle 允许您为命令定义动态输入。在执行命令之前，这些输入将从用户处获取。您可以使用命令配置中的 <code>inputs</code> 参数来定义输入。</p>
+<h4 id="带有输入的示例配置">带有输入的示例配置</h4><pre><code class="language-json">{
+  &quot;name&quot;: &quot;带输入的示例多命令&quot;,
+  &quot;inputs&quot;: {
+    &quot;key1&quot;: &quot;默认值1&quot;,
+    &quot;key2&quot;: &quot;默认值2&quot;
+  },
+  &quot;command&quot;: null,
+  &quot;commands&quot;: [
+    &quot;export MY_VAR=$(echo &#39;步骤1: [key1]&#39;)&quot;,
+    &quot;RESULT=$(echo &#39;步骤2: [key2]&#39; &amp;&amp; echo $MY_VAR)&quot;,
+    &quot;echo 步骤3: 完成 &amp;&amp; echo $RESULT&quot;
+  ],
+  &quot;submenu&quot;: null,
+  &quot;hotkey&quot;: &quot;Ctrl+Shift+M&quot;
+}
+</code></pre>
+<h3 id="热键">热键</h3><p>您可以通过在命令配置中添加 <code>hotkey</code> 参数来为命令分配全局热键。热键组合必须遵循修饰键（Ctrl、Shift、Alt、Win）与键（A-Z、0-9 等）相结合的格式。例如，要为命令设置 &quot;Ctrl+Shift+E&quot; 作为热键：</p>
+<pre><code class="language-json">{
+  &quot;name&quot;: &quot;示例命令&quot;,
+  &quot;command&quot;: &quot;echo 你好，世界！&quot;,
+  &quot;submenu&quot;: null,
+  &quot;hotkey&quot;: &quot;Ctrl+Shift+E&quot;,
+  &quot;commands&quot;: null
+}
+</code></pre>
+<p>参数 <code>hotkey</code> 是可选的。如果没有指定，该命令将没有与之关联的全局热键。</p>
+<h3 id="如何使用热键">如何使用热键</h3><ol>
+<li><strong>分配热键</strong>：编辑配置文件，以包含 <code>hotkey</code> 参数，为您希望通过全局热键触发的命令。</li>
+<li><strong>使用热键</strong>：重新启动应用程序后，使用分配的热键触发相应的命令，无论当前焦点在哪个应用程序上。</li>
+</ol>
+<h2 id="如何使用">如何使用</h2><ol>
+<li><strong>Edit Config</strong>：右键单击托盘图标并选择 &quot;Edit Config&quot; 以在默认编辑器中打开配置文件。根据需要修改配置。</li>
+<li><strong>Show Config Folder</strong>：右键单击托盘图标并选择 &quot;Show Config Folder&quot; 以在文件管理器中打开配置目录。</li>
+<li><strong>Toggle Launch at Login</strong>：右键单击托盘图标并选择 &quot;Toggle Launch at Login&quot; 以启用或禁用应用程序在登录时启动。</li>
+<li><strong>Execute Command</strong>：左键单击托盘图标并从菜单</li>
+</ol>
+<p>中选择您要执行的命令。该命令将在指定的终端应用程序中执行。</p>
+<h3 id="创建子菜单">创建子菜单</h3><p>要创建子菜单，请将 <code>command</code> 字段设置为 <code>null</code> 并在 <code>submenu</code> 字段中提供子命令列表。子命令也可以有自己的子菜单，从而允许嵌套菜单。</p>
+<h2 id="构建应用程序">构建应用程序</h2><h3 id="先决条件">先决条件</h3><ul>
+<li><a href="https://www.rust-lang.org/tools/install">Rust</a></li>
+<li><a href="https://tauri.app/v1/guides/getting-started/prerequisites/">Tauri</a></li>
+</ul>
+<h3 id="步骤">步骤</h3><ol>
+<li>克隆存储库：</li>
+</ol>
+<pre><code class="language-sh">git clone https://github.com/s00d/switchshuttle.git
+cd switchshuttle
+npm i
+</code></pre>
+<ol start="2">
+<li>构建应用程序：</li>
+</ol>
+<pre><code class="language-sh">cargo tauri build
+</code></pre>
+<ol start="3">
+<li>运行应用程序：</li>
+</ol>
+<pre><code class="language-sh">cargo tauri dev
+</code></pre>
+<h2 id="下载">下载</h2><p>可以从 <a href="https://github.com/s00d/switchshuttle/releases">GitHub Releases</a> 页面下载最新版本的 SwitchShuttle。</p>
+<h3 id="macos">macOS</h3><p>应用程序签名</p>
+<p>如果您使用的是 macOS，可能需要在运行应用程序之前对其进行签名。步骤如下：</p>
+<ol>
+<li>使二进制文件可执行：</li>
+</ol>
+<pre><code class="language-bash">chmod +x /Applications/switch-shuttle.app
+</code></pre>
+<ol start="2">
+<li>清除扩展属性并签署二进制文件：</li>
+</ol>
+<pre><code class="language-bash">xattr -cr /Applications/switch-shuttle.app &amp;&amp; codesign --force --deep --sign - /Applications/switch-shuttle.app
+</code></pre>
+<h2 id="贡献">贡献</h2><p>欢迎贡献！请随时提交拉取请求或在 GitHub 上打开问题。</p>
+<h2 id="许可证">许可证</h2><p>本项目依据 MIT 许可证授权。详情请参见 <a href="LICENSE">LICENSE</a> 文件。</p>
+<hr>
+<p>享受使用 SwitchShuttle 轻松管理您的终端命令吧！</p>
+
+    </main>
+</div>
+</body>
+</html>
