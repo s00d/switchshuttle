@@ -45,13 +45,53 @@ header nav ul li a:hover {
     border-radius: 4px;
 }
 
+header nav ul .dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+header nav ul .dropdown .dropbtn {
+    cursor: pointer;
+}
+
+header nav ul .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #21252b;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    top: 100%;
+}
+
+header nav ul .dropdown-content a {
+    color: #abb2bf;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.3s;
+}
+
+header nav ul .dropdown-content a:hover {
+    background-color: #3e4451;
+}
+
+header nav ul .dropdown:hover .dropdown-content {
+    display: block;
+}
+
+header nav ul .dropdown-content a.selected {
+    background-color: #3e4451;
+}
+
+
 .container {
     display: flex;
     height: calc(100vh - 3em); /* Adjust based on header height */
 }
 
 aside {
-    width: 200px;
+    width: 500px;
     background-color: #21252b;
     padding: 1em;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
@@ -113,4 +153,34 @@ a {
 
 a:hover {
     text-decoration: underline;
+}
+
+img {
+    width: 80%;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1em;
+}
+
+th, td {
+    padding: 0.75em;
+    border: 1px solid #3e4451;
+}
+
+th {
+    background-color: #21252b;
+    color: #abb2bf;
+    text-align: left;
+}
+
+td {
+    background-color: #282c34;
+    color: #abb2bf;
+}
+
+tr:nth-child(even) td {
+    background-color: #32363f;
 }
