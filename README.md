@@ -13,7 +13,7 @@ SwitchShuttle is a reimagining and extension of the [Shuttle](https://github.com
 
 ## Features
 
-- Supports multiple terminal applications: iTerm, Terminal, Warp.
+- Supports multiple terminal applications: iTerm, Terminal, Warp, Alacritty, Hyper.
 - Run commands in different modes: current window, new tab, new window.
 - Toggle launch at login.
 - Edit configuration directly from the tray menu.

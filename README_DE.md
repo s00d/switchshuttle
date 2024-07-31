@@ -13,7 +13,7 @@ SwitchShuttle ist eine Neuinterpretation und Erweiterung der [Shuttle](https://g
 
 ## Funktionen
 
-- Unterstützt mehrere Terminalanwendungen: iTerm, Terminal, Warp.
+- Unterstützt mehrere Terminalanwendungen: iTerm, Terminal, Warp, Alacritty, Hyper.
 - Befehle in verschiedenen Modi ausführen: aktuelles Fenster, neuer Tab, neues Fenster.
 - Start beim Login umschalten.
 - Konfiguration direkt über das Tray-Menü bearbeiten.

@@ -13,7 +13,7 @@ SwitchShuttle 是对 [Shuttle](https://github.com/fitztrev/shuttle) 应用程序
 
 ## 功能
 
-- 支持多种终端应用程序：iTerm、Terminal、Warp。
+- 支持多种终端应用程序：iTerm、Terminal、Warp, Alacritty, Hyper。
 - 在不同模式下运行命令：当前窗口、新标签页、新窗口。
 - 切换登录时启动。
 - 直接从托盘菜单编辑配置。
