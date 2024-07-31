@@ -76,7 +76,7 @@ const generateHtmlForLanguage = (lang, inputPath, outputPath) => {
 <header>
     <div class="logo">
         <a href="https://github.com/s00d/switchshuttle/">
-            <img src="https://github.com/s00d/switchshuttle/blob/main/icons/128x128_white.png?raw=true" alt="SwitchShuttle Logo">
+            <img src="https://github.com/s00d/switchshuttle/blob/main/src-tauri/icons/128x128.png?raw=true" alt="SwitchShuttle Logo">
         </a>
     </div>
     <nav>
