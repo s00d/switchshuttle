@@ -30,10 +30,13 @@ pub fn execute_command(command_config: &CommandConfig, terminal: &str, launch_in
     // Дебаг: Печать списка команд
     println!("Commands to execute: {:?}", commands_to_execute);
 
+    let terminal = terminal.to_lowercase();
+    let launch_in = launch_in.to_lowercase();
+
     if cfg!(target_os = "macos") {
         println!("Detected macOS");
 
-        let script_path = match (terminal, launch_in) {
+        let script_path = match (terminal.as_str(), launch_in.as_str()) {
             ("iterm", "current") => "iTerm-Current.scpt",
             ("iterm", "new_tab") => "iTerm-Tab.scpt",
             ("iterm", "new_window") => "iTerm-Window.scpt",
@@ -43,6 +46,12 @@ pub fn execute_command(command_config: &CommandConfig, terminal: &str, launch_in
             ("warp", "current") => "Warp-Current.scpt",
             ("warp", "new_tab") => "Warp-Tab.scpt",
             ("warp", "new_window") => "Warp-Window.scpt",
+            ("hyper", "current") => "Hyper-Current.scpt",
+            ("hyper", "new_tab") => "Hyper-Tab.scpt",
+            ("hyper", "new_window") => "Hyper-Window.scpt",
+            ("alacritty", "current") => "Alacritty-Current.scpt",
+            ("alacritty", "new_tab") => "Alacritty-Tab.scpt",
+            ("alacritty", "new_window") => "Alacritty-Window.scpt",
             _ => "",
         };
 
@@ -51,7 +60,6 @@ pub fn execute_command(command_config: &CommandConfig, terminal: &str, launch_in
             return;
         }
 
-        // Дебаг: Печать пути к скрипту
         println!("Script path: {}", script_path);
 
         let script_content = match read_script(script_path) {
@@ -67,7 +75,7 @@ pub fn execute_command(command_config: &CommandConfig, terminal: &str, launch_in
                 .replace("{theme}", theme)
                 .replace("{title}", title);
 
-            // println!("Executing script: {}", script);
+            println!("Executing script: {}", script);
 
             let output = Command::new("osascript")
                 .arg("-e")
@@ -92,12 +100,15 @@ pub fn execute_command(command_config: &CommandConfig, terminal: &str, launch_in
         for command in commands_to_execute {
             println!("Executing command: {}", command);
 
-            let status = Command::new("cmd")
-                .args(&["/C", &command])
-                .status()
-                .expect("Failed to execute command");
+            let status = match terminal.as_str() {
+                "hyper" => Command::new("cmd")
+                    .args(&["/C", &format!("start hyper -e \"{}\"", command)])
+                    .status(),
+                _ => Command::new("cmd")
+                    .args(&["/C", &command])
+                    .status(),
+            }.expect("Failed to execute command");
 
-            // Дебаг: Печать результата выполнения
             if status.success() {
                 println!("Command succeeded: {}", command);
             } else {
@@ -111,13 +122,17 @@ pub fn execute_command(command_config: &CommandConfig, terminal: &str, launch_in
         for command in commands_to_execute {
             println!("Executing command: {}", command);
 
-            let status = Command::new("sh")
-                .arg("-c")
-                .arg(&command)
-                .status()
-                .expect("Failed to execute command");
+            let status = match terminal.as_str() {
+                "hyper" => Command::new("sh")
+                    .arg("-c")
+                    .arg(&format!("hyper -e \"{}\"", command))
+                    .status(),
+                _ => Command::new("sh")
+                    .arg("-c")
+                    .arg(&command)
+                    .status(),
+            }.expect("Failed to execute command");
 
-            // Дебаг: Печать результата выполнения
             if status.success() {
                 println!("Command succeeded: {}", command);
             } else {
@@ -129,7 +144,6 @@ pub fn execute_command(command_config: &CommandConfig, terminal: &str, launch_in
         println!("Unsupported operating system");
     }
 }
-
 
 pub fn open_in_default_editor(path: &PathBuf) {
     #[cfg(target_os = "macos")]

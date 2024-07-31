@@ -13,7 +13,7 @@ SwitchShuttleは、[Shuttle](https://github.com/fitztrev/shuttle)アプリケー
 
 ## 機能
 
-- 複数のターミナルアプリケーションをサポート: iTerm, Terminal, Warp。
+- 複数のターミナルアプリケーションをサポート: iTerm, Terminal, Warp, Alacritty, Hyper。
 - 異なるモードでコマンドを実行: 現在のウィンドウ、新しいタブ、新しいウィンドウ。
 - 起動時に自動起動を切り替える。
 - トレイメニューから直接設定を編集。
