@@ -13,6 +13,7 @@ on scriptRun(argsCmd, argsTheme, argsTitle)
 end scriptRun
 
 on CommandRun(withCmd, withTheme, theTitle)
+	set currentClipboard to do shell script "pbpaste"
 	set the clipboard to withCmd
 	tell application "Warp"
 			activate
@@ -24,4 +25,5 @@ on CommandRun(withCmd, withTheme, theTitle)
 					end tell
 		end tell
 	end tell
+	do shell script "echo " & quoted form of currentClipboard & " | pbcopy"
 end CommandRun
