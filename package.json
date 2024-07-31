@@ -16,15 +16,15 @@
   "dependencies": {
     "@tauri-apps/api": "^1",
     "tauri-plugin-context-menu": "^0.8.0",
-    "vue": "^3.3.4",
-    "vue-router": "^4.4.0"
+    "vue": "^3.4.35",
+    "vue-router": "^4.4.1"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1",
-    "@vitejs/plugin-vue": "^5.0.5",
+    "@vitejs/plugin-vue": "^5.1.1",
     "marked": "^12.0.2",
-    "typescript": "^5.2.2",
-    "vite": "^5.3.1",
+    "typescript": "^5.5.4",
+    "vite": "^5.3.5",
     "vue-tsc": "^2.0.22"
   },
   "packageManager": "yarn@3.7.0+sha256.7bf0c78a106332886ea4e59641fd819b1af953edcd72c4d93a32b1c71000ee67"
