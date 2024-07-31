@@ -2,7 +2,7 @@ use std::{fs};
 use std::path::PathBuf;
 use std::process::Command;
 use include_dir::{Dir, include_dir};
-use tauri::{Manager, WindowBuilder, WindowUrl};
+use tauri::{AppHandle, Manager};
 use crate::config::CommandConfig;
 
 static SCRIPTS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/scripts");
@@ -206,32 +206,18 @@ pub fn open_folder_in_default_explorer(path: &PathBuf) {
     }
 }
 
-pub fn create_window(app: &tauri::AppHandle, label: &str, title: &str, url: &str, width: f64, height: f64) -> tauri::Window {
-    match app.get_window(label) {
-        Some(window) => {
-            window.show().unwrap_or_else(|e| println!("Failed to show window: {:?}", e));
-            window.set_focus().expect("Failed to set focus on window");
-            window
-        },
-        None => {
-            let window = WindowBuilder::new(
-                app,
-                label,
-                WindowUrl::App(url.into())
-            )
-                .title(title)
-                .fullscreen(false)
-                .resizable(false)
-                .decorations(false)
-                .inner_size(width, height)
-                .always_on_top(true)
-                .build()
-                .expect("Failed to create window");
+pub fn create_window(app: &AppHandle, _label: &str, title: &str, route: &str, width: f64, height: f64, center: bool) -> tauri::Window {
+    let window = app.get_window("main").unwrap();
+    window.show().unwrap_or_else(|e| println!("Failed to show window: {:?}", e));
+    window.set_focus().expect("Failed to set focus on window");
 
-            window.show().unwrap_or_else(|e| println!("Failed to show window: {:?}", e));
-            window.set_focus().expect("Failed to set focus on window");
-
-            window
+    window.emit("navigate", (route, title)).unwrap();
+    window.set_size(tauri::Size::Logical(tauri::LogicalSize { width, height })).unwrap();
+    if center {
+        if let Err(e) = window.center() {
+            println!("Failed to center window: {:?}", e);
         }
     }
+
+    window
 }
