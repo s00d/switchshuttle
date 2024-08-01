@@ -9,7 +9,9 @@
 import { ref, onMounted } from 'vue';
 import { invoke } from '@tauri-apps/api';
 import { appWindow } from '@tauri-apps/api/window';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const message = ref('');
 
 async function fetchMessage() {
@@ -17,6 +19,7 @@ async function fetchMessage() {
 }
 
 function onClose() {
+  router.push('/').catch((error) => {});
   appWindow.hide();
 }
 

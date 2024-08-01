@@ -22,6 +22,7 @@ const route = useRoute();
 const router = useRouter();
 
 function onClose() {
+  router.push('/').catch((error) => {});
   appWindow.hide();
 }
 
