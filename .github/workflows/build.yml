@@ -37,6 +37,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
+            src-tauri/target/
             C:\Users\runneradmin\.cargo\registry\index\
             C:\Users\runneradmin\.cargo\registry\cache\
             C:\Users\runneradmin\.cargo\git\db\
