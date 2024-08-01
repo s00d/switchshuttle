@@ -19,16 +19,14 @@ import { ref, onBeforeMount, onMounted, onUnmounted } from 'vue';
 import { invoke } from '@tauri-apps/api';
 import { emit, listen } from '@tauri-apps/api/event'
 import { appWindow } from '@tauri-apps/api/window';
-import eventBus from '../plugins/eventBus';
+import { useRouter, useRoute } from 'vue-router';
+
+const router = useRouter();
+const route = useRoute();
 
 const command = ref('');
 const inputs = ref({});
 const errorMessage = ref('');
-
-function handleInputData(payload) {
-  command.value = payload[0];
-  inputs.value = payload[1];
-}
 
 function submitForm() {
   invoke('execute_command_with_inputs', { inputs: inputs.value, command: command.value }).then(() => {
@@ -38,16 +36,24 @@ function submitForm() {
   });
 }
 
+function fetchInputData() {
+  // Implement your logic to fetch input data using the ID
+  invoke('fetch_input_data', { command: command.value }).then((data) => {
+    console.log(111, data);
+    inputs.value = JSON.parse(data);
+  }).catch((error) => {
+    errorMessage.value = error;
+  });
+}
+
 function onClose() {
+  router.push('/').catch((error) => {});
   appWindow.hide();
 }
 
 onMounted(() => {
-  eventBus.on('input_data', handleInputData);
-});
-
-onUnmounted(() => {
-  eventBus.off('input_data', handleInputData);
+  command.value = route.params.id; // Get the ID from the route parameters
+  fetchInputData(); // Fetch the input data using the ID
 });
 </script>
 

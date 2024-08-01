@@ -111,9 +111,7 @@ pub fn execute_command_with_inputs(window: Window, inputs: HashMap<String, Strin
         hotkey: command.hotkey.clone(),
     };
 
-    println!("execute_command_with_inputs {:?}", updated_command);
-
-    execute_command(command, &config.terminal, &config.launch_in, &config.theme, &config.title);
+    execute_command(&updated_command, &config.terminal, &config.launch_in, &config.theme, &config.title);
     Ok("Ok".to_string())
 }
 
@@ -182,4 +180,22 @@ pub fn show_context_menu(window: Window, x: i32, y: i32) {
     // window.set_focus().unwrap();
     window.emit("show_context_menu", {}).unwrap();
     window.emit("menu-did-open", json!({ "x": x, "y": y })).unwrap();
+}
+
+#[tauri::command]
+pub fn fetch_input_data(window: Window, command: String) -> Result<String, String> {
+    println!("get_inputs_data {:?}", command);
+
+    let mut config_manager = ConfigManager::new();
+    config_manager.load_configs(Some(&window)).map_err(|e| e.to_string())?;
+
+    let (command, _config) = match config_manager.find_command_by_id(&command) {
+        Some((cmd, cfg)) => (cmd, cfg),
+        None => return Err("Command not found".to_string()),
+    };
+
+    match &command.inputs {
+        Some(inputs) =>  Ok(json!(inputs).to_string()),
+        None => return Err("Inputs not found".to_string()),
+    }
 }

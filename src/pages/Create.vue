@@ -12,7 +12,9 @@
 import { ref } from 'vue';
 import { invoke } from '@tauri-apps/api';
 import { appWindow } from '@tauri-apps/api/window';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const fileName = ref('');
 const errorMessage = ref('');
 
@@ -25,6 +27,7 @@ function onCreate() {
 }
 
 function onClose() {
+  router.push('/').catch((error) => {});
   appWindow.hide();
 }
 </script>

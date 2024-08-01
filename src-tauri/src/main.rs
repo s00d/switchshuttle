@@ -10,13 +10,14 @@ use std::str::FromStr;
 use tauri::{CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem, SystemTraySubmenu};
 use auto_launch::*;
 use tauri::utils::platform::current_exe;
-use crate::config::{CommandConfig, ConfigManager};
-use crate::helpers::{create_window, execute_command, get_config_path, open_folder_in_default_explorer, open_in_default_editor};
 use global_hotkey::{GlobalHotKeyManager, GlobalHotKeyEvent, hotkey::{HotKey}, HotKeyState};
 use mouse_position::mouse_position::Mouse;
 use once_cell::sync::Lazy;
 use serde::Deserialize;
-use crate::commands::{check_for_updates, create_new_config, execute, execute_command_with_inputs, about_message, get_menu_data, get_version, show_context_menu};
+
+use crate::config::{CommandConfig, ConfigManager};
+use crate::helpers::{create_window, execute_command, get_config_path, open_folder_in_default_explorer, open_in_default_editor};
+use crate::commands::{check_for_updates, create_new_config, execute, execute_command_with_inputs, about_message, get_menu_data, get_version, show_context_menu, fetch_input_data};
 
 
 #[derive(Deserialize)]
@@ -117,7 +118,16 @@ fn main() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![create_new_config, about_message, check_for_updates, get_version, execute_command_with_inputs, get_menu_data, execute])
+        .invoke_handler(tauri::generate_handler![
+            create_new_config,
+            about_message,
+            check_for_updates,
+            get_version,
+            execute_command_with_inputs,
+            get_menu_data,
+            execute,
+            fetch_input_data
+        ])
         .system_tray(SystemTray::new().with_menu(system_tray_menu))
         .plugin(tauri_plugin_context_menu::init())
         .on_system_tray_event(move |app, event| {
@@ -187,8 +197,11 @@ fn main() {
                             match config_manager.find_command_by_id(id.as_str()) {
                                 Some((command, config)) => {
                                     if let Some(inputs) = &command.inputs {
-                                        let window = create_window(&app, "input_window", "Provide Inputs", "inputs", 400.0, 300.0, true);
-                                        window.emit("input_data", (id.clone(), inputs.clone())).unwrap();
+                                        if let Some(id) = &command.id {
+                                            let window = create_window(&app, "input_window", "Provide Inputs", &format!("inputs/{}", id), 400.0, 300.0, true);
+                                            window.emit("input_data", (id.clone(), inputs.clone())).unwrap();
+                                        }
+
                                     } else {
                                         execute_command(command, &config.terminal, &config.launch_in, &config.theme, &config.title);
                                     }

@@ -151,8 +151,10 @@ import { ref, onMounted } from 'vue';
 import { writeTextFile, readTextFile, exists, readDir, removeFile } from '@tauri-apps/api/fs';
 import { appWindow } from '@tauri-apps/api/window';
 import { path as tauriPath } from '@tauri-apps/api';
+import { useRouter } from 'vue-router';
 import SubcommandTable from '../components/SubcommandTable.vue';
 
+const router = useRouter();
 const configFiles = ref([]);
 const currentConfig = ref('');
 const config = ref({
@@ -342,6 +344,7 @@ async function deleteConfig() {
 }
 
 function onClose() {
+  router.push('/').catch((error) => {});
   appWindow.hide();
 }
 
@@ -351,7 +354,6 @@ onMounted(loadConfigs);
 <style>
 /* Add styles from editor.html */
 .container {
-  border-radius: 12px;
   padding: 40px;
   display: flex;
   flex-direction: column;
