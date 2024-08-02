@@ -42,23 +42,23 @@ const emit = defineEmits<{
   (e: 'close'): void;
 }>();
 
-function beforeEnter(el: HTMLElement) {
-  el.style.opacity = '0';
-  el.style.transform = 'scale(0.9)';
+function beforeEnter(el: Element) {
+  (el as HTMLElement).style.opacity = '0';
+  (el as HTMLElement).style.transform = 'scale(0.9)';
 }
 
-function enter(el: HTMLElement, done: () => void) {
-  el.offsetHeight; // trigger reflow
-  el.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-  el.style.opacity = '1';
-  el.style.transform = 'scale(1)';
+function enter(el: Element, done: () => void) {
+  (el as HTMLElement).offsetHeight; // trigger reflow
+  (el as HTMLElement).style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+  (el as HTMLElement).style.opacity = '1';
+  (el as HTMLElement).style.transform = 'scale(1)';
   done();
 }
 
-function leave(el: HTMLElement, done: () => void) {
-  el.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-  el.style.opacity = '0';
-  el.style.transform = 'scale(0.9)';
+function leave(el: Element, done: () => void) {
+  (el as HTMLElement).style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+  (el as HTMLElement).style.opacity = '0';
+  (el as HTMLElement).style.transform = 'scale(0.9)';
   setTimeout(done, 300);
 }
 </script>
