@@ -13,16 +13,15 @@
 <script setup>
 import { ref } from 'vue';
 import { appWindow } from '@tauri-apps/api/window';
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { listen, emit } from '@tauri-apps/api/event';
 import { invoke } from '@tauri-apps/api';
 
 const title = ref('Switch Shuttle');
-const route = useRoute();
 const router = useRouter();
 
 function onClose() {
-  router.push('/').catch((error) => {});
+  router.push('/').catch(() => {});
   appWindow.hide();
 }
 

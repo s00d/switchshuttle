@@ -25,6 +25,7 @@
     "marked": "^12.0.2",
     "typescript": "^5.5.4",
     "vite": "^5.3.5",
+    "vite-plugin-vue-devtools": "^7.3.7",
     "vue-tsc": "^2.0.22"
   },
   "packageManager": "yarn@3.7.0+sha256.7bf0c78a106332886ea4e59641fd819b1af953edcd72c4d93a32b1c71000ee67"
