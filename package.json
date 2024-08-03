@@ -17,11 +17,11 @@
     "@tauri-apps/api": "^1",
     "tauri-plugin-context-menu": "^0.8.0",
     "vue": "^3.4.35",
-    "vue-router": "^4.4.1"
+    "vue-router": "^4.4.2"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1",
-    "@vitejs/plugin-vue": "^5.1.1",
+    "@vitejs/plugin-vue": "^5.1.2",
     "marked": "^12.0.2",
     "typescript": "^5.5.4",
     "vite": "^5.3.5",
