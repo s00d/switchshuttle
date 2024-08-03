@@ -1,17 +1,27 @@
-use std::{fs};
+use include_dir::{include_dir, Dir};
+use serde_json::json;
+use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
-use include_dir::{Dir, include_dir};
-use tauri::{AppHandle, Manager};
+use tauri::{AppHandle, Manager, Window};
+
 use crate::config::CommandConfig;
 
 static SCRIPTS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/scripts");
 
 fn read_script(script_path: &str) -> Option<String> {
-    SCRIPTS_DIR.get_file(script_path).map(|file| file.contents_utf8().unwrap().to_string())
+    SCRIPTS_DIR
+        .get_file(script_path)
+        .map(|file| file.contents_utf8().unwrap().to_string())
 }
 
-pub fn execute_command(command_config: &CommandConfig, terminal: &str, launch_in: &str, theme: &String, title: &String) {
+pub fn execute_command(
+    command_config: &CommandConfig,
+    terminal: &str,
+    launch_in: &str,
+    theme: &String,
+    title: &String,
+) {
     let mut commands_to_execute = Vec::new();
 
     // Дебаг: Инициализация commands_to_execute
@@ -71,7 +81,8 @@ pub fn execute_command(command_config: &CommandConfig, terminal: &str, launch_in
         };
 
         for command in commands_to_execute {
-            let script = script_content.replace("{command}", &command)
+            let script = script_content
+                .replace("{command}", &command)
                 .replace("{theme}", theme)
                 .replace("{title}", title);
 
@@ -86,11 +97,20 @@ pub fn execute_command(command_config: &CommandConfig, terminal: &str, launch_in
             // Дебаг: Печать результата выполнения
             if output.status.success() {
                 println!("Command succeeded: {}", command);
-                println!("Standard Output: {}", String::from_utf8_lossy(&output.stdout));
+                println!(
+                    "Standard Output: {}",
+                    String::from_utf8_lossy(&output.stdout)
+                );
             } else {
                 println!("Command failed: {}", command);
-                println!("Standard Output: {}", String::from_utf8_lossy(&output.stdout));
-                println!("Standard Error: {}", String::from_utf8_lossy(&output.stderr));
+                println!(
+                    "Standard Output: {}",
+                    String::from_utf8_lossy(&output.stdout)
+                );
+                println!(
+                    "Standard Error: {}",
+                    String::from_utf8_lossy(&output.stderr)
+                );
                 break;
             }
         }
@@ -104,10 +124,9 @@ pub fn execute_command(command_config: &CommandConfig, terminal: &str, launch_in
                 "hyper" => Command::new("cmd")
                     .args(&["/C", &format!("start hyper -e \"{}\"", command)])
                     .status(),
-                _ => Command::new("cmd")
-                    .args(&["/C", &command])
-                    .status(),
-            }.expect("Failed to execute command");
+                _ => Command::new("cmd").args(&["/C", &command]).status(),
+            }
+            .expect("Failed to execute command");
 
             if status.success() {
                 println!("Command succeeded: {}", command);
@@ -127,11 +146,9 @@ pub fn execute_command(command_config: &CommandConfig, terminal: &str, launch_in
                     .arg("-c")
                     .arg(&format!("hyper -e \"{}\"", command))
                     .status(),
-                _ => Command::new("sh")
-                    .arg("-c")
-                    .arg(&command)
-                    .status(),
-            }.expect("Failed to execute command");
+                _ => Command::new("sh").arg("-c").arg(&command).status(),
+            }
+            .expect("Failed to execute command");
 
             if status.success() {
                 println!("Command succeeded: {}", command);
@@ -179,7 +196,6 @@ pub fn get_config_path() -> PathBuf {
     config_path
 }
 
-
 pub fn open_folder_in_default_explorer(path: &PathBuf) {
     #[cfg(target_os = "macos")]
     {
@@ -206,13 +222,24 @@ pub fn open_folder_in_default_explorer(path: &PathBuf) {
     }
 }
 
-pub fn create_window(app: &AppHandle, _label: &str, title: &str, route: &str, width: f64, height: f64, center: bool) -> tauri::Window {
+pub fn create_window(
+    app: &AppHandle,
+    title: &str,
+    route: &str,
+    width: f64,
+    height: f64,
+    center: bool,
+) -> tauri::Window {
     let window = app.get_window("main").unwrap();
-    window.show().unwrap_or_else(|e| println!("Failed to show window: {:?}", e));
+    window
+        .show()
+        .unwrap_or_else(|e| println!("Failed to show window: {:?}", e));
     window.set_focus().expect("Failed to set focus on window");
 
     window.emit("navigate", (route, title)).unwrap();
-    window.set_size(tauri::Size::Logical(tauri::LogicalSize { width, height })).unwrap();
+    window
+        .set_size(tauri::Size::Logical(tauri::LogicalSize { width, height }))
+        .unwrap();
     if center {
         if let Err(e) = window.center() {
             println!("Failed to center window: {:?}", e);
@@ -220,4 +247,18 @@ pub fn create_window(app: &AppHandle, _label: &str, title: &str, route: &str, wi
     }
 
     window
+}
+
+pub fn show_context_menu(window: Window, x: i32, y: i32) {
+    window
+        .set_position(tauri::Position::Physical(tauri::PhysicalPosition::new(
+            0, 0,
+        )))
+        .unwrap();
+    window.hide().unwrap();
+    // window.set_focus().unwrap();
+    window.emit("show_context_menu", {}).unwrap();
+    window
+        .emit("menu-did-open", json!({ "x": x, "y": y }))
+        .unwrap();
 }

@@ -1,9 +1,9 @@
-use std::{fs, io};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::PathBuf;
-use std::sync::Arc;
-use serde::{Deserialize, Serialize};
 use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::Arc;
+use std::{fs, io};
 use tauri::api::dialog::message;
 use tauri::Window;
 
@@ -32,9 +32,8 @@ pub struct CommandConfig {
 pub struct ConfigManager {
     pub configs: Vec<Config>,
     pub config_paths: Vec<PathBuf>,
-    counter: Arc<AtomicUsize>
+    counter: Arc<AtomicUsize>,
 }
-
 
 impl ConfigManager {
     pub fn new() -> Self {
@@ -57,17 +56,20 @@ impl ConfigManager {
         let mut has_configs = false;
 
         if let Ok(entries) = fs::read_dir(&config_dir) {
-            let mut paths: Vec<_> = entries.filter_map(|entry| {
-                entry.ok().and_then(|e| {
-                    let path = e.path();
-                    if path.is_file() && path.extension().and_then(|ext| ext.to_str()) == Some("json") {
-                        Some(path)
-                    } else {
-                        None
-                    }
+            let mut paths: Vec<_> = entries
+                .filter_map(|entry| {
+                    entry.ok().and_then(|e| {
+                        let path = e.path();
+                        if path.is_file()
+                            && path.extension().and_then(|ext| ext.to_str()) == Some("json")
+                        {
+                            Some(path)
+                        } else {
+                            None
+                        }
+                    })
                 })
-            }).collect();
-
+                .collect();
 
             paths.sort();
 
@@ -82,7 +84,11 @@ impl ConfigManager {
                     Err(err) => {
                         eprintln!("Failed to load config from {}: {}", path.display(), err);
                         if let Some(w) = window {
-                            message(Some(w), "Error", &format!("Failed to parse config from {}: {}", path.display(), err));
+                            message(
+                                Some(w),
+                                "Error",
+                                &format!("Failed to parse config from {}: {}", path.display(), err),
+                            );
                         }
                     }
                 }
@@ -111,7 +117,14 @@ impl ConfigManager {
 }
 
 impl Config {
-    fn new(terminal: &str, launch_in: &str, theme: &str, title: &str, menu_hotkey: Option<String>, commands: Vec<CommandConfig>) -> Self {
+    fn new(
+        terminal: &str,
+        launch_in: &str,
+        theme: &str,
+        title: &str,
+        menu_hotkey: Option<String>,
+        commands: Vec<CommandConfig>,
+    ) -> Self {
         Config {
             terminal: terminal.to_string(),
             launch_in: launch_in.to_string(),
@@ -150,72 +163,70 @@ impl Config {
             "current",
             "Homebrew",
             "New tab",
-            Some("Ctrl+Shift+M".parse().unwrap()),
-            vec![
-                CommandConfig {
-                    id: None,
-                    name: "Command".to_string(),
-                    command: None,
-                    inputs: None,
-                    commands: None,
-                    submenu: Some(vec![
-                        CommandConfig {
-                            id: None,
-                            name: "Example Command".to_string(),
-                            command: Some("echo Hello, world!".to_string()),
-                            inputs: None,
-                            commands: None,
-                            submenu: None,
-                            hotkey: Some("Ctrl+Shift+E".to_string()),
-                        },
-                        CommandConfig {
-                            id: None,
-                            name: "Example Multi-Command with input".to_string(),
-                            command: None,
-                            submenu: None,
-                            hotkey: Some("Ctrl+Shift+M".to_string()),
-                            commands: Some(vec![
-                                "export MY_VAR=$(echo 'Step 1: [key1]')".to_string(),
-                                "RESULT=$(echo 'Step 2: [key2]' && echo $MY_VAR)".to_string(),
-                                "echo Step 3: Finalize && echo $RESULT".to_string(),
-                            ]),
-                            inputs: Some(HashMap::from([
-                                ("key1".to_string(), "default1".to_string()),
-                                ("key2".to_string(), "default2".to_string())
-                            ])),
-                        },
-                        CommandConfig {
-                            id: None,
-                            name: "Example Submenu".to_string(),
-                            inputs: None,
-                            command: None,
-                            commands: None,
-                            hotkey: None,
-                            submenu: Some(vec![
-                                CommandConfig {
-                                    id: None,
-                                    name: "Subcommand 1".to_string(),
-                                    inputs: None,
-                                    command: Some("echo Subcommand 1".to_string()),
-                                    commands: None,
-                                    submenu: None,
-                                    hotkey: Some("Ctrl+Shift+S".to_string()),
-                                },
-                                CommandConfig {
-                                    id: None,
-                                    name: "Subcommand 2".to_string(),
-                                    inputs: None,
-                                    command: Some("echo Subcommand 2".to_string()),
-                                    commands: None,
-                                    submenu: None,
-                                    hotkey: None,
-                                },
-                            ]),
-                        },
-                    ]),
-                    hotkey: None,
-                },
-            ],
+            Some("Ctrl+Shift+M".to_string()),
+            vec![CommandConfig {
+                id: None,
+                name: "Command".to_string(),
+                command: None,
+                inputs: None,
+                commands: None,
+                submenu: Some(vec![
+                    CommandConfig {
+                        id: None,
+                        name: "Example Command".to_string(),
+                        command: Some("echo Hello, world!".to_string()),
+                        inputs: None,
+                        commands: None,
+                        submenu: None,
+                        hotkey: Some("Ctrl+Shift+E".to_string()),
+                    },
+                    CommandConfig {
+                        id: None,
+                        name: "Example Multi-Command with input".to_string(),
+                        command: None,
+                        submenu: None,
+                        hotkey: Some("Ctrl+Shift+M".to_string()),
+                        commands: Some(vec![
+                            "export MY_VAR=$(echo 'Step 1: [key1]')".to_string(),
+                            "RESULT=$(echo 'Step 2: [key2]' && echo $MY_VAR)".to_string(),
+                            "echo Step 3: Finalize && echo $RESULT".to_string(),
+                        ]),
+                        inputs: Some(HashMap::from([
+                            ("key1".to_string(), "default1".to_string()),
+                            ("key2".to_string(), "default2".to_string()),
+                        ])),
+                    },
+                    CommandConfig {
+                        id: None,
+                        name: "Example Submenu".to_string(),
+                        inputs: None,
+                        command: None,
+                        commands: None,
+                        hotkey: None,
+                        submenu: Some(vec![
+                            CommandConfig {
+                                id: None,
+                                name: "Subcommand 1".to_string(),
+                                inputs: None,
+                                command: Some("echo Subcommand 1".to_string()),
+                                commands: None,
+                                submenu: None,
+                                hotkey: Some("Ctrl+Shift+S".to_string()),
+                            },
+                            CommandConfig {
+                                id: None,
+                                name: "Subcommand 2".to_string(),
+                                inputs: None,
+                                command: Some("echo Subcommand 2".to_string()),
+                                commands: None,
+                                submenu: None,
+                                hotkey: None,
+                            },
+                        ]),
+                    },
+                ]),
+                hotkey: None,
+            }],
         )
     }
 

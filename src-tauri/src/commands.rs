@@ -1,11 +1,18 @@
-use std::collections::HashMap;
 use reqwest::blocking::Client;
 use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
+use serde::Deserialize;
 use serde_json::json;
+use std::collections::HashMap;
 use tauri::Window;
+
 use crate::config::{CommandConfig, Config, ConfigManager};
-use crate::{GitHubRelease};
 use crate::helpers::{execute_command, get_config_path, open_in_default_editor};
+
+#[derive(Deserialize)]
+struct GitHubRelease {
+    tag_name: String,
+    html_url: String,
+}
 
 #[tauri::command]
 pub fn create_new_config(file_name: String) -> Result<(), String> {
@@ -26,7 +33,9 @@ pub fn create_new_config(file_name: String) -> Result<(), String> {
     if let Some(main_command) = new_config.commands.get_mut(0) {
         main_command.name = file_name.clone();
     }
-    new_config.save(&new_config_path).map_err(|e| e.to_string())?;
+    new_config
+        .save(&new_config_path)
+        .map_err(|e| e.to_string())?;
     open_in_default_editor(&new_config_path);
 
     Ok(())
@@ -51,7 +60,10 @@ pub fn check_for_updates(app: tauri::AppHandle) -> Result<(String, String), Stri
         .build()
         .map_err(|e| e.to_string())?;
 
-    let response = client.get(latest_release_url).send().map_err(|e| e.to_string())?;
+    let response = client
+        .get(latest_release_url)
+        .send()
+        .map_err(|e| e.to_string())?;
 
     let latest_release: GitHubRelease = response.json().map_err(|e| e.to_string())?;
 
@@ -73,11 +85,17 @@ pub fn get_version(app: tauri::AppHandle) -> String {
 }
 
 #[tauri::command]
-pub fn execute_command_with_inputs(window: Window, inputs: HashMap<String, String>, command: String) -> Result<String, String> {
+pub fn execute_command_with_inputs(
+    window: Window,
+    inputs: HashMap<String, String>,
+    command: String,
+) -> Result<String, String> {
     println!("execute_command_with_inputs {:?} {:?}", inputs, command);
 
     let mut config_manager = ConfigManager::new();
-    config_manager.load_configs(Some(&window)).map_err(|e| e.to_string())?;
+    config_manager
+        .load_configs(Some(&window))
+        .map_err(|e| e.to_string())?;
 
     let (command, config) = match config_manager.find_command_by_id(&command) {
         Some((cmd, cfg)) => (cmd, cfg),
@@ -111,20 +129,29 @@ pub fn execute_command_with_inputs(window: Window, inputs: HashMap<String, Strin
         hotkey: command.hotkey.clone(),
     };
 
-    execute_command(&updated_command, &config.terminal, &config.launch_in, &config.theme, &config.title);
+    execute_command(
+        &updated_command,
+        &config.terminal,
+        &config.launch_in,
+        &config.theme,
+        &config.title,
+    );
     Ok("Ok".to_string())
 }
 
 #[tauri::command]
 pub fn get_menu_data(window: Window) -> Result<String, String> {
     let mut config_manager = ConfigManager::new();
-    config_manager.load_configs(Some(&window)).map_err(|e| e.to_string())?;
+    config_manager
+        .load_configs(Some(&window))
+        .map_err(|e| e.to_string())?;
 
     fn build_menu_items(commands: &Vec<CommandConfig>) -> Vec<serde_json::Value> {
         let mut items = Vec::new();
 
         for command in commands {
-            let event_name = command.name
+            let event_name = command
+                .name
                 .replace(" ", "_")
                 .to_lowercase()
                 .chars()
@@ -162,11 +189,19 @@ pub fn execute(window: Window, command: String) -> Result<String, String> {
     println!("Executing command: {}", command);
 
     let mut config_manager = ConfigManager::new();
-    config_manager.load_configs(Some(&window)).map_err(|e| e.to_string())?;
+    config_manager
+        .load_configs(Some(&window))
+        .map_err(|e| e.to_string())?;
 
     match config_manager.find_command_by_id(&command) {
         Some((command, config)) => {
-            execute_command(command, &config.terminal, &config.launch_in, &config.theme, &config.title);
+            execute_command(
+                command,
+                &config.terminal,
+                &config.launch_in,
+                &config.theme,
+                &config.title,
+            );
             Ok("Ok".to_string())
         }
         None => Err(format!("Command '{}' not found", command)),
@@ -174,20 +209,13 @@ pub fn execute(window: Window, command: String) -> Result<String, String> {
 }
 
 #[tauri::command]
-pub fn show_context_menu(window: Window, x: i32, y: i32) {
-    window.set_position(tauri::Position::Physical(tauri::PhysicalPosition::new(0, 0))).unwrap();
-    window.hide().unwrap();
-    // window.set_focus().unwrap();
-    window.emit("show_context_menu", {}).unwrap();
-    window.emit("menu-did-open", json!({ "x": x, "y": y })).unwrap();
-}
-
-#[tauri::command]
 pub fn fetch_input_data(window: Window, command: String) -> Result<String, String> {
     println!("get_inputs_data {:?}", command);
 
     let mut config_manager = ConfigManager::new();
-    config_manager.load_configs(Some(&window)).map_err(|e| e.to_string())?;
+    config_manager
+        .load_configs(Some(&window))
+        .map_err(|e| e.to_string())?;
 
     let (command, _config) = match config_manager.find_command_by_id(&command) {
         Some((cmd, cfg)) => (cmd, cfg),
@@ -195,7 +223,7 @@ pub fn fetch_input_data(window: Window, command: String) -> Result<String, Strin
     };
 
     match &command.inputs {
-        Some(inputs) =>  Ok(json!(inputs).to_string()),
+        Some(inputs) => Ok(json!(inputs).to_string()),
         None => return Err("Inputs not found".to_string()),
     }
 }
