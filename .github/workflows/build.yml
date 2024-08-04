@@ -79,3 +79,7 @@ jobs:
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
+          includeUpdaterJson: true
+          updaterJsonPreferNsis: true
+          includeDebug: false
+          includeRelease: true
