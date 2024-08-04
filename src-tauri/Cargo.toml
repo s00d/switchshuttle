@@ -17,7 +17,6 @@ dirs = "5.0.1"
 include_dir = "0.7"
 reqwest = { version = "0.12.5", features = ["json", "blocking"] }
 once_cell = "1.19.0"
-openssl = { version = "0.10", features = ["vendored"] }
 
 [lib]
 name = "app_lib"
