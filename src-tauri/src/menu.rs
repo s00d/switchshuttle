@@ -122,76 +122,85 @@ pub fn handle_system_tray_event(app: &tauri::AppHandle, event: SystemTrayEvent) 
     config_manager
         .load_configs(Some(&app.get_window("main").unwrap()))
         .expect("Failed to reload configs");
-    let new_system_tray_menu =
-        create_system_tray_menu(auto_start.is_enabled().unwrap(), &config_manager);
-    app.tray_handle().set_menu(new_system_tray_menu).unwrap();
 
-    if let SystemTrayEvent::MenuItemClick { id, .. } = event {
-        match id.as_str() {
-            "quit" => std::process::exit(0),
-            "edit_config" => open_in_default_editor(&config_path),
-            "open_config_folder" => {
-                open_folder_in_default_explorer(&config_path.parent().unwrap().to_path_buf())
-            }
-            "open_config_editor" => {
-                create_window(&app, "Config Editor", "editor", 800.0, 600.0, true);
-            }
-            "toggle_launch_at_login" => {
-                let enabled = auto_start.is_enabled().unwrap();
-                if enabled {
-                    auto_start.disable().unwrap();
-                } else {
-                    auto_start.enable().unwrap();
+    match event {
+        SystemTrayEvent::MenuItemClick { id, .. } => {
+            match id.as_str() {
+                "quit" => std::process::exit(0),
+                "edit_config" => open_in_default_editor(&config_path),
+                "open_config_folder" => {
+                    open_folder_in_default_explorer(&config_path.parent().unwrap().to_path_buf())
                 }
-                let new_system_tray_menu = create_system_tray_menu(!enabled, &config_manager);
-                app.tray_handle().set_menu(new_system_tray_menu).unwrap();
-            }
-            "about" => {
-                create_window(&app, "About", "about", 400.0, 180.0, true);
-            }
-            "homepage" => {
-                let homepage_url = "https://github.com/s00d/SwitchShuttle";
-                tauri::api::shell::open(&app.shell_scope(), homepage_url, None).unwrap();
-            }
-            "check_updates" => {
-                create_window(&app, "Update Available", "update", 400.0, 300.0, true);
-            }
-            "add_new_config" => {
-                create_window(&app, "Create New Config", "create", 400.0, 300.0, true);
-            }
-            _ => {
-                if id.starts_with("edit_") {
-                    let config_file_name = id.replacen("edit_", "", 1);
-                    let config_file_path = config_path.parent().unwrap().join(&config_file_name);
-                    open_in_default_editor(&config_file_path);
-                } else {
-                    match config_manager.find_command_by_id(id.as_str()) {
-                        Some((command, config)) => {
-                            if let Some(_inputs) = &command.inputs {
-                                if let Some(id) = &command.id {
-                                    create_window(
-                                        &app,
-                                        "Provide Inputs",
-                                        &format!("inputs/{}", id),
-                                        400.0,
-                                        300.0,
-                                        true,
+                "open_config_editor" => {
+                    create_window(&app, "Config Editor", "editor", 800.0, 600.0, true);
+                }
+                "toggle_launch_at_login" => {
+                    let enabled = auto_start.is_enabled().unwrap();
+                    if enabled {
+                        auto_start.disable().unwrap();
+                    } else {
+                        auto_start.enable().unwrap();
+                    }
+                    let new_system_tray_menu =
+                        create_system_tray_menu(!enabled, &config_manager);
+                    app.tray_handle().set_menu(new_system_tray_menu).unwrap();
+                }
+                "about" => {
+                    create_window(&app, "About", "about", 400.0, 180.0, true);
+                }
+                "homepage" => {
+                    let homepage_url = "https://github.com/s00d/SwitchShuttle";
+                    tauri::api::shell::open(&app.shell_scope(), homepage_url, None).unwrap();
+                }
+                "check_updates" => {
+                    create_window(&app, "Update Available", "update", 400.0, 300.0, true);
+                }
+                "add_new_config" => {
+                    create_window(&app, "Create New Config", "create", 400.0, 300.0, true);
+                }
+                _ => {
+                    if id.starts_with("edit_") {
+                        let config_file_name = id.replacen("edit_", "", 1);
+                        let config_file_path = config_path.parent().unwrap().join(&config_file_name);
+                        open_in_default_editor(&config_file_path);
+                    } else {
+                        match config_manager.find_command_by_id(id.as_str()) {
+                            Some((command, config)) => {
+                                if let Some(_inputs) = &command.inputs {
+                                    if let Some(id) = &command.id {
+                                        create_window(
+                                            &app,
+                                            "Provide Inputs",
+                                            &format!("inputs/{}", id),
+                                            400.0,
+                                            300.0,
+                                            true,
+                                        );
+                                    }
+                                } else {
+                                    helpers::execute_command(
+                                        command,
+                                        &config.terminal,
+                                        &config.launch_in,
+                                        &config.theme,
+                                        &config.title,
                                     );
                                 }
-                            } else {
-                                helpers::execute_command(
-                                    command,
-                                    &config.terminal,
-                                    &config.launch_in,
-                                    &config.theme,
-                                    &config.title,
-                                );
                             }
+                            None => eprintln!("Command '{}' not found", id),
                         }
-                        None => eprintln!("Command '{}' not found", id),
                     }
                 }
             }
         }
+        SystemTrayEvent::LeftClick { .. } | SystemTrayEvent::RightClick { .. } => {
+            // Обновляем меню при левом клике на иконку системного трея
+            let autostart = auto_start.is_enabled().unwrap();
+            let new_system_tray_menu = create_system_tray_menu(autostart, &config_manager);
+            app.tray_handle().set_menu(new_system_tray_menu).unwrap();
+        }
+        _ => {}
     }
+
+
 }
