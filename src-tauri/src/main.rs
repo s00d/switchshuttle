@@ -7,6 +7,7 @@ mod helpers;
 mod hotkeys;
 mod menu;
 
+use std::sync::{Arc, Mutex};
 use tauri::{Manager, SystemTray};
 use config::ConfigManager;
 
@@ -17,14 +18,18 @@ use crate::commands::{
 };
 
 fn main() {
-    let mut config_manager = ConfigManager::new();
-    config_manager
-        .load_configs(None)
-        .expect("Failed to load configs");
+    let config_manager = Arc::new(Mutex::new(ConfigManager::new()));
+    {
+        let mut config_manager = config_manager.lock().unwrap();
+        config_manager
+            .load_configs(None)
+            .expect("Failed to load configs");
+    }
 
-    let system_tray_menu = create_system_tray_menu(false, &config_manager);
+    let system_tray_menu = create_system_tray_menu(false, &config_manager.lock().unwrap());
 
     let app = tauri::Builder::default()
+        .manage(config_manager.clone())
         .setup(move |app| {
             #[cfg(target_os = "macos")]
             {
@@ -55,7 +60,7 @@ fn main() {
         .build(tauri::generate_context!())
         .expect("error while running tauri application");
 
-    hotkeys::register_global_hotkeys(app.app_handle());
+    hotkeys::register_global_hotkeys(app.app_handle(), config_manager.clone());
 
     app.run(|_app_handle, event| match event {
         tauri::RunEvent::ExitRequested { api, .. } => {

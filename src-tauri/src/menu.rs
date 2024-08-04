@@ -1,8 +1,7 @@
+use std::sync::{Arc, Mutex};
 use auto_launch::AutoLaunchBuilder;
 use tauri::utils::platform::current_exe;
-use tauri::{
-    CustomMenuItem, Manager, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem, SystemTraySubmenu,
-};
+use tauri::{CustomMenuItem, Manager, State, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem, SystemTraySubmenu};
 
 use crate::config::{CommandConfig, ConfigManager};
 use crate::helpers;
@@ -111,6 +110,8 @@ pub fn handle_system_tray_event(app: &tauri::AppHandle, event: SystemTrayEvent) 
     let app_name = &app.package_info().name;
     let current_exe = current_exe().unwrap();
 
+    let state: State<'_, Arc<Mutex<ConfigManager>>> = app.state();
+
     let auto_start = AutoLaunchBuilder::new()
         .set_app_name(&app_name)
         .set_app_path(&current_exe.to_str().unwrap())
@@ -118,11 +119,7 @@ pub fn handle_system_tray_event(app: &tauri::AppHandle, event: SystemTrayEvent) 
         .build()
         .unwrap();
 
-    let mut config_manager = ConfigManager::new();
-    config_manager
-        .load_configs(Some(&app.get_window("main").unwrap()))
-        .expect("Failed to reload configs");
-
+    let mut config_manager = state.lock().unwrap();
     match event {
         SystemTrayEvent::MenuItemClick { id, .. } => {
             match id.as_str() {
@@ -196,6 +193,9 @@ pub fn handle_system_tray_event(app: &tauri::AppHandle, event: SystemTrayEvent) 
         SystemTrayEvent::LeftClick { .. } | SystemTrayEvent::RightClick { .. } => {
             // Обновляем меню при левом клике на иконку системного трея
             let autostart = auto_start.is_enabled().unwrap();
+            config_manager
+                .load_configs(Some(&app.get_window("main").unwrap()))
+                .expect("Failed to reload configs");
             let new_system_tray_menu = create_system_tray_menu(autostart, &config_manager);
             app.tray_handle().set_menu(new_system_tray_menu).unwrap();
         }

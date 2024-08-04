@@ -3,7 +3,8 @@ use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
 use serde::Deserialize;
 use serde_json::json;
 use std::collections::HashMap;
-use tauri::Window;
+use std::sync::{Arc, Mutex};
+use tauri::{State};
 
 use crate::config::{CommandConfig, Config, ConfigManager};
 use crate::helpers::{execute_command, get_config_path, open_in_default_editor};
@@ -86,16 +87,13 @@ pub fn get_version(app: tauri::AppHandle) -> String {
 
 #[tauri::command]
 pub fn execute_command_with_inputs(
-    window: Window,
+    state: State<'_, Arc<Mutex<ConfigManager>>>,
     inputs: HashMap<String, String>,
     command: String,
 ) -> Result<String, String> {
     println!("execute_command_with_inputs {:?} {:?}", inputs, command);
 
-    let mut config_manager = ConfigManager::new();
-    config_manager
-        .load_configs(Some(&window))
-        .map_err(|e| e.to_string())?;
+    let config_manager = state.lock().unwrap();
 
     let (command, config) = match config_manager.find_command_by_id(&command) {
         Some((cmd, cfg)) => (cmd, cfg),
@@ -140,11 +138,8 @@ pub fn execute_command_with_inputs(
 }
 
 #[tauri::command]
-pub fn get_menu_data(window: Window) -> Result<String, String> {
-    let mut config_manager = ConfigManager::new();
-    config_manager
-        .load_configs(Some(&window))
-        .map_err(|e| e.to_string())?;
+pub fn get_menu_data(state: State<'_, Arc<Mutex<ConfigManager>>>) -> Result<String, String> {
+    let config_manager = state.lock().unwrap();
 
     fn build_menu_items(commands: &Vec<CommandConfig>) -> Vec<serde_json::Value> {
         let mut items = Vec::new();
@@ -185,13 +180,10 @@ pub fn get_menu_data(window: Window) -> Result<String, String> {
 }
 
 #[tauri::command]
-pub fn execute(window: Window, command: String) -> Result<String, String> {
+pub fn execute(state: State<'_, Arc<Mutex<ConfigManager>>>, command: String) -> Result<String, String> {
     println!("Executing command: {}", command);
 
-    let mut config_manager = ConfigManager::new();
-    config_manager
-        .load_configs(Some(&window))
-        .map_err(|e| e.to_string())?;
+    let config_manager = state.lock().unwrap();
 
     match config_manager.find_command_by_id(&command) {
         Some((command, config)) => {
@@ -209,13 +201,10 @@ pub fn execute(window: Window, command: String) -> Result<String, String> {
 }
 
 #[tauri::command]
-pub fn fetch_input_data(window: Window, command: String) -> Result<String, String> {
+pub fn fetch_input_data(state: State<'_, Arc<Mutex<ConfigManager>>>, command: String) -> Result<String, String> {
     println!("get_inputs_data {:?}", command);
 
-    let mut config_manager = ConfigManager::new();
-    config_manager
-        .load_configs(Some(&window))
-        .map_err(|e| e.to_string())?;
+    let config_manager = state.lock().unwrap();
 
     let (command, _config) = match config_manager.find_command_by_id(&command) {
         Some((cmd, cfg)) => (cmd, cfg),
