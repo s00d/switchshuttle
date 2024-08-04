@@ -34,7 +34,7 @@ async function loadConfigs() {
   const configDir = await tauriPath.configDir();
   const configFilesList = await readDir(`${configDir}/switch-shuttle`);
   configFiles.value = configFilesList.filter(file => file.name?.endsWith('.json')).map(file => ({
-    path: file.path,
+    path: `${configDir}/switch-shuttle`,
     name: file.name?.replace('.json', '') ?? ''
   }));
   if (configFiles.value.length > 0) {

@@ -164,7 +164,7 @@ pub fn get_menu_data(state: State<'_, Arc<Mutex<ConfigManager>>>) -> Result<Stri
             });
 
             if let Some(submenu) = &command.submenu {
-                item["subitems"] = json!(build_menu_items(submenu));
+                item["submenu"] = json!(build_menu_items(submenu));
             }
 
             items.push(item);

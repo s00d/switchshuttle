@@ -4,11 +4,11 @@ export interface ConfigFile {
 }
 
 export interface Command {
+  id?: string,
   name: string;
   command: string;
-  id: string;
   hotkey: string | null;
-  subitems: Command[]|null;
+  submenu: Command[]|null;
   commands: string[];
 }
 
