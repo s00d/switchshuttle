@@ -15,6 +15,9 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
+    "resources": [
+      "icons/*"
+    ],
     "createUpdaterArtifacts": true
   },
   "productName": "switch-shuttle",
