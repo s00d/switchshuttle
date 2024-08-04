@@ -12,7 +12,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import {getCurrentWindow, LogicalPosition, cursorPosition} from '@tauri-apps/api/window';
+import {getCurrentWindow, cursorPosition} from '@tauri-apps/api/window';
 import { useRouter } from 'vue-router';
 import { listen, emit } from '@tauri-apps/api/event';
 import { invoke } from '@tauri-apps/api/core';
