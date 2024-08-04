@@ -1,4 +1,3 @@
-use mouse_position::mouse_position::Mouse;
 use reqwest::blocking::Client;
 use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
 use serde::Deserialize;
@@ -41,12 +40,6 @@ pub fn create_new_config(file_name: String) -> Result<(), String> {
     open_in_default_editor(&new_config_path);
 
     Ok(())
-}
-
-#[tauri::command]
-pub fn about_message(app: tauri::AppHandle) -> Result<String, String> {
-    let tauri_version = app.package_info().version.to_string();
-    Ok(format!("SwitchShuttle v{} \n\n by s00d.", tauri_version))
 }
 
 #[tauri::command]
@@ -226,16 +219,5 @@ pub fn fetch_input_data(
     match &command.inputs {
         Some(inputs) => Ok(json!(inputs).to_string()),
         None => return Err("Inputs not found".to_string()),
-    }
-}
-
-#[tauri::command]
-pub fn cursor_pos(_app: tauri::AppHandle) -> Result<String, String> {
-    let position = Mouse::get_mouse_position();
-
-    if let Mouse::Position { x, y } = position {
-        Ok(json!({ "x": (x - 100), "y": y }).to_string())
-    } else {
-        Err("cursor_pos err".to_string())
     }
 }

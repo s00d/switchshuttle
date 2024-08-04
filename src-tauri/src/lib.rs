@@ -5,7 +5,7 @@ mod helpers;
 mod menu;
 
 use crate::commands::{
-    about_message, check_for_updates, create_new_config, cursor_pos, execute,
+    check_for_updates, create_new_config, execute,
     execute_command_with_inputs, fetch_input_data, get_menu_data, get_version,
 };
 use crate::menu::{create_system_tray_menu, handle_system_tray_event};
@@ -58,14 +58,12 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             create_new_config,
-            about_message,
             check_for_updates,
             get_version,
             execute_command_with_inputs,
             get_menu_data,
             execute,
-            fetch_input_data,
-            cursor_pos
+            fetch_input_data
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application");
