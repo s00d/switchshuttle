@@ -45,10 +45,10 @@ jobs:
 
       - name: Export variable (unix)
         if: matrix.platform != 'windows-latest'
-        run: echo "TAURI_PRIVATE_KEY=${{ secrets.TAURI_PRIVATE_KEY }}" >> $GITHUB_ENV
+        run: echo "TAURI_SIGNING_PRIVATE_KEY=${{ secrets.TAURI_PRIVATE_KEY }}" >> $GITHUB_ENV
       - name: Export variable (windows)
         if: matrix.platform == 'windows-latest'
-        run: echo "TAURI_PRIVATE_KEY=${{ secrets.TAURI_PRIVATE_KEY }}" >> $GITHUB_ENV
+        run: echo "TAURI_SIGNING_PRIVATE_KEY=${{ secrets.TAURI_PRIVATE_KEY }}" >> $GITHUB_ENV
         shell: bash
 
       - name: Install Rust stable
