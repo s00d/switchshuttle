@@ -44,8 +44,8 @@ listen('navigate', (event: any) => {
 });
 
 async function createMenuItem(item: Command): Promise<MenuItem | Submenu> {
-  if (item.subitems) {
-    const submenuItems = await Promise.all(item.subitems.map(createMenuItem));
+  if (item.submenu) {
+    const submenuItems = await Promise.all(item.submenu.map(createMenuItem));
     return await Submenu.new({
       text: item.name,
       items: submenuItems,
@@ -67,7 +67,11 @@ async function showContextMenu() {
 
   const menuData = JSON.parse(config) as { items: Command[], menu_hotkeys: string[] };
 
+  console.log(555, menuData);
+
   const menuItems = await Promise.all(menuData.items.map(createMenuItem));
+
+  console.log(555, menuItems);
 
   const menu = await Menu.new({
     items: menuItems,
