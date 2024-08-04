@@ -7,8 +7,8 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { invoke } from '@tauri-apps/api';
-import { appWindow } from '@tauri-apps/api/window';
+import { invoke } from '@tauri-apps/api/core';
+import { getCurrentWindow } from '@tauri-apps/api/window';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
@@ -20,7 +20,7 @@ async function fetchMessage() {
 
 function onClose() {
   router.push('/').catch((error) => {});
-  appWindow.hide();
+  getCurrentWindow().hide();
 }
 
 onMounted(fetchMessage);

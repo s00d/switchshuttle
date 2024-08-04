@@ -13,7 +13,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, watch } from 'vue';
-import { exists, readDir, readTextFile } from '@tauri-apps/api/fs';
+import { exists, readDir, readTextFile } from '@tauri-apps/plugin-fs';
 import { path as tauriPath } from '@tauri-apps/api';
 import { ConfigFile, Config } from '../types';
 

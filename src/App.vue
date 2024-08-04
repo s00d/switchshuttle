@@ -12,17 +12,17 @@
 
 <script setup>
 import { ref } from 'vue';
-import { appWindow } from '@tauri-apps/api/window';
+import { getCurrentWindow } from '@tauri-apps/api/window';
 import { useRouter } from 'vue-router';
 import { listen, emit } from '@tauri-apps/api/event';
-import { invoke } from '@tauri-apps/api';
+import { invoke } from '@tauri-apps/api/core';
 
 const title = ref('Switch Shuttle');
 const router = useRouter();
 
 function onClose() {
   router.push('/').catch(() => {});
-  appWindow.hide();
+  getCurrentWindow().hide();
 }
 
 listen('navigate', (event) => {

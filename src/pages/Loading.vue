@@ -7,10 +7,10 @@
 
 <script setup>
 import { onMounted } from 'vue';
-import { appWindow } from '@tauri-apps/api/window';
+import { getCurrentWindow } from '@tauri-apps/api/window';
 
 function onClose() {
-  appWindow.close();
+  getCurrentWindow().close();
 }
 
 onMounted(() => {
