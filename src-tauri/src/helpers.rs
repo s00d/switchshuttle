@@ -1,9 +1,8 @@
 use include_dir::{include_dir, Dir};
-use serde_json::json;
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
-use tauri::{AppHandle, Manager, Window};
+use tauri::{AppHandle, Emitter, Manager};
 
 use crate::config::CommandConfig;
 
@@ -247,18 +246,4 @@ pub fn create_window(
     }
 
     window
-}
-
-pub fn show_context_menu(window: Window, x: i32, y: i32) {
-    window
-        .set_position(tauri::Position::Physical(tauri::PhysicalPosition::new(
-            0, 0,
-        )))
-        .unwrap();
-    window.hide().unwrap();
-    // window.set_focus().unwrap();
-    window.emit("show_context_menu", {}).unwrap();
-    window
-        .emit("menu-did-open", json!({ "x": x, "y": y }))
-        .unwrap();
 }

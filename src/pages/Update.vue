@@ -12,9 +12,9 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { invoke } from '@tauri-apps/api';
-import { open } from '@tauri-apps/api/shell';
-import { appWindow } from '@tauri-apps/api/window';
+import { invoke } from '@tauri-apps/api/core';
+import { open } from '@tauri-apps/plugin-shell';
+import { getCurrentWindow } from '@tauri-apps/api/window';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
@@ -44,7 +44,7 @@ function update() {
 
 function onClose() {
   router.push('/').catch((error) => {});
-  appWindow.hide();
+  getCurrentWindow().hide();
 }
 
 onMounted(checkForUpdates);

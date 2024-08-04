@@ -4,7 +4,7 @@ use serde::Deserialize;
 use serde_json::json;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use tauri::{State};
+use tauri::State;
 
 use crate::config::{CommandConfig, Config, ConfigManager};
 use crate::helpers::{execute_command, get_config_path, open_in_default_editor};
@@ -180,7 +180,10 @@ pub fn get_menu_data(state: State<'_, Arc<Mutex<ConfigManager>>>) -> Result<Stri
 }
 
 #[tauri::command]
-pub fn execute(state: State<'_, Arc<Mutex<ConfigManager>>>, command: String) -> Result<String, String> {
+pub fn execute(
+    state: State<'_, Arc<Mutex<ConfigManager>>>,
+    command: String,
+) -> Result<String, String> {
     println!("Executing command: {}", command);
 
     let config_manager = state.lock().unwrap();
@@ -201,7 +204,10 @@ pub fn execute(state: State<'_, Arc<Mutex<ConfigManager>>>, command: String) -> 
 }
 
 #[tauri::command]
-pub fn fetch_input_data(state: State<'_, Arc<Mutex<ConfigManager>>>, command: String) -> Result<String, String> {
+pub fn fetch_input_data(
+    state: State<'_, Arc<Mutex<ConfigManager>>>,
+    command: String,
+) -> Result<String, String> {
     println!("get_inputs_data {:?}", command);
 
     let config_manager = state.lock().unwrap();
