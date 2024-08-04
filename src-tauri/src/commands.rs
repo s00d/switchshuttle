@@ -170,7 +170,10 @@ pub fn get_menu_data(state: State<'_, Arc<Mutex<ConfigManager>>>) -> Result<Stri
     for config in &config_manager.configs {
         let items = build_menu_items(&config.commands);
         if let Some(hotkey) = &config.menu_hotkey {
-            grouped_items.entry(hotkey.clone()).or_insert_with(Vec::new).extend(items);
+            grouped_items
+                .entry(hotkey.clone())
+                .or_insert_with(Vec::new)
+                .extend(items);
         }
     }
 

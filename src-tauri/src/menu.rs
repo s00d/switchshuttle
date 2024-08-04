@@ -4,10 +4,12 @@ use crate::helpers::{
     create_window, get_config_path, open_folder_in_default_explorer, open_in_default_editor,
 };
 use std::sync::{Arc, Mutex};
-use tauri::menu::{MenuBuilder, SubmenuBuilder, CheckMenuItem, Submenu, IconMenuItemBuilder, IconMenuItem};
-use tauri::{AppHandle, Wry, Manager};
 use tauri::image::Image;
+use tauri::menu::{
+    CheckMenuItem, IconMenuItem, IconMenuItemBuilder, MenuBuilder, Submenu, SubmenuBuilder,
+};
 use tauri::path::BaseDirectory;
+use tauri::{AppHandle, Manager, Wry};
 use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_shell::ShellExt;
 
@@ -19,8 +21,12 @@ fn create_sub_menu(app: &AppHandle<Wry>, items: &[CommandConfig], title: &str) -
             submenu_builder = submenu_builder.item(&sub_submenu);
         } else {
             let id = item.id.clone().unwrap_or(item.name.clone());
-            let icon_path = app.path().resolve("icons/terminal.png", BaseDirectory::Resource).unwrap();
-            let mut menu_item = IconMenuItemBuilder::with_id(&id, &item.name).icon(Image::from_path(icon_path).unwrap());
+            let icon_path = app
+                .path()
+                .resolve("icons/terminal.png", BaseDirectory::Resource)
+                .unwrap();
+            let mut menu_item = IconMenuItemBuilder::with_id(&id, &item.name)
+                .icon(Image::from_path(icon_path).unwrap());
             if let Some(hotkey) = &item.hotkey {
                 menu_item = menu_item.accelerator(hotkey);
             }
@@ -52,8 +58,12 @@ pub fn create_system_tray_menu(
                 menu_items.push(MenuItemOrSubmenu::Submenu(submenu));
             } else {
                 let id = command.id.clone().unwrap_or(command.name.clone());
-                let icon_path = app.path().resolve("icons/terminal.png", BaseDirectory::Resource).unwrap();
-                let mut item = IconMenuItemBuilder::with_id(&id, &command.name).icon(Image::from_path(icon_path).unwrap());
+                let icon_path = app
+                    .path()
+                    .resolve("icons/terminal.png", BaseDirectory::Resource)
+                    .unwrap();
+                let mut item = IconMenuItemBuilder::with_id(&id, &command.name)
+                    .icon(Image::from_path(icon_path).unwrap());
                 if let Some(hotkey) = &command.hotkey {
                     item = item.accelerator(hotkey);
                 }
@@ -81,7 +91,10 @@ pub fn create_system_tray_menu(
 
     let mut edit_config_submenu = SubmenuBuilder::new(app, "Edit Config");
 
-    let icon_path = app.path().resolve("icons/create.png", BaseDirectory::Resource).unwrap();
+    let icon_path = app
+        .path()
+        .resolve("icons/create.png", BaseDirectory::Resource)
+        .unwrap();
     edit_config_submenu = edit_config_submenu.item(
         &IconMenuItemBuilder::with_id("add_new_config", "Create New Config")
             .icon(Image::from_path(icon_path).unwrap())
@@ -91,7 +104,10 @@ pub fn create_system_tray_menu(
     edit_config_submenu = edit_config_submenu.separator();
     for path in &config_manager.config_paths {
         let file_name = path.file_name().unwrap().to_string_lossy().to_string();
-        let icon_path = app.path().resolve("icons/edit.png", BaseDirectory::Resource).unwrap();
+        let icon_path = app
+            .path()
+            .resolve("icons/edit.png", BaseDirectory::Resource)
+            .unwrap();
         edit_config_submenu = edit_config_submenu.item(
             &IconMenuItemBuilder::with_id(&format!("edit_{}", file_name), &file_name)
                 .icon(Image::from_path(icon_path).unwrap())
@@ -101,14 +117,20 @@ pub fn create_system_tray_menu(
     }
 
     edit_config_submenu = edit_config_submenu.separator();
-    let icon_path = app.path().resolve("icons/folder.png", BaseDirectory::Resource).unwrap();
+    let icon_path = app
+        .path()
+        .resolve("icons/folder.png", BaseDirectory::Resource)
+        .unwrap();
     edit_config_submenu = edit_config_submenu.item(
         &IconMenuItemBuilder::with_id("open_config_folder", "Show Config Folder")
             .icon(Image::from_path(icon_path).unwrap())
             .build(app)
             .unwrap(),
     );
-    let icon_path = app.path().resolve("icons/visual.png", BaseDirectory::Resource).unwrap();
+    let icon_path = app
+        .path()
+        .resolve("icons/visual.png", BaseDirectory::Resource)
+        .unwrap();
     edit_config_submenu = edit_config_submenu.item(
         &IconMenuItemBuilder::with_id("open_config_editor", "Open Visual Editor")
             .icon(Image::from_path(icon_path).unwrap())
@@ -121,26 +143,43 @@ pub fn create_system_tray_menu(
     tray_menu_builder = tray_menu_builder.separator();
 
     tray_menu_builder = tray_menu_builder.item(
-        &CheckMenuItem::with_id(app.app_handle(), "toggle_launch_at_login", "Launch at Login", true, autostart, None::<&str>).unwrap(),
+        &CheckMenuItem::with_id(
+            app.app_handle(),
+            "toggle_launch_at_login",
+            "Launch at Login",
+            true,
+            autostart,
+            None::<&str>,
+        )
+        .unwrap(),
     );
 
     tray_menu_builder = tray_menu_builder.separator();
 
-    let icon_path = app.path().resolve("icons/info.png", BaseDirectory::Resource).unwrap();
+    let icon_path = app
+        .path()
+        .resolve("icons/info.png", BaseDirectory::Resource)
+        .unwrap();
     tray_menu_builder = tray_menu_builder.item(
         &IconMenuItemBuilder::with_id("about", "About")
             .icon(Image::from_path(icon_path).unwrap())
             .build(app)
             .unwrap(),
     );
-    let icon_path = app.path().resolve("icons/site.png", BaseDirectory::Resource).unwrap();
+    let icon_path = app
+        .path()
+        .resolve("icons/site.png", BaseDirectory::Resource)
+        .unwrap();
     tray_menu_builder = tray_menu_builder.item(
         &IconMenuItemBuilder::with_id("homepage", "Homepage")
             .icon(Image::from_path(icon_path).unwrap())
             .build(app)
             .unwrap(),
     );
-    let icon_path = app.path().resolve("icons/update.png", BaseDirectory::Resource).unwrap();
+    let icon_path = app
+        .path()
+        .resolve("icons/update.png", BaseDirectory::Resource)
+        .unwrap();
     tray_menu_builder = tray_menu_builder.item(
         &IconMenuItemBuilder::with_id("check_updates", "Check for Updates")
             .icon(Image::from_path(icon_path).unwrap())
@@ -149,14 +188,16 @@ pub fn create_system_tray_menu(
     );
 
     tray_menu_builder = tray_menu_builder.separator();
-    let icon_path = app.path().resolve("icons/exit.png", BaseDirectory::Resource).unwrap();
+    let icon_path = app
+        .path()
+        .resolve("icons/exit.png", BaseDirectory::Resource)
+        .unwrap();
     tray_menu_builder = tray_menu_builder.item(
         &IconMenuItemBuilder::with_id("quit", "Quit SwitchShuttle")
             .icon(Image::from_path(icon_path).unwrap())
             .build(app)
-            .unwrap()
+            .unwrap(),
     );
-
 
     tray_menu_builder.build().unwrap()
 }
