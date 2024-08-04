@@ -2,7 +2,11 @@
 ![intro](https://github.com/s00d/switchshuttle/blob/main/icons/intro.gif?raw=true)
 
 <span class="locale">
-[[English](README.md)] [[中文](README_ZH.md)] [[Русский](README_RU.md)] [[Deutsch](README_DE.md)] [[日本語](README_JA.md)]
+  <a href="README.md">English</a> | 
+  <a href="README_ZH.md">中文</a> | 
+  <a href="README_RU.md">Русский</a> | 
+  <a href="README_DE.md">Deutsch</a> | 
+  <a href="README_JA.md">日本語</a>
 </span>
 
 ## SwitchShuttle
