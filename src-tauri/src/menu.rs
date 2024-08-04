@@ -3,14 +3,11 @@ use crate::helpers;
 use crate::helpers::{
     create_window, get_config_path, open_folder_in_default_explorer, open_in_default_editor,
 };
-use auto_launch::AutoLaunchBuilder;
 use std::sync::{Arc, Mutex};
-use tauri::menu::{MenuItem, Submenu};
-use tauri::utils::platform::current_exe;
-use tauri::{
-    menu::{MenuBuilder, MenuItemBuilder, PredefinedMenuItem, SubmenuBuilder},
-    AppHandle, Wry,
-};
+use tauri::menu::{MenuBuilder, SubmenuBuilder, CheckMenuItem, Submenu, IconMenuItemBuilder, IconMenuItem, AboutMetadataBuilder};
+use tauri::{AppHandle, Wry, Manager};
+use tauri::image::Image;
+use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_shell::ShellExt;
 
 fn create_sub_menu(app: &AppHandle<Wry>, items: &[CommandConfig], title: &str) -> Submenu<Wry> {
@@ -21,7 +18,7 @@ fn create_sub_menu(app: &AppHandle<Wry>, items: &[CommandConfig], title: &str) -
             submenu_builder = submenu_builder.item(&sub_submenu);
         } else {
             let id = item.id.clone().unwrap_or(item.name.clone());
-            let mut menu_item = MenuItemBuilder::with_id(&id, &item.name);
+            let mut menu_item = IconMenuItemBuilder::with_id(&id, &item.name).icon(Image::from_path("icons/terminal.png").unwrap());
             if let Some(hotkey) = &item.hotkey {
                 menu_item = menu_item.accelerator(hotkey);
             }
@@ -32,8 +29,9 @@ fn create_sub_menu(app: &AppHandle<Wry>, items: &[CommandConfig], title: &str) -
 }
 
 enum MenuItemOrSubmenu {
-    MenuItem(MenuItem<Wry>),
+    // MenuItem(MenuItem<Wry>),
     Submenu(Submenu<Wry>),
+    IconItem(IconMenuItem<Wry>),
 }
 
 pub fn create_system_tray_menu(
@@ -52,92 +50,102 @@ pub fn create_system_tray_menu(
                 menu_items.push(MenuItemOrSubmenu::Submenu(submenu));
             } else {
                 let id = command.id.clone().unwrap_or(command.name.clone());
-                let mut item = MenuItemBuilder::with_id(&id, &command.name);
+                let mut item = IconMenuItemBuilder::with_id(&id, &command.name).icon(Image::from_path("icons/terminal.png").unwrap());
                 if let Some(hotkey) = &command.hotkey {
                     item = item.accelerator(hotkey);
                 }
                 let menu_item = item.build(app).unwrap();
-                menu_items.push(MenuItemOrSubmenu::MenuItem(menu_item));
+                menu_items.push(MenuItemOrSubmenu::IconItem(menu_item));
             }
         }
     }
 
     for item in menu_items {
         match item {
-            MenuItemOrSubmenu::MenuItem(menu_item) => {
-                tray_menu_builder = tray_menu_builder.item(&menu_item);
-            }
+            // MenuItemOrSubmenu::MenuItem(menu_item) => {
+            //     tray_menu_builder = tray_menu_builder.item(&menu_item);
+            // }
             MenuItemOrSubmenu::Submenu(submenu) => {
+                tray_menu_builder = tray_menu_builder.item(&submenu);
+            }
+            MenuItemOrSubmenu::IconItem(submenu) => {
                 tray_menu_builder = tray_menu_builder.item(&submenu);
             }
         }
     }
 
-    tray_menu_builder = tray_menu_builder.item(&PredefinedMenuItem::separator(app).unwrap());
+    tray_menu_builder = tray_menu_builder.separator();
 
     let mut edit_config_submenu = SubmenuBuilder::new(app, "Edit Config");
     edit_config_submenu = edit_config_submenu.item(
-        &MenuItemBuilder::with_id("add_new_config", "Create New Config")
+        &IconMenuItemBuilder::with_id("add_new_config", "Create New Config")
+            .icon(Image::from_path("icons/create.png").unwrap())
             .build(app)
             .unwrap(),
     );
-    edit_config_submenu = edit_config_submenu.item(&PredefinedMenuItem::separator(app).unwrap());
+    edit_config_submenu = edit_config_submenu.separator();
     for path in &config_manager.config_paths {
         let file_name = path.file_name().unwrap().to_string_lossy().to_string();
         edit_config_submenu = edit_config_submenu.item(
-            &MenuItemBuilder::with_id(&format!("edit_{}", file_name), &file_name)
+            &IconMenuItemBuilder::with_id(&format!("edit_{}", file_name), &file_name)
+                .icon(Image::from_path("icons/edit.png").unwrap())
                 .build(app)
                 .unwrap(),
         );
     }
 
-    edit_config_submenu = edit_config_submenu.item(&PredefinedMenuItem::separator(app).unwrap());
+    edit_config_submenu = edit_config_submenu.separator();
     edit_config_submenu = edit_config_submenu.item(
-        &MenuItemBuilder::with_id("open_config_folder", "Show Config Folder")
+        &IconMenuItemBuilder::with_id("open_config_folder", "Show Config Folder")
+            .icon(Image::from_path("icons/folder.png").unwrap())
             .build(app)
             .unwrap(),
     );
     edit_config_submenu = edit_config_submenu.item(
-        &MenuItemBuilder::with_id("open_config_editor", "Open Visual Editor")
+        &IconMenuItemBuilder::with_id("open_config_editor", "Open Visual Editor")
+            .icon(Image::from_path("icons/visual.png").unwrap())
             .build(app)
             .unwrap(),
     );
 
     tray_menu_builder = tray_menu_builder.item(&edit_config_submenu.build().unwrap());
 
-    tray_menu_builder = tray_menu_builder.item(&PredefinedMenuItem::separator(app).unwrap());
+    tray_menu_builder = tray_menu_builder.separator();
 
-    let launch_at_login_text = if autostart {
-        "✔ Launch at Login"
-    } else {
-        "✖ Launch at Login"
-    };
     tray_menu_builder = tray_menu_builder.item(
-        &MenuItemBuilder::with_id("toggle_launch_at_login", launch_at_login_text)
-            .build(app)
-            .unwrap(),
+        &CheckMenuItem::with_id(app.app_handle(), "toggle_launch_at_login", "Launch at Login", true, autostart, None::<&str>).unwrap(),
     );
 
-    tray_menu_builder = tray_menu_builder.item(&PredefinedMenuItem::separator(app).unwrap());
+    tray_menu_builder = tray_menu_builder.separator();
+
+    let about = AboutMetadataBuilder::default()
+        .copyright(Some("s00d"))
+        .license(Some("MIT"))
+        .build();
+
+    tray_menu_builder = tray_menu_builder.about(Some(about));
     tray_menu_builder = tray_menu_builder.item(
-        &MenuItemBuilder::with_id("about", "About")
+        &IconMenuItemBuilder::with_id("homepage", "Homepage")
+            .icon(Image::from_path("icons/site.png").unwrap())
             .build(app)
             .unwrap(),
     );
     tray_menu_builder = tray_menu_builder.item(
-        &MenuItemBuilder::with_id("homepage", "Homepage")
-            .build(app)
-            .unwrap(),
-    );
-    tray_menu_builder = tray_menu_builder.item(
-        &MenuItemBuilder::with_id("check_updates", "Check for Updates")
+        &IconMenuItemBuilder::with_id("check_updates", "Check for Updates")
+            .icon(Image::from_path("icons/update.png").unwrap())
             .build(app)
             .unwrap(),
     );
 
-    tray_menu_builder = tray_menu_builder.item(&PredefinedMenuItem::separator(app).unwrap());
+    tray_menu_builder = tray_menu_builder.separator();
     tray_menu_builder =
-        tray_menu_builder.item(&MenuItemBuilder::with_id("quit", "Quit").build(app).unwrap());
+        tray_menu_builder.item(
+            &IconMenuItemBuilder::with_id("quit", "Quit SwitchShuttle")
+                .icon(Image::from_path("icons/exit.png").unwrap())
+                .build(app)
+                .unwrap()
+        );
+
 
     tray_menu_builder.build().unwrap()
 }
@@ -148,15 +156,8 @@ pub fn handle_system_tray_event(
     config_manager: Arc<Mutex<ConfigManager>>,
 ) {
     let config_path = get_config_path();
-    let app_name = &app.package_info().name;
-    let current_exe = current_exe().unwrap();
 
-    let auto_start = AutoLaunchBuilder::new()
-        .set_app_name(&app_name)
-        .set_app_path(&current_exe.to_str().unwrap())
-        .set_use_launch_agent(true)
-        .build()
-        .unwrap();
+    let autostart_manager = app.autolaunch();
 
     config_manager
         .lock()
@@ -174,18 +175,15 @@ pub fn handle_system_tray_event(
             create_window(&app, "Config Editor", "editor", 800.0, 600.0, true);
         }
         "toggle_launch_at_login" => {
-            let enabled = auto_start.is_enabled().unwrap();
+            let enabled = autostart_manager.is_enabled().unwrap();
             if enabled {
-                auto_start.disable().unwrap();
+                autostart_manager.disable().unwrap();
             } else {
-                auto_start.enable().unwrap();
+                autostart_manager.enable().unwrap();
             }
             let new_system_tray_menu =
-                create_system_tray_menu(app, !enabled, &config_manager.lock().unwrap());
+                create_system_tray_menu(app, enabled, &config_manager.lock().unwrap());
             app.set_menu(new_system_tray_menu).unwrap();
-        }
-        "about" => {
-            create_window(&app, "About", "about", 400.0, 180.0, true);
         }
         "homepage" => {
             let homepage_url = "https://github.com/s00d/SwitchShuttle";

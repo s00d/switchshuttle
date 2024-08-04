@@ -12,7 +12,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import {getCurrentWindow, LogicalPosition} from '@tauri-apps/api/window';
+import {getCurrentWindow, LogicalPosition, cursorPosition} from '@tauri-apps/api/window';
 import { useRouter } from 'vue-router';
 import { listen, emit } from '@tauri-apps/api/event';
 import { invoke } from '@tauri-apps/api/core';
@@ -60,18 +60,13 @@ async function createMenuItem(item: Command): Promise<MenuItem | Submenu> {
 }
 
 async function showContextMenu() {
-  const pos = await invoke('cursor_pos') as string;
-  const cursor_pos = JSON.parse(pos) as { x: number, y: number };
+  const pos2 = await cursorPosition()
 
   const config = await invoke('get_menu_data') as string;
 
   const menuData = JSON.parse(config) as { items: Command[], menu_hotkeys: string[] };
 
-  console.log(555, menuData);
-
   const menuItems = await Promise.all(menuData.items.map(createMenuItem));
-
-  console.log(555, menuItems);
 
   const menu = await Menu.new({
     items: menuItems,
@@ -79,7 +74,7 @@ async function showContextMenu() {
 
   getCurrentWindow().hide().then(() => {
     getCurrentWindow().setPosition(new PhysicalPosition(0, 0)).then(() => {
-      menu.popup(new LogicalPosition(cursor_pos.x, cursor_pos.y)).catch(error => {
+      menu.popup(new PhysicalPosition(parseInt(pos2.x.toString()), parseInt(pos2.y.toString()))).catch(error => {
         console.error('Failed to show context menu:', error);
       });
     })
