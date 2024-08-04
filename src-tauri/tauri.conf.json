@@ -42,7 +42,8 @@
     },
     "trayIcon": {
       "iconPath": "icons/icon.png",
-      "iconAsTemplate": true
+      "iconAsTemplate": true,
+      "id": "switch-shuttle-tray"
     }
   }
 }

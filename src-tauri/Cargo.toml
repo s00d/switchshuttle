@@ -4,7 +4,7 @@ version = "1.0.1"
 edition = "2021"
 
 [dependencies]
-tauri = { version = "^2.0.0-rc.0", features = ["wry", "tray-icon", "unstable"] }
+tauri = { version = "^2.0.0-rc.0", features = ["wry", "tray-icon", "unstable", "image-png"] }
 tauri-plugin-fs = "^2.0.0-rc.0"
 tauri-plugin-dialog = "2.0.0-rc.0"
 tauri-plugin-log = "2.0.0-rc.0"
