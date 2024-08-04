@@ -166,16 +166,15 @@ pub fn get_menu_data(state: State<'_, Arc<Mutex<ConfigManager>>>) -> Result<Stri
         items
     }
 
-    let mut all_items = Vec::new();
-    let mut menu_hotkeys = Vec::new();
+    let mut grouped_items: HashMap<String, Vec<serde_json::Value>> = HashMap::new();
     for config in &config_manager.configs {
-        all_items.extend(build_menu_items(&config.commands));
+        let items = build_menu_items(&config.commands);
         if let Some(hotkey) = &config.menu_hotkey {
-            menu_hotkeys.push(hotkey.clone());
+            grouped_items.entry(hotkey.clone()).or_insert_with(Vec::new).extend(items);
         }
     }
 
-    Ok(json!({ "items": all_items, "menu_hotkeys": menu_hotkeys }).to_string())
+    Ok(serde_json::to_string(&grouped_items).unwrap())
 }
 
 #[tauri::command]
@@ -220,4 +219,10 @@ pub fn fetch_input_data(
         Some(inputs) => Ok(json!(inputs).to_string()),
         None => return Err("Inputs not found".to_string()),
     }
+}
+
+#[tauri::command]
+pub fn about_message(app: tauri::AppHandle) -> Result<String, String> {
+    let tauri_version = app.package_info().version.to_string();
+    Ok(format!("SwitchShuttle v{} \n\n by s00d.", tauri_version))
 }

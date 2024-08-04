@@ -5,7 +5,7 @@ mod helpers;
 mod menu;
 
 use crate::commands::{
-    check_for_updates, create_new_config, execute,
+    check_for_updates, create_new_config, execute, about_message,
     execute_command_with_inputs, fetch_input_data, get_menu_data, get_version,
 };
 use crate::menu::{create_system_tray_menu, handle_system_tray_event};
@@ -63,6 +63,7 @@ pub fn run() {
             execute_command_with_inputs,
             get_menu_data,
             execute,
+            about_message,
             fetch_input_data
         ])
         .build(tauri::generate_context!())

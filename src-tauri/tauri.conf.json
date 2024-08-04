@@ -40,10 +40,8 @@
       {
         "label": "main",
         "title": "Main",
-        "width": 400,
+        "width": 200,
         "height": 200,
-        "x": 0,
-        "y": 0,
         "fullscreen": false,
         "resizable": false,
         "decorations": false,
