@@ -1,3 +1,4 @@
+use mouse_position::mouse_position::Mouse;
 use reqwest::blocking::Client;
 use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
 use serde::Deserialize;
@@ -154,11 +155,12 @@ pub fn get_menu_data(state: State<'_, Arc<Mutex<ConfigManager>>>) -> Result<Stri
                 .collect::<String>();
 
             let mut item = json!({
-                "label": command.name,
+                "name": command.name,
                 "disabled": false,
                 "event": format!("command_{}", event_name),
-                "payload": command.id.clone(),
-                "shortcut": command.hotkey.clone().unwrap_or_default()
+                "id": command.id.clone(),
+                "command": command.command.clone(),
+                "hotkey": command.hotkey.clone().unwrap_or_default()
             });
 
             if let Some(submenu) = &command.submenu {
@@ -172,11 +174,15 @@ pub fn get_menu_data(state: State<'_, Arc<Mutex<ConfigManager>>>) -> Result<Stri
     }
 
     let mut all_items = Vec::new();
+    let mut menu_hotkeys = Vec::new();
     for config in &config_manager.configs {
         all_items.extend(build_menu_items(&config.commands));
+        if let Some(hotkey) = &config.menu_hotkey {
+            menu_hotkeys.push(hotkey.clone());
+        }
     }
 
-    Ok(json!({ "items": all_items }).to_string())
+    Ok(json!({ "items": all_items, "menu_hotkeys": menu_hotkeys }).to_string())
 }
 
 #[tauri::command]
@@ -220,5 +226,16 @@ pub fn fetch_input_data(
     match &command.inputs {
         Some(inputs) => Ok(json!(inputs).to_string()),
         None => return Err("Inputs not found".to_string()),
+    }
+}
+
+#[tauri::command]
+pub fn cursor_pos(_app: tauri::AppHandle) -> Result<String, String> {
+    let position = Mouse::get_mouse_position();
+
+    if let Mouse::Position { x, y } = position {
+        Ok(json!({ "x": (x - 100), "y": y }).to_string())
+    } else {
+        Err("cursor_pos err".to_string())
     }
 }

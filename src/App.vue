@@ -10,12 +10,18 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
-import { getCurrentWindow } from '@tauri-apps/api/window';
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import {getCurrentWindow, LogicalPosition} from '@tauri-apps/api/window';
 import { useRouter } from 'vue-router';
 import { listen, emit } from '@tauri-apps/api/event';
 import { invoke } from '@tauri-apps/api/core';
+import {MenuItem} from "@tauri-apps/api/menu/menuItem";
+import {Menu} from "@tauri-apps/api/menu/menu";
+import {Command} from "./types.ts";
+import {register} from "@tauri-apps/plugin-global-shortcut";
+import {Submenu} from "@tauri-apps/api/menu/submenu";
+import {PhysicalPosition} from "@tauri-apps/api/dpi";
 
 const title = ref('Switch Shuttle');
 const router = useRouter();
@@ -25,7 +31,7 @@ function onClose() {
   getCurrentWindow().hide();
 }
 
-listen('navigate', (event) => {
+listen('navigate', (event: any) => {
   title.value = event.payload[1];
   router.push(event.payload[0]).then(() => {
     // Send a confirmation event back to the backend
@@ -37,49 +43,70 @@ listen('navigate', (event) => {
   console.error('Failed to listen for navigate event:', error);
 });
 
-async function registerListenersForMenuItems(items) {
-  items.forEach(command => {
-    if (command.event) {
-      listen(command.event, (event) => {
-        console.log('execute', { command: event.payload });
-        invoke('execute', { command: event.payload }).catch((error) => {
-          console.log('error', error);
-        });
+async function createMenuItem(item: Command): Promise<MenuItem | Submenu> {
+  if (item.subitems) {
+    const submenuItems = await Promise.all(item.subitems.map(createMenuItem));
+    return await Submenu.new({
+      text: item.name,
+      items: submenuItems,
+    });
+  } else {
+    return await MenuItem.new({
+      id: item.id,
+      text: item.name,
+      action: () => invoke('execute', { command: item.command }),
+    });
+  }
+}
+
+async function showContextMenu() {
+  const pos = await invoke('cursor_pos') as string;
+  const cursor_pos = JSON.parse(pos) as { x: number, y: number };
+
+  const config = await invoke('get_menu_data') as string;
+
+  const menuData = JSON.parse(config) as { items: Command[], menu_hotkeys: string[] };
+
+  const menuItems = await Promise.all(menuData.items.map(createMenuItem));
+
+  const menu = await Menu.new({
+    items: menuItems,
+  });
+
+  getCurrentWindow().hide().then(() => {
+    getCurrentWindow().setPosition(new PhysicalPosition(0, 0)).then(() => {
+      menu.popup(new LogicalPosition(cursor_pos.x, cursor_pos.y)).catch(error => {
+        console.error('Failed to show context menu:', error);
+      });
+    })
+  });
+}
+
+onMounted(async () => {
+  const config = await invoke('get_menu_data') as string;
+  const menuData = JSON.parse(config) as { items: Command[], menu_hotkeys: string[] };
+
+  const uniqueHotkeys = new Set<string>();
+
+  menuData.menu_hotkeys.map(async (hotkey) => {
+    hotkey = hotkey.replace('', '');
+    if (uniqueHotkeys.has(hotkey)) {
+      console.error(`Hotkey ${hotkey} is already registered.`);
+    } else {
+      uniqueHotkeys.add(hotkey);
+      await register(hotkey, async (event) => {
+        if(event.state === 'Released') {
+          console.log('Shortcut triggered');
+          await showContextMenu();
+        }
+      }).catch((error) => {
+        console.error(`Failed to register hotkey ${hotkey}:`, error);
       });
     }
-
-    if (command.subitems) {
-      registerListenersForMenuItems(command.subitems);
-    }
   });
-}
+});
 
-async function registerListeners() {
-  // Listen to command events
-  const config = await invoke('get_menu_data');
-  const menuData = JSON.parse(config);
 
-  registerListenersForMenuItems(menuData.items);
-
-  await listen('menu-did-open', async (event) => {
-    console.log(event);
-
-    const config = await invoke('get_menu_data');
-    const menuData = JSON.parse(config);
-
-    // show context menu
-    invoke('plugin:context_menu|show_context_menu', {
-      pos: {
-        x: event.payload.x,
-        y: event.payload.y
-      },
-      theme: 'light',
-      items: menuData.items
-    });
-  });
-}
-
-registerListeners(); // Register event listeners once
 </script>
 
 <style scoped>
@@ -208,80 +235,80 @@ body {
 }
 
 .container {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    box-sizing: border-box;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  box-sizing: border-box;
 
-    background: #fff;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    width: 100%;
-    max-width: 400px;
-    position: relative;
-    height: 100%;
-    padding: 30px 0 0 0;
+  background: #fff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  height: 100%;
+  padding: 30px 0 0 0;
 }
 
 
 button {
-    padding: 6px 20px;
-    font-size: 14px;
-    border: 1px solid #ccd0d5;
-    border-radius: 6px;
-    background: linear-gradient(to bottom, #ffffff, #e0e0e0);
-    color: #333;
-    cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 6px 20px;
+  font-size: 14px;
+  border: 1px solid #ccd0d5;
+  border-radius: 6px;
+  background: linear-gradient(to bottom, #ffffff, #e0e0e0);
+  color: #333;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 button:hover {
-    background: linear-gradient(to bottom, #e0e0e0, #d0d0d0);
-    border-color: #bbb;
+  background: linear-gradient(to bottom, #e0e0e0, #d0d0d0);
+  border-color: #bbb;
 }
 
 button:active {
-    background: linear-gradient(to bottom, #d0d0d0, #c0c0c0);
-    border-color: #aaa;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(to bottom, #d0d0d0, #c0c0c0);
+  border-color: #aaa;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 button:focus {
-    outline: none;
-    box-shadow: 0 0 3px 2px rgba(0, 123, 255, 0.25);
+  outline: none;
+  box-shadow: 0 0 3px 2px rgba(0, 123, 255, 0.25);
 }
 
 
 .button-blue {
-    border: 1px solid #007aff;
-    background: linear-gradient(to bottom, #007aff, #005bb5);
-    color: white;
+  border: 1px solid #007aff;
+  background: linear-gradient(to bottom, #007aff, #005bb5);
+  color: white;
 }
 
 .button-blue:hover {
-    background: linear-gradient(to bottom, #005bb5, #004a99);
-    border-color: #005bb5;
+  background: linear-gradient(to bottom, #005bb5, #004a99);
+  border-color: #005bb5;
 }
 
 .button-blue:active {
-    background: linear-gradient(to bottom, #004a99, #003d7a);
-    border-color: #004a99;
+  background: linear-gradient(to bottom, #004a99, #003d7a);
+  border-color: #004a99;
 }
 
 .cancel-button {
-    background: linear-gradient(to bottom, #dc3545, #c82333);
-    color: white;
+  background: linear-gradient(to bottom, #dc3545, #c82333);
+  color: white;
 }
 
 .cancel-button:hover {
-    background: linear-gradient(to bottom, #c82333, #a71d2a);
-    border-color: #a71d2a;
+  background: linear-gradient(to bottom, #c82333, #a71d2a);
+  border-color: #a71d2a;
 }
 
 .cancel-button:active {
-    background: linear-gradient(to bottom, #a71d2a, #8a1621);
-    border-color: #8a1621;
+  background: linear-gradient(to bottom, #a71d2a, #8a1621);
+  border-color: #8a1621;
 }
 </style>

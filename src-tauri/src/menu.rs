@@ -1,17 +1,17 @@
-use auto_launch::AutoLaunchBuilder;
-use std::sync::{Arc, Mutex};
-use tauri::utils::platform::current_exe;
-use tauri::{
-    menu::{MenuBuilder, MenuItemBuilder, SubmenuBuilder, PredefinedMenuItem},
-    AppHandle, Wry,
-};
-use tauri::menu::Submenu;
-use tauri_plugin_shell::ShellExt;
 use crate::config::{CommandConfig, ConfigManager};
 use crate::helpers;
 use crate::helpers::{
     create_window, get_config_path, open_folder_in_default_explorer, open_in_default_editor,
 };
+use auto_launch::AutoLaunchBuilder;
+use std::sync::{Arc, Mutex};
+use tauri::menu::{MenuItem, Submenu};
+use tauri::utils::platform::current_exe;
+use tauri::{
+    menu::{MenuBuilder, MenuItemBuilder, PredefinedMenuItem, SubmenuBuilder},
+    AppHandle, Wry,
+};
+use tauri_plugin_shell::ShellExt;
 
 fn create_sub_menu(app: &AppHandle<Wry>, items: &[CommandConfig], title: &str) -> Submenu<Wry> {
     let mut submenu_builder = SubmenuBuilder::new(app, title);
@@ -31,13 +31,25 @@ fn create_sub_menu(app: &AppHandle<Wry>, items: &[CommandConfig], title: &str) -
     submenu_builder.build().unwrap()
 }
 
-pub fn generate_command_menus(app: &AppHandle<Wry>, config_manager: &ConfigManager) -> Vec<Submenu<Wry>> {
-    let mut submenus = Vec::new();
+enum MenuItemOrSubmenu {
+    MenuItem(MenuItem<Wry>),
+    Submenu(Submenu<Wry>),
+}
+
+pub fn create_system_tray_menu(
+    app: &AppHandle<Wry>,
+    autostart: bool,
+    config_manager: &ConfigManager,
+) -> tauri::menu::Menu<Wry> {
+    let mut tray_menu_builder = MenuBuilder::new(app);
+
+    let mut menu_items = Vec::new();
+
     for config in &config_manager.configs {
         for command in &config.commands {
             if let Some(submenu_items) = &command.submenu {
                 let submenu = create_sub_menu(app, submenu_items, &command.name);
-                submenus.push(submenu);
+                menu_items.push(MenuItemOrSubmenu::Submenu(submenu));
             } else {
                 let id = command.id.clone().unwrap_or(command.name.clone());
                 let mut item = MenuItemBuilder::with_id(&id, &command.name);
@@ -45,43 +57,50 @@ pub fn generate_command_menus(app: &AppHandle<Wry>, config_manager: &ConfigManag
                     item = item.accelerator(hotkey);
                 }
                 let menu_item = item.build(app).unwrap();
-                let submenu = SubmenuBuilder::new(app, &command.name)
-                    .item(&menu_item)
-                    .build()
-                    .unwrap();
-                submenus.push(submenu);
+                menu_items.push(MenuItemOrSubmenu::MenuItem(menu_item));
             }
         }
     }
-    submenus
-}
 
-pub fn create_system_tray_menu(app: &AppHandle<Wry>, autostart: bool, config_manager: &ConfigManager) -> tauri::menu::Menu<Wry> {
-    let mut tray_menu_builder = MenuBuilder::new(app);
-
-    let command_submenus = generate_command_menus(app, config_manager);
-    for submenu in command_submenus {
-        tray_menu_builder = tray_menu_builder.item(&submenu);
+    for item in menu_items {
+        match item {
+            MenuItemOrSubmenu::MenuItem(menu_item) => {
+                tray_menu_builder = tray_menu_builder.item(&menu_item);
+            }
+            MenuItemOrSubmenu::Submenu(submenu) => {
+                tray_menu_builder = tray_menu_builder.item(&submenu);
+            }
+        }
     }
+
+    tray_menu_builder = tray_menu_builder.item(&PredefinedMenuItem::separator(app).unwrap());
 
     let mut edit_config_submenu = SubmenuBuilder::new(app, "Edit Config");
     edit_config_submenu = edit_config_submenu.item(
-        &MenuItemBuilder::with_id("add_new_config", "Create New Config").build(app).unwrap()
+        &MenuItemBuilder::with_id("add_new_config", "Create New Config")
+            .build(app)
+            .unwrap(),
     );
     edit_config_submenu = edit_config_submenu.item(&PredefinedMenuItem::separator(app).unwrap());
     for path in &config_manager.config_paths {
         let file_name = path.file_name().unwrap().to_string_lossy().to_string();
         edit_config_submenu = edit_config_submenu.item(
-            &MenuItemBuilder::with_id(&format!("edit_{}", file_name), &file_name).build(app).unwrap()
+            &MenuItemBuilder::with_id(&format!("edit_{}", file_name), &file_name)
+                .build(app)
+                .unwrap(),
         );
     }
 
     edit_config_submenu = edit_config_submenu.item(&PredefinedMenuItem::separator(app).unwrap());
     edit_config_submenu = edit_config_submenu.item(
-        &MenuItemBuilder::with_id("open_config_folder", "Show Config Folder").build(app).unwrap()
+        &MenuItemBuilder::with_id("open_config_folder", "Show Config Folder")
+            .build(app)
+            .unwrap(),
     );
     edit_config_submenu = edit_config_submenu.item(
-        &MenuItemBuilder::with_id("open_config_editor", "Open Visual Editor").build(app).unwrap()
+        &MenuItemBuilder::with_id("open_config_editor", "Open Visual Editor")
+            .build(app)
+            .unwrap(),
     );
 
     tray_menu_builder = tray_menu_builder.item(&edit_config_submenu.build().unwrap());
@@ -94,29 +113,40 @@ pub fn create_system_tray_menu(app: &AppHandle<Wry>, autostart: bool, config_man
         "✖ Launch at Login"
     };
     tray_menu_builder = tray_menu_builder.item(
-        &MenuItemBuilder::with_id("toggle_launch_at_login", launch_at_login_text).build(app).unwrap()
+        &MenuItemBuilder::with_id("toggle_launch_at_login", launch_at_login_text)
+            .build(app)
+            .unwrap(),
     );
 
     tray_menu_builder = tray_menu_builder.item(&PredefinedMenuItem::separator(app).unwrap());
     tray_menu_builder = tray_menu_builder.item(
-        &MenuItemBuilder::with_id("about", "About").build(app).unwrap()
+        &MenuItemBuilder::with_id("about", "About")
+            .build(app)
+            .unwrap(),
     );
     tray_menu_builder = tray_menu_builder.item(
-        &MenuItemBuilder::with_id("homepage", "Homepage").build(app).unwrap()
+        &MenuItemBuilder::with_id("homepage", "Homepage")
+            .build(app)
+            .unwrap(),
     );
     tray_menu_builder = tray_menu_builder.item(
-        &MenuItemBuilder::with_id("check_updates", "Check for Updates").build(app).unwrap()
+        &MenuItemBuilder::with_id("check_updates", "Check for Updates")
+            .build(app)
+            .unwrap(),
     );
 
     tray_menu_builder = tray_menu_builder.item(&PredefinedMenuItem::separator(app).unwrap());
-    tray_menu_builder = tray_menu_builder.item(
-        &MenuItemBuilder::with_id("quit", "Quit").build(app).unwrap()
-    );
+    tray_menu_builder =
+        tray_menu_builder.item(&MenuItemBuilder::with_id("quit", "Quit").build(app).unwrap());
 
     tray_menu_builder.build().unwrap()
 }
 
-pub fn handle_system_tray_event(app: &AppHandle<Wry>, event: tauri::menu::MenuEvent, config_manager: Arc<Mutex<ConfigManager>>) {
+pub fn handle_system_tray_event(
+    app: &AppHandle<Wry>,
+    event: tauri::menu::MenuEvent,
+    config_manager: Arc<Mutex<ConfigManager>>,
+) {
     let config_path = get_config_path();
     let app_name = &app.package_info().name;
     let current_exe = current_exe().unwrap();
@@ -150,7 +180,8 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event: tauri::menu::MenuEv
             } else {
                 auto_start.enable().unwrap();
             }
-            let new_system_tray_menu = create_system_tray_menu(app, !enabled, &config_manager.lock().unwrap());
+            let new_system_tray_menu =
+                create_system_tray_menu(app, !enabled, &config_manager.lock().unwrap());
             app.set_menu(new_system_tray_menu).unwrap();
         }
         "about" => {

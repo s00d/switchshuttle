@@ -6,8 +6,9 @@ export interface ConfigFile {
 export interface Command {
   name: string;
   command: string;
+  id: string;
   hotkey: string | null;
-  submenu: Command[]|null;
+  subitems: Command[]|null;
   commands: string[];
 }
 

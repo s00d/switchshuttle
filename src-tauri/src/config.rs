@@ -85,12 +85,16 @@ impl ConfigManager {
                         eprintln!("Failed to load config from {}: {}", path.display(), err);
                         if let Some(w) = app {
                             w.dialog()
-                                .message(&format!("Failed to parse config from {}: {}", path.display(), err))
+                                .message(&format!(
+                                    "Failed to parse config from {}: {}",
+                                    path.display(),
+                                    err
+                                ))
                                 .title("Error")
                                 .ok_button_label("Absolutely")
                                 .cancel_button_label("Totally")
                                 .show(|result| match result {
-                                    true => {},
+                                    true => {}
                                     false => {}
                                 });
                         }
