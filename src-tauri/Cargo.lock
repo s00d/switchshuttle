@@ -4,7 +4,7 @@ version = 3
 
 [[package]]
 name = "SwitchShuttle"
-version = "1.0.1"
+version = "0.0.0"
 dependencies = [
  "auto-launch",
  "dirs 5.0.1",
