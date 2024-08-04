@@ -209,8 +209,6 @@ pub fn handle_system_tray_event(
 ) {
     let config_path = get_config_path();
 
-    let autostart_manager = app.autolaunch();
-
     config_manager
         .lock()
         .unwrap()
@@ -230,6 +228,7 @@ pub fn handle_system_tray_event(
             create_window(&app, "Config Editor", "editor", 800.0, 600.0, true);
         }
         "toggle_launch_at_login" => {
+            let autostart_manager = app.autolaunch();
             let enabled = autostart_manager.is_enabled().unwrap();
             if enabled {
                 autostart_manager.disable().unwrap();
@@ -237,7 +236,7 @@ pub fn handle_system_tray_event(
                 autostart_manager.enable().unwrap();
             }
             let new_system_tray_menu =
-                create_system_tray_menu(app, enabled, &config_manager.lock().unwrap());
+                create_system_tray_menu(app, !enabled, &config_manager.lock().unwrap());
             app.set_menu(new_system_tray_menu).unwrap();
         }
         "homepage" => {

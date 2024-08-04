@@ -11,7 +11,7 @@ use crate::commands::{
 use crate::menu::{create_system_tray_menu, handle_system_tray_event};
 use config::ConfigManager;
 use std::sync::{Arc, Mutex};
-use tauri_plugin_autostart::MacosLauncher;
+use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
 
 pub fn run() {
     let config_manager = Arc::new(Mutex::new(ConfigManager::new()));
@@ -44,8 +44,10 @@ pub fn run() {
                 app.set_activation_policy(tauri::ActivationPolicy::Accessory);
             }
 
+            let autostart_manager = app.autolaunch();
+            let enabled = autostart_manager.is_enabled().unwrap();
             let system_tray_menu =
-                create_system_tray_menu(app.handle(), false, &config_manager.lock().unwrap());
+                create_system_tray_menu(app.handle(), enabled, &config_manager.lock().unwrap());
 
             let tray = app.tray_by_id("switch-shuttle-tray").unwrap();
 
