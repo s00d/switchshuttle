@@ -69,6 +69,7 @@
     "store:default",
     "global-shortcut:allow-register",
     "global-shortcut:default",
-    "positioner:default"
+    "positioner:default",
+    "updater:default"
   ]
 }
