@@ -3,6 +3,7 @@ use mouse_position::mouse_position::Mouse;
 use once_cell::sync::Lazy;
 use std::str::FromStr;
 use std::{collections::HashMap, sync::Mutex, thread};
+use std::sync::Arc;
 use tauri::{AppHandle, Manager};
 
 use crate::config::{CommandConfig, ConfigManager};
@@ -12,19 +13,16 @@ static HOTKEY_COMMAND_MAP: Lazy<
     Mutex<HashMap<u32, (CommandConfig, String, String, String, String)>>,
 > = Lazy::new(|| Mutex::new(HashMap::new()));
 
-pub fn register_global_hotkeys(app_handle: AppHandle) {
+pub fn register_global_hotkeys(app_handle: AppHandle, config_manager: Arc<Mutex<ConfigManager>>) {
     thread::spawn(move || {
         let manager = GlobalHotKeyManager::new().unwrap();
-        register_hotkeys(&app_handle, &manager);
+        register_hotkeys(config_manager, &manager);
         handle_hotkey_events(app_handle);
     });
 }
 
-fn register_hotkeys(app_handle: &AppHandle, manager: &GlobalHotKeyManager) {
-    let mut config_manager = ConfigManager::new();
-    config_manager
-        .load_configs(Some(&app_handle.get_window("main").unwrap()))
-        .expect("Failed to load configs");
+fn register_hotkeys(config_manager: Arc<Mutex<ConfigManager>>, manager: &GlobalHotKeyManager) {
+    let config_manager = config_manager.lock().unwrap();
 
     let mut unique_hotkeys = HashMap::new();
 
