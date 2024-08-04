@@ -125,7 +125,7 @@ pub fn create_system_tray_menu(
     );
 
     tray_menu_builder = tray_menu_builder.separator();
-;
+
     let icon_path = app.path().resolve("icons/info.png", BaseDirectory::Resource).unwrap();
     tray_menu_builder = tray_menu_builder.item(
         &IconMenuItemBuilder::with_id("about", "About")
