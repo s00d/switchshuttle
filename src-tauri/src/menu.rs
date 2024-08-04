@@ -4,7 +4,7 @@ use crate::helpers::{
     create_window, get_config_path, open_folder_in_default_explorer, open_in_default_editor,
 };
 use std::sync::{Arc, Mutex};
-use tauri::menu::{MenuBuilder, SubmenuBuilder, CheckMenuItem, Submenu, IconMenuItemBuilder, IconMenuItem, AboutMetadataBuilder};
+use tauri::menu::{MenuBuilder, SubmenuBuilder, CheckMenuItem, Submenu, IconMenuItemBuilder, IconMenuItem};
 use tauri::{AppHandle, Wry, Manager};
 use tauri::image::Image;
 use tauri::path::BaseDirectory;
@@ -125,13 +125,14 @@ pub fn create_system_tray_menu(
     );
 
     tray_menu_builder = tray_menu_builder.separator();
-
-    let about = AboutMetadataBuilder::default()
-        .copyright(Some("s00d"))
-        .license(Some("MIT"))
-        .build();
-
-    tray_menu_builder = tray_menu_builder.about(Some(about));
+;
+    let icon_path = app.path().resolve("icons/info.png", BaseDirectory::Resource).unwrap();
+    tray_menu_builder = tray_menu_builder.item(
+        &IconMenuItemBuilder::with_id("about", "About")
+            .icon(Image::from_path(icon_path).unwrap())
+            .build(app)
+            .unwrap(),
+    );
     let icon_path = app.path().resolve("icons/site.png", BaseDirectory::Resource).unwrap();
     tray_menu_builder = tray_menu_builder.item(
         &IconMenuItemBuilder::with_id("homepage", "Homepage")
@@ -176,6 +177,9 @@ pub fn handle_system_tray_event(
         .expect("Failed to reload configs");
 
     match event.id().0.as_str() {
+        "about" => {
+            create_window(&app, "About", "about", 400.0, 180.0, true);
+        }
         "quit" => std::process::exit(0),
         "edit_config" => open_in_default_editor(&config_path),
         "open_config_folder" => {

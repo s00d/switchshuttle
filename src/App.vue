@@ -18,6 +18,7 @@ import { listen, emit } from '@tauri-apps/api/event';
 import { invoke } from '@tauri-apps/api/core';
 import {MenuItem} from "@tauri-apps/api/menu/menuItem";
 import {Menu} from "@tauri-apps/api/menu/menu";
+import { message } from '@tauri-apps/plugin-dialog';
 import {Command} from "./types.ts";
 import {register} from "@tauri-apps/plugin-global-shortcut";
 import {Submenu} from "@tauri-apps/api/menu/submenu";
@@ -54,55 +55,97 @@ async function createMenuItem(item: Command): Promise<MenuItem | Submenu> {
     return await MenuItem.new({
       id: item.id,
       text: item.name,
-      action: () => invoke('execute', { command: item.command }),
+      // action: () => invoke('execute', { command: item.id }), // how it work??? O_o
     });
   }
 }
 
-async function showContextMenu() {
-  const pos2 = await cursorPosition()
+async function showContextMenu(hotkey: string) {
+  const pos2 = await cursorPosition();
 
   const config = await invoke('get_menu_data') as string;
+  const menuData = JSON.parse(config) as Record<string, Command[]>;
 
-  const menuData = JSON.parse(config) as { items: Command[], menu_hotkeys: string[] };
+  if (menuData[hotkey]) {
+    const menuItems = await Promise.all(menuData[hotkey].map(createMenuItem));
+    const menu = await Menu.new({
+      items: menuItems,
+    });
 
-  const menuItems = await Promise.all(menuData.items.map(createMenuItem));
+    getCurrentWindow().hide().then(() => {
+      getCurrentWindow().setPosition(new PhysicalPosition(0, 0)).then(() => {
+        menu.popup(new PhysicalPosition(parseInt(pos2.x.toString()), parseInt(pos2.y.toString()))).catch(error => {
+          console.error('Failed to show context menu:', error);
+        });
+      })
+    });
+  } else {
+    console.error(`No menu items found for hotkey: ${hotkey}`);
+    await message(`No menu items found for hotkey: ${hotkey}`, { title: 'Error', kind: 'error' });
+    await getCurrentWindow().hide();
+  }
+}
 
-  const menu = await Menu.new({
-    items: menuItems,
-  });
 
-  getCurrentWindow().hide().then(() => {
-    getCurrentWindow().setPosition(new PhysicalPosition(0, 0)).then(() => {
-      menu.popup(new PhysicalPosition(parseInt(pos2.x.toString()), parseInt(pos2.y.toString()))).catch(error => {
-        console.error('Failed to show context menu:', error);
-      });
-    })
-  });
+async function registerGlobalHotkeys(commands: Command[], uniqueHotkeys: Set<string>) {
+  for (const command of commands) {
+    if (command.hotkey) {
+      if (uniqueHotkeys.has(command.hotkey)) {
+        console.error(`Hotkey ${command.hotkey} is already registered for command ${command.name}.`);
+        await message(`Hotkey ${command.hotkey} is already registered for command ${command.name}.`, { title: 'Error', kind: 'error' });
+        await getCurrentWindow().hide();
+      } else {
+        uniqueHotkeys.add(command.hotkey);
+        await register(command.hotkey, async (event) => {
+          if (event.state === 'Released') {
+            console.log(`Shortcut for command ${command.name} triggered`);
+            await invoke('execute', { command: command.id });
+          }
+        }).catch(async (error) => {
+          console.error(`Failed to register hotkey ${command.hotkey} for command ${command.name}:`, error);
+          await message(`Failed to register hotkey ${command.hotkey} for command ${command.name}: ${error}`, { title: 'Error', kind: 'error' });
+          await getCurrentWindow().hide();
+        });
+      }
+    }
+
+    if (command.submenu) {
+      await registerGlobalHotkeys(command.submenu, uniqueHotkeys);
+    }
+  }
 }
 
 onMounted(async () => {
   const config = await invoke('get_menu_data') as string;
-  const menuData = JSON.parse(config) as { items: Command[], menu_hotkeys: string[] };
+  const menuData = JSON.parse(config) as Record<string, Command[]>;
 
   const uniqueHotkeys = new Set<string>();
 
-  menuData.menu_hotkeys.map(async (hotkey) => {
-    hotkey = hotkey.replace('', '');
+  for (const [hotkey, _items] of Object.entries(menuData)) {
     if (uniqueHotkeys.has(hotkey)) {
       console.error(`Hotkey ${hotkey} is already registered.`);
+      await message(`Hotkey ${hotkey} is already registered.`, { title: 'Error', kind: 'error' });
+      await getCurrentWindow().hide();
     } else {
       uniqueHotkeys.add(hotkey);
       await register(hotkey, async (event) => {
-        if(event.state === 'Released') {
+        if (event.state === 'Released') {
           console.log('Shortcut triggered');
-          await showContextMenu();
+          await showContextMenu(hotkey);
         }
-      }).catch((error) => {
+      }).catch(async (error) => {
         console.error(`Failed to register hotkey ${hotkey}:`, error);
+        await message(`Failed to register hotkey ${hotkey}: ${error}`, { title: 'Error', kind: 'error' });
+        await getCurrentWindow().hide();
       });
     }
-  });
+  }
+
+  for (const [_hotkey, items] of Object.entries(menuData)) {
+    await registerGlobalHotkeys(items, uniqueHotkeys);
+  }
+
+
 });
 
 
