@@ -22,12 +22,12 @@
   "identifier": "com.SwitchShuttle.app",
   "plugins": {
     "updater": {
-      "active": false,
+      "active": true,
       "dialog": false,
       "endpoints": [
         "https://raw.githubusercontent.com/s00d/switchshuttle/update/latest.json"
       ],
-      "pubkey": "generate updater key: https://tauri.app/v1/guides/distribution/updater/",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDQ1Q0IzNkFDQkZFMjRDQjkKUldTNVRPSy9yRGJMUlVVSlZYaUlTc1ZkZkFHYnFSb1pnWmNVeTVXdnFKK3BZZHVWamptM0RHT00K",
       "windows": {
         "installMode": "passive"
       }
