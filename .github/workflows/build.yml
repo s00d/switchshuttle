@@ -13,12 +13,16 @@ jobs:
         include:
           - platform: 'macos-latest' # for Arm based macs (M1 and above)
             args: '--target aarch64-apple-darwin'
+            os: 'macos'
           - platform: 'macos-13' # for Intel based macs
             args: '--target x86_64-apple-darwin'
+            os: 'macos'
           - platform: 'ubuntu-22.04' # for Tauri v1 you could replace this with ubuntu-20.04
             args: ''
+            os: 'linux'
           - platform: 'windows-latest'
             args: ''
+            os: 'windows'
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -74,6 +78,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: app-v__VERSION__ # the action automatically replaces __VERSION__ with the app version.
+          appName: 'switch-shuttle_${{ matrix.os }}'
           releaseName: 'Release v__VERSION__'
           releaseBody: 'See the assets to download this version and install.'
           releaseDraft: true

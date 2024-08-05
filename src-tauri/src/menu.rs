@@ -1,8 +1,6 @@
 use crate::config::{CommandConfig, ConfigManager};
 use crate::helpers;
-use crate::helpers::{
-    create_window, get_config_path, open_folder_in_default_explorer, open_in_default_editor,
-};
+use crate::helpers::{change_devtools, create_window, get_config_path, open_folder_in_default_explorer, open_in_default_editor};
 use std::sync::{Arc, Mutex};
 use tauri::image::Image;
 use tauri::menu::{
@@ -12,19 +10,6 @@ use tauri::path::BaseDirectory;
 use tauri::{AppHandle, Manager, Wry};
 use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_shell::ShellExt;
-
-#[cfg(debug_assertions)]
-pub fn change_devtools(app: &AppHandle) {
-    let window = app.get_webview_window("main").unwrap();
-    if !window.is_devtools_open() {
-        window.open_devtools();
-    } else {
-        window.close_devtools();
-    }
-}
-
-#[cfg(not(debug_assertions))]
-pub fn change_devtools(_app: &AppHandle) {}
 
 fn create_sub_menu(app: &AppHandle<Wry>, items: &[CommandConfig], title: &str) -> Submenu<Wry> {
     let mut submenu_builder = SubmenuBuilder::new(app, title);
