@@ -138,6 +138,19 @@ pub fn create_system_tray_menu(
             .unwrap(),
     );
 
+    edit_config_submenu = edit_config_submenu.separator();
+
+    let icon_path = app
+        .path()
+        .resolve("icons/refresh_settings.png", BaseDirectory::Resource)
+        .unwrap();
+    edit_config_submenu = edit_config_submenu.item(
+        &IconMenuItemBuilder::with_id("reload", "Reload App")
+            .icon(Image::from_path(icon_path).unwrap())
+            .build(app)
+            .unwrap(),
+    );
+
     tray_menu_builder = tray_menu_builder.item(&edit_config_submenu.build().unwrap());
 
     tray_menu_builder = tray_menu_builder.separator();
@@ -155,6 +168,21 @@ pub fn create_system_tray_menu(
     );
 
     tray_menu_builder = tray_menu_builder.separator();
+
+    if cfg!(debug_assertions) {
+        let icon_path = app
+            .path()
+            .resolve("icons/devtools.png", BaseDirectory::Resource)
+            .unwrap();
+        tray_menu_builder = tray_menu_builder.item(
+            &IconMenuItemBuilder::with_id("open_devtools", "Open DevTools")
+                .icon(Image::from_path(icon_path).unwrap())
+                .build(app)
+                .unwrap(),
+        );
+
+        tray_menu_builder = tray_menu_builder.separator();
+    }
 
     let icon_path = app
         .path()
@@ -217,9 +245,10 @@ pub fn handle_system_tray_event(
 
     match event.id().0.as_str() {
         "about" => {
-            create_window(&app, "About", "about", 400.0, 180.0, true);
+            create_window(&app, "About", "about", 400.0, 580.0, true);
         }
         "quit" => std::process::exit(0),
+        "reload" => app.restart(),
         "edit_config" => open_in_default_editor(&config_path),
         "open_config_folder" => {
             open_folder_in_default_explorer(&config_path.parent().unwrap().to_path_buf())
@@ -248,6 +277,14 @@ pub fn handle_system_tray_event(
         }
         "add_new_config" => {
             create_window(&app, "Create New Config", "create", 400.0, 300.0, true);
+        }
+        "open_devtools" => {
+            let window = app.get_webview_window("main").unwrap();
+            if !window.is_devtools_open() {
+                window.open_devtools();
+            } else {
+                window.close_devtools();
+            }
         }
         _ => {
             if event.id().0.starts_with("edit_") {

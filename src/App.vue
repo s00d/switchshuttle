@@ -20,7 +20,7 @@ import {MenuItem} from "@tauri-apps/api/menu/menuItem";
 import {Menu} from "@tauri-apps/api/menu/menu";
 import { message } from '@tauri-apps/plugin-dialog';
 import {Command} from "./types.ts";
-import {register} from "@tauri-apps/plugin-global-shortcut";
+import { register, unregister } from "@tauri-apps/plugin-global-shortcut";
 import {Submenu} from "@tauri-apps/api/menu/submenu";
 import {PhysicalPosition} from "@tauri-apps/api/dpi";
 
@@ -37,6 +37,8 @@ listen('navigate', (event: any) => {
   router.push(event.payload[0]).then(() => {
     // Send a confirmation event back to the backend
     emit('navigation_complete', { route: event.payload[0] });
+    getCurrentWindow().center();
+    getCurrentWindow().setFocus();
   }).catch((error) => {
     console.error('Navigation error:', error);
   });
@@ -81,7 +83,9 @@ async function showContextMenu(hotkey: string) {
     });
   } else {
     console.error(`No menu items found for hotkey: ${hotkey}`);
-    await message(`No menu items found for hotkey: ${hotkey}`, { title: 'Error', kind: 'error' });
+    if (process.env.NODE_ENV === 'production') {
+      await message(`No menu items found for hotkey: ${hotkey}`, {title: 'Error', kind: 'error'});
+    }
     await getCurrentWindow().hide();
   }
 }
@@ -92,10 +96,16 @@ async function registerGlobalHotkeys(commands: Command[], uniqueHotkeys: Set<str
     if (command.hotkey) {
       if (uniqueHotkeys.has(command.hotkey)) {
         console.error(`Hotkey ${command.hotkey} is already registered for command ${command.name}.`);
-        await message(`Hotkey ${command.hotkey} is already registered for command ${command.name}.`, { title: 'Error', kind: 'error' });
+        if (process.env.NODE_ENV === 'production') {
+          await message(`Hotkey ${command.hotkey} is already registered for command ${command.name}.`, {
+            title: 'Error',
+            kind: 'error'
+          });
+        }
         await getCurrentWindow().hide();
       } else {
         uniqueHotkeys.add(command.hotkey);
+        await unregister(command.hotkey);
         await register(command.hotkey, async (event) => {
           if (event.state === 'Released') {
             console.log(`Shortcut for command ${command.name} triggered`);
@@ -124,10 +134,13 @@ onMounted(async () => {
   for (const [hotkey, _items] of Object.entries(menuData)) {
     if (uniqueHotkeys.has(hotkey)) {
       console.error(`Hotkey ${hotkey} is already registered.`);
-      await message(`Hotkey ${hotkey} is already registered.`, { title: 'Error', kind: 'error' });
+      if (process.env.NODE_ENV === 'production') {
+        await message(`Hotkey ${hotkey} is already registered.`, {title: 'Error', kind: 'error'});
+      }
       await getCurrentWindow().hide();
     } else {
       uniqueHotkeys.add(hotkey);
+      await unregister(hotkey);
       await register(hotkey, async (event) => {
         if (event.state === 'Released') {
           console.log('Shortcut triggered');
@@ -135,7 +148,9 @@ onMounted(async () => {
         }
       }).catch(async (error) => {
         console.error(`Failed to register hotkey ${hotkey}:`, error);
-        await message(`Failed to register hotkey ${hotkey}: ${error}`, { title: 'Error', kind: 'error' });
+        if (process.env.NODE_ENV === 'production') {
+          await message(`Failed to register hotkey ${hotkey}: ${error}`, {title: 'Error', kind: 'error'});
+        }
         await getCurrentWindow().hide();
       });
     }
@@ -144,8 +159,6 @@ onMounted(async () => {
   for (const [_hotkey, items] of Object.entries(menuData)) {
     await registerGlobalHotkeys(items, uniqueHotkeys);
   }
-
-
 });
 
 
@@ -203,66 +216,6 @@ onMounted(async () => {
   -webkit-app-region: drag;
   padding-left: 22px;
 }
-
-button {
-  padding: 6px 20px;
-  font-size: 14px;
-  border: 1px solid #ccd0d5;
-  border-radius: 6px;
-  background: linear-gradient(to bottom, #ffffff, #e0e0e0);
-  color: #333;
-  cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin: 10px 5px;
-}
-
-button:hover {
-  background: linear-gradient(to bottom, #e0e0e0, #d0d0d0);
-  border-color: #bbb;
-}
-
-button:active {
-  background: linear-gradient(to bottom, #d0d0d0, #c0c0c0);
-  border-color: #aaa;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-button:focus {
-  outline: none;
-  box-shadow: 0 0 3px 2px rgba(0, 123, 255, 0.25);
-}
-
-.cancel-button {
-  background: linear-gradient(to bottom, #dc3545, #c82333);
-  color: white;
-}
-
-.cancel-button:hover {
-  background: linear-gradient(to bottom, #c82333, #a71d2a);
-  border-color: #a71d2a;
-}
-
-.cancel-button:active {
-  background: linear-gradient(to bottom, #a71d2a, #8a1621);
-  border-color: #8a1621;
-}
-
-.button-blue {
-  border: 1px solid #007aff;
-  background: linear-gradient(to bottom, #007aff, #005bb5);
-  color: white;
-}
-
-.button-blue:hover {
-  background: linear-gradient(to bottom, #005bb5, #004a99);
-  border-color: #005bb5;
-}
-
-.button-blue:active {
-  background: linear-gradient(to bottom, #004a99, #003d7a);
-  border-color: #004a99;
-}
 </style>
 <style>
 * {
@@ -299,7 +252,6 @@ button {
   font-size: 14px;
   border: 1px solid #ccd0d5;
   border-radius: 6px;
-  background: linear-gradient(to bottom, #ffffff, #e0e0e0);
   color: #333;
   cursor: pointer;
   transition: background 0.2s, border-color 0.2s;
