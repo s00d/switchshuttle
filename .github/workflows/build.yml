@@ -11,18 +11,21 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-latest' # for Arm based macs (M1 and above)
-            args: '--target aarch64-apple-darwin'
-            os: 'macos'
-          - platform: 'macos-13' # for Intel based macs
-            args: '--target x86_64-apple-darwin'
-            os: 'macos'
-          - platform: 'ubuntu-22.04' # for Tauri v1 you could replace this with ubuntu-20.04
-            args: ''
-            os: 'linux'
+#          - platform: 'macos-latest' # for Arm based macs (M1 and above)
+#            args: '--target aarch64-apple-darwin'
+#            os: 'macos'
+#          - platform: 'macos-13' # for Intel based macs
+#            args: '--target x86_64-apple-darwin'
+#            os: 'macos'
+#          - platform: 'ubuntu-22.04' # for Tauri v1 you could replace this with ubuntu-20.04
+#            args: ''
+#            os: 'linux'
+#          - platform: 'windows-latest'
+#            args: ''
+#            os: 'windows'
           - platform: 'windows-latest'
-            args: ''
-            os: 'windows'
+            args: '--target i686-pc-windows-msvc'
+            suffix: 'windows'
 
     runs-on: ${{ matrix.platform }}
     steps:
