@@ -13,6 +13,19 @@ use tauri::{AppHandle, Manager, Wry};
 use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_shell::ShellExt;
 
+#[cfg(debug_assertions)]
+pub fn change_devtools(app: &AppHandle) {
+    let window = app.get_webview_window("main").unwrap();
+    if !window.is_devtools_open() {
+        window.open_devtools();
+    } else {
+        window.close_devtools();
+    }
+}
+
+#[cfg(not(debug_assertions))]
+pub fn change_devtools(_app: &AppHandle) {}
+
 fn create_sub_menu(app: &AppHandle<Wry>, items: &[CommandConfig], title: &str) -> Submenu<Wry> {
     let mut submenu_builder = SubmenuBuilder::new(app, title);
     for item in items {
@@ -279,11 +292,8 @@ pub fn handle_system_tray_event(
             create_window(&app, "Create New Config", "create", 400.0, 300.0, true);
         }
         "open_devtools" => {
-            let window = app.get_webview_window("main").unwrap();
-            if !window.is_devtools_open() {
-                window.open_devtools();
-            } else {
-                window.close_devtools();
+            if cfg!(debug_assertions) {
+                change_devtools(app);
             }
         }
         _ => {
