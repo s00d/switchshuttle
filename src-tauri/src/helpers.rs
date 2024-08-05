@@ -248,3 +248,16 @@ pub fn create_window(
 
     window
 }
+
+#[cfg(debug_assertions)]
+pub fn change_devtools(app: &AppHandle) {
+    let window = app.get_webview_window("main").unwrap();
+    if !window.is_devtools_open() {
+        window.open_devtools();
+    } else {
+        window.close_devtools();
+    }
+}
+
+#[cfg(not(debug_assertions))]
+pub fn change_devtools(_app: &AppHandle) {}
