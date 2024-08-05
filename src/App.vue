@@ -39,6 +39,8 @@ listen('navigate', (event: any) => {
     emit('navigation_complete', { route: event.payload[0] });
     getCurrentWindow().center();
     getCurrentWindow().setFocus();
+    getCurrentWindow().setAlwaysOnTop(true);
+    getCurrentWindow().setShadow(true);
   }).catch((error) => {
     console.error('Navigation error:', error);
   });
