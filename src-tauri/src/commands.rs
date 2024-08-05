@@ -4,6 +4,7 @@ use serde::Deserialize;
 use serde_json::json;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
+use std::time::{SystemTime, UNIX_EPOCH};
 use tauri::State;
 
 use crate::config::{CommandConfig, Config, ConfigManager};
@@ -227,5 +228,23 @@ pub fn fetch_input_data(
 #[tauri::command]
 pub fn about_message(app: tauri::AppHandle) -> Result<String, String> {
     let tauri_version = app.package_info().version.to_string();
-    Ok(format!("SwitchShuttle v{} \n\n by s00d.", tauri_version))
+
+    // Получение текущего года
+    let start = UNIX_EPOCH;
+    let now = SystemTime::now();
+    let duration = now.duration_since(start).unwrap();
+    let secs = duration.as_secs();
+    let current_year = 1970 + secs / 31_536_000; // 31_536_000 секунд в году
+
+    let message = format!(
+        "<h2>About SwitchShuttle</h1>
+        <p>Version: {}</p>
+        <p>by <a href='https://github.com/s00d'>s00d</a></p>
+        <p><a href='https://github.com/s00d/SwitchShuttle'>Homepage</a></p>
+        <p>License: MIT</p>
+        <p>Description: SwitchShuttle is a tool to manage your configurations and shortcuts efficiently.</p>
+        <p>&copy; {} SwitchShuttle. All rights reserved.</p>",
+        tauri_version, current_year
+    );
+    Ok(message)
 }
