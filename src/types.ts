@@ -4,6 +4,7 @@ export interface ConfigFile {
 }
 
 export interface Command {
+  id?: string,
   name: string;
   command: string;
   hotkey: string | null;

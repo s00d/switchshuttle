@@ -13,7 +13,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, watch } from 'vue';
-import { exists, readDir, readTextFile } from '@tauri-apps/api/fs';
+import { exists, readDir, readTextFile } from '@tauri-apps/plugin-fs';
 import { path as tauriPath } from '@tauri-apps/api';
 import { ConfigFile, Config } from '../types';
 
@@ -34,7 +34,7 @@ async function loadConfigs() {
   const configDir = await tauriPath.configDir();
   const configFilesList = await readDir(`${configDir}/switch-shuttle`);
   configFiles.value = configFilesList.filter(file => file.name?.endsWith('.json')).map(file => ({
-    path: file.path,
+    path: `${configDir}/switch-shuttle`,
     name: file.name?.replace('.json', '') ?? ''
   }));
   if (configFiles.value.length > 0) {

@@ -6,15 +6,15 @@
     <div v-if="loading" id="loader-text">loading...</div>
     <p v-if="!loading" id="message">{{ message }}</p>
     <button v-if="!loading && url" id="update-button" class="button-blue" @click="update">Update</button>
-    <button v-if="!loading" id="close-button" @click="onClose">Close</button>
+    <button v-if="!loading" id="close-button" class="cancel-button" @click="onClose">Close</button>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { invoke } from '@tauri-apps/api';
-import { open } from '@tauri-apps/api/shell';
-import { appWindow } from '@tauri-apps/api/window';
+import { invoke } from '@tauri-apps/api/core';
+import { open } from '@tauri-apps/plugin-shell';
+import { getCurrentWindow } from '@tauri-apps/api/window';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
@@ -44,7 +44,7 @@ function update() {
 
 function onClose() {
   router.push('/').catch((error) => {});
-  appWindow.hide();
+  getCurrentWindow().hide();
 }
 
 onMounted(checkForUpdates);

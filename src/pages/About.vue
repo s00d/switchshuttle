@@ -1,15 +1,17 @@
 <template>
   <div class="container">
-    <p id="message">{{ message }}</p>
-    <button @click="onClose">OK</button>
+    <img src="/logo.svg" alt="Logo" class="logo">
+    <div id="message" v-html="message" @click="handleLinkClick"></div>
+    <button class="button-blue" @click="onClose">OK</button>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { invoke } from '@tauri-apps/api';
-import { appWindow } from '@tauri-apps/api/window';
+import { invoke } from '@tauri-apps/api/core';
+import { getCurrentWindow } from '@tauri-apps/api/window';
 import { useRouter } from 'vue-router';
+import { open } from '@tauri-apps/plugin-shell';
 
 const router = useRouter();
 const message = ref('');
@@ -20,18 +22,42 @@ async function fetchMessage() {
 
 function onClose() {
   router.push('/').catch((error) => {});
-  appWindow.hide();
+  getCurrentWindow().hide();
+}
+
+async function handleLinkClick(event) {
+  if (event.target.tagName === 'A') {
+    event.preventDefault();
+    await open(event.target.href);
+  }
 }
 
 onMounted(fetchMessage);
 </script>
 
 <style scoped>
-/* Add styles from about.html */
 #app {
   height: 100vh;
   background-color: #f3f3f3;
-  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  position: relative;
+}
+
+.logo {
+  width: 128px;
+  height: 128px;
+  display: block;
+  margin: 20px auto 0;
 }
 
 #message {
@@ -40,7 +66,17 @@ onMounted(fetchMessage);
   color: #333;
 }
 
-.container {
-  height: 100%;
+button {
+  padding: 10px 20px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
 }
 </style>

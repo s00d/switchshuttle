@@ -1,9 +1,8 @@
 use include_dir::{include_dir, Dir};
-use serde_json::json;
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
-use tauri::{AppHandle, Manager, Window};
+use tauri::{AppHandle, Emitter, Manager};
 
 use crate::config::CommandConfig;
 
@@ -234,6 +233,7 @@ pub fn create_window(
     window
         .show()
         .unwrap_or_else(|e| println!("Failed to show window: {:?}", e));
+    window.center().unwrap_or_else(|e| println!("Failed to center window: {:?}", e));
     window.set_focus().expect("Failed to set focus on window");
 
     window.emit("navigate", (route, title)).unwrap();
@@ -249,16 +249,15 @@ pub fn create_window(
     window
 }
 
-pub fn show_context_menu(window: Window, x: i32, y: i32) {
-    window
-        .set_position(tauri::Position::Physical(tauri::PhysicalPosition::new(
-            0, 0,
-        )))
-        .unwrap();
-    window.hide().unwrap();
-    // window.set_focus().unwrap();
-    window.emit("show_context_menu", {}).unwrap();
-    window
-        .emit("menu-did-open", json!({ "x": x, "y": y }))
-        .unwrap();
+#[cfg(debug_assertions)]
+pub fn change_devtools(app: &AppHandle) {
+    let window = app.get_webview_window("main").unwrap();
+    if !window.is_devtools_open() {
+        window.open_devtools();
+    } else {
+        window.close_devtools();
+    }
 }
+
+#[cfg(not(debug_assertions))]
+pub fn change_devtools(_app: &AppHandle) {}

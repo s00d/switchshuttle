@@ -15,10 +15,9 @@
 </template>
 
 <script setup>
-import { ref, onBeforeMount, onMounted, onUnmounted } from 'vue';
-import { invoke } from '@tauri-apps/api';
-import { emit, listen } from '@tauri-apps/api/event'
-import { appWindow } from '@tauri-apps/api/window';
+import { ref, onMounted } from 'vue';
+import { invoke } from '@tauri-apps/api/core';
+import { getCurrentWindow } from '@tauri-apps/api/window';
 import { useRouter, useRoute } from 'vue-router';
 
 const router = useRouter();
@@ -48,7 +47,7 @@ function fetchInputData() {
 
 function onClose() {
   router.push('/').catch((error) => {});
-  appWindow.hide();
+  getCurrentWindow().hide();
 }
 
 onMounted(() => {

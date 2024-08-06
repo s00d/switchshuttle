@@ -4,8 +4,8 @@ use std::path::PathBuf;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 use std::{fs, io};
-use tauri::api::dialog::message;
-use tauri::Window;
+use tauri::{AppHandle, Wry};
+use tauri_plugin_dialog::DialogExt;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Config {
@@ -44,7 +44,7 @@ impl ConfigManager {
         }
     }
 
-    pub fn load_configs(&mut self, window: Option<&Window>) -> io::Result<()> {
+    pub fn load_configs(&mut self, app: Option<&AppHandle<Wry>>) -> io::Result<()> {
         self.counter = Arc::new(AtomicUsize::new(0));
 
         let config_path = get_config_path();
@@ -83,12 +83,20 @@ impl ConfigManager {
                     }
                     Err(err) => {
                         eprintln!("Failed to load config from {}: {}", path.display(), err);
-                        if let Some(w) = window {
-                            message(
-                                Some(w),
-                                "Error",
-                                &format!("Failed to parse config from {}: {}", path.display(), err),
-                            );
+                        if let Some(w) = app {
+                            w.dialog()
+                                .message(&format!(
+                                    "Failed to parse config from {}: {}",
+                                    path.display(),
+                                    err
+                                ))
+                                .title("Error")
+                                .ok_button_label("Absolutely")
+                                .cancel_button_label("Totally")
+                                .show(|result| match result {
+                                    true => {}
+                                    false => {}
+                                });
                         }
                     }
                 }

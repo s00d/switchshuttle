@@ -2,22 +2,55 @@
   "build": {
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
-    "devPath": "http://localhost:1420",
-    "distDir": "../dist"
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420"
   },
-  "package": {
-    "productName": "switch-shuttle",
-    "version": "1.2.3"
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "resources": [
+      "icons/*"
+    ],
+    "createUpdaterArtifacts": true
   },
-  "tauri": {
+  "productName": "switch-shuttle",
+  "version": "../package.json",
+  "identifier": "com.SwitchShuttle.app",
+  "plugins": {
+    "deep-link": {
+      "mobile": [
+        { "host": "com.SwitchShuttle.app" }
+      ],
+      "desktop": {
+        "schemes": ["switchshuttle", "switch-shuttle"]
+      }
+    },
+    "updater": {
+      "active": true,
+      "endpoints": [
+        "https://raw.githubusercontent.com/s00d/switchshuttle/update/latest.json",
+        "https://github.com/s00d/switchshuttle/releases/latest/download/latest.json"
+      ],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDQ1Q0IzNkFDQkZFMjRDQjkKUldTNVRPSy9yRGJMUlVVSlZYaUlTc1ZkZkFHYnFSb1pnWmNVeTVXdnFKK3BZZHVWamptM0RHT00K",
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  },
+  "app": {
     "windows": [
       {
         "label": "main",
         "title": "Main",
-        "width": 400,
+        "width": 200,
         "height": 200,
-        "x": 0,
-        "y": 0,
         "fullscreen": false,
         "resizable": false,
         "decorations": false,
@@ -25,43 +58,13 @@
         "alwaysOnTop": true
       }
     ],
-    "systemTray": {
-      "iconPath": "icons/icon.png",
-      "iconAsTemplate": true
-    },
-    "allowlist": {
-      "all": false,
-      "path": {
-        "all": true
-      },
-      "fs": {
-        "all": true,
-        "scope": ["*/**"]
-      },
-      "window": {
-        "all": true
-      },
-      "shell": {
-        "all": false,
-        "execute": true,
-        "sidecar": true,
-        "open": true
-      }
-    },
     "security": {
       "csp": null
     },
-    "bundle": {
-      "active": true,
-      "targets": "all",
-      "identifier": "com.SwitchShuttle.app",
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ]
+    "trayIcon": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true,
+      "id": "switch-shuttle-tray"
     }
   }
 }
