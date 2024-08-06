@@ -1,206 +1,319 @@
-use std::sync::{Arc, Mutex};
-use auto_launch::AutoLaunchBuilder;
-use tauri::utils::platform::current_exe;
-use tauri::{CustomMenuItem, Manager, State, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem, SystemTraySubmenu};
-
 use crate::config::{CommandConfig, ConfigManager};
 use crate::helpers;
-use crate::helpers::{
-    create_window, get_config_path, open_folder_in_default_explorer, open_in_default_editor,
+use crate::helpers::{change_devtools, create_window, get_config_path, open_folder_in_default_explorer, open_in_default_editor};
+use std::sync::{Arc, Mutex};
+use tauri::image::Image;
+use tauri::menu::{
+    CheckMenuItem, IconMenuItem, IconMenuItemBuilder, MenuBuilder, Submenu, SubmenuBuilder,
 };
+use tauri::path::BaseDirectory;
+use tauri::{AppHandle, Manager, Wry};
+use tauri_plugin_autostart::ManagerExt;
+use tauri_plugin_shell::ShellExt;
 
-fn create_sub_menu(items: &[CommandConfig]) -> SystemTrayMenu {
-    let mut menu = SystemTrayMenu::new();
+fn create_sub_menu(app: &AppHandle<Wry>, items: &[CommandConfig], title: &str) -> Submenu<Wry> {
+    let mut submenu_builder = SubmenuBuilder::new(app, title);
     for item in items {
-        if let Some(submenu) = &item.submenu {
-            let submenu_item = create_sub_menu(submenu);
-            menu = menu.add_submenu(SystemTraySubmenu::new(item.name.clone(), submenu_item));
+        if let Some(sub_items) = &item.submenu {
+            let sub_submenu = create_sub_menu(app, sub_items, &item.name);
+            submenu_builder = submenu_builder.item(&sub_submenu);
         } else {
             let id = item.id.clone().unwrap_or(item.name.clone());
-            let mut menu_item = CustomMenuItem::new(id, item.name.clone());
+            let icon_path = app
+                .path()
+                .resolve("icons/terminal.png", BaseDirectory::Resource)
+                .unwrap();
+            let mut menu_item = IconMenuItemBuilder::with_id(&id, &item.name)
+                .icon(Image::from_path(icon_path).unwrap());
             if let Some(hotkey) = &item.hotkey {
                 menu_item = menu_item.accelerator(hotkey);
             }
-            menu = menu.add_item(menu_item);
+            submenu_builder = submenu_builder.item(&menu_item.build(app).unwrap());
         }
     }
-    menu
+    submenu_builder.build().unwrap()
 }
 
-pub fn generate_command_menus(config_manager: &ConfigManager) -> SystemTrayMenu {
-    let mut tray_menu = SystemTrayMenu::new();
+enum MenuItemOrSubmenu {
+    // MenuItem(MenuItem<Wry>),
+    Submenu(Submenu<Wry>),
+    IconItem(IconMenuItem<Wry>),
+}
+
+pub fn create_system_tray_menu(
+    app: &AppHandle<Wry>,
+    autostart: bool,
+    config_manager: &ConfigManager,
+) -> tauri::menu::Menu<Wry> {
+    let mut tray_menu_builder = MenuBuilder::new(app);
+
+    let mut menu_items = Vec::new();
+
     for config in &config_manager.configs {
         for command in &config.commands {
-            if let Some(submenu) = &command.submenu {
-                let submenu_item = create_sub_menu(submenu);
-                tray_menu = tray_menu
-                    .add_submenu(SystemTraySubmenu::new(command.name.clone(), submenu_item));
+            if let Some(submenu_items) = &command.submenu {
+                let submenu = create_sub_menu(app, submenu_items, &command.name);
+                menu_items.push(MenuItemOrSubmenu::Submenu(submenu));
             } else {
                 let id = command.id.clone().unwrap_or(command.name.clone());
-                let mut item = CustomMenuItem::new(id, command.name.clone());
+                let icon_path = app
+                    .path()
+                    .resolve("icons/terminal.png", BaseDirectory::Resource)
+                    .unwrap();
+                let mut item = IconMenuItemBuilder::with_id(&id, &command.name)
+                    .icon(Image::from_path(icon_path).unwrap());
                 if let Some(hotkey) = &command.hotkey {
                     item = item.accelerator(hotkey);
                 }
-                tray_menu = tray_menu.add_item(item);
+                let menu_item = item.build(app).unwrap();
+                menu_items.push(MenuItemOrSubmenu::IconItem(menu_item));
             }
         }
     }
-    tray_menu
-}
 
-pub fn create_system_tray_menu(autostart: bool, config_manager: &ConfigManager) -> SystemTrayMenu {
-    let mut tray_menu = generate_command_menus(config_manager);
+    for item in menu_items {
+        match item {
+            // MenuItemOrSubmenu::MenuItem(menu_item) => {
+            //     tray_menu_builder = tray_menu_builder.item(&menu_item);
+            // }
+            MenuItemOrSubmenu::Submenu(submenu) => {
+                tray_menu_builder = tray_menu_builder.item(&submenu);
+            }
+            MenuItemOrSubmenu::IconItem(submenu) => {
+                tray_menu_builder = tray_menu_builder.item(&submenu);
+            }
+        }
+    }
 
-    tray_menu = tray_menu.add_native_item(SystemTrayMenuItem::Separator);
+    tray_menu_builder = tray_menu_builder.separator();
 
-    let mut edit_config_submenu = SystemTrayMenu::new();
-    edit_config_submenu = edit_config_submenu.add_item(CustomMenuItem::new(
-        "add_new_config".to_string(),
-        "Create New Config",
-    ));
-    edit_config_submenu = edit_config_submenu.add_native_item(SystemTrayMenuItem::Separator);
+    let mut edit_config_submenu = SubmenuBuilder::new(app, "Edit Config");
+
+    let icon_path = app
+        .path()
+        .resolve("icons/create.png", BaseDirectory::Resource)
+        .unwrap();
+    edit_config_submenu = edit_config_submenu.item(
+        &IconMenuItemBuilder::with_id("add_new_config", "Create New Config")
+            .icon(Image::from_path(icon_path).unwrap())
+            .build(app)
+            .unwrap(),
+    );
+    edit_config_submenu = edit_config_submenu.separator();
     for path in &config_manager.config_paths {
         let file_name = path.file_name().unwrap().to_string_lossy().to_string();
-        edit_config_submenu = edit_config_submenu.add_item(CustomMenuItem::new(
-            format!("edit_{}", file_name),
-            file_name.clone(),
-        ));
+        let icon_path = app
+            .path()
+            .resolve("icons/edit.png", BaseDirectory::Resource)
+            .unwrap();
+        edit_config_submenu = edit_config_submenu.item(
+            &IconMenuItemBuilder::with_id(&format!("edit_{}", file_name), &file_name)
+                .icon(Image::from_path(icon_path).unwrap())
+                .build(app)
+                .unwrap(),
+        );
     }
 
-    edit_config_submenu = edit_config_submenu.add_native_item(SystemTrayMenuItem::Separator);
-    edit_config_submenu = edit_config_submenu.add_item(CustomMenuItem::new(
-        "open_config_folder".to_string(),
-        "Show Config Folder",
-    ));
-    edit_config_submenu = edit_config_submenu.add_item(CustomMenuItem::new(
-        "open_config_editor".to_string(),
-        "Open Visual Editor",
-    ));
+    edit_config_submenu = edit_config_submenu.separator();
+    let icon_path = app
+        .path()
+        .resolve("icons/folder.png", BaseDirectory::Resource)
+        .unwrap();
+    edit_config_submenu = edit_config_submenu.item(
+        &IconMenuItemBuilder::with_id("open_config_folder", "Show Config Folder")
+            .icon(Image::from_path(icon_path).unwrap())
+            .build(app)
+            .unwrap(),
+    );
+    let icon_path = app
+        .path()
+        .resolve("icons/visual.png", BaseDirectory::Resource)
+        .unwrap();
+    edit_config_submenu = edit_config_submenu.item(
+        &IconMenuItemBuilder::with_id("open_config_editor", "Open Visual Editor")
+            .icon(Image::from_path(icon_path).unwrap())
+            .build(app)
+            .unwrap(),
+    );
 
-    tray_menu = tray_menu.add_submenu(SystemTraySubmenu::new("Edit Config", edit_config_submenu));
+    edit_config_submenu = edit_config_submenu.separator();
 
-    tray_menu = tray_menu.add_native_item(SystemTrayMenuItem::Separator);
+    let icon_path = app
+        .path()
+        .resolve("icons/refresh_settings.png", BaseDirectory::Resource)
+        .unwrap();
+    edit_config_submenu = edit_config_submenu.item(
+        &IconMenuItemBuilder::with_id("reload", "Reload App")
+            .icon(Image::from_path(icon_path).unwrap())
+            .build(app)
+            .unwrap(),
+    );
 
-    let launch_at_login_text = if autostart {
-        "✔ Launch at Login"
-    } else {
-        "✖ Launch at Login"
-    };
-    tray_menu = tray_menu.add_item(CustomMenuItem::new(
-        "toggle_launch_at_login".to_string(),
-        launch_at_login_text,
-    ));
+    tray_menu_builder = tray_menu_builder.item(&edit_config_submenu.build().unwrap());
 
-    tray_menu = tray_menu.add_native_item(SystemTrayMenuItem::Separator);
-    tray_menu = tray_menu.add_item(CustomMenuItem::new("about".to_string(), "About"));
-    tray_menu = tray_menu.add_item(CustomMenuItem::new("homepage".to_string(), "Homepage"));
-    tray_menu = tray_menu.add_item(CustomMenuItem::new(
-        "check_updates".to_string(),
-        "Check for Updates",
-    ));
+    tray_menu_builder = tray_menu_builder.separator();
 
-    tray_menu = tray_menu.add_native_item(SystemTrayMenuItem::Separator);
-    tray_menu = tray_menu.add_item(CustomMenuItem::new("quit".to_string(), "Quit"));
+    tray_menu_builder = tray_menu_builder.item(
+        &CheckMenuItem::with_id(
+            app.app_handle(),
+            "toggle_launch_at_login",
+            "Launch at Login",
+            true,
+            autostart,
+            None::<&str>,
+        )
+        .unwrap(),
+    );
 
-    tray_menu
+    tray_menu_builder = tray_menu_builder.separator();
+
+    if cfg!(debug_assertions) {
+        let icon_path = app
+            .path()
+            .resolve("icons/devtools.png", BaseDirectory::Resource)
+            .unwrap();
+        tray_menu_builder = tray_menu_builder.item(
+            &IconMenuItemBuilder::with_id("open_devtools", "Open DevTools")
+                .icon(Image::from_path(icon_path).unwrap())
+                .build(app)
+                .unwrap(),
+        );
+
+        tray_menu_builder = tray_menu_builder.separator();
+    }
+
+    let icon_path = app
+        .path()
+        .resolve("icons/info.png", BaseDirectory::Resource)
+        .unwrap();
+    tray_menu_builder = tray_menu_builder.item(
+        &IconMenuItemBuilder::with_id("about", "About")
+            .icon(Image::from_path(icon_path).unwrap())
+            .build(app)
+            .unwrap(),
+    );
+    let icon_path = app
+        .path()
+        .resolve("icons/site.png", BaseDirectory::Resource)
+        .unwrap();
+    tray_menu_builder = tray_menu_builder.item(
+        &IconMenuItemBuilder::with_id("homepage", "Homepage")
+            .icon(Image::from_path(icon_path).unwrap())
+            .build(app)
+            .unwrap(),
+    );
+    let icon_path = app
+        .path()
+        .resolve("icons/update.png", BaseDirectory::Resource)
+        .unwrap();
+    tray_menu_builder = tray_menu_builder.item(
+        &IconMenuItemBuilder::with_id("check_updates", "Check for Updates")
+            .icon(Image::from_path(icon_path).unwrap())
+            .build(app)
+            .unwrap(),
+    );
+
+    tray_menu_builder = tray_menu_builder.separator();
+    let icon_path = app
+        .path()
+        .resolve("icons/exit.png", BaseDirectory::Resource)
+        .unwrap();
+    tray_menu_builder = tray_menu_builder.item(
+        &IconMenuItemBuilder::with_id("quit", "Quit SwitchShuttle")
+            .icon(Image::from_path(icon_path).unwrap())
+            .build(app)
+            .unwrap(),
+    );
+
+    tray_menu_builder.build().unwrap()
 }
 
-pub fn handle_system_tray_event(app: &tauri::AppHandle, event: SystemTrayEvent) {
+pub fn handle_system_tray_event(
+    app: &AppHandle<Wry>,
+    event: tauri::menu::MenuEvent,
+    config_manager: Arc<Mutex<ConfigManager>>,
+) {
     let config_path = get_config_path();
-    let app_name = &app.package_info().name;
-    let current_exe = current_exe().unwrap();
 
-    let state: State<'_, Arc<Mutex<ConfigManager>>> = app.state();
+    config_manager
+        .lock()
+        .unwrap()
+        .load_configs(Some(&app))
+        .expect("Failed to reload configs");
 
-    let auto_start = AutoLaunchBuilder::new()
-        .set_app_name(&app_name)
-        .set_app_path(&current_exe.to_str().unwrap())
-        .set_use_launch_agent(true)
-        .build()
-        .unwrap();
-
-    let mut config_manager = state.lock().unwrap();
-    match event {
-        SystemTrayEvent::MenuItemClick { id, .. } => {
-            match id.as_str() {
-                "quit" => std::process::exit(0),
-                "edit_config" => open_in_default_editor(&config_path),
-                "open_config_folder" => {
-                    open_folder_in_default_explorer(&config_path.parent().unwrap().to_path_buf())
-                }
-                "open_config_editor" => {
-                    create_window(&app, "Config Editor", "editor", 800.0, 600.0, true);
-                }
-                "toggle_launch_at_login" => {
-                    let enabled = auto_start.is_enabled().unwrap();
-                    if enabled {
-                        auto_start.disable().unwrap();
-                    } else {
-                        auto_start.enable().unwrap();
-                    }
-                    let new_system_tray_menu =
-                        create_system_tray_menu(!enabled, &config_manager);
-                    app.tray_handle().set_menu(new_system_tray_menu).unwrap();
-                }
-                "about" => {
-                    create_window(&app, "About", "about", 400.0, 180.0, true);
-                }
-                "homepage" => {
-                    let homepage_url = "https://github.com/s00d/SwitchShuttle";
-                    tauri::api::shell::open(&app.shell_scope(), homepage_url, None).unwrap();
-                }
-                "check_updates" => {
-                    create_window(&app, "Update Available", "update", 400.0, 300.0, true);
-                }
-                "add_new_config" => {
-                    create_window(&app, "Create New Config", "create", 400.0, 300.0, true);
-                }
-                _ => {
-                    if id.starts_with("edit_") {
-                        let config_file_name = id.replacen("edit_", "", 1);
-                        let config_file_path = config_path.parent().unwrap().join(&config_file_name);
-                        open_in_default_editor(&config_file_path);
-                    } else {
-                        match config_manager.find_command_by_id(id.as_str()) {
-                            Some((command, config)) => {
-                                if let Some(_inputs) = &command.inputs {
-                                    if let Some(id) = &command.id {
-                                        create_window(
-                                            &app,
-                                            "Provide Inputs",
-                                            &format!("inputs/{}", id),
-                                            400.0,
-                                            300.0,
-                                            true,
-                                        );
-                                    }
-                                } else {
-                                    helpers::execute_command(
-                                        command,
-                                        &config.terminal,
-                                        &config.launch_in,
-                                        &config.theme,
-                                        &config.title,
-                                    );
-                                }
+    match event.id().0.as_str() {
+        "about" => {
+            create_window(&app, "About", "about", 400.0, 580.0, true);
+        }
+        "quit" => std::process::exit(0),
+        "reload" => app.restart(),
+        "edit_config" => open_in_default_editor(&config_path),
+        "open_config_folder" => {
+            open_folder_in_default_explorer(&config_path.parent().unwrap().to_path_buf())
+        }
+        "open_config_editor" => {
+            create_window(&app, "Config Editor", "editor", 800.0, 600.0, true);
+        }
+        "toggle_launch_at_login" => {
+            let autostart_manager = app.autolaunch();
+            let enabled = autostart_manager.is_enabled().unwrap();
+            if enabled {
+                autostart_manager.disable().unwrap();
+            } else {
+                autostart_manager.enable().unwrap();
+            }
+            let new_system_tray_menu =
+                create_system_tray_menu(app, !enabled, &config_manager.lock().unwrap());
+            app.set_menu(new_system_tray_menu).unwrap();
+        }
+        "homepage" => {
+            let homepage_url = "https://github.com/s00d/SwitchShuttle";
+            app.shell().open(homepage_url, None).unwrap();
+        }
+        "check_updates" => {
+            create_window(&app, "Update Available", "update", 400.0, 300.0, true);
+        }
+        "add_new_config" => {
+            create_window(&app, "Create New Config", "create", 400.0, 300.0, true);
+        }
+        "open_devtools" => {
+            if cfg!(debug_assertions) {
+                change_devtools(app);
+            }
+        }
+        _ => {
+            if event.id().0.starts_with("edit_") {
+                let config_file_name = event.id().0.replacen("edit_", "", 1);
+                let config_file_path = config_path.parent().unwrap().join(&config_file_name);
+                open_in_default_editor(&config_file_path);
+            } else {
+                let config_manager = config_manager.lock().unwrap();
+                match config_manager.find_command_by_id(event.id().0.as_str()) {
+                    Some((command, config)) => {
+                        if let Some(_inputs) = &command.inputs {
+                            if let Some(id) = &command.id {
+                                create_window(
+                                    &app,
+                                    "Provide Inputs",
+                                    &format!("inputs/{}", id),
+                                    400.0,
+                                    300.0,
+                                    true,
+                                );
                             }
-                            None => eprintln!("Command '{}' not found", id),
+                        } else {
+                            helpers::execute_command(
+                                command,
+                                &config.terminal,
+                                &config.launch_in,
+                                &config.theme,
+                                &config.title,
+                            );
                         }
                     }
+                    None => eprintln!("Command '{}' not found", event.id().0),
                 }
             }
         }
-        SystemTrayEvent::LeftClick { .. } | SystemTrayEvent::RightClick { .. } => {
-            // Обновляем меню при левом клике на иконку системного трея
-            let autostart = auto_start.is_enabled().unwrap();
-            config_manager
-                .load_configs(Some(&app.get_window("main").unwrap()))
-                .expect("Failed to reload configs");
-            let new_system_tray_menu = create_system_tray_menu(autostart, &config_manager);
-            app.tray_handle().set_menu(new_system_tray_menu).unwrap();
-        }
-        _ => {}
     }
-
-
 }

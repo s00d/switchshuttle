@@ -30,8 +30,8 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { writeTextFile, readTextFile, exists, readDir, removeFile } from '@tauri-apps/api/fs';
-import { appWindow } from '@tauri-apps/api/window';
+import { writeTextFile, readTextFile, exists, readDir, remove } from '@tauri-apps/plugin-fs';
+import { getCurrentWindow } from '@tauri-apps/api/window';
 import { path as tauriPath } from '@tauri-apps/api';
 import { useRouter } from 'vue-router';
 
@@ -62,7 +62,7 @@ async function loadConfigs() {
   const configDir = await tauriPath.configDir();
   const configFilesList = await readDir(`${configDir}/switch-shuttle`);
   configFiles.value = configFilesList.filter(file => file.name?.endsWith('.json')).map(file => ({
-    path: file.path,
+    path: `${configDir}/switch-shuttle`,
     name: file.name?.replace('.json', '') ?? ''
   }));
   if (configFiles.value.length > 0) {
@@ -143,7 +143,7 @@ async function deleteConfig() {
     return;
   }
   try {
-    await removeFile(currentConfig.value);
+    await remove(currentConfig.value);
     showNotification('Config deleted successfully', 'success');
     closeDeleteConfigModal();
     loadConfigs();
@@ -154,7 +154,7 @@ async function deleteConfig() {
 
 function onClose() {
   router.push('/').catch(() => {});
-  appWindow.hide();
+  getCurrentWindow().hide()
 }
 
 onMounted(loadConfigs);

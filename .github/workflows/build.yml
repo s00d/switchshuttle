@@ -13,12 +13,19 @@ jobs:
         include:
           - platform: 'macos-latest' # for Arm based macs (M1 and above)
             args: '--target aarch64-apple-darwin'
+            os: 'macos'
           - platform: 'macos-13' # for Intel based macs
             args: '--target x86_64-apple-darwin'
-          - platform: 'ubuntu-20.04' # for Tauri v1 you could replace this with ubuntu-20.04
+            os: 'macos'
+          - platform: 'ubuntu-22.04' # for Tauri v1 you could replace this with ubuntu-20.04
             args: ''
+            os: 'linux'
           - platform: 'windows-latest'
             args: ''
+            os: 'windows'
+          - platform: 'windows-latest'
+            args: '--target i686-pc-windows-msvc'
+            suffix: 'windows'
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -43,17 +50,25 @@ jobs:
             C:\Users\runneradmin\.cargo\git\db\
           key: ${{ runner.os }}-${{ matrix.args }}-${{ hashFiles('Cargo.lock') }}
 
+      - name: Export variable (unix)
+        if: matrix.platform != 'windows-latest'
+        run: echo "TAURI_SIGNING_PRIVATE_KEY=${{ secrets.TAURI_PRIVATE_KEY }}" >> $GITHUB_ENV
+      - name: Export variable (windows)
+        if: matrix.platform == 'windows-latest'
+        run: echo "TAURI_SIGNING_PRIVATE_KEY=${{ secrets.TAURI_PRIVATE_KEY }}" >> $GITHUB_ENV
+        shell: bash
+
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
           # Those targets are only used on macOS runners so it's in an `if` to slightly speed up windows and linux builds.
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || matrix.platform == 'windows-latest' && 'i686-pc-windows-msvc,x86_64-pc-windows-msvc' || '' }}
 
       - name: Install dependencies (Ubuntu only)
-        if: matrix.platform == 'ubuntu-20.04' # This must match the platform value defined above.
+        if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev
         # webkitgtk 4.0 is for Tauri v1 - webkitgtk 4.1 is for Tauri v2.
         # You can remove the one that doesn't apply to your app to speed up the workflow a bit.
 
@@ -66,8 +81,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: app-v__VERSION__ # the action automatically replaces __VERSION__ with the app version.
+          appName: 'switch-shuttle_${{ matrix.os }}'
           releaseName: 'Release v__VERSION__'
           releaseBody: 'See the assets to download this version and install.'
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
+          includeUpdaterJson: true
+          updaterJsonPreferNsis: true
+          includeDebug: false
+          includeRelease: true

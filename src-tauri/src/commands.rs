@@ -4,7 +4,8 @@ use serde::Deserialize;
 use serde_json::json;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use tauri::{State};
+use std::time::{SystemTime, UNIX_EPOCH};
+use tauri::State;
 
 use crate::config::{CommandConfig, Config, ConfigManager};
 use crate::helpers::{execute_command, get_config_path, open_in_default_editor};
@@ -40,12 +41,6 @@ pub fn create_new_config(file_name: String) -> Result<(), String> {
     open_in_default_editor(&new_config_path);
 
     Ok(())
-}
-
-#[tauri::command]
-pub fn about_message(app: tauri::AppHandle) -> Result<String, String> {
-    let tauri_version = app.package_info().version.to_string();
-    Ok(format!("SwitchShuttle v{} \n\n by s00d.", tauri_version))
 }
 
 #[tauri::command]
@@ -154,15 +149,16 @@ pub fn get_menu_data(state: State<'_, Arc<Mutex<ConfigManager>>>) -> Result<Stri
                 .collect::<String>();
 
             let mut item = json!({
-                "label": command.name,
+                "name": command.name,
                 "disabled": false,
                 "event": format!("command_{}", event_name),
-                "payload": command.id.clone(),
-                "shortcut": command.hotkey.clone().unwrap_or_default()
+                "id": command.id.clone(),
+                "command": command.command.clone(),
+                "hotkey": command.hotkey.clone().unwrap_or_default()
             });
 
             if let Some(submenu) = &command.submenu {
-                item["subitems"] = json!(build_menu_items(submenu));
+                item["submenu"] = json!(build_menu_items(submenu));
             }
 
             items.push(item);
@@ -171,16 +167,25 @@ pub fn get_menu_data(state: State<'_, Arc<Mutex<ConfigManager>>>) -> Result<Stri
         items
     }
 
-    let mut all_items = Vec::new();
+    let mut grouped_items: HashMap<String, Vec<serde_json::Value>> = HashMap::new();
     for config in &config_manager.configs {
-        all_items.extend(build_menu_items(&config.commands));
+        let items = build_menu_items(&config.commands);
+        if let Some(hotkey) = &config.menu_hotkey {
+            grouped_items
+                .entry(hotkey.clone())
+                .or_insert_with(Vec::new)
+                .extend(items);
+        }
     }
 
-    Ok(json!({ "items": all_items }).to_string())
+    Ok(serde_json::to_string(&grouped_items).unwrap())
 }
 
 #[tauri::command]
-pub fn execute(state: State<'_, Arc<Mutex<ConfigManager>>>, command: String) -> Result<String, String> {
+pub fn execute(
+    state: State<'_, Arc<Mutex<ConfigManager>>>,
+    command: String,
+) -> Result<String, String> {
     println!("Executing command: {}", command);
 
     let config_manager = state.lock().unwrap();
@@ -201,7 +206,10 @@ pub fn execute(state: State<'_, Arc<Mutex<ConfigManager>>>, command: String) -> 
 }
 
 #[tauri::command]
-pub fn fetch_input_data(state: State<'_, Arc<Mutex<ConfigManager>>>, command: String) -> Result<String, String> {
+pub fn fetch_input_data(
+    state: State<'_, Arc<Mutex<ConfigManager>>>,
+    command: String,
+) -> Result<String, String> {
     println!("get_inputs_data {:?}", command);
 
     let config_manager = state.lock().unwrap();
@@ -215,4 +223,28 @@ pub fn fetch_input_data(state: State<'_, Arc<Mutex<ConfigManager>>>, command: St
         Some(inputs) => Ok(json!(inputs).to_string()),
         None => return Err("Inputs not found".to_string()),
     }
+}
+
+#[tauri::command]
+pub fn about_message(app: tauri::AppHandle) -> Result<String, String> {
+    let tauri_version = app.package_info().version.to_string();
+
+    // Получение текущего года
+    let start = UNIX_EPOCH;
+    let now = SystemTime::now();
+    let duration = now.duration_since(start).unwrap();
+    let secs = duration.as_secs();
+    let current_year = 1970 + secs / 31_536_000; // 31_536_000 секунд в году
+
+    let message = format!(
+        "<h2>About SwitchShuttle</h1>
+        <p>Version: {}</p>
+        <p>by <a href='https://github.com/s00d'>s00d</a></p>
+        <p><a href='https://github.com/s00d/SwitchShuttle'>Homepage</a></p>
+        <p>License: MIT</p>
+        <p>Description: SwitchShuttle is a tool to manage your configurations and shortcuts efficiently.</p>
+        <p>&copy; {} SwitchShuttle. All rights reserved.</p>",
+        tauri_version, current_year
+    );
+    Ok(message)
 }
