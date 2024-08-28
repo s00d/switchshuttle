@@ -18,7 +18,11 @@ import { listen, emit } from '@tauri-apps/api/event';
 import { invoke } from '@tauri-apps/api/core';
 import {MenuItem} from "@tauri-apps/api/menu/menuItem";
 import {Menu} from "@tauri-apps/api/menu/menu";
-import { message } from '@tauri-apps/plugin-dialog';
+import {
+  isPermissionGranted,
+  requestPermission,
+  sendNotification,
+} from '@tauri-apps/plugin-notification';
 import {Command} from "./types.ts";
 import { register, unregister } from "@tauri-apps/plugin-global-shortcut";
 import {Submenu} from "@tauri-apps/api/menu/submenu";
@@ -64,6 +68,17 @@ async function createMenuItem(item: Command): Promise<MenuItem | Submenu> {
   }
 }
 
+async function noti(title: string, body: string) {
+  let permissionGranted = await isPermissionGranted();
+  if (!permissionGranted) {
+    const permission = await requestPermission();
+    permissionGranted = permission === 'granted';
+  }
+  if (permissionGranted) {
+    sendNotification({ title, body });
+  }
+}
+
 async function showContextMenu(hotkey: string) {
   const pos2 = await cursorPosition();
 
@@ -86,7 +101,7 @@ async function showContextMenu(hotkey: string) {
   } else {
     console.error(`No menu items found for hotkey: ${hotkey}`);
     if (process.env.NODE_ENV === 'production') {
-      await message(`No menu items found for hotkey: ${hotkey}`, {title: 'Error', kind: 'error'});
+      noti('Error', `No menu items found for hotkey: ${hotkey}`)
     }
     await getCurrentWindow().hide();
   }
@@ -99,10 +114,7 @@ async function registerGlobalHotkeys(commands: Command[], uniqueHotkeys: Set<str
       if (uniqueHotkeys.has(command.hotkey)) {
         console.error(`Hotkey ${command.hotkey} is already registered for command ${command.name}.`);
         if (process.env.NODE_ENV === 'production') {
-          await message(`Hotkey ${command.hotkey} is already registered for command ${command.name}.`, {
-            title: 'Error',
-            kind: 'error'
-          });
+          noti('Warning', `Hotkey ${command.hotkey} is already registered for command ${command.name}.`)
         }
         await getCurrentWindow().hide();
       } else {
@@ -115,7 +127,7 @@ async function registerGlobalHotkeys(commands: Command[], uniqueHotkeys: Set<str
           }
         }).catch(async (error) => {
           console.error(`Failed to register hotkey ${command.hotkey} for command ${command.name}:`, error);
-          await message(`Failed to register hotkey ${command.hotkey} for command ${command.name}: ${error}`, { title: 'Error', kind: 'error' });
+          noti('Error', `Failed to register hotkey ${command.hotkey} for command ${command.name}: ${error}`)
           await getCurrentWindow().hide();
         });
       }
@@ -137,7 +149,7 @@ onMounted(async () => {
     if (uniqueHotkeys.has(hotkey)) {
       console.error(`Hotkey ${hotkey} is already registered.`);
       if (process.env.NODE_ENV === 'production') {
-        await message(`Hotkey ${hotkey} is already registered.`, {title: 'Error', kind: 'error'});
+        noti('Warning', `Hotkey ${hotkey} is already registered.`)
       }
       await getCurrentWindow().hide();
     } else {
@@ -151,7 +163,7 @@ onMounted(async () => {
       }).catch(async (error) => {
         console.error(`Failed to register hotkey ${hotkey}:`, error);
         if (process.env.NODE_ENV === 'production') {
-          await message(`Failed to register hotkey ${hotkey}: ${error}`, {title: 'Error', kind: 'error'});
+          noti('Warning', `Failed to register hotkey ${hotkey}: ${error}`,)
         }
         await getCurrentWindow().hide();
       });
@@ -161,9 +173,12 @@ onMounted(async () => {
   for (const [_hotkey, items] of Object.entries(menuData)) {
     await registerGlobalHotkeys(items, uniqueHotkeys);
   }
+
+  let permissionGranted = await isPermissionGranted();
+  if (!permissionGranted) {
+    await requestPermission();
+  }
 });
-
-
 </script>
 
 <style scoped>
