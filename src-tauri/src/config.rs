@@ -193,7 +193,7 @@ impl Config {
                         name: "Example Multi-Command with input".to_string(),
                         command: None,
                         submenu: None,
-                        hotkey: Some("Ctrl+Shift+M".to_string()),
+                        hotkey: None,
                         commands: Some(vec![
                             "export MY_VAR=$(echo 'Step 1: [key1]')".to_string(),
                             "RESULT=$(echo 'Step 2: [key2]' && echo $MY_VAR)".to_string(),

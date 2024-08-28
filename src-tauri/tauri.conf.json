@@ -18,6 +18,12 @@
     "resources": [
       "icons/*"
     ],
+    "macOS": {
+      "files": {
+        "README.md": "../README.md",
+        "post_install.sh": "../post_install.sh"
+      }
+    },
     "createUpdaterArtifacts": true
   },
   "productName": "switch-shuttle",
