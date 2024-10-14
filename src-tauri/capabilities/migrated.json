@@ -69,7 +69,6 @@
     "global-shortcut:default",
     "global-shortcut:allow-unregister",
     "global-shortcut:allow-register",
-    "positioner:default",
     "updater:default",
     "process:default"
   ]

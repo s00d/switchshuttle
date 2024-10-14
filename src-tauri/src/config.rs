@@ -5,7 +5,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 use std::{fs, io};
 use tauri::{AppHandle, Wry};
-use tauri_plugin_dialog::DialogExt;
+use tauri_plugin_dialog::{DialogExt};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Config {
@@ -91,8 +91,6 @@ impl ConfigManager {
                                     err
                                 ))
                                 .title("Error")
-                                .ok_button_label("Absolutely")
-                                .cancel_button_label("Totally")
                                 .show(|result| match result {
                                     true => {}
                                     false => {}
@@ -238,6 +236,7 @@ impl Config {
         )
     }
 
+    #[allow(dead_code)]
     pub fn ensure_default(path: &PathBuf) -> io::Result<()> {
         if !path.exists() {
             let mut config = Config::default_config();
