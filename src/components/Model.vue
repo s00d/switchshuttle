@@ -38,7 +38,7 @@ defineProps({
   }
 });
 
-const emit = defineEmits<{
+defineEmits<{
   (e: 'close'): void;
 }>();
 

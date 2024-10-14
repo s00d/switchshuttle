@@ -49,7 +49,7 @@ const props = defineProps<{
   commands: Command[];
 }>();
 
-const emit = defineEmits<{
+defineEmits<{
   (e: 'saveConfig'): void;
   (e: 'onClose'): void;
 }>();
