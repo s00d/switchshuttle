@@ -5,7 +5,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 use std::{fs, io};
 use tauri::{AppHandle, Wry};
-use tauri_plugin_dialog::{DialogExt};
+use tauri_plugin_dialog::DialogExt;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Config {

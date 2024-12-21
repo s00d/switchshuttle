@@ -233,7 +233,9 @@ pub fn create_window(
     window
         .show()
         .unwrap_or_else(|e| println!("Failed to show window: {:?}", e));
-    window.center().unwrap_or_else(|e| println!("Failed to center window: {:?}", e));
+    window
+        .center()
+        .unwrap_or_else(|e| println!("Failed to center window: {:?}", e));
     window.set_focus().expect("Failed to set focus on window");
 
     window.emit("navigate", (route, title)).unwrap();

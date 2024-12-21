@@ -1,6 +1,9 @@
 use crate::config::{CommandConfig, ConfigManager};
 use crate::helpers;
-use crate::helpers::{change_devtools, create_window, get_config_path, open_folder_in_default_explorer, open_in_default_editor};
+use crate::helpers::{
+    change_devtools, create_window, get_config_path, open_folder_in_default_explorer,
+    open_in_default_editor,
+};
 use std::sync::{Arc, Mutex};
 use tauri::image::Image;
 use tauri::menu::{
@@ -9,7 +12,7 @@ use tauri::menu::{
 use tauri::path::BaseDirectory;
 use tauri::{AppHandle, Manager, Wry};
 use tauri_plugin_autostart::ManagerExt;
-use tauri_plugin_shell::ShellExt;
+use tauri_plugin_opener::OpenerExt;
 
 fn create_sub_menu(app: &AppHandle<Wry>, items: &[CommandConfig], title: &str) -> Submenu<Wry> {
     let mut submenu_builder = SubmenuBuilder::new(app, title);
@@ -268,7 +271,8 @@ pub fn handle_system_tray_event(
         }
         "homepage" => {
             let homepage_url = "https://github.com/s00d/SwitchShuttle";
-            app.shell().open(homepage_url, None).unwrap();
+            let opener = app.opener();
+            opener.open_url(homepage_url, None::<&str>).unwrap();
         }
         "check_updates" => {
             create_window(&app, "Update Available", "update", 400.0, 300.0, true);
