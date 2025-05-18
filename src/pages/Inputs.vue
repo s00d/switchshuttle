@@ -1,18 +1,41 @@
 <template>
-  <div class="container">
-    <form id="inputForm">
-      <div v-for="(value, key) in inputs" :key="key" class="input-group">
-        <label :for="key">{{ key }}</label>
-        <input type="text" :name="key" :id="key" v-model="inputs[key]">
+  <div class="w-full h-full overflow-x-auto flex flex-col items-center px-6 py-8 bg-white">
+    <form id="inputForm" class="w-full max-w-lg flex flex-col gap-4">
+      <div v-for="(value, key) in inputs" :key="key" class="flex flex-col gap-1">
+        <label :for="key" class="text-sm font-medium text-gray-700 bg-gray-100 px-2 py-1 rounded">
+          {{ key }}
+        </label>
+        <input
+            type="text"
+            :name="key"
+            :id="key"
+            v-model="inputs[key]"
+            class="w-full border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
       </div>
     </form>
-    <div id="error-message">{{ errorMessage }}</div>
-    <div class="buttons">
-      <button type="button" class="button-blue" @click="submitForm">OK</button>
-      <button type="button" class="cancel-button" @click="onClose">Cancel</button>
+
+    <div v-if="errorMessage" class="text-red-600 text-sm mt-4">{{ errorMessage }}</div>
+
+    <div class="mt-6 flex justify-center gap-4">
+      <button
+          type="button"
+          class="bg-blue-600 text-white px-6 py-2 text-sm hover:bg-blue-700 transition"
+          @click="submitForm"
+      >
+        OK
+      </button>
+      <button
+          type="button"
+          class="bg-gray-300 text-black px-6 py-2 text-sm hover:bg-gray-400 transition"
+          @click="onClose"
+      >
+        Cancel
+      </button>
     </div>
   </div>
 </template>
+
 
 <script setup>
 import { ref, onMounted } from 'vue';
@@ -55,68 +78,3 @@ onMounted(() => {
   fetchInputData(); // Fetch the input data using the ID
 });
 </script>
-
-<style scoped>
-/* Add styles from inputs.html */
-.container {
-  overflow-x: scroll;
-}
-
-h1 {
-  margin-top: 20px;
-  font-size: 24px;
-  color: #333;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-  margin-top: 20px;
-  padding: 10px;
-}
-
-.input-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 10px;
-  width: 100%;
-}
-
-label {
-  font-size: 16px;
-  color: #333;
-  margin-bottom: 5px;
-  background: #f0f0f5;
-  padding: 2px 6px;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  width: 80%;
-}
-
-input[type="text"] {
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  width: 80%;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-input[type="text"]:focus {
-  border-color: #007aff;
-  box-shadow: 0 0 3px 2px rgba(0, 123, 255, 0.25);
-  outline: none;
-}
-
-.buttons {
-  display: flex;
-  justify-content: center;
-}
-
-#error-message {
-  color: red;
-  margin-top: 10px;
-}
-</style>

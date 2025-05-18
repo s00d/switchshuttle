@@ -1,14 +1,32 @@
 <template>
-  <div class="container">
-    <h1 v-if="url">Update Available</h1>
-    <h1 v-else>Update Not Available</h1>
-    <div v-if="loading" class="loader"></div>
-    <div v-if="loading" id="loader-text">loading...</div>
-    <p v-if="!loading" id="message">{{ message }}</p>
-    <button v-if="!loading && url" id="update-button" class="button-blue" @click="update">Update</button>
-    <button v-if="!loading" id="close-button" class="cancel-button" @click="onClose">Close</button>
+  <div class="flex flex-col items-center justify-center min-h-screen bg-white px-4 text-center">
+    <h1 class="text-2xl font-semibold text-gray-800 mb-6">
+      {{ url ? 'Update Available' : 'Update Not Available' }}
+    </h1>
+
+    <div v-if="loading" class="w-10 h-10 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin mb-4"></div>
+    <div v-if="loading" class="text-sm text-gray-600 mb-4">loading...</div>
+
+    <p v-if="!loading" class="text-base text-gray-700 mb-6">{{ message }}</p>
+
+    <div v-if="!loading" class="flex gap-4 justify-center">
+      <button
+          v-if="url"
+          @click="update"
+          class="bg-blue-600 text-white px-5 py-2 text-sm hover:bg-blue-700 transition"
+      >
+        Update
+      </button>
+      <button
+          @click="onClose"
+          class="bg-gray-300 text-black px-5 py-2 text-sm hover:bg-gray-400 transition"
+      >
+        Close
+      </button>
+    </div>
   </div>
 </template>
+
 
 <script setup>
 import { ref, onMounted } from 'vue';
@@ -49,49 +67,3 @@ function onClose() {
 
 onMounted(checkForUpdates);
 </script>
-
-<style scoped>
-/* Add styles from update.html */
-h1 {
-  margin: 20px 0;
-  font-size: 24px;
-  color: #333;
-}
-
-#message {
-  margin: 20px 0;
-  font-size: 16px;
-  color: #333;
-}
-
-.loader {
-  border: 4px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 4px solid #3498db;
-  width: 40px;
-  height: 40px;
-  animation: spin 2s linear infinite;
-  margin: 20px auto;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.button-blue {
-  border: 1px solid #007aff;
-  background: linear-gradient(to bottom, #007aff, #005bb5);
-  color: white;
-}
-
-.button-blue:hover {
-  background: linear-gradient(to bottom, #005bb5, #004a99);
-  border-color: #005bb5;
-}
-
-.button-blue:active {
-  background: linear-gradient(to bottom, #004a99, #003d7a);
-  border-color: #004a99;
-}
-</style>

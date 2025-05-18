@@ -1,7 +1,7 @@
 <template>
-  <div class="container">
-    <div id="loader" class="loader"></div>
-    <div id="loader-text">loading...</div>
+  <div class="flex flex-col items-center justify-center h-screen w-screen bg-white">
+    <div class="w-10 h-10 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin mb-4"></div>
+    <div class="text-sm text-gray-600">loading...</div>
   </div>
 </template>
 
@@ -12,34 +12,3 @@ onMounted(() => {
   // Add any initialization logic if needed
 });
 </script>
-
-<style scoped>
-/* Add styles from main.html */
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #f0f0f5;
-}
-
-h1 {
-  font-size: 24px;
-  color: #333;
-}
-
-.loader {
-  border: 4px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 4px solid #3498db;
-  width: 40px;
-  height: 40px;
-  animation: spin 2s linear infinite;
-  margin: 20px auto;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-</style>

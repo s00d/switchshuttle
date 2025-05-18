@@ -1,28 +1,47 @@
 <template>
-  <div class="container">
-    <h1>Config Editor</h1>
+  <div class="flex flex-col px-10 py-6 overflow-x-auto h-full w-full bg-white">
+    <h1 class="text-2xl font-semibold text-gray-800 mb-6">Config Editor</h1>
 
-    <div id="notification" :class="notificationClass" class="alert" v-if="notificationMessage" v-text="notificationMessage"></div>
+    <div v-if="notificationMessage" :class="notificationClass" class="w-4/5 mx-auto mb-4 rounded px-4 py-3 text-sm font-medium text-center">
+      {{ notificationMessage }}
+    </div>
 
-    <ConfigSelector v-model="config" @showAddConfigModal="showAddConfigModal" @showDeleteConfigModal="showDeleteConfigModal"/>
-    <ConfigEditor :config="config" :commands="config.commands" @saveConfig="saveConfig" @onClose="onClose" />
+    <ConfigSelector
+        v-model="config"
+        @showAddConfigModal="showAddConfigModal"
+        @showDeleteConfigModal="showDeleteConfigModal"
+    />
 
+    <ConfigEditor
+        :config="config"
+        :commands="config.commands"
+        @saveConfig="saveConfig"
+        @onClose="onClose"
+    />
+
+    <!-- Add Config Modal -->
     <Modal :show="addConfigModal" title="Add New Config" @close="closeAddConfigModal">
-      <div class="form-group">
-        <label for="new-config-name">Config Name</label>
-        <input type="text" id="new-config-name" class="form-control" v-model="newConfigName">
+      <div class="flex flex-col gap-2 mb-4">
+        <label for="new-config-name" class="text-sm font-medium text-gray-700">Config Name</label>
+        <input
+            type="text"
+            id="new-config-name"
+            v-model="newConfigName"
+            class="border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
       </div>
       <template #footer>
-        <button type="button" class="button-blue" @click="addNewConfig">Add</button>
-        <button type="button" class="cancel-button" @click="closeAddConfigModal">Cancel</button>
+        <button class="bg-blue-600 text-white px-4 py-2 text-sm hover:bg-blue-700" @click="addNewConfig">Add</button>
+        <button class="bg-gray-300 text-black px-4 py-2 text-sm hover:bg-gray-400" @click="closeAddConfigModal">Cancel</button>
       </template>
     </Modal>
 
+    <!-- Delete Config Modal -->
     <Modal :show="deleteConfigModal" title="Confirm Delete" @close="closeDeleteConfigModal">
-      <p>Are you sure you want to delete this config?</p>
+      <p class="text-sm text-gray-800 mb-4">Are you sure you want to delete this config?</p>
       <template #footer>
-        <button type="button" class="cancel-button" @click="deleteConfig">Delete</button>
-        <button type="button" class="button-blue" @click="closeDeleteConfigModal">Cancel</button>
+        <button class="bg-red-600 text-white px-4 py-2 text-sm hover:bg-red-700" @click="deleteConfig">Delete</button>
+        <button class="bg-gray-300 text-black px-4 py-2 text-sm hover:bg-gray-400" @click="closeDeleteConfigModal">Cancel</button>
       </template>
     </Modal>
   </div>
@@ -160,39 +179,3 @@ function onClose() {
 onMounted(loadConfigs);
 </script>
 
-<style>
-/* Add styles from editor.html */
-.container {
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  overflow-x: scroll;
-  max-width: 100%;
-  height: 100%;
-}
-
-h1 {
-  margin-top: 40px;
-  font-size: 24px;
-  color: #333;
-}
-
-#notification {
-  width: 80%;
-  margin: 20px auto;
-  padding: 10px;
-  border-radius: 6px;
-}
-
-
-.alert-success {
-  background-color: #d4edda;
-  color: #155724;
-}
-
-.alert-error {
-  background-color: #f8d7da;
-  color: #721c24;
-}
-</style>
