@@ -1,8 +1,13 @@
+<!-- src/components/ConfigEditor.vue -->
 <template>
-  <div>
-    <div class="form-group">
-      <label for="terminal">Terminal</label>
-      <select id="terminal" class="form-control" v-model="config.terminal">
+  <div class="space-y-6">
+    <div class="space-y-2">
+      <label for="terminal" class="block text-sm font-medium text-gray-700">Terminal</label>
+      <select
+          id="terminal"
+          v-model="config.terminal"
+          class="w-full border border-gray-300 px-3 py-2 text-sm bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
         <option value="iterm">iTerm</option>
         <option value="terminal">Terminal</option>
         <option value="warp">Warp</option>
@@ -10,30 +15,74 @@
         <option value="alacritty">Alacritty</option>
       </select>
     </div>
-    <div class="form-group">
-      <label for="launch-in">Launch In</label>
-      <select id="launch-in" class="form-control" v-model="config.launch_in">
+
+    <div class="space-y-2">
+      <label for="launch-in" class="block text-sm font-medium text-gray-700">Launch In</label>
+      <select
+          id="launch-in"
+          v-model="config.launch_in"
+          class="w-full border border-gray-300 px-3 py-2 text-sm bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
         <option value="current">Current</option>
         <option value="new_tab">New Tab</option>
         <option value="new_window">New Window</option>
       </select>
     </div>
-    <div class="form-group">
-      <label for="theme">Theme</label>
-      <input type="text" id="theme" class="form-control" v-model="config.theme">
+
+    <div class="space-y-2">
+      <label for="theme" class="block text-sm font-medium text-gray-700">Theme</label>
+      <input
+          type="text"
+          id="theme"
+          v-model="config.theme"
+          class="w-full border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
     </div>
-    <div class="form-group">
-      <label for="title">Title</label>
-      <input type="text" id="title" class="form-control" v-model="config.title">
+
+    <div class="space-y-2">
+      <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+      <input
+          type="text"
+          id="title"
+          v-model="config.title"
+          class="w-full border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
     </div>
-    <div class="form-group">
-      <label for="menu-hotkey">Menu Hotkey</label>
-      <input type="text" id="menu-hotkey" class="form-control" v-model="config.menu_hotkey" @keydown="handleHotkey(config, 'menu_hotkey', $event)">
+
+    <div class="space-y-2">
+      <label for="menu-hotkey" class="block text-sm font-medium text-gray-700">Menu Hotkey</label>
+      <input
+          type="text"
+          id="menu-hotkey"
+          v-model="config.menu_hotkey"
+          @keydown="handleHotkey(config, 'menu_hotkey', $event)"
+          class="w-full border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
     </div>
-    <CommandsTable :commands="commands" @addCommand="addCommand" @deleteCommand="deleteCommand" @addInnerCommand="addInnerCommand" @deleteInnerCommand="deleteInnerCommand" @toggleHotkeyInput="toggleHotkeyInput" @hotkeyHandler="handleHotkey" />
-    <div class="button-group d-flex justify-content-between mt-4">
-      <button class="button-blue" @click="$emit('saveConfig')">Save</button>
-      <button class="cancel-button" @click="$emit('onClose')">Cancel</button>
+
+    <CommandsTable
+        :commands="commands"
+        @addCommand="addCommand"
+        @deleteCommand="deleteCommand"
+        @addInnerCommand="addInnerCommand"
+        @deleteInnerCommand="deleteInnerCommand"
+        @toggleHotkeyInput="toggleHotkeyInput"
+        @hotkeyHandler="handleHotkey"
+    />
+
+    <div class="flex justify-between gap-4 pt-4">
+      <button
+          @click="$emit('saveConfig')"
+          class="w-full bg-blue-600 text-white px-4 py-2 text-sm hover:bg-blue-700 transition"
+      >
+        Save
+      </button>
+      <button
+          @click="$emit('onClose')"
+          class="w-full bg-gray-300 text-black px-4 py-2 text-sm hover:bg-gray-400 transition"
+      >
+        Cancel
+      </button>
     </div>
   </div>
 </template>
@@ -80,55 +129,3 @@ function toggleHotkeyInput(index: number) {
   command.hotkey = command.hotkey ? null : '';
 }
 </script>
-
-<style scoped>
-.form-control {
-  height: 32px; /* Ensure the height is set to 20px */
-  padding: 0; /* Remove default padding */
-  border: 1px solid #ccc; /* Optional: Customize border */
-  box-sizing: border-box; /* Ensure padding and border are included in the height */
-  font-size: 14px; /* Adjust the font size as needed */
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 20px;
-  width: 100%;
-}
-
-.form-group label {
-  font-size: 16px;
-  color: #333;
-  margin-bottom: 5px;
-  width: 100%;
-  text-align: left;
-}
-
-.form-group input, .form-group select {
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  width: 100%;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.form-group input:focus, .form-group select:focus {
-  border-color: #007aff;
-  box-shadow: 0 0 3px 2px rgba(0, 123, 255, 0.25);
-  outline: none;
-}
-
-.d-flex {
-  display: flex;
-  width: 100%;
-  justify-content: center;
-}
-
-.button-group {
-  width: 100%;
-}
-</style>

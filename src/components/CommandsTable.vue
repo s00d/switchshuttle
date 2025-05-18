@@ -1,49 +1,109 @@
+<!-- src/components/CommandsTable.vue -->
 <template>
-  <table id="commands-table">
+  <table class="w-full table-fixed border-collapse text-sm">
     <thead>
-    <tr>
-      <th>Command Name</th>
-      <th>Single Command</th>
-      <th>Commands</th>
-      <th>Hotkey</th>
-      <th>Actions</th>
+    <tr class="bg-gray-100 text-left border-b">
+      <th class="p-2">Command Name</th>
+      <th class="p-2">Single Command</th>
+      <th class="p-2">Commands</th>
+      <th class="p-2">Hotkey</th>
+      <th class="p-2">Actions</th>
     </tr>
     </thead>
     <tbody>
     <template v-for="(command, index) in commands" :key="index">
-      <tr :data-index="index">
-        <td><input type="text" class="form-control" v-model="command.name"></td>
-        <td><input v-if="!command.submenu" type="text" class="form-control" v-model="command.command" :disabled="!!(command.commands && command.commands.length)"></td>
-        <td>
-          <div v-if="!command.submenu" v-for="(_cmd, cmdIndex) in command.commands" :key="cmdIndex" class="d-flex align-items-center">
-            <input type="text" class="form-control" v-model="command.commands[cmdIndex]">
-            <button class="cancel-button" @click="deleteInnerCommand(index, cmdIndex)">x</button>
-          </div>
-          <button v-if="!command.submenu" class="button-blue fill-width" @click="addInnerCommand(index)">+</button>
+      <tr class="border-b" :data-index="index">
+        <td class="p-2">
+          <input type="text" class="w-full border border-gray-300 px-2 py-1" v-model="command.name" />
         </td>
-        <td>
-          <div class="d-flex align-items-center">
-            <input type="checkbox" class="mr-2" :checked="command.hotkey !== null" @change="toggleHotkeyInput(index)">
-            <input type="text" class="form-control" v-model="command.hotkey" v-if="command.hotkey !== null" @keydown="hotkeyHandler(command, 'hotkey', $event)" :disabled="!!command.submenu">
+        <td class="p-2">
+          <input
+              v-if="!command.submenu"
+              type="text"
+              class="w-full border border-gray-300 px-2 py-1"
+              v-model="command.command"
+              :disabled="!!(command.commands && command.commands.length)"
+          />
+        </td>
+        <td class="p-2">
+          <div v-if="!command.submenu" class="space-y-1">
+            <div
+                v-for="(_cmd, cmdIndex) in command.commands"
+                :key="cmdIndex"
+                class="flex items-center gap-2"
+            >
+              <input type="text" class="flex-1 border border-gray-300 px-2 py-1" v-model="command.commands[cmdIndex]" />
+              <button
+                  class="bg-red-500 text-white px-2 py-1 text-xs hover:bg-red-600"
+                  @click="deleteInnerCommand(index, cmdIndex)"
+              >
+                x
+              </button>
+            </div>
+            <button
+                class="w-full bg-blue-600 text-white text-xs py-1 mt-1 hover:bg-blue-700"
+                @click="addInnerCommand(index)"
+            >
+              +
+            </button>
           </div>
         </td>
-        <td>
-          <button class="button-blue" @click="addSubCommand(index)">+</button>
-          <button class="cancel-button" @click="deleteCommand(index)">x</button>
+        <td class="p-2">
+          <div class="flex items-center gap-2">
+            <input
+                type="checkbox"
+                :checked="command.hotkey !== null"
+                @change="toggleHotkeyInput(index)"
+            />
+            <input
+                v-if="command.hotkey !== null"
+                type="text"
+                class="flex-1 border border-gray-300 px-2 py-1"
+                v-model="command.hotkey"
+                @keydown="hotkeyHandler(command, 'hotkey', $event)"
+                :disabled="!!command.submenu"
+            />
+          </div>
+        </td>
+        <td class="p-2 flex gap-2">
+          <button
+              class="bg-blue-600 text-white px-2 py-1 text-xs hover:bg-blue-700"
+              @click="addSubCommand(index)"
+          >
+            +
+          </button>
+          <button
+              class="bg-red-500 text-white px-2 py-1 text-xs hover:bg-red-600"
+              @click="deleteCommand(index)"
+          >
+            x
+          </button>
         </td>
       </tr>
       <tr v-if="command.submenu" :key="'sub' + index">
-        <td colspan="5">
-          <CommandsTable :commands="command.submenu" @addCommand="addSubCommand(index)" @deleteCommand="deleteSubCommand(index, $event)" @addInnerCommand="addInnerSubCommand(index, $event)" @deleteInnerCommand="deleteInnerSubCommand(index, $event, $event)" @toggleHotkeyInput="toggleSubHotkeyInput(index, $event)" @hotkeyHandler="hotkeyHandler" />
+        <td colspan="5" class="p-2">
+          <CommandsTable
+              :commands="command.submenu"
+              @addCommand="addSubCommand(index)"
+              @deleteCommand="deleteSubCommand(index, $event)"
+              @addInnerCommand="addInnerSubCommand(index, $event)"
+              @deleteInnerCommand="deleteInnerSubCommand(index, $event, $event)"
+              @toggleHotkeyInput="toggleSubHotkeyInput(index, $event)"
+              @hotkeyHandler="hotkeyHandler"
+          />
         </td>
       </tr>
     </template>
     </tbody>
   </table>
-  <div class="table-actions text-center">
-    <button class="button-blue fill-width" @click="addCommand">+</button>
+
+  <div class="flex justify-center border border-gray-300 rounded mt-2 bg-gray-50 py-2">
+    <button class="w-full max-w-xs bg-blue-600 text-white py-1 text-sm hover:bg-blue-700" @click="addCommand">
+      +
+    </button>
   </div>
 </template>
+
 
 <script lang="ts" setup>
 import { PropType } from 'vue';
@@ -121,67 +181,3 @@ function toggleSubHotkeyInput(parentIndex: number, subIndex: number) {
   }
 }
 </script>
-<style scoped>
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th, td {
-  padding: 10px;
-  border: 1px solid #ccc;
-  text-align: left;
-}
-
-th {
-  background: #f0f0f5;
-}
-
-.form-control {
-  width: calc(100% - 20px);
-  margin: 0 10px;
-  height: 28px;
-}
-
-.d-flex {
-  display: flex;
-  align-items: center;
-}
-
-.mr-2 {
-  margin-right: 8px;
-}
-
-.button-blue {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.cancel-button {
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-
-}
-
-.fill-width {
-  width: 100%;
-}
-
-.table-actions {
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 1px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #f9f9f9;
-}
-</style>

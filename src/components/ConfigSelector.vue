@@ -1,12 +1,32 @@
 <template>
-  <div class="form-group">
-    <label for="config-select">Select Config</label>
-    <div class="d-flex gap-2">
-      <select id="config-select" class="form-control" v-model="currentConfig" @change="loadConfig">
-        <option v-for="file in configFiles" :value="file.path" :key="file.path" v-text="file.name"></option>
+  <div class="flex flex-col gap-2 w-full">
+    <label for="config-select" class="text-sm font-medium text-gray-700">Select Config</label>
+    <div class="flex gap-2 w-full">
+      <select
+          id="config-select"
+          class="flex-1 border border-gray-300 px-3 py-2 text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          v-model="currentConfig"
+          @change="loadConfig"
+      >
+        <option
+            v-for="file in configFiles"
+            :key="file.path"
+            :value="file.path"
+            v-text="file.name"
+        ></option>
       </select>
-      <button class="button-blue" @click="$emit('showAddConfigModal')">+</button>
-      <button class="cancel-button" @click="$emit('showDeleteConfigModal')">x</button>
+      <button
+          class="bg-blue-600 text-white text-sm px-3 py-2 hover:bg-blue-700 transition"
+          @click="$emit('showAddConfigModal')"
+      >
+        +
+      </button>
+      <button
+          class="bg-red-500 text-white text-sm px-3 py-2 hover:bg-red-600 transition"
+          @click="$emit('showDeleteConfigModal')"
+      >
+        x
+      </button>
     </div>
   </div>
 </template>
@@ -32,11 +52,15 @@ const emit = defineEmits<{
 
 async function loadConfigs() {
   const configDir = await tauriPath.configDir();
-  const configFilesList = await readDir(`${configDir}/switch-shuttle`);
-  configFiles.value = configFilesList.filter(file => file.name?.endsWith('.json')).map(file => ({
-    path: `${configDir}/switch-shuttle`,
-    name: file.name?.replace('.json', '') ?? ''
-  }));
+  const dirPath = `${configDir}/switch-shuttle`;
+  const configFilesList = await readDir(dirPath);
+  configFiles.value = configFilesList
+      .filter(file => file.name?.endsWith('.json'))
+      .map(file => ({
+        path: `${dirPath}/${file.name}`, // полный путь к файлу
+        name: file.name?.replace('.json', '') ?? ''
+      }));
+
   if (configFiles.value.length > 0) {
     currentConfig.value = configFiles.value[0].path;
     loadConfig();
@@ -59,43 +83,3 @@ watch(currentConfig, () => {
 
 onMounted(loadConfigs);
 </script>
-
-<style scoped>
-.form-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 20px;
-  width: 100%;
-}
-
-.form-group label {
-  font-size: 16px;
-  color: #333;
-  margin-bottom: 5px;
-  width: 100%;
-  text-align: left;
-}
-
-.d-flex {
-  display: flex;
-  width: 100%;
-  justify-content: center;
-}
-
-.gap-2 {
-  gap: 8px;
-}
-
-.form-control {
-  width: calc(100% - 20px);
-  margin: 0 10px 0 0;
-  height: 32px; /* Ensure the height is set to 20px */
-  padding: 0; /* Remove default padding */
-  border: 1px solid #ccc; /* Optional: Customize border */
-  box-sizing: border-box; /* Ensure padding and border are included in the height */
-  font-size: 14px; /* Adjust the font size as needed */
-}
-
-
-</style>
