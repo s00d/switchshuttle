@@ -26,6 +26,11 @@ jobs:
           workspaces: src-tauri
           cache-on-failure: true
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+          run_install: false
+
       - name: Build app
         uses: pguyot/arm-runner-action@v2.6.5
         with:
@@ -52,10 +57,10 @@ jobs:
             apt-get install -y nodejs
 
             # Install frontend dependencies
-            npm install
+            pnpm install
 
             # Build the application
-            npm run tauri build -- --verbose
+            pnpm run tauri build -- --verbose
 
       - name: Get app version
         run: echo "APP_VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
