@@ -295,7 +295,6 @@ Dieses Projekt ist unter der MIT-Lizenz lizenziert - siehe [LICENSE](LICENSE) Da
 ## 📞 Support
 
 - **Issues**: [GitHub Issues](https://github.com/s00d/switchshuttle/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/s00d/switchshuttle/discussions)
 - **Releases**: [GitHub Releases](https://github.com/s00d/switchshuttle/releases)
 
 ---

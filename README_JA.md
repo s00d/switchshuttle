@@ -295,7 +295,6 @@ codesign --force --deep --sign - /Applications/switch-shuttle.app
 ## 📞 サポート
 
 - **Issues**: [GitHub Issues](https://github.com/s00d/switchshuttle/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/s00d/switchshuttle/discussions)
 - **Releases**: [GitHub Releases](https://github.com/s00d/switchshuttle/releases)
 
 ---
