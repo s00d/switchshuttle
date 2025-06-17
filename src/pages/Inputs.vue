@@ -1,37 +1,40 @@
 <template>
-  <div class="w-full h-full overflow-x-auto flex flex-col items-center px-6 py-8 bg-white">
-    <form id="inputForm" class="w-full max-w-lg flex flex-col gap-4">
-      <div v-for="(value, key) in inputs" :key="key" class="flex flex-col gap-1">
-        <label :for="key" class="text-sm font-medium text-gray-700 bg-gray-100 px-2 py-1 rounded">
+  <div class="w-full h-full overflow-x-auto flex flex-col items-center px-8 py-8 bg-slate-50">
+    <div class="w-full max-w-2xl">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+        <h1 class="text-2xl font-bold text-slate-800 mb-6">Input Parameters</h1>
+        
+        <form id="inputForm" class="w-full flex flex-col gap-6">
+          <div v-for="(value, key) in inputs" :key="key" class="flex flex-col gap-2">
+            <label :for="key" class="text-sm font-semibold text-slate-700 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200">
           {{ key }}
         </label>
-        <input
-            type="text"
-            :name="key"
-            :id="key"
-            v-model="inputs[key]"
-            class="w-full border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            <Input
+              v-model="inputs[key]"
+              :id="key"
+              :name="key"
+              :placeholder="`Enter ${key.toLowerCase()}`"
         />
       </div>
     </form>
 
-    <div v-if="errorMessage" class="text-red-600 text-sm mt-4">{{ errorMessage }}</div>
+        <div v-if="errorMessage" class="text-red-600 text-sm mt-6 bg-red-50 border border-red-200 rounded-lg px-4 py-3">{{ errorMessage }}</div>
 
-    <div class="mt-6 flex justify-center gap-4">
-      <button
-          type="button"
-          class="bg-blue-600 text-white px-6 py-2 text-sm hover:bg-blue-700 transition"
+        <div class="mt-8 flex justify-center gap-4">
+          <Button
+            variant="primary"
           @click="submitForm"
       >
-        OK
-      </button>
-      <button
-          type="button"
-          class="bg-gray-300 text-black px-6 py-2 text-sm hover:bg-gray-400 transition"
+            Execute Command
+          </Button>
+          <Button
+            variant="secondary"
           @click="onClose"
       >
         Cancel
-      </button>
+          </Button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -42,6 +45,8 @@ import { ref, onMounted } from 'vue';
 import { invoke } from '@tauri-apps/api/core';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { useRouter, useRoute } from 'vue-router';
+import Button from '../components/Button.vue';
+import Input from '../components/Input.vue';
 
 const router = useRouter();
 const route = useRoute();
