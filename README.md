@@ -1,4 +1,4 @@
-![SwitchShuttle](https://raw.githubusercontent.com/s00d/switchshuttle/main/icons/logo.webp)
+![SwitchShuttle](https://raw.githubusercontent.com/s00d/switchshuttle/refs/heads/main/icons/logo-min.png)
 ![intro](https://github.com/s00d/switchshuttle/blob/main/icons/intro.gif?raw=true)
 
 <span class="locale">
@@ -8,6 +8,10 @@
   <a href="README_DE.md">Deutsch</a> | 
   <a href="README_JA.md">日本語</a>
 </span>
+
+
+
+![intro](https://github.com/s00d/switchshuttle/blob/main/icons/intro_new.gif?raw=true)
 
 ## SwitchShuttle
 
