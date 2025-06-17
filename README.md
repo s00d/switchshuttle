@@ -9,10 +9,6 @@
   <a href="README_JA.md">日本語</a>
 </span>
 
-
-
-![intro](https://github.com/s00d/switchshuttle/blob/main/icons/intro_new.gif?raw=true)
-
 ## SwitchShuttle
 
 SwitchShuttle is a cross-platform system tray application that allows users to run predefined commands in various terminal applications. It supports macOS, Windows, and Linux, offering a simple and customizable way to manage and execute your frequently used commands.
