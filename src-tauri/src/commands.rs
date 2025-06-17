@@ -4,8 +4,7 @@ use serde::Deserialize;
 use serde_json::json;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use std::time::{SystemTime, UNIX_EPOCH};
-use tauri::State;
+use tauri::{State};
 
 use crate::config::{CommandConfig, Config, ConfigManager};
 use crate::helpers::{execute_command, get_config_path, open_in_default_editor};
@@ -227,24 +226,404 @@ pub fn fetch_input_data(
 
 #[tauri::command]
 pub fn about_message(app: tauri::AppHandle) -> Result<String, String> {
-    let tauri_version = app.package_info().version.to_string();
-
-    // Получение текущего года
-    let start = UNIX_EPOCH;
-    let now = SystemTime::now();
-    let duration = now.duration_since(start).unwrap();
-    let secs = duration.as_secs();
-    let current_year = 1970 + secs / 31_536_000; // 31_536_000 секунд в году
+    let version = app.package_info().version.to_string();
 
     let message = format!(
-        "<h2>About SwitchShuttle</h1>
-        <p>Version: {}</p>
-        <p>by <a href='https://github.com/s00d'>s00d</a></p>
-        <p><a href='https://github.com/s00d/SwitchShuttle'>Homepage</a></p>
-        <p>License: MIT</p>
-        <p>Description: SwitchShuttle is a tool to manage your configurations and shortcuts efficiently.</p>
-        <p>&copy; {} SwitchShuttle. All rights reserved.</p>",
-        tauri_version, current_year
+        r#"
+        <div style="text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+            <h2 style="color: #1f2937; margin-bottom: 1rem;">SwitchShuttle</h2>
+            <p style="color: #6b7280; margin-bottom: 0.5rem;">Version {}</p>
+            <p style="color: #6b7280; margin-bottom: 1rem;">A powerful terminal configuration manager</p>
+            <div style="margin-top: 1rem;">
+                <a href="https://github.com/s00d/switchshuttle" style="color: #3b82f6; text-decoration: none; margin: 0 0.5rem;">GitHub</a>
+                <span style="color: #d1d5db;">|</span>
+                <a href="https://switchshuttle.com" style="color: #3b82f6; text-decoration: none; margin: 0 0.5rem;">Website</a>
+            </div>
+            <p style="color: #9ca3af; font-size: 0.875rem; margin-top: 1rem;">Built with Tauri and Vue.js</p>
+        </div>
+        "#,
+        version
     );
+
     Ok(message)
+}
+
+#[tauri::command]
+pub fn get_configurations(state: State<'_, Arc<Mutex<ConfigManager>>>) -> Result<Vec<Config>, String> {
+    let config_manager = state.lock().unwrap();
+    Ok(config_manager.configs.clone())
+}
+
+#[tauri::command]
+pub fn open_configuration(
+    id: String,
+    state: State<'_, Arc<Mutex<ConfigManager>>>
+) -> Result<(), String> {
+    let config_path = get_config_path();
+    let config_dir = config_path.parent().unwrap().to_path_buf();
+    
+    // Находим правильное имя файла по title конфигурации
+    let config_manager = state.lock().unwrap();
+    let file_name = find_config_file_by_title(&config_manager, &id)
+        .ok_or_else(|| format!("Configuration with title '{}' not found", id))?;
+    
+    let config_file = config_dir.join(format!("{}.json", file_name));
+    
+    if config_file.exists() {
+        open_in_default_editor(&config_file);
+        Ok(())
+    } else {
+        Err(format!("Configuration file not found: {}", file_name))
+    }
+}
+
+#[tauri::command]
+pub fn delete_configuration(
+    id: String,
+    state: State<'_, Arc<Mutex<ConfigManager>>>,
+    app: tauri::AppHandle
+) -> Result<(), String> {
+    let config_path = get_config_path();
+    let config_dir = config_path.parent().unwrap().to_path_buf();
+    
+    // Находим правильное имя файла по title конфигурации
+    let config_manager = state.lock().unwrap();
+    let file_name = find_config_file_by_title(&config_manager, &id)
+        .ok_or_else(|| format!("Configuration with title '{}' not found", id))?;
+    
+    let config_file = config_dir.join(format!("{}.json", file_name));
+    
+    if config_file.exists() {
+        std::fs::remove_file(&config_file)
+            .map_err(|e| format!("Failed to delete configuration: {}", e))?;
+        
+        // Перезагружаем конфигурации в ConfigManager после удаления
+        drop(config_manager); // Освобождаем блокировку перед повторным получением
+        let mut config_manager = state.lock().unwrap();
+        config_manager.load_configs(None)
+            .map_err(|e| format!("Failed to reload configurations: {}", e))?;
+        
+        // Обновляем меню в трее
+        update_system_tray_menu(&app, &config_manager)
+    } else {
+        Err(format!("Configuration file not found: {}", file_name))
+    }
+}
+
+// Функция для поиска имени файла по title конфигурации
+fn find_config_file_by_title(config_manager: &ConfigManager, title: &str) -> Option<String> {
+    for (config, path) in config_manager.configs.iter().zip(config_manager.config_paths.iter()) {
+        if config.title == title {
+            return path.file_name()
+                .and_then(|name| name.to_str())
+                .map(|name| name.replace(".json", ""));
+        }
+    }
+    None
+}
+
+#[tauri::command]
+pub fn save_configuration(
+    mut config: Config,
+    state: State<'_, Arc<Mutex<ConfigManager>>>,
+    app: tauri::AppHandle
+) -> Result<(), String> {
+    let config_path = get_config_path();
+    let config_dir = config_path.parent().unwrap().to_path_buf();
+    
+    // Генерируем уникальное имя файла
+    let unique_title = generate_unique_title(&config_dir, &config.title);
+    let config_file = config_dir.join(format!("{}.json", unique_title));
+    
+    // Обновляем заголовок конфигурации если он изменился
+    if unique_title != config.title {
+        config.title = unique_title.clone();
+    }
+    
+    // Очищаем ID перед сохранением
+    config.clear_ids();
+    
+    config.save(&config_file)
+        .map_err(|e| format!("Failed to save configuration: {}", e))?;
+    
+    // Перезагружаем конфигурации в ConfigManager
+    let mut config_manager = state.lock().unwrap();
+    config_manager.load_configs(None)
+        .map_err(|e| format!("Failed to reload configurations: {}", e))?;
+    
+    // Обновляем меню в трее
+    update_system_tray_menu(&app, &config_manager)
+}
+
+fn generate_unique_title(config_dir: &std::path::Path, base_title: &str) -> String {
+    let mut counter = 1;
+    let mut title = base_title.to_string();
+    
+    // Если заголовок пустой, используем базовый
+    if title.trim().is_empty() {
+        title = "New Configuration".to_string();
+    }
+    
+    // Проверяем, существует ли файл с таким именем
+    while config_dir.join(format!("{}.json", title)).exists() {
+        title = format!("{} ({})", base_title, counter);
+        counter += 1;
+    }
+    
+    title
+}
+
+#[tauri::command]
+pub fn get_unique_config_title(base_title: String) -> Result<String, String> {
+    let config_path = get_config_path();
+    let config_dir = config_path.parent().unwrap().to_path_buf();
+    
+    Ok(generate_unique_title(&config_dir, &base_title))
+}
+
+#[tauri::command]
+pub fn save_configuration_by_id(
+    mut config: Config, 
+    id: String,
+    state: State<'_, Arc<Mutex<ConfigManager>>>,
+    app: tauri::AppHandle
+) -> Result<(), String> {
+    let config_path = get_config_path();
+    let config_dir = config_path.parent().unwrap().to_path_buf();
+    let config_file = config_dir.join(format!("{}.json", id));
+    
+    // Очищаем ID перед сохранением
+    config.clear_ids();
+    
+    config.save(&config_file)
+        .map_err(|e| format!("Failed to save configuration: {}", e))?;
+    
+    // Перезагружаем конфигурации в ConfigManager
+    let mut config_manager = state.lock().unwrap();
+    config_manager.load_configs(None)
+        .map_err(|e| format!("Failed to reload configurations: {}", e))?;
+    
+    // Обновляем меню в трее
+    update_system_tray_menu(&app, &config_manager)
+}
+
+#[tauri::command]
+pub fn create_new_configuration() -> Result<Config, String> {
+    Ok(Config::default_config())
+}
+
+#[tauri::command]
+pub fn duplicate_configuration(config: Config) -> Result<Config, String> {
+    let mut new_config = config.clone();
+    new_config.title = format!("{} (Copy)", new_config.title);
+    new_config.clear_ids();
+    Ok(new_config)
+}
+
+#[tauri::command]
+pub fn validate_configuration(config: Config) -> Result<(), String> {
+    // Проверяем уникальность hotkeys
+    let mut hotkeys = std::collections::HashSet::new();
+    
+    fn check_hotkeys(commands: &Vec<CommandConfig>, hotkeys: &mut std::collections::HashSet<String>) -> Result<(), String> {
+        for command in commands {
+            if let Some(hotkey) = &command.hotkey {
+                if !hotkey.trim().is_empty() && !hotkeys.insert(hotkey.clone()) {
+                    return Err(format!("Duplicate hotkey found: {}", hotkey));
+                }
+            }
+            
+            if let Some(submenu) = &command.submenu {
+                check_hotkeys(submenu, hotkeys)?;
+            }
+        }
+        Ok(())
+    }
+    
+    fn validate_command_structure(commands: &Vec<CommandConfig>) -> Result<(), String> {
+        for command in commands {
+            // Проверяем, что у команды есть название
+            if command.name.trim().is_empty() {
+                return Err("Command name cannot be empty".to_string());
+            }
+            
+            // Проверяем структуру команды
+            let has_command = command.command.is_some();
+            let has_commands = command.commands.is_some() && !command.commands.as_ref().unwrap().is_empty();
+            let has_submenu = command.submenu.is_some() && !command.submenu.as_ref().unwrap().is_empty();
+            
+            // Команда должна иметь хотя бы один из типов: command, commands или submenu
+            if !has_command && !has_commands && !has_submenu {
+                return Err(format!("Command '{}' must have either a single command, multiple commands, or submenu", command.name));
+            }
+            
+            // Проверяем, что не указаны одновременно несовместимые типы
+            if has_command && has_commands {
+                return Err(format!("Command '{}' cannot have both 'command' and 'commands' fields", command.name));
+            }
+            
+            if has_command && has_submenu {
+                return Err(format!("Command '{}' cannot have both 'command' and 'submenu' fields", command.name));
+            }
+            
+            if has_commands && has_submenu {
+                return Err(format!("Command '{}' cannot have both 'commands' and 'submenu' fields", command.name));
+            }
+            
+            // Проверяем подменю рекурсивно
+            if let Some(submenu) = &command.submenu {
+                validate_command_structure(submenu)?;
+            }
+        }
+        Ok(())
+    }
+    
+    // Проверяем структуру команд
+    validate_command_structure(&config.commands)?;
+    
+    // Проверяем уникальность горячих клавиш
+    check_hotkeys(&config.commands, &mut hotkeys)?;
+    
+    Ok(())
+}
+
+#[tauri::command]
+pub fn get_config_files() -> Result<Vec<serde_json::Value>, String> {
+    let config_path = get_config_path();
+    let config_dir = config_path.parent().unwrap().to_path_buf();
+    
+    if !config_dir.exists() {
+        std::fs::create_dir_all(&config_dir)
+            .map_err(|e| format!("Failed to create config directory: {}", e))?;
+    }
+    
+    let mut config_files = Vec::new();
+    
+    if let Ok(entries) = std::fs::read_dir(&config_dir) {
+        for entry in entries {
+            if let Ok(entry) = entry {
+                if let Some(file_name) = entry.file_name().to_str() {
+                    if file_name.ends_with(".json") {
+                        let name = file_name.replace(".json", "");
+                        let path = entry.path().to_str().unwrap().to_string();
+                        
+                        config_files.push(serde_json::json!({
+                            "name": name,
+                            "path": path
+                        }));
+                    }
+                }
+            }
+        }
+    }
+    
+    Ok(config_files)
+}
+
+#[tauri::command]
+pub fn load_config(path: String) -> Result<Config, String> {
+    let config_path = std::path::PathBuf::from(path);
+    
+    if config_path.exists() {
+        Config::load(&config_path)
+            .map_err(|e| format!("Failed to load configuration: {}", e))
+    } else {
+        Err(format!("Configuration file not found: {}", config_path.display()))
+    }
+}
+
+// Функция для обновления меню в трее
+fn update_system_tray_menu(app: &tauri::AppHandle, config_manager: &ConfigManager) -> Result<(), String> {
+    use crate::menu::create_system_tray_menu;
+    use tauri_plugin_autostart::{ManagerExt};
+    
+    // Получаем состояние автозапуска
+    let autostart_manager = app.autolaunch();
+    let autostart_enabled = autostart_manager.is_enabled().unwrap_or(false);
+    
+    // Создаем новое меню
+    let new_menu = create_system_tray_menu(app, autostart_enabled, config_manager);
+    
+    // Обновляем меню в трее
+    if let Some(tray) = app.tray_by_id("switch-shuttle-tray") {
+        tray.set_menu(Some(new_menu))
+            .map_err(|e| format!("Failed to update tray menu: {}", e))?;
+    }
+    
+    Ok(())
+}
+
+#[tauri::command]
+pub fn update_configuration(
+    mut config: Config,
+    original_title: String,
+    state: State<'_, Arc<Mutex<ConfigManager>>>,
+    app: tauri::AppHandle
+) -> Result<(), String> {
+    let config_path = get_config_path();
+    let config_dir = config_path.parent().unwrap().to_path_buf();
+    
+    // Используем оригинальный заголовок для поиска файла
+    let original_config_file = config_dir.join(format!("{}.json", original_title));
+    
+    if !original_config_file.exists() {
+        return Err(format!("Configuration file not found: {}", original_title));
+    }
+    
+    // Генерируем уникальное имя файла для нового заголовка
+    let unique_title = generate_unique_title(&config_dir, &config.title);
+    let new_config_file = config_dir.join(format!("{}.json", unique_title));
+    
+    // Очищаем ID перед сохранением
+    config.clear_ids();
+    
+    // Если заголовок изменился, переименовываем файл
+    if unique_title != original_title {
+        // Удаляем старый файл если новый файл уже существует
+        if new_config_file.exists() {
+            std::fs::remove_file(&new_config_file)
+                .map_err(|e| format!("Failed to remove existing file: {}", e))?;
+        }
+        
+        // Переименовываем файл
+        std::fs::rename(&original_config_file, &new_config_file)
+            .map_err(|e| format!("Failed to rename configuration file: {}", e))?;
+        
+        // Обновляем заголовок конфигурации если он изменился
+        if unique_title != config.title {
+            config.title = unique_title.clone();
+        }
+    }
+    
+    // Сохраняем конфигурацию в файл (используем правильный путь)
+    let save_path = if unique_title != original_title {
+        &new_config_file
+    } else {
+        &original_config_file
+    };
+    
+    config.save(save_path)
+        .map_err(|e| format!("Failed to save configuration: {}", e))?;
+    
+    // Перезагружаем конфигурации в ConfigManager
+    let mut config_manager = state.lock().unwrap();
+    config_manager.load_configs(None)
+        .map_err(|e| format!("Failed to reload configurations: {}", e))?;
+    
+    // Обновляем меню в трее
+    update_system_tray_menu(&app, &config_manager)
+}
+
+#[tauri::command]
+pub fn refresh_configurations(
+    state: State<'_, Arc<Mutex<ConfigManager>>>,
+    app: tauri::AppHandle
+) -> Result<(), String> {
+    // Перезагружаем конфигурации в ConfigManager
+    let mut config_manager = state.lock().unwrap();
+    config_manager.load_configs(None)
+        .map_err(|e| format!("Failed to reload configurations: {}", e))?;
+    
+    // Обновляем меню в трее
+    update_system_tray_menu(&app, &config_manager)
 }
