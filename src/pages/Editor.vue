@@ -9,14 +9,14 @@
             <p class="text-slate-600 mt-1">Manage and edit terminal configurations</p>
           </div>
           <div class="flex items-center space-x-2">
+            <Button @click="openConfigFolder" variant="ghost" size="lg" title="Open Config Folder">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-5l-2-2H5a2 2 0 00-2 2z" />
+              </svg>
+            </Button>
             <Button @click="createNewConfig" size="lg" title="Create new configuration">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-            </Button>
-            <Button @click="importConfig" variant="secondary" size="lg" title="Import configuration">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
               </svg>
             </Button>
           </div>
@@ -364,9 +364,13 @@ const confirmDelete = async () => {
   }
 };
 
-const importConfig = () => {
-  // TODO: Implement configuration import
-  console.log('Import config');
+
+const openConfigFolder = async () => {
+  try {
+    await invoke('open_config_folder');
+  } catch (error) {
+    console.error('Failed to open config folder:', error);
+  }
 };
 
 onMounted(() => {
