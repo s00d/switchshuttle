@@ -5,10 +5,13 @@
   
   **🚀 Plattformübergreifender Terminal-Befehlsmanager mit globalen Hotkeys**
   
-  [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-blue.svg)](https://github.com/s00d/switchshuttle)
-  [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-  [![Release](https://img.shields.io/github/v/release/s00d/switchshuttle)](https://github.com/s00d/switchshuttle/releases)
-  [![Downloads](https://img.shields.io/github/downloads/s00d/switchshuttle/total)](https://github.com/s00d/switchshuttle/releases)
+  [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-blue?style=for-the-badge)](https://github.com/s00d/switchshuttle)
+  [![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](LICENSE)
+  [![GitHub release](https://img.shields.io/github/v/release/s00d/switchshuttle?style=for-the-badge)](https://github.com/s00d/switchshuttle/releases)
+  [![GitHub downloads](https://img.shields.io/github/downloads/s00d/switchshuttle/total?style=for-the-badge)](https://github.com/s00d/switchshuttle/releases)
+  [![GitHub issues](https://img.shields.io/github/issues/s00d/switchshuttle?style=for-the-badge)](https://github.com/s00d/switchshuttle/issues)
+  [![GitHub stars](https://img.shields.io/github/stars/s00d/switchshuttle?style=for-the-badge)](https://github.com/s00d/switchshuttle/stargazers)
+  [![Donate](https://img.shields.io/badge/Donate-Donationalerts-ff4081?style=for-the-badge)](https://www.donationalerts.com/r/s00d88)
   
   <img src="https://github.com/s00d/switchshuttle/blob/main/icons/intro.gif?raw=true" alt="SwitchShuttle Demo" width="600">
   
