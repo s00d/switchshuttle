@@ -3,386 +3,456 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SwitchShuttle Documentation</title>
+    <title>SwitchShuttle Documentation - Русский</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="https://github.com/s00d/switchshuttle/blob/main/icons/128x128_white.png?raw=true">
 </head>
 <body>
-<header>
-    <div class="logo">
-        <a href="https://github.com/s00d/switchshuttle/">
-            <img src="https://github.com/s00d/switchshuttle/blob/main/icons/128x128_white.png?raw=true"
-                 alt="SwitchShuttle Logo">
-        </a>
-    </div>
-    <nav>
-        <ul>
-            <li><a href="https://github.com/s00d/switchshuttle/">GitHub</a></li>
-            <li><a href="https://github.com/s00d/switchshuttle/issues">Issues</a></li>
-            <li class="dropdown">
-                <a href="javascript:void(0)" class="dropbtn">Language</a>
-                <div class="dropdown-content">
-                    <a href="index.html" class="">English</a>
-                    <a href="index_de.html" class="">Deutsch</a>
-                    <a href="index_ja.html" class="">日本語</a>
-                    <a href="index_ru.html" class="selected">Русский</a>
-                    <a href="index_zh.html" class="">中文</a>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="https://github.com/s00d/switchshuttle/" class="logo-link">
+                        <img src="https://github.com/s00d/switchshuttle/blob/main/icons/128x128_white.png?raw=true" alt="SwitchShuttle" class="logo-img">
+                        <span class="logo-text">SwitchShuttle</span>
+                    </a>
                 </div>
-            </li>
-        </ul>
-    </nav>
-</header>
-<div class="container">
-    <aside>
-        <ul id="aside-menu">
-            <li class="level-2"><a href="#switchshuttle">SwitchShuttle</a></li>
-            <li class="level-2"><a href="#о-проекте">О проекте</a></li>
-            <li class="level-2"><a href="#возможности">Возможности</a></li>
-            <li class="level-2"><a href="#конфигурация">Конфигурация</a></li>
-            <li class="level-3"><a href="#параметры-конфигурации">Параметры конфигурации</a></li>
-            <li class="level-3"><a href="#параметры-команд">Параметры команд</a></li>
-            <li class="level-3"><a href="#логика-выполнения-команд">Логика выполнения команд</a></li>
-            <li class="level-4"><a href="#пример-выполнения">Пример выполнения</a></li>
-            <li class="level-3"><a href="#динамические-входные-данные">Динамические входные данные</a></li>
-            <li class="level-4"><a href="#пример-конфигурации-с-входными-данными">Пример конфигурации с входными
-                данными</a></li>
-            <li class="level-3"><a href="#горячие-клавиши">Горячие клавиши</a></li>
-            <li class="level-3"><a href="#как-использовать-горячие-клавиши">Как использовать горячие клавиши</a></li>
-            <li class="level-2"><a href="#как-использовать">Как использовать</a></li>
-            <li class="level-3"><a href="#создание-подменю">Создание подменю</a></li>
-            <li class="level-2"><a href="#сборка-приложения">Сборка приложения</a></li>
-            <li class="level-3"><a href="#необходимые-условия">Необходимые условия</a></li>
-            <li class="level-3"><a href="#шаги">Шаги</a></li>
-            <li class="level-2"><a href="#загрузка">Загрузка</a></li>
-            <li class="level-3"><a href="#macos">macOS</a></li>
-            <li class="level-2"><a href="#участие-в-разработке">Участие в разработке</a></li>
-            <li class="level-2"><a href="#лицензия">Лицензия</a></li>
-        </ul>
-    </aside>
-    <main id="content">
-        <p><img src="https://raw.githubusercontent.com/s00d/switchshuttle/refs/heads/main/icons/logo-min.png" alt="SwitchShuttle">
-            <img src="https://github.com/s00d/switchshuttle/blob/main/icons/intro.gif?raw=true" alt="intro"></p>
-        <h2 id="switchshuttle">SwitchShuttle</h2>
-        <p>SwitchShuttle — это кроссплатформенное приложение для системного трея, которое позволяет пользователям
-            запускать предопределенные команды в различных терминальных приложениях. Оно поддерживает macOS, Windows и
-            Linux, предлагая простой и настраиваемый способ управления и выполнения ваших часто используемых команд.</p>
-        <h2 id="о-проекте">О проекте</h2>
-        <p>SwitchShuttle — это переосмысление и расширение приложения <a href="https://github.com/fitztrev/shuttle">Shuttle</a>.
-            В то время как Shuttle предоставляет простой и эффективный способ управления ярлыками команд в macOS,
-            SwitchShuttle расширяет эту концепцию, предлагая поддержку нескольких операционных систем и терминальных
-            эмуляторов, а также улучшенные возможности конфигурации и настройки пользователем.</p>
-        <h2 id="возможности">Возможности</h2>
-        <ul>
-            <li>Поддержка нескольких терминальных приложений: iTerm, Terminal, Warp, Alacritty, Hyper.</li>
-            <li>Запуск команд в различных режимах: текущее окно, новая вкладка, новое окно.</li>
-            <li>Переключение запуска при входе в систему.</li>
-            <li>Редактирование конфигурации прямо из меню трея.</li>
-            <li>Открытие папки конфигурации из меню трея.</li>
-            <li>Поддержка подменю для лучшей организации команд.</li>
-            <li>Поддержка динамических входных данных для команд.</li>
-            <li><strong>Новое</strong>: Вызов контекстного меню с помощью горячей клавиши.</li>
-        </ul>
-        <h2 id="конфигурация">Конфигурация</h2>
-        <p>Конфигурация хранится в JSON-файлах, расположенных в каталоге конфигурации пользователя. Путь по умолчанию —
-            <code>~/.config/switch-shuttle/</code> на Linux и macOS, и <code>C:\Users\&lt;Username&gt;\AppData\Roaming\switch-shuttle\</code>
-            на Windows. Вы можете хранить несколько файлов конфигурации в этом каталоге, каждый из которых представляет
-            собой другой набор команд и настроек.</p>
-        <p>Пример конфигурационного файла:</p>
-        <pre><code class="language-json">{
-   &quot;terminal&quot;: &quot;iterm&quot;,
-   &quot;launch_in&quot;: &quot;current&quot;,
-   &quot;theme&quot;: &quot;Homebrew&quot;,
-   &quot;title&quot;: &quot;New tab&quot;,
-   &quot;menu_hotkey&quot;: &quot;Ctrl+Shift+M&quot;,
-   &quot;commands&quot;: [
+                
+                <nav class="nav">
+                    <div class="nav-links">
+                        <a href="https://github.com/s00d/switchshuttle/" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                            GitHub
+                        </a>
+                        <a href="https://github.com/s00d/switchshuttle/issues" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                            Issues
+                        </a>
+                    </div>
+                    
+                    <div class="language-selector">
+                        <div class="language-dropdown">
+                            <button class="language-btn">
+                                <span class="current-lang">Русский</span>
+                                <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M7 10l5 5 5-5z"/>
+                                </svg>
+                            </button>
+                            <div class="language-menu">
+                                <a href="index.html" class="lang-item ">English</a><a href="index_de.html" class="lang-item ">Deutsch</a><a href="index_ja.html" class="lang-item ">日本語</a><a href="index_ru.html" class="lang-item active">Русский</a><a href="index_zh.html" class="lang-item ">中文</a>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-container">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h3 class="sidebar-title">Contents</h3>
+                </div>
+                <nav class="sidebar-nav">
+                    <ul class="sidebar-menu">
+                        <li class="menu-item level-2 indent-1">
+            <a href="#switchshuttle" class="menu-link">
+                <span class="menu-text">SwitchShuttle</span>
+            </a>
+        </li>
+<li class="menu-item level-2 indent-1">
+            <a href="#o-proekte" class="menu-link">
+                <span class="menu-text">О проекте</span>
+            </a>
+        </li>
+<li class="menu-item level-2 indent-1">
+            <a href="#vozmozhnosti" class="menu-link">
+                <span class="menu-text">Возможности</span>
+            </a>
+        </li>
+<li class="menu-item level-2 indent-1">
+            <a href="#konfiguratsiya" class="menu-link">
+                <span class="menu-text">Конфигурация</span>
+            </a>
+        </li>
+<li class="menu-item level-2 indent-1">
+            <a href="#kak-ispolzovat" class="menu-link">
+                <span class="menu-text">Как использовать</span>
+            </a>
+        </li>
+<li class="menu-item level-2 indent-1">
+            <a href="#sborka-prilozheniya" class="menu-link">
+                <span class="menu-text">Сборка приложения</span>
+            </a>
+        </li>
+<li class="menu-item level-2 indent-1">
+            <a href="#zagruzka" class="menu-link">
+                <span class="menu-text">Загрузка</span>
+            </a>
+        </li>
+<li class="menu-item level-2 indent-1">
+            <a href="#uchastie-v-razrabotke" class="menu-link">
+                <span class="menu-text">Участие в разработке</span>
+            </a>
+        </li>
+<li class="menu-item level-2 indent-1">
+            <a href="#litsenziya" class="menu-link">
+                <span class="menu-text">Лицензия</span>
+            </a>
+        </li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Content -->
+            <main class="content">
+                <div class="content-wrapper">
+                    <p><img src="https://raw.githubusercontent.com/s00d/switchshuttle/refs/heads/main/icons/logo-min.png" alt="SwitchShuttle">
+<img src="https://github.com/s00d/switchshuttle/blob/main/icons/intro.gif?raw=true" alt="intro"></p>
+<h2 id="switchshuttle" class="heading-2">SwitchShuttle</h2><p>SwitchShuttle — это кроссплатформенное приложение для системного трея, которое позволяет пользователям запускать предопределенные команды в различных терминальных приложениях. Оно поддерживает macOS, Windows и Linux, предлагая простой и настраиваемый способ управления и выполнения ваших часто используемых команд.</p>
+<h2 id="o-proekte" class="heading-2">О проекте</h2><p>SwitchShuttle — это переосмысление и расширение приложения <a href="https://github.com/fitztrev/shuttle">Shuttle</a>. В то время как Shuttle предоставляет простой и эффективный способ управления ярлыками команд в macOS, SwitchShuttle расширяет эту концепцию, предлагая поддержку нескольких операционных систем и терминальных эмуляторов, а также улучшенные возможности конфигурации и настройки пользователем.</p>
+<h2 id="vozmozhnosti" class="heading-2">Возможности</h2><ul>
+<li>Поддержка нескольких терминальных приложений: iTerm, Terminal, Warp, Alacritty, Hyper.</li>
+<li>Запуск команд в различных режимах: текущее окно, новая вкладка, новое окно.</li>
+<li>Переключение запуска при входе в систему.</li>
+<li>Редактирование конфигурации прямо из меню трея.</li>
+<li>Открытие папки конфигурации из меню трея.</li>
+<li>Поддержка подменю для лучшей организации команд.</li>
+<li>Поддержка динамических входных данных для команд.</li>
+<li><strong>Новое</strong>: Вызов контекстного меню с помощью горячей клавиши.</li>
+</ul>
+<h2 id="konfiguratsiya" class="heading-2">Конфигурация</h2><p>Конфигурация хранится в JSON-файлах, расположенных в каталоге конфигурации пользователя. Путь по умолчанию — <code>~/.config/switch-shuttle/</code> на Linux и macOS, и <code>C:\Users\&lt;Username&gt;\AppData\Roaming\switch-shuttle\</code> на Windows. Вы можете хранить несколько файлов конфигурации в этом каталоге, каждый из которых представляет собой другой набор команд и настроек.</p>
+<p>Пример конфигурационного файла:</p>
+<pre class="code-block"><code class="language-json">{
+   "terminal": "iterm",
+   "launch_in": "current",
+   "theme": "Homebrew",
+   "title": "New tab",
+   "menu_hotkey": "Ctrl+Shift+M",
+   "commands": [
       {
-         &quot;name&quot;: &quot;Command&quot;,
-         &quot;inputs&quot;: null,
-         &quot;command&quot;: null,
-         &quot;commands&quot;: null,
-         &quot;hotkey&quot;: null,
-         &quot;submenu&quot;: [
+         "name": "Command",
+         "inputs": null,
+         "command": null,
+         "commands": null,
+         "hotkey": null,
+         "submenu": [
             {
-               &quot;name&quot;: &quot;Example Command&quot;,
-               &quot;inputs&quot;: null,
-               &quot;command&quot;: &quot;echo Hello, world!&quot;,
-               &quot;commands&quot;: null,
-               &quot;submenu&quot;: null,
-               &quot;hotkey&quot;: &quot;Ctrl+Shift+E&quot;
+               "name": "Example Command",
+               "inputs": null,
+               "command": "echo Hello, world!",
+               "commands": null,
+               "submenu": null,
+               "hotkey": "Ctrl+Shift+E"
             },
             {
-               &quot;name&quot;: &quot;Example Multi-Command with input&quot;,
-               &quot;inputs&quot;: {
-                  &quot;key1&quot;: &quot;default1&quot;,
-                  &quot;key2&quot;: &quot;default2&quot;
+               "name": "Example Multi-Command with input",
+               "inputs": {
+                  "key1": "default1",
+                  "key2": "default2"
                },
-               &quot;command&quot;: null,
-               &quot;commands&quot;: [
-                  &quot;export MY_VAR=$(echo &#39;Step 1: [key1]&#39;)&quot;,
-                  &quot;RESULT=$(echo &#39;Step 2: [key2]&#39; &amp;&amp; echo $MY_VAR)&quot;,
-                  &quot;echo Step 3: Finalize &amp;&amp; echo $RESULT&quot;
+               "command": null,
+               "commands": [
+                  "export MY_VAR=$(echo 'Step 1: [key1]')",
+                  "RESULT=$(echo 'Step 2: [key2]' && echo $MY_VAR)",
+                  "echo Step 3: Finalize && echo $RESULT"
                ],
-               &quot;submenu&quot;: null,
-               &quot;hotkey&quot;: &quot;Ctrl+Shift+M&quot;
+               "submenu": null,
+               "hotkey": "Ctrl+Shift+M"
             },
             {
-               &quot;name&quot;: &quot;Example Submenu&quot;,
-               &quot;inputs&quot;: null,
-               &quot;command&quot;: null,
-               &quot;commands&quot;: null,
-               &quot;submenu&quot;: [
+               "name": "Example Submenu",
+               "inputs": null,
+               "command": null,
+               "commands": null,
+               "submenu": [
                   {
-                     &quot;name&quot;: &quot;Subcommand 1&quot;,
-                     &quot;inputs&quot;: null,
-                     &quot;command&quot;: &quot;echo Subcommand 1&quot;,
-                     &quot;commands&quot;: null,
-                     &quot;submenu&quot;: null,
-                     &quot;hotkey&quot;: &quot;Ctrl+Shift+S&quot;
+                     "name": "Subcommand 1",
+                     "inputs": null,
+                     "command": "echo Subcommand 1",
+                     "commands": null,
+                     "submenu": null,
+                     "hotkey": "Ctrl+Shift+S"
                   },
                   {
-                     &quot;name&quot;: &quot;Subcommand 2&quot;,
-                     &quot;inputs&quot;: null,
-                     &quot;command&quot;: &quot;echo Subcommand 2&quot;,
-                     &quot;commands&quot;: null,
-                     &quot;submenu&quot;: null,
-                     &quot;hotkey&quot;: null
+                     "name": "Subcommand 2",
+                     "inputs": null,
+                     "command": "echo Subcommand 2",
+                     "commands": null,
+                     "submenu": null,
+                     "hotkey": null
                   }
                ],
-               &quot;hotkey&quot;: null
+               "hotkey": null
             }
          ]
       }
    ]
-}
-</code></pre>
-        <h3 id="параметры-конфигурации">Параметры конфигурации</h3>
-        <table>
-            <thead>
-            <tr>
-                <th>Параметр</th>
-                <th>Тип</th>
-                <th>Описание</th>
-                <th>Допустимые значения</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>terminal</td>
-                <td>String</td>
-                <td>Терминальное приложение для использования</td>
-                <td>&quot;iterm&quot;, &quot;terminal&quot;, &quot;warp&quot;</td>
-            </tr>
-            <tr>
-                <td>launch_in</td>
-                <td>String</td>
-                <td>Где запускать команду</td>
-                <td>&quot;current&quot;, &quot;new_tab&quot;, &quot;new_window&quot;</td>
-            </tr>
-            <tr>
-                <td>theme</td>
-                <td>String</td>
-                <td>Тема для использования (если поддерживается)</td>
-                <td>Любое строковое значение, представляющее тему</td>
-            </tr>
-            <tr>
-                <td>title</td>
-                <td>String</td>
-                <td>Заголовок для окна/вкладки терминала</td>
-                <td>Любое строковое значение</td>
-            </tr>
-            <tr>
-                <td>menu_hotkey</td>
-                <td>String (Optional)</td>
-                <td>Глобальная горячая клавиша для вызова контекстного меню</td>
-                <td>Любая допустимая комбинация горячих клавиш, например, &quot;Ctrl+Shift+M&quot;</td>
-            </tr>
-            <tr>
-                <td>commands</td>
-                <td>Array</td>
-                <td>Список конфигураций команд</td>
-                <td>См. ниже для параметров команд</td>
-            </tr>
-            </tbody>
-        </table>
-        <h3 id="параметры-команд">Параметры команд</h3>
-        <table>
-            <thead>
-            <tr>
-                <th>Параметр</th>
-                <th>Тип</th>
-                <th>Описание</th>
-                <th>Допустимые значения</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>name</td>
-                <td>String</td>
-                <td>Название команды или подменю</td>
-                <td>Любое строковое значение</td>
-            </tr>
-            <tr>
-                <td>inputs</td>
-                <td>Object (Optional)</td>
-                <td>Пары ключ-значение для входных данных</td>
-                <td>{&quot;key1&quot;: &quot;default1&quot;, &quot;key2&quot;: &quot;default2&quot;}</td>
-            </tr>
-            <tr>
-                <td>command</td>
-                <td>String (Optional)</td>
-                <td>Команда для выполнения (если это команда)</td>
-                <td>Любое строковое значение, представляющее команду</td>
-            </tr>
-            <tr>
-                <td>commands</td>
-                <td>Array (Optional)</td>
-                <td>Список команд для последовательного выполнения</td>
-                <td>Любой массив строк, каждая строка - команда</td>
-            </tr>
-            <tr>
-                <td>submenu</td>
-                <td>Array (Optional)</td>
-                <td>Список подкоманд (если это подменю)</td>
-                <td>См. выше для параметров команд</td>
-            </tr>
-            <tr>
-                <td>hotkey</td>
-                <td>String (Optional)</td>
-                <td>Глобальная горячая клавиша для вызова команды</td>
-                <td>Любая допустимая комбинация горячих клавиш, например, &quot;Ctrl+Shift+E&quot;</td>
-            </tr>
-            </tbody>
-        </table>
-        <h3 id="логика-выполнения-команд">Логика выполнения команд</h3>
-        <p>SwitchShuttle поддерживает определение одной команды с использованием параметра <code>command</code>, списка
-            команд с использованием параметра <code>commands</code> или обоих сразу. Если указаны и <code>command</code>,
-            и <code>commands</code>, сначала выполняется одиночная команда, а затем команды из списка.</p>
-        <h4 id="пример-выполнения">Пример выполнения</h4>
-        <ol>
-            <li><strong>Одиночная команда</strong>: Если указан только <code>command</code>, выполняется эта команда.
-            </li>
-            <li><strong>Несколько команд</strong>: Если указан только <code>commands</code>, каждая команда из списка
-                выполняется последовательно.
-            </li>
-            <li><strong>Оба параметра</strong>: Если указаны и <code>command</code>, и <code>commands</code>, сначала
-                выполняется одиночная команда, а затем каждая команда из списка <code>commands</code>.
-            </li>
-        </ol>
-        <h3 id="динамические-входные-данные">Динамические входные данные</h3>
-        <p>SwitchShuttle позволяет определить динамические входные данные для команд. Эти данные будут запрашиваться у
-            пользователя перед выполнением команды. Вы можете определить входные данные с помощью параметра
-            <code>inputs</code> в конфигурации команды.</p>
-        <h4 id="пример-конфигурации-с-входными-данными">Пример конфигурации с входными данными</h4>
-        <pre><code class="language-json">{
-   &quot;name&quot;: &quot;Example Multi-Command with input&quot;,
-   &quot;inputs&quot;: {
-      &quot;key1&quot;: &quot;default1&quot;,
-      &quot;key2&quot;: &quot;default2&quot;
+}</code></pre><h3 id="parametry-konfiguratsii" class="heading-3">Параметры конфигурации</h3><table>
+<thead>
+<tr>
+<th>Параметр</th>
+<th>Тип</th>
+<th>Описание</th>
+<th>Допустимые значения</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>terminal</td>
+<td>String</td>
+<td>Терминальное приложение для использования</td>
+<td>&quot;iterm&quot;, &quot;terminal&quot;, &quot;warp&quot;</td>
+</tr>
+<tr>
+<td>launch_in</td>
+<td>String</td>
+<td>Где запускать команду</td>
+<td>&quot;current&quot;, &quot;new_tab&quot;, &quot;new_window&quot;</td>
+</tr>
+<tr>
+<td>theme</td>
+<td>String</td>
+<td>Тема для использования (если поддерживается)</td>
+<td>Любое строковое значение, представляющее тему</td>
+</tr>
+<tr>
+<td>title</td>
+<td>String</td>
+<td>Заголовок для окна/вкладки терминала</td>
+<td>Любое строковое значение</td>
+</tr>
+<tr>
+<td>menu_hotkey</td>
+<td>String (Optional)</td>
+<td>Глобальная горячая клавиша для вызова контекстного меню</td>
+<td>Любая допустимая комбинация горячих клавиш, например, &quot;Ctrl+Shift+M&quot;</td>
+</tr>
+<tr>
+<td>commands</td>
+<td>Array</td>
+<td>Список конфигураций команд</td>
+<td>См. ниже для параметров команд</td>
+</tr>
+</tbody></table>
+<h3 id="parametry-komand" class="heading-3">Параметры команд</h3><table>
+<thead>
+<tr>
+<th>Параметр</th>
+<th>Тип</th>
+<th>Описание</th>
+<th>Допустимые значения</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>name</td>
+<td>String</td>
+<td>Название команды или подменю</td>
+<td>Любое строковое значение</td>
+</tr>
+<tr>
+<td>inputs</td>
+<td>Object (Optional)</td>
+<td>Пары ключ-значение для входных данных</td>
+<td>{&quot;key1&quot;: &quot;default1&quot;, &quot;key2&quot;: &quot;default2&quot;}</td>
+</tr>
+<tr>
+<td>command</td>
+<td>String (Optional)</td>
+<td>Команда для выполнения (если это команда)</td>
+<td>Любое строковое значение, представляющее команду</td>
+</tr>
+<tr>
+<td>commands</td>
+<td>Array (Optional)</td>
+<td>Список команд для последовательного выполнения</td>
+<td>Любой массив строк, каждая строка - команда</td>
+</tr>
+<tr>
+<td>submenu</td>
+<td>Array (Optional)</td>
+<td>Список подкоманд (если это подменю)</td>
+<td>См. выше для параметров команд</td>
+</tr>
+<tr>
+<td>hotkey</td>
+<td>String (Optional)</td>
+<td>Глобальная горячая клавиша для вызова команды</td>
+<td>Любая допустимая комбинация горячих клавиш, например, &quot;Ctrl+Shift+E&quot;</td>
+</tr>
+</tbody></table>
+<h3 id="logika-vypolneniya-komand" class="heading-3">Логика выполнения команд</h3><p>SwitchShuttle поддерживает определение одной команды с использованием параметра <code>command</code>, списка команд с использованием параметра <code>commands</code> или обоих сразу. Если указаны и <code>command</code>, и <code>commands</code>, сначала выполняется одиночная команда, а затем команды из списка.</p>
+<h4 id="primer-vypolneniya" class="heading-4">Пример выполнения</h4><ol>
+<li><strong>Одиночная команда</strong>: Если указан только <code>command</code>, выполняется эта команда.</li>
+<li><strong>Несколько команд</strong>: Если указан только <code>commands</code>, каждая команда из списка выполняется последовательно.</li>
+<li><strong>Оба параметра</strong>: Если указаны и <code>command</code>, и <code>commands</code>, сначала выполняется одиночная команда, а затем каждая команда из списка <code>commands</code>.</li>
+</ol>
+<h3 id="dinamicheskie-vhodnye-dannye" class="heading-3">Динамические входные данные</h3><p>SwitchShuttle позволяет определить динамические входные данные для команд. Эти данные будут запрашиваться у пользователя перед выполнением команды. Вы можете определить входные данные с помощью параметра <code>inputs</code> в конфигурации команды.</p>
+<h4 id="primer-konfiguratsii-s-vhodnymi-dannymi" class="heading-4">Пример конфигурации с входными данными</h4><pre class="code-block"><code class="language-json">{
+   "name": "Example Multi-Command with input",
+   "inputs": {
+      "key1": "default1",
+      "key2": "default2"
    },
-   &quot;command&quot;: null,
-   &quot;commands&quot;: [
-      &quot;export MY_VAR=$(echo &#39;Step 1: [key1]&#39;)&quot;,
-      &quot;RESULT=$(echo &#39;Step 2: [key2]&#39; &amp;&amp; echo $MY_VAR)&quot;,
-      &quot;echo Step 3: Finalize &amp;&amp; echo $RESULT&quot;
+   "command": null,
+   "commands": [
+      "export MY_VAR=$(echo 'Step 1: [key1]')",
+      "RESULT=$(echo 'Step 2: [key2]' && echo $MY_VAR)",
+      "echo Step 3: Finalize && echo $RESULT"
    ],
-   &quot;submenu&quot;: null,
-   &quot;hotkey&quot;: &quot;Ctrl+Shift+M&quot;
-}
-</code></pre>
-        <h3 id="горячие-клавиши">Горячие клавиши</h3>
-        <p>Вы можете назначить глобальные горячие клавиши для команд, добавив параметр <code>hotkey</code> в
-            конфигурацию команды. Комбинация горячих клавиш должна следовать формату модификаторов (Ctrl, Shift, Alt,
-            Win) в сочетании с клавишей (A-Z, 0-9 и т.д.). Например, чтобы установить &quot;Ctrl+Shift+E&quot; в
-            качестве горячей клавиши для команды:</p>
-        <pre><code class="language-json">{
-   &quot;name&quot;: &quot;Example Command&quot;,
-   &quot;command&quot;: &quot;echo Hello, world!&quot;,
-   &quot;submenu&quot;: null,
-   &quot;hotkey&quot;: &quot;Ctrl+Shift+E&quot;,
-   &quot;commands&quot;: null
-}
-</code></pre>
-        <p>Параметр <code>hotkey</code> является необязательным. Если он не указан, у команды не будет связанной с ней
-            глобальной горячей клавиши.</p>
-        <h3 id="как-использовать-горячие-клавиши">Как использовать горячие клавиши</h3>
-        <ol>
-            <li><strong>Назначение горячих клавиш</strong>: Отредактируйте файл конфигурации, чтобы включить параметр
-                <code>hotkey</code> для команд, которые вы хотите вызывать с помощью глобальных горячих клавиш.
-            </li>
-            <li><strong>Использование горячих клавиш</strong>: После перезапуска приложения используйте назначенные
-                горячие клавиши для вызова соответствующих команд, независимо от того, какое приложение в данный момент
-                активно.
-            </li>
-        </ol>
-        <h2 id="как-использовать">Как использовать</h2>
-        <ol>
-            <li><strong>Edit Config</strong>: Щелкните правой кнопкой мыши по значку в трее и выберите конфигурация,
-                чтобы открыть файл конфигурации в вашем редакторе по умолчанию. Измените конфигурацию по мере
-                необходимости.
-            </li>
-            <li><strong>Show Config Folder</strong>: Щелкните правой кнопкой мыши по значку в трее и выберите &quot;Show
-                Config Folder&quot;, чтобы открыть каталог конфигурации в вашем файловом менеджере.
-            </li>
-            <li><strong>Toggle Launch at Login</strong>: Щелкните правой кнопкой мыши по значку в трее и выберите &quot;Toggle
-                Launch at Login&quot;, чтобы включить или отключить автоматический запуск приложения при входе в
-                систему.
-            </li>
-            <li><strong>Execute Command</strong>: Щелкните левой кнопкой мыши по значку в трее и выберите команду,
-                которую хотите выполнить из меню. Команда будет выполнена в указанном терминальном приложении.
-            </li>
-        </ol>
-        <h3 id="создание-подменю">Создание подменю</h3>
-        <p>Чтобы создать подменю, установите поле <code>command</code> и <code>commands</code> в <code>null</code> и
-            предоставьте список подкоманд в поле <code>submenu</code>. Подкоманды также могут иметь свои собственные
-            подменю, что позволяет создавать вложенные меню.</p>
-        <h2 id="сборка-приложения">Сборка приложения</h2>
-        <h3 id="необходимые-условия">Необходимые условия</h3>
-        <ul>
-            <li><a href="https://www.rust-lang.org/tools/install">Rust</a></li>
-            <li><a href="https://tauri.app/v1/guides/getting-started/prerequisites/">Tauri</a></li>
-        </ul>
-        <h3 id="шаги">Шаги</h3>
-        <ol>
-            <li>Клонируйте репозиторий:</li>
-        </ol>
-        <pre><code class="language-sh">git clone https://github.com/s00d/switchshuttle.git
+   "submenu": null,
+   "hotkey": "Ctrl+Shift+M"
+}</code></pre><h3 id="goryachie-klavishi" class="heading-3">Горячие клавиши</h3><p>Вы можете назначить глобальные горячие клавиши для команд, добавив параметр <code>hotkey</code> в конфигурацию команды. Комбинация горячих клавиш должна следовать формату модификаторов (Ctrl, Shift, Alt, Win) в сочетании с клавишей (A-Z, 0-9 и т.д.). Например, чтобы установить &quot;Ctrl+Shift+E&quot; в качестве горячей клавиши для команды:</p>
+<pre class="code-block"><code class="language-json">{
+   "name": "Example Command",
+   "command": "echo Hello, world!",
+   "submenu": null,
+   "hotkey": "Ctrl+Shift+E",
+   "commands": null
+}</code></pre><p>Параметр <code>hotkey</code> является необязательным. Если он не указан, у команды не будет связанной с ней глобальной горячей клавиши.</p>
+<h3 id="kak-ispolzovat-goryachie-klavishi" class="heading-3">Как использовать горячие клавиши</h3><ol>
+<li><strong>Назначение горячих клавиш</strong>: Отредактируйте файл конфигурации, чтобы включить параметр <code>hotkey</code> для команд, которые вы хотите вызывать с помощью глобальных горячих клавиш.</li>
+<li><strong>Использование горячих клавиш</strong>: После перезапуска приложения используйте назначенные горячие клавиши для вызова соответствующих команд, независимо от того, какое приложение в данный момент активно.</li>
+</ol>
+<h2 id="kak-ispolzovat" class="heading-2">Как использовать</h2><ol>
+<li><strong>Edit Config</strong>: Щелкните правой кнопкой мыши по значку в трее и выберите конфигурация, чтобы открыть файл конфигурации в вашем редакторе по умолчанию. Измените конфигурацию по мере необходимости.</li>
+<li><strong>Show Config Folder</strong>: Щелкните правой кнопкой мыши по значку в трее и выберите &quot;Show Config Folder&quot;, чтобы открыть каталог конфигурации в вашем файловом менеджере.</li>
+<li><strong>Toggle Launch at Login</strong>: Щелкните правой кнопкой мыши по значку в трее и выберите &quot;Toggle Launch at Login&quot;, чтобы включить или отключить автоматический запуск приложения при входе в систему.</li>
+<li><strong>Execute Command</strong>: Щелкните левой кнопкой мыши по значку в трее и выберите команду, которую хотите выполнить из меню. Команда будет выполнена в указанном терминальном приложении.</li>
+</ol>
+<h3 id="sozdanie-podmenyu" class="heading-3">Создание подменю</h3><p>Чтобы создать подменю, установите поле <code>command</code> и <code>commands</code> в <code>null</code> и предоставьте список подкоманд в поле <code>submenu</code>. Подкоманды также могут иметь свои собственные подменю, что позволяет создавать вложенные меню.</p>
+<h2 id="sborka-prilozheniya" class="heading-2">Сборка приложения</h2><h3 id="neobhodimye-usloviya" class="heading-3">Необходимые условия</h3><ul>
+<li><a href="https://www.rust-lang.org/tools/install">Rust</a></li>
+<li><a href="https://tauri.app/v1/guides/getting-started/prerequisites/">Tauri</a></li>
+</ul>
+<h3 id="shagi" class="heading-3">Шаги</h3><ol>
+<li>Клонируйте репозиторий:</li>
+</ol>
+<pre class="code-block"><code class="language-sh">git clone https://github.com/s00d/switchshuttle.git
 cd switchshuttle
-npm i
-</code></pre>
-        <ol start="2">
-            <li>Соберите приложение:</li>
-        </ol>
-        <pre><code class="language-sh">cargo tauri build
-</code></pre>
-        <ol start="3">
-            <li>Запустите приложение:</li>
-        </ol>
-        <pre><code class="language-sh">cargo tauri dev
-</code></pre>
-        <h2 id="загрузка">Загрузка</h2>
-        <p>Последнюю версию SwitchShuttle можно скачать со страницы <a
-                href="https://github.com/s00d/switchshuttle/releases">GitHub Releases</a>.</p>
-        <h3 id="macos">macOS</h3>
-        <p>Подпись приложения</p>
-        <p>Если вы используете macOS, возможно, вам потребуется подписать приложение перед его запуском. Вот шаги:</p>
-        <ol>
-            <li>Сделайте бинарный файл исполняемым:</li>
-        </ol>
-        <pre><code class="language-bash">chmod +x /Applications/switch-shuttle.app
-</code></pre>
-        <ol start="2">
-            <li>Очистите расширенные атрибуты и подпишите бинарный файл:</li>
-        </ol>
-        <pre><code class="language-bash">xattr -cr /Applications/switch-shuttle.app &amp;&amp; codesign --force --deep --sign - /Applications/switch-shuttle.app
-</code></pre>
-        <h2 id="участие-в-разработке">Участие в разработке</h2>
-        <p>Приветствуются ваши вклады! Пожалуйста, не стесняйтесь отправлять запросы на внесение изменений или открывать
-            новые вопросы на GitHub.</p>
-        <h2 id="лицензия">Лицензия</h2>
-        <p>Этот проект лицензирован по лицензии MIT. См. файл <a href="LICENSE">LICENSE</a> для подробностей.</p>
-        <hr>
-        <p>Наслаждайтесь использованием SwitchShuttle для легкого управления вашими терминальными командами!</p>
+npm i</code></pre><ol start="2">
+<li>Соберите приложение:</li>
+</ol>
+<pre class="code-block"><code class="language-sh">cargo tauri build</code></pre><ol start="3">
+<li>Запустите приложение:</li>
+</ol>
+<pre class="code-block"><code class="language-sh">cargo tauri dev</code></pre><h2 id="zagruzka" class="heading-2">Загрузка</h2><p>Последнюю версию SwitchShuttle можно скачать со страницы <a href="https://github.com/s00d/switchshuttle/releases">GitHub Releases</a>.</p>
+<h3 id="macos" class="heading-3">macOS</h3><p>Подпись приложения</p>
+<p>Если вы используете macOS, возможно, вам потребуется подписать приложение перед его запуском. Вот шаги:</p>
+<ol>
+<li>Сделайте бинарный файл исполняемым:</li>
+</ol>
+<pre class="code-block"><code class="language-bash">chmod +x /Applications/switch-shuttle.app</code></pre><ol start="2">
+<li>Очистите расширенные атрибуты и подпишите бинарный файл:</li>
+</ol>
+<pre class="code-block"><code class="language-bash">xattr -cr /Applications/switch-shuttle.app && codesign --force --deep --sign - /Applications/switch-shuttle.app</code></pre><h2 id="uchastie-v-razrabotke" class="heading-2">Участие в разработке</h2><p>Приветствуются ваши вклады! Пожалуйста, не стесняйтесь отправлять запросы на внесение изменений или открывать новые вопросы на GitHub.</p>
+<h2 id="litsenziya" class="heading-2">Лицензия</h2><p>Этот проект лицензирован по лицензии MIT. См. файл <a href="LICENSE">LICENSE</a> для подробностей.</p>
+<hr>
+<p>Наслаждайтесь использованием SwitchShuttle для легкого управления вашими терминальными командами!</p>
 
-    </main>
-</div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Плавная прокрутка к якорям
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Подсветка активного пункта меню через отслеживание скролла
+        const updateActiveMenuItem = () => {
+            const scrollPosition = window.scrollY + 100; // Небольшой отступ
+            
+            // Получаем все ссылки из меню
+            const menuLinks = document.querySelectorAll('.sidebar-menu a');
+            let activeLink = null;
+            
+            // Проверяем каждую ссылку из меню
+            menuLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && href.startsWith('#')) {
+                    const targetId = href.substring(1);
+                    const targetElement = document.getElementById(targetId);
+                    
+                    if (targetElement) {
+                        const elementTop = targetElement.offsetTop;
+                        
+                        if (elementTop <= scrollPosition) {
+                            activeLink = link;
+                        }
+                    }
+                }
+            });
+            
+            // Обновляем активный пункт меню
+            menuLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+        };
+
+        // Добавляем обработчик скролла с throttling
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    updateActiveMenuItem();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+
+        // Инициализируем активный пункт при загрузке
+        updateActiveMenuItem();
+
+        // Переключение языкового меню
+        const languageBtn = document.querySelector('.language-btn');
+        const languageMenu = document.querySelector('.language-menu');
+        
+        if (languageBtn && languageMenu) {
+            languageBtn.addEventListener('click', () => {
+                languageMenu.classList.toggle('open');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!languageBtn.contains(e.target) && !languageMenu.contains(e.target)) {
+                    languageMenu.classList.remove('open');
+                }
+            });
+        }
+
+        // Мобильное меню
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const sidebar = document.querySelector('.sidebar');
+        
+        if (mobileMenuBtn && sidebar) {
+            mobileMenuBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('mobile-open');
+            });
+        }
+    </script>
 </body>
 </html>

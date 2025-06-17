@@ -3,370 +3,459 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SwitchShuttle Documentation</title>
+    <title>SwitchShuttle Documentation - 日本語</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="https://github.com/s00d/switchshuttle/blob/main/icons/128x128_white.png?raw=true">
 </head>
 <body>
-<header>
-    <div class="logo">
-        <a href="https://github.com/s00d/switchshuttle/">
-            <img src="https://github.com/s00d/switchshuttle/blob/main/icons/128x128_white.png?raw=true"
-                 alt="SwitchShuttle Logo">
-        </a>
-    </div>
-    <nav>
-        <ul>
-            <li><a href="https://github.com/s00d/switchshuttle/">GitHub</a></li>
-            <li><a href="https://github.com/s00d/switchshuttle/issues">Issues</a></li>
-            <li class="dropdown">
-                <a href="javascript:void(0)" class="dropbtn">Language</a>
-                <div class="dropdown-content">
-                    <a href="index.html" class="">English</a>
-                    <a href="index_de.html" class="">Deutsch</a>
-                    <a href="index_ja.html" class="selected">日本語</a>
-                    <a href="index_ru.html" class="">Русский</a>
-                    <a href="index_zh.html" class="">中文</a>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="https://github.com/s00d/switchshuttle/" class="logo-link">
+                        <img src="https://github.com/s00d/switchshuttle/blob/main/icons/128x128_white.png?raw=true" alt="SwitchShuttle" class="logo-img">
+                        <span class="logo-text">SwitchShuttle</span>
+                    </a>
                 </div>
-            </li>
-        </ul>
-    </nav>
-</header>
-<div class="container">
-    <aside>
-        <ul id="aside-menu">
-            <li class="level-2"><a href="#switchshuttle">SwitchShuttle</a></li>
-            <li class="level-2"><a href="#概要">概要</a></li>
-            <li class="level-2"><a href="#機能">機能</a></li>
-            <li class="level-2"><a href="#設定">設定</a></li>
-            <li class="level-3"><a href="#設定パラメータ">設定パラメータ</a></li>
-            <li class="level-3"><a href="#コマンドパラメータ">コマンドパラメータ</a></li>
-            <li class="level-3"><a href="#コマンド実行ロジック">コマンド実行ロジック</a></li>
-            <li class="level-4"><a href="#実行フローの例">実行フローの例</a></li>
-            <li class="level-3"><a href="#動的入力">動的入力</a></li>
-            <li class="level-4"><a href="#入力付き設定の例">入力付き設定の例</a></li>
-            <li class="level-3"><a href="#ホットキー">ホットキー</a></li>
-            <li class="level-3"><a href="#ホットキーの使用方法">ホットキーの使用方法</a></li>
-            <li class="level-2"><a href="#使用方法">使用方法</a></li>
-            <li class="level-3"><a href="#サブメニューの作成">サブメニューの作成</a></li>
-            <li class="level-2"><a href="#アプリケーションのビルド">アプリケーションのビルド</a></li>
-            <li class="level-3"><a href="#前提条件">前提条件</a></li>
-            <li class="level-3"><a href="#手順">手順</a></li>
-            <li class="level-2"><a href="#ダウンロード">ダウンロード</a></li>
-            <li class="level-3"><a href="#macosの場合">macOSの場合</a></li>
-            <li class="level-2"><a href="#コントリビューション">コントリビューション</a></li>
-            <li class="level-2"><a href="#ライセンス">ライセンス</a></li>
-        </ul>
-    </aside>
-    <main id="content">
-        <p><img src="https://raw.githubusercontent.com/s00d/switchshuttle/refs/heads/main/icons/logo-min.png" alt="SwitchShuttle">
-            <img src="https://github.com/s00d/switchshuttle/blob/main/icons/intro.gif?raw=true" alt="intro"></p>
-        <h2 id="switchshuttle">SwitchShuttle</h2>
-        <p>
-            SwitchShuttleは、事前定義されたコマンドをさまざまなターミナルアプリケーションで実行できるクロスプラットフォームのシステムトレイアプリケーションです。macOS、Windows、Linuxをサポートし、頻繁に使用するコマンドを管理および実行するためのシンプルでカスタマイズ可能な方法を提供します。</p>
-        <h2 id="概要">概要</h2>
-        <p>SwitchShuttleは、<a href="https://github.com/fitztrev/shuttle">Shuttle</a>アプリケーションの再構築および拡張版です。ShuttleがmacOSでコマンドショートカットを管理するためのシンプルで効果的な方法を提供するのに対し、SwitchShuttleは複数のオペレーティングシステムとターミナルエミュレータのサポートを提供し、拡張された設定機能とユーザーのカスタマイズオプションを備えています。
-        </p>
-        <h2 id="機能">機能</h2>
-        <ul>
-            <li>複数のターミナルアプリケーションをサポート: iTerm, Terminal, Warp, Alacritty, Hyper。</li>
-            <li>異なるモードでコマンドを実行: 現在のウィンドウ、新しいタブ、新しいウィンドウ。</li>
-            <li>起動時に自動起動を切り替える。</li>
-            <li>トレイメニューから直接設定を編集。</li>
-            <li>トレイメニューから設定フォルダを開く。</li>
-            <li>コマンドの整理に役立つサブメニューをサポート。</li>
-            <li>コマンドの動的入力をサポート。</li>
-            <li><strong>新機能</strong>: ホットキーでコンテキストメニューをトリガー。</li>
-        </ul>
-        <h2 id="設定">設定</h2>
-        <p>設定はユーザーの設定ディレクトリにあるJSONファイルに保存されます。デフォルトのパスは、LinuxとmacOSでは<code>~/.config/switch-shuttle/</code>、Windowsでは<code>C:\Users\&lt;Username&gt;\AppData\Roaming\switch-shuttle\</code>です。このディレクトリには複数の設定ファイルを保存でき、それぞれが異なるコマンドや設定のセットを表します。
-        </p>
-        <p>設定ファイルの例は以下の通りです：</p>
-        <pre><code class="language-json">{
-  &quot;terminal&quot;: &quot;iterm&quot;,
-  &quot;launch_in&quot;: &quot;current&quot;,
-  &quot;theme&quot;: &quot;Homebrew&quot;,
-  &quot;title&quot;: &quot;新しいタブ&quot;,
-  &quot;menu_hotkey&quot;: &quot;Ctrl+Shift+M&quot;,
-  &quot;commands&quot;: [
+                
+                <nav class="nav">
+                    <div class="nav-links">
+                        <a href="https://github.com/s00d/switchshuttle/" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                            GitHub
+                        </a>
+                        <a href="https://github.com/s00d/switchshuttle/issues" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                            Issues
+                        </a>
+                    </div>
+                    
+                    <div class="language-selector">
+                        <div class="language-dropdown">
+                            <button class="language-btn">
+                                <span class="current-lang">日本語</span>
+                                <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M7 10l5 5 5-5z"/>
+                                </svg>
+                            </button>
+                            <div class="language-menu">
+                                <a href="index.html" class="lang-item ">English</a><a href="index_de.html" class="lang-item ">Deutsch</a><a href="index_ja.html" class="lang-item active">日本語</a><a href="index_ru.html" class="lang-item ">Русский</a><a href="index_zh.html" class="lang-item ">中文</a>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-container">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h3 class="sidebar-title">Contents</h3>
+                </div>
+                <nav class="sidebar-nav">
+                    <ul class="sidebar-menu">
+                        <li class="menu-item level-2 indent-1">
+            <a href="#switchshuttle" class="menu-link">
+                <span class="menu-text">SwitchShuttle</span>
+            </a>
+        </li>
+<li class="menu-item level-2 indent-1">
+            <a href="#" class="menu-link">
+                <span class="menu-text">概要</span>
+            </a>
+        </li>
+<li class="menu-item level-2 indent-1">
+            <a href="#" class="menu-link">
+                <span class="menu-text">機能</span>
+            </a>
+        </li>
+<li class="menu-item level-2 indent-1">
+            <a href="#" class="menu-link">
+                <span class="menu-text">設定</span>
+            </a>
+        </li>
+<li class="menu-item level-2 indent-1">
+            <a href="#shiyong" class="menu-link">
+                <span class="menu-text">使用方法</span>
+            </a>
+        </li>
+<li class="menu-item level-2 indent-1">
+            <a href="#no" class="menu-link">
+                <span class="menu-text">アプリケーションのビルド</span>
+            </a>
+        </li>
+<li class="menu-item level-2 indent-1">
+            <a href="#" class="menu-link">
+                <span class="menu-text">ダウンロード</span>
+            </a>
+        </li>
+<li class="menu-item level-2 indent-1">
+            <a href="#" class="menu-link">
+                <span class="menu-text">コントリビューション</span>
+            </a>
+        </li>
+<li class="menu-item level-2 indent-1">
+            <a href="#" class="menu-link">
+                <span class="menu-text">ライセンス</span>
+            </a>
+        </li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Content -->
+            <main class="content">
+                <div class="content-wrapper">
+                    <p><img src="https://raw.githubusercontent.com/s00d/switchshuttle/refs/heads/main/icons/logo-min.png" alt="SwitchShuttle">
+<img src="https://github.com/s00d/switchshuttle/blob/main/icons/intro.gif?raw=true" alt="intro"></p>
+<h2 id="switchshuttle" class="heading-2">SwitchShuttle</h2><p>SwitchShuttleは、事前定義されたコマンドをさまざまなターミナルアプリケーションで実行できるクロスプラットフォームのシステムトレイアプリケーションです。macOS、Windows、Linuxをサポートし、頻繁に使用するコマンドを管理および実行するためのシンプルでカスタマイズ可能な方法を提供します。</p>
+<h2 id="" class="heading-2">概要</h2><p>SwitchShuttleは、<a href="https://github.com/fitztrev/shuttle">Shuttle</a>アプリケーションの再構築および拡張版です。ShuttleがmacOSでコマンドショートカットを管理するためのシンプルで効果的な方法を提供するのに対し、SwitchShuttleは複数のオペレーティングシステムとターミナルエミュレータのサポートを提供し、拡張された設定機能とユーザーのカスタマイズオプションを備えています。</p>
+<h2 id="" class="heading-2">機能</h2><ul>
+<li>複数のターミナルアプリケーションをサポート: iTerm, Terminal, Warp, Alacritty, Hyper。</li>
+<li>異なるモードでコマンドを実行: 現在のウィンドウ、新しいタブ、新しいウィンドウ。</li>
+<li>起動時に自動起動を切り替える。</li>
+<li>トレイメニューから直接設定を編集。</li>
+<li>トレイメニューから設定フォルダを開く。</li>
+<li>コマンドの整理に役立つサブメニューをサポート。</li>
+<li>コマンドの動的入力をサポート。</li>
+<li><strong>新機能</strong>: ホットキーでコンテキストメニューをトリガー。</li>
+</ul>
+<h2 id="" class="heading-2">設定</h2><p>設定はユーザーの設定ディレクトリにあるJSONファイルに保存されます。デフォルトのパスは、LinuxとmacOSでは<code>~/.config/switch-shuttle/</code>、Windowsでは<code>C:\Users\&lt;Username&gt;\AppData\Roaming\switch-shuttle\</code>です。このディレクトリには複数の設定ファイルを保存でき、それぞれが異なるコマンドや設定のセットを表します。</p>
+<p>設定ファイルの例は以下の通りです：</p>
+<pre class="code-block"><code class="language-json">{
+  "terminal": "iterm",
+  "launch_in": "current",
+  "theme": "Homebrew",
+  "title": "新しいタブ",
+  "menu_hotkey": "Ctrl+Shift+M",
+  "commands": [
     {
-      &quot;name&quot;: &quot;コマンド&quot;,
-      &quot;inputs&quot;: null,
-      &quot;command&quot;: null,
-      &quot;commands&quot;: null,
-      &quot;hotkey&quot;: null,
-      &quot;submenu&quot;: [
+      "name": "コマンド",
+      "inputs": null,
+      "command": null,
+      "commands": null,
+      "hotkey": null,
+      "submenu": [
         {
-          &quot;name&quot;: &quot;例のコマンド&quot;,
-          &quot;inputs&quot;: null,
-          &quot;command&quot;: &quot;echo こんにちは、世界！&quot;,
-          &quot;commands&quot;: null,
-          &quot;submenu&quot;: null,
-          &quot;hotkey&quot;: &quot;Ctrl+Shift+E&quot;
+          "name": "例のコマンド",
+          "inputs": null,
+          "command": "echo こんにちは、世界！",
+          "commands": null,
+          "submenu": null,
+          "hotkey": "Ctrl+Shift+E"
         },
         {
-          &quot;name&quot;: &quot;入力付きの例のマルチコマンド&quot;,
-          &quot;inputs&quot;: {
-            &quot;key1&quot;: &quot;デフォルト1&quot;,
-            &quot;key2&quot;: &quot;デフォルト2&quot;
+          "name": "入力付きの例のマルチコマンド",
+          "inputs": {
+            "key1": "デフォルト1",
+            "key2": "デフォルト2"
           },
-          &quot;command&quot;: null,
-          &quot;commands&quot;: [
-            &quot;export MY_VAR=$(echo &#39;ステップ1: [key1]&#39;)&quot;,
-            &quot;RESULT=$(echo &#39;ステップ2: [key2]&#39; &amp;&amp; echo $MY_VAR)&quot;,
-            &quot;echo ステップ3: 完了 &amp;&amp; echo $RESULT&quot;
+          "command": null,
+          "commands": [
+            "export MY_VAR=$(echo 'ステップ1: [key1]')",
+            "RESULT=$(echo 'ステップ2: [key2]' && echo $MY_VAR)",
+            "echo ステップ3: 完了 && echo $RESULT"
           ],
-          &quot;submenu&quot;: null,
-          &quot;hotkey&quot;: &quot;Ctrl+Shift+M&quot;
+          "submenu": null,
+          "hotkey": "Ctrl+Shift+M"
         },
         {
-          &quot;name&quot;: &quot;例のサブメニュー&quot;,
-          &quot;inputs&quot;: null,
-          &quot;command&quot;: null,
-          &quot;commands&quot;: null,
-          &quot;submenu&quot;: [
+          "name": "例のサブメニュー",
+          "inputs": null,
+          "command": null,
+          "commands": null,
+          "submenu": [
             {
-              &quot;name&quot;: &quot;サブコマンド1&quot;,
-              &quot;inputs&quot;: null,
-              &quot;command&quot;: &quot;echo サブコマンド1&quot;,
-              &quot;commands&quot;: null,
-              &quot;submenu&quot;: null,
-              &quot;hotkey&quot;: &quot;Ctrl+Shift+S&quot;
+              "name": "サブコマンド1",
+              "inputs": null,
+              "command": "echo サブコマンド1",
+              "commands": null,
+              "submenu": null,
+              "hotkey": "Ctrl+Shift+S"
             },
             {
-              &quot;name&quot;: &quot;サブコマンド2&quot;,
-              &quot;inputs&quot;: null,
-              &quot;command&quot;: &quot;echo サブコマンド2&quot;,
-              &quot;commands&quot;: null,
-              &quot;submenu&quot;: null,
-              &quot;hotkey&quot;: null
+              "name": "サブコマンド2",
+              "inputs": null,
+              "command": "echo サブコマンド2",
+              "commands": null,
+              "submenu": null,
+              "hotkey": null
             }
           ],
-          &quot;hotkey&quot;: null
+          "hotkey": null
         }
       ]
     }
   ]
-}
-</code></pre>
-        <h3 id="設定パラメータ">設定パラメータ</h3>
-        <table>
-            <thead>
-            <tr>
-                <th>パラメータ</th>
-                <th>タイプ</th>
-                <th>説明</th>
-                <th>有効な値</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>terminal</td>
-                <td>String</td>
-                <td>使用するターミナルアプリケーション</td>
-                <td>&quot;iterm&quot;, &quot;terminal&quot;, &quot;warp&quot;</td>
-            </tr>
-            <tr>
-                <td>launch_in</td>
-                <td>String</td>
-                <td>コマンドを起動する場所</td>
-                <td>&quot;current&quot;, &quot;new_tab&quot;, &quot;new_window&quot;</td>
-            </tr>
-            <tr>
-                <td>theme</td>
-                <td>String</td>
-                <td>使用するテーマ（ターミナルがサポートする場合）</td>
-                <td>テーマを表す任意の文字列</td>
-            </tr>
-            <tr>
-                <td>title</td>
-                <td>String</td>
-                <td>ターミナルウィンドウ/タブのタイトル</td>
-                <td>任意の文字列</td>
-            </tr>
-            <tr>
-                <td>menu_hotkey</td>
-                <td>String (Optional)</td>
-                <td>コンテキストメニューをトリガーするグローバルホットキー</td>
-                <td>有効なホットキーの組み合わせ, 例: &quot;Ctrl+Shift+M&quot;</td>
-            </tr>
-            <tr>
-                <td>commands</td>
-                <td>Array</td>
-                <td>コマンド設定のリスト</td>
-                <td>コマンドパラメータを参照</td>
-            </tr>
-            </tbody>
-        </table>
-        <h3 id="コマンドパラメータ">コマンドパラメータ</h3>
-        <table>
-            <thead>
-            <tr>
-                <th>パラメータ</th>
-                <th>タイプ</th>
-                <th>説明</th>
-                <th>有効な値</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>name</td>
-                <td>String</td>
-                <td>コマンドまたはサブメニューの名前</td>
-                <td>任意の文字列</td>
-            </tr>
-            <tr>
-                <td>inputs</td>
-                <td>Object (Optional)</td>
-                <td>入力のキーとデフォルト値</td>
-                <td>{&quot;key1&quot;: &quot;default1&quot;, &quot;key2&quot;: &quot;default2&quot;}</td>
-            </tr>
-            <tr>
-                <td>command</td>
-                <td>String (Optional)</td>
-                <td>実行するコマンド（コマンドの場合）</td>
-                <td>コマンドを表す任意の文字列</td>
-            </tr>
-            <tr>
-                <td>commands</td>
-                <td>Array (Optional)</td>
-                <td>順次実行するコマンドのリスト</td>
-                <td>各コマンドが文字列である任意の配列</td>
-            </tr>
-            <tr>
-                <td>submenu</td>
-                <td>Array (Optional)</td>
-                <td>サブコマンドのリスト（サブメニューの場合）</td>
-                <td>コマンドパラメータを参照</td>
-            </tr>
-            <tr>
-                <td>hotkey</td>
-                <td>String (Optional)</td>
-                <td>コマンドをトリガーするグローバルホットキー</td>
-                <td>有効なホットキーの組み合わせ, 例: &quot;Ctrl+Shift+E&quot;</td>
-            </tr>
-            </tbody>
-        </table>
-        <h3 id="コマンド実行ロジック">コマンド実行ロジック</h3>
-        <p>SwitchShuttleは、<code>command</code>パラメータを使用して単一のコマンドを定義する方法、<code>commands</code>パラメータを使用してコマンドのリストを定義する方法、またはその両方をサポートします。<code>command</code>と<code>commands</code>の両方が指定されている場合、単一のコマンドが最初に実行され、その後にリスト内のコマンドが順次実行されます。
-        </p>
-        <h4 id="実行フローの例">実行フローの例</h4>
-        <ol>
-            <li><strong>単一コマンド</strong>: <code>command</code>のみが指定されている場合、そのコマンドが実行されます。
-            </li>
-            <li><strong>複数コマンド</strong>: <code>commands</code>のみが指定されている場合、リスト内の各コマンドが順次実行されます。
-            </li>
-            <li><strong>コマンドとコマンドリストの両方</strong>: <code>command</code>と<code>commands</code>の両方が指定されている場合、単一のコマンドが最初に実行され、その後リスト内の各コマンドが実行されます。
-            </li>
-        </ol>
-        <h3 id="動的入力">動的入力</h3>
-        <p>SwitchShuttleでは、コマンドの実行前にユーザーからの入力を求める動的入力を定義できます。<code>inputs</code>パラメータを使用してコマンド設定に入力を定義できます。
-        </p>
-        <h4 id="入力付き設定の例">入力付き設定の例</h4>
-        <pre><code class="language-json">{
-  &quot;name&quot;: &quot;入力付きの例のマルチコマンド&quot;,
-  &quot;inputs&quot;: {
-    &quot;key1&quot;: &quot;デフォルト1&quot;,
-    &quot;key2&quot;: &quot;デフォルト2&quot;
+}</code></pre><h3 id="" class="heading-3">設定パラメータ</h3><table>
+<thead>
+<tr>
+<th>パラメータ</th>
+<th>タイプ</th>
+<th>説明</th>
+<th>有効な値</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>terminal</td>
+<td>String</td>
+<td>使用するターミナルアプリケーション</td>
+<td>&quot;iterm&quot;, &quot;terminal&quot;, &quot;warp&quot;</td>
+</tr>
+<tr>
+<td>launch_in</td>
+<td>String</td>
+<td>コマンドを起動する場所</td>
+<td>&quot;current&quot;, &quot;new_tab&quot;, &quot;new_window&quot;</td>
+</tr>
+<tr>
+<td>theme</td>
+<td>String</td>
+<td>使用するテーマ（ターミナルがサポートする場合）</td>
+<td>テーマを表す任意の文字列</td>
+</tr>
+<tr>
+<td>title</td>
+<td>String</td>
+<td>ターミナルウィンドウ/タブのタイトル</td>
+<td>任意の文字列</td>
+</tr>
+<tr>
+<td>menu_hotkey</td>
+<td>String (Optional)</td>
+<td>コンテキストメニューをトリガーするグローバルホットキー</td>
+<td>有効なホットキーの組み合わせ, 例: &quot;Ctrl+Shift+M&quot;</td>
+</tr>
+<tr>
+<td>commands</td>
+<td>Array</td>
+<td>コマンド設定のリスト</td>
+<td>コマンドパラメータを参照</td>
+</tr>
+</tbody></table>
+<h3 id="" class="heading-3">コマンドパラメータ</h3><table>
+<thead>
+<tr>
+<th>パラメータ</th>
+<th>タイプ</th>
+<th>説明</th>
+<th>有効な値</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>name</td>
+<td>String</td>
+<td>コマンドまたはサブメニューの名前</td>
+<td>任意の文字列</td>
+</tr>
+<tr>
+<td>inputs</td>
+<td>Object (Optional)</td>
+<td>入力のキーとデフォルト値</td>
+<td>{&quot;key1&quot;: &quot;default1&quot;, &quot;key2&quot;: &quot;default2&quot;}</td>
+</tr>
+<tr>
+<td>command</td>
+<td>String (Optional)</td>
+<td>実行するコマンド（コマンドの場合）</td>
+<td>コマンドを表す任意の文字列</td>
+</tr>
+<tr>
+<td>commands</td>
+<td>Array (Optional)</td>
+<td>順次実行するコマンドのリスト</td>
+<td>各コマンドが文字列である任意の配列</td>
+</tr>
+<tr>
+<td>submenu</td>
+<td>Array (Optional)</td>
+<td>サブコマンドのリスト（サブメニューの場合）</td>
+<td>コマンドパラメータを参照</td>
+</tr>
+<tr>
+<td>hotkey</td>
+<td>String (Optional)</td>
+<td>コマンドをトリガーするグローバルホットキー</td>
+<td>有効なホットキーの組み合わせ, 例: &quot;Ctrl+Shift+E&quot;</td>
+</tr>
+</tbody></table>
+<h3 id="" class="heading-3">コマンド実行ロジック</h3><p>SwitchShuttleは、<code>command</code>パラメータを使用して単一のコマンドを定義する方法、<code>commands</code>パラメータを使用してコマンドのリストを定義する方法、またはその両方をサポートします。<code>command</code>と<code>commands</code>の両方が指定されている場合、単一のコマンドが最初に実行され、その後にリスト内のコマンドが順次実行されます。</p>
+<h4 id="no" class="heading-4">実行フローの例</h4><ol>
+<li><strong>単一コマンド</strong>: <code>command</code>のみが指定されている場合、そのコマンドが実行されます。</li>
+<li><strong>複数コマンド</strong>: <code>commands</code>のみが指定されている場合、リスト内の各コマンドが順次実行されます。</li>
+<li><strong>コマンドとコマンドリストの両方</strong>: <code>command</code>と<code>commands</code>の両方が指定されている場合、単一のコマンドが最初に実行され、その後リスト内の各コマンドが実行されます。</li>
+</ol>
+<h3 id="" class="heading-3">動的入力</h3><p>SwitchShuttleでは、コマンドの実行前にユーザーからの入力を求める動的入力を定義できます。<code>inputs</code>パラメータを使用してコマンド設定に入力を定義できます。</p>
+<h4 id="kino" class="heading-4">入力付き設定の例</h4><pre class="code-block"><code class="language-json">{
+  "name": "入力付きの例のマルチコマンド",
+  "inputs": {
+    "key1": "デフォルト1",
+    "key2": "デフォルト2"
   },
-  &quot;command&quot;: null,
-  &quot;commands&quot;: [
-    &quot;export MY_VAR=$(echo &#39;ステップ1: [key1]&#39;)&quot;,
-    &quot;RESULT=$(echo &#39;ステップ2: [key2]&#39; &amp;&amp; echo $MY_VAR)&quot;,
-    &quot;echo ステップ3: 完了 &amp;&amp; echo $RESULT&quot;
+  "command": null,
+  "commands": [
+    "export MY_VAR=$(echo 'ステップ1: [key1]')",
+    "RESULT=$(echo 'ステップ2: [key2]' && echo $MY_VAR)",
+    "echo ステップ3: 完了 && echo $RESULT"
   ],
-  &quot;submenu&quot;: null,
+  "submenu": null,
 
 
-  &quot;hotkey&quot;: &quot;Ctrl+Shift+M&quot;
-}
-</code></pre>
-        <h3 id="ホットキー">ホットキー</h3>
-        <p>コマンド設定に<code>hotkey</code>パラメータを追加することで、コマンドにグローバルホットキーを割り当てることができます。ホットキーの組み合わせは、修飾キー（Ctrl、Shift、Alt、Win）とキー（A-Z、0-9など）を組み合わせた形式でなければなりません。例えば、コマンドに「Ctrl+Shift+E」をホットキーとして設定するには：
-        </p>
-        <pre><code class="language-json">{
-   &quot;name&quot;: &quot;例のコマンド&quot;,
-   &quot;command&quot;: &quot;echo こんにちは、世界！&quot;,
-   &quot;submenu&quot;: null,
-   &quot;hotkey&quot;: &quot;Ctrl+Shift+E&quot;,
-   &quot;commands&quot;: null
-}
-</code></pre>
-        <p>
-            ホットキーパラメータはオプションです。指定しない場合、そのコマンドにはグローバルホットキーが割り当てられません。</p>
-        <h3 id="ホットキーの使用方法">ホットキーの使用方法</h3>
-        <ol>
-            <li><strong>ホットキーの割り当て</strong>:
-                設定ファイルを編集して、トリガーしたいコマンドに<code>hotkey</code>パラメータを追加します。
-            </li>
-            <li><strong>ホットキーの使用</strong>:
-                アプリケーションを再起動した後、設定したホットキーを使用して、フォーカスしているアプリケーションに関係なく対応するコマンドをトリガーします。
-            </li>
-        </ol>
-        <h2 id="使用方法">使用方法</h2>
-        <ol>
-            <li><strong>Edit Config</strong>: トレイアイコンを右クリックして「設定の編集」を選択し、デフォルトのエディタで設定ファイルを開きます。必要に応じて設定を変更します。
-            </li>
-            <li><strong>Show Config Folder</strong>: トレイアイコンを右クリックして「設定フォルダを開く」を選択し、ファイルエクスプローラで設定ディレクトリを開きます。
-            </li>
-            <li><strong>Toggle Launch at Login</strong>:
-                トレイアイコンを右クリックして「ログイン時に自動起動を切り替える」を選択し、アプリケーションがログイン時に起動するかどうかを切り替えます。
-            </li>
-            <li><strong>Execute Command</strong>: トレイアイコンを左クリックしてメニューから実行したいコマンドを選択します。指定されたターミナルアプリケーションでコマンドが実行されます。
-            </li>
-        </ol>
-        <h3 id="サブメニューの作成">サブメニューの作成</h3>
-        <p>サブメニューを作成するには、<code>command</code>フィールドを<code>null</code>に設定し、<code>submenu</code>フィールドにサブコマンドのリストを提供します。サブコマンドも独自のサブメニューを持つことができ、ネストされたメニューが可能です。
-        </p>
-        <h2 id="アプリケーションのビルド">アプリケーションのビルド</h2>
-        <h3 id="前提条件">前提条件</h3>
-        <ul>
-            <li><a href="https://www.rust-lang.org/tools/install">Rust</a></li>
-            <li><a href="https://tauri.app/v1/guides/getting-started/prerequisites/">Tauri</a></li>
-        </ul>
-        <h3 id="手順">手順</h3>
-        <ol>
-            <li>リポジトリをクローンする:</li>
-        </ol>
-        <pre><code class="language-sh">git clone https://github.com/s00d/switchshuttle.git
+  "hotkey": "Ctrl+Shift+M"
+}</code></pre><h3 id="" class="heading-3">ホットキー</h3><p>コマンド設定に<code>hotkey</code>パラメータを追加することで、コマンドにグローバルホットキーを割り当てることができます。ホットキーの組み合わせは、修飾キー（Ctrl、Shift、Alt、Win）とキー（A-Z、0-9など）を組み合わせた形式でなければなりません。例えば、コマンドに「Ctrl+Shift+E」をホットキーとして設定するには：</p>
+<pre class="code-block"><code class="language-json">{
+   "name": "例のコマンド",
+   "command": "echo こんにちは、世界！",
+   "submenu": null,
+   "hotkey": "Ctrl+Shift+E",
+   "commands": null
+}</code></pre><p>ホットキーパラメータはオプションです。指定しない場合、そのコマンドにはグローバルホットキーが割り当てられません。</p>
+<h3 id="noshiyong" class="heading-3">ホットキーの使用方法</h3><ol>
+<li><strong>ホットキーの割り当て</strong>: 設定ファイルを編集して、トリガーしたいコマンドに<code>hotkey</code>パラメータを追加します。</li>
+<li><strong>ホットキーの使用</strong>: アプリケーションを再起動した後、設定したホットキーを使用して、フォーカスしているアプリケーションに関係なく対応するコマンドをトリガーします。</li>
+</ol>
+<h2 id="shiyong" class="heading-2">使用方法</h2><ol>
+<li><strong>Edit Config</strong>: トレイアイコンを右クリックして「設定の編集」を選択し、デフォルトのエディタで設定ファイルを開きます。必要に応じて設定を変更します。</li>
+<li><strong>Show Config Folder</strong>: トレイアイコンを右クリックして「設定フォルダを開く」を選択し、ファイルエクスプローラで設定ディレクトリを開きます。</li>
+<li><strong>Toggle Launch at Login</strong>: トレイアイコンを右クリックして「ログイン時に自動起動を切り替える」を選択し、アプリケーションがログイン時に起動するかどうかを切り替えます。</li>
+<li><strong>Execute Command</strong>: トレイアイコンを左クリックしてメニューから実行したいコマンドを選択します。指定されたターミナルアプリケーションでコマンドが実行されます。</li>
+</ol>
+<h3 id="nozuocheng" class="heading-3">サブメニューの作成</h3><p>サブメニューを作成するには、<code>command</code>フィールドを<code>null</code>に設定し、<code>submenu</code>フィールドにサブコマンドのリストを提供します。サブコマンドも独自のサブメニューを持つことができ、ネストされたメニューが可能です。</p>
+<h2 id="no" class="heading-2">アプリケーションのビルド</h2><h3 id="" class="heading-3">前提条件</h3><ul>
+<li><a href="https://www.rust-lang.org/tools/install">Rust</a></li>
+<li><a href="https://tauri.app/v1/guides/getting-started/prerequisites/">Tauri</a></li>
+</ul>
+<h3 id="" class="heading-3">手順</h3><ol>
+<li>リポジトリをクローンする:</li>
+</ol>
+<pre class="code-block"><code class="language-sh">git clone https://github.com/s00d/switchshuttle.git
 cd switchshuttle
-npm i
-</code></pre>
-        <ol start="2">
-            <li>アプリケーションをビルドする:</li>
-        </ol>
-        <pre><code class="language-sh">cargo tauri build
-</code></pre>
-        <ol start="3">
-            <li>アプリケーションを実行する:</li>
-        </ol>
-        <pre><code class="language-sh">cargo tauri dev
-</code></pre>
-        <h2 id="ダウンロード">ダウンロード</h2>
-        <p>最新バージョンのSwitchShuttleは<a href="https://github.com/s00d/switchshuttle/releases">GitHub Releases</a>ページからダウンロードできます。
-        </p>
-        <h3 id="macosの場合">macOSの場合</h3>
-        <p>アプリケーションを実行する前に、サインが必要な場合があります。以下の手順でサインを行ってください：</p>
-        <ol>
-            <li>バイナリを実行可能にする:</li>
-        </ol>
-        <pre><code class="language-bash">chmod +x /Applications/switch-shuttle.app
-</code></pre>
-        <ol start="2">
-            <li>拡張属性をクリアし、バイナリにサインする:</li>
-        </ol>
-        <pre><code class="language-bash">xattr -cr /Applications/switch-shuttle.app &amp;&amp; codesign --force --deep --sign - /Applications/switch-shuttle.app
-</code></pre>
-        <h2 id="コントリビューション">コントリビューション</h2>
-        <p>貢献は大歓迎です！GitHubでプルリクエストを提出するか、イシューをオープンしてください。</p>
-        <h2 id="ライセンス">ライセンス</h2>
-        <p>このプロジェクトはMITライセンスの下でライセンスされています。詳細は<a href="LICENSE">LICENSE</a>ファイルを参照してください。
-        </p>
-        <hr>
-        <p>SwitchShuttleを使用してターミナルコマンドを簡単に管理しましょう！</p>
-        <hr>
-        <p>この翻訳が役立つことを願っています。</p>
+npm i</code></pre><ol start="2">
+<li>アプリケーションをビルドする:</li>
+</ol>
+<pre class="code-block"><code class="language-sh">cargo tauri build</code></pre><ol start="3">
+<li>アプリケーションを実行する:</li>
+</ol>
+<pre class="code-block"><code class="language-sh">cargo tauri dev</code></pre><h2 id="" class="heading-2">ダウンロード</h2><p>最新バージョンのSwitchShuttleは<a href="https://github.com/s00d/switchshuttle/releases">GitHub Releases</a>ページからダウンロードできます。</p>
+<h3 id="macosno" class="heading-3">macOSの場合</h3><p>アプリケーションを実行する前に、サインが必要な場合があります。以下の手順でサインを行ってください：</p>
+<ol>
+<li>バイナリを実行可能にする:</li>
+</ol>
+<pre class="code-block"><code class="language-bash">chmod +x /Applications/switch-shuttle.app</code></pre><ol start="2">
+<li>拡張属性をクリアし、バイナリにサインする:</li>
+</ol>
+<pre class="code-block"><code class="language-bash">xattr -cr /Applications/switch-shuttle.app && codesign --force --deep --sign - /Applications/switch-shuttle.app</code></pre><h2 id="" class="heading-2">コントリビューション</h2><p>貢献は大歓迎です！GitHubでプルリクエストを提出するか、イシューをオープンしてください。</p>
+<h2 id="" class="heading-2">ライセンス</h2><p>このプロジェクトはMITライセンスの下でライセンスされています。詳細は<a href="LICENSE">LICENSE</a>ファイルを参照してください。</p>
+<hr>
+<p>SwitchShuttleを使用してターミナルコマンドを簡単に管理しましょう！</p>
+<hr>
+<p>この翻訳が役立つことを願っています。</p>
 
-    </main>
-</div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Плавная прокрутка к якорям
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Подсветка активного пункта меню через отслеживание скролла
+        const updateActiveMenuItem = () => {
+            const scrollPosition = window.scrollY + 100; // Небольшой отступ
+            
+            // Получаем все ссылки из меню
+            const menuLinks = document.querySelectorAll('.sidebar-menu a');
+            let activeLink = null;
+            
+            // Проверяем каждую ссылку из меню
+            menuLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && href.startsWith('#')) {
+                    const targetId = href.substring(1);
+                    const targetElement = document.getElementById(targetId);
+                    
+                    if (targetElement) {
+                        const elementTop = targetElement.offsetTop;
+                        
+                        if (elementTop <= scrollPosition) {
+                            activeLink = link;
+                        }
+                    }
+                }
+            });
+            
+            // Обновляем активный пункт меню
+            menuLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+        };
+
+        // Добавляем обработчик скролла с throttling
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    updateActiveMenuItem();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+
+        // Инициализируем активный пункт при загрузке
+        updateActiveMenuItem();
+
+        // Переключение языкового меню
+        const languageBtn = document.querySelector('.language-btn');
+        const languageMenu = document.querySelector('.language-menu');
+        
+        if (languageBtn && languageMenu) {
+            languageBtn.addEventListener('click', () => {
+                languageMenu.classList.toggle('open');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!languageBtn.contains(e.target) && !languageMenu.contains(e.target)) {
+                    languageMenu.classList.remove('open');
+                }
+            });
+        }
+
+        // Мобильное меню
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const sidebar = document.querySelector('.sidebar');
+        
+        if (mobileMenuBtn && sidebar) {
+            mobileMenuBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('mobile-open');
+            });
+        }
+    </script>
 </body>
 </html>
