@@ -1,101 +1,97 @@
-![SwitchShuttle](https://raw.githubusercontent.com/s00d/switchshuttle/refs/heads/main/icons/logo-min.png)
-![intro](https://github.com/s00d/switchshuttle/blob/main/icons/intro.gif?raw=true)
+<div align="center">
+  <img src="https://raw.githubusercontent.com/s00d/switchshuttle/refs/heads/main/icons/logo-min.png" alt="SwitchShuttle Logo" width="200">
+  
+  # SwitchShuttle
+  
+  **🚀 带全局热键的跨平台终端命令管理器**
+  
+  [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-blue.svg)](https://github.com/s00d/switchshuttle)
+  [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+  [![Release](https://img.shields.io/github/v/release/s00d/switchshuttle)](https://github.com/s00d/switchshuttle/releases)
+  [![Downloads](https://img.shields.io/github/downloads/s00d/switchshuttle/total)](https://github.com/s00d/switchshuttle/releases)
+  
+  <img src="https://github.com/s00d/switchshuttle/blob/main/icons/intro.gif?raw=true" alt="SwitchShuttle Demo" width="600">
+  
+  <div>
+    <a href="README.md">🇺🇸 English</a> • 
+    <a href="README_ZH.md">🇨🇳 中文</a> • 
+    <a href="README_RU.md">🇷🇺 Русский</a> • 
+    <a href="README_DE.md">🇩🇪 Deutsch</a> • 
+    <a href="README_JA.md">🇯🇵 日本語</a>
+  </div>
+</div>
 
-<span class="locale">
-  <a href="README.md">English</a> | 
-  <a href="README_ZH.md">中文</a> | 
-  <a href="README_RU.md">Русский</a> | 
-  <a href="README_DE.md">Deutsch</a> | 
-  <a href="README_JA.md">日本語</a>
-</span>
+---
 
-## SwitchShuttle
+## ✨ 什么是 SwitchShuttle？
 
-SwitchShuttle 是一个跨平台系统托盘应用程序，允许用户在各种终端应用程序中运行预定义的命令。它支持 macOS、Windows 和 Linux，提供了一种简单且可定制的方式来管理和执行您经常使用的命令。
+SwitchShuttle 是一个强大的跨平台系统托盘应用程序，它彻底改变了您管理和执行终端命令的方式。使用现代技术（Rust + Tauri + Vue.js）构建，它提供了一个优雅的界面来组织、自定义和快速访问您最常用的终端操作。
 
-## 关于
+### 🎯 主要功能
 
-SwitchShuttle 是对 [Shuttle](https://github.com/fitztrev/shuttle) 应用程序的重新构想和扩展。虽然 Shuttle 提供了一种简单有效的方式来管理 macOS 中的命令快捷方式，但 SwitchShuttle 在这一概念基础上进行了扩展，提供对多种操作系统和终端模拟器的支持，并增强了配置和用户自定义功能。
+- **🖥️ 多平台支持** - 在 macOS、Windows 和 Linux 上无缝运行
+- **⚡ 全局热键** - 使用键盘快捷键从任何地方立即执行命令
+- **🎨 多终端支持** - iTerm、Terminal、Warp、Alacritty、Hyper 等
+- **📁 智能组织** - 创建嵌套子菜单以更好地组织命令
+- **🔧 动态输入** - 需要用户输入的命令的交互式提示
+- **🔄 多种执行模式** - 在当前窗口、新标签页或新窗口中执行
+- **🚀 自动启动** - 系统启动时启动以立即访问
+- **🎨 现代界面** - 使用 Vue.js 构建的美丽直观界面
 
-## 功能
+## 🚀 快速开始
 
-- 支持多种终端应用程序：iTerm、Terminal、Warp, Alacritty, Hyper。
-- 在不同模式下运行命令：当前窗口、新标签页、新窗口。
-- 切换登录时启动。
-- 直接从托盘菜单编辑配置。
-- 从托盘菜单打开配置文件夹。
-- 支持子菜单以更好地组织命令。
-- 支持命令的动态输入。
-- **新功能**：通过热键触发上下文菜单。
+### 下载和安装
 
-## 配置
+1. **下载** 从 [GitHub Releases](https://github.com/s00d/switchshuttle/releases) 下载您平台的最新版本
+2. **安装** 应用程序
+3. **启动** SwitchShuttle - 它将出现在系统托盘中
+4. **右键点击** 托盘图标访问菜单
 
-配置存储在用户配置目录中的 JSON 文件中。默认路径为 Linux 和 macOS 上的 `~/.config/switch-shuttle/`，Windows 上的 `C:\Users\<Username>\AppData\Roaming\switch-shuttle\`。您可以在该目录中存储多个配置文件，每个配置文件代表一组不同的命令和设置。
+### 首次配置
 
-以下是一个配置文件示例：
+1. **编辑配置** → 在默认编辑器中打开配置文件
+2. **添加命令** 使用 JSON 格式（见下面的示例）
+3. **保存并重启** 应用程序
+4. **享受** 您组织的命令快捷方式！
+
+## 📋 配置指南
+
+### 基本结构
+
+SwitchShuttle 使用 JSON 配置文件，存储在：
+- **macOS/Linux**: `~/.config/switch-shuttle/`
+- **Windows**: `C:\Users\<Username>\AppData\Roaming\switch-shuttle\`
+
+### 简单示例
 
 ```json
 {
   "terminal": "iterm",
-  "launch_in": "current",
-  "theme": "Homebrew",
-  "title": "新标签页",
-  "menu_hotkey": "Ctrl+Shift+M",
+  "launch_in": "new_tab",
+  "title": "我的命令",
   "commands": [
     {
-      "name": "命令",
-      "inputs": null,
-      "command": null,
-      "commands": null,
-      "hotkey": null,
+      "name": "🚀 启动开发服务器",
+      "command": "npm run dev",
+      "hotkey": "Ctrl+Shift+D"
+    },
+    {
+      "name": "📦 安装依赖",
+      "command": "npm install",
+      "hotkey": "Ctrl+Shift+I"
+    },
+    {
+      "name": "🔧 开发工具",
       "submenu": [
         {
-          "name": "示例命令",
-          "inputs": null,
-          "command": "echo 你好，世界！",
-          "commands": null,
-          "submenu": null,
-          "hotkey": "Ctrl+Shift+E"
+          "name": "🧪 运行测试",
+          "command": "npm test",
+          "hotkey": "Ctrl+Shift+T"
         },
         {
-          "name": "带输入的示例多命令",
-          "inputs": {
-            "key1": "默认值1",
-            "key2": "默认值2"
-          },
-          "command": null,
-          "commands": [
-            "export MY_VAR=$(echo '步骤1: [key1]')",
-            "RESULT=$(echo '步骤2: [key2]' && echo $MY_VAR)",
-            "echo 步骤3: 完成 && echo $RESULT"
-          ],
-          "submenu": null,
-          "hotkey": "Ctrl+Shift+M"
-        },
-        {
-          "name": "示例子菜单",
-          "inputs": null,
-          "command": null,
-          "commands": null,
-          "submenu": [
-            {
-              "name": "子命令1",
-              "inputs": null,
-              "command": "echo 子命令1",
-              "commands": null,
-              "submenu": null,
-              "hotkey": "Ctrl+Shift+S"
-            },
-            {
-              "name": "子命令2",
-              "inputs": null,
-              "command": "echo 子命令2",
-              "commands": null,
-              "submenu": null,
-              "hotkey": null
-            }
-          ],
-          "hotkey": null
+          "name": "📊 构建项目",
+          "command": "npm run build",
+          "hotkey": "Ctrl+Shift+B"
         }
       ]
     }
@@ -103,152 +99,208 @@ SwitchShuttle 是对 [Shuttle](https://github.com/fitztrev/shuttle) 应用程序
 }
 ```
 
-### 配置参数
+### 高级功能
 
-| 参数          | 类型                | 描述           | 有效值                                |
-|-------------|-------------------|--------------|------------------------------------|
-| terminal    | String            | 使用的终端应用程序    | "iterm", "terminal", "warp"        |
-| launch_in   | String            | 命令启动位置       | "current", "new_tab", "new_window" |
-| theme       | String            | 终端支持的主题      | 表示主题的任何字符串值                        |
-| title       | String            | 终端窗口/标签页的标题  | 任何字符串值                             |
-| menu_hotkey | String (Optional) | 触发上下文菜单的全局热键 | 任何有效的热键组合，例如 "Ctrl+Shift+M"        |
-| commands    | Array             | 命令配置列表       | 参见下方的命令参数                          |
+#### 🔧 动态输入
 
-### 命令参数
-
-| 参数       | 类型                | 描述               | 有效值                                      |
-|----------|-------------------|------------------|------------------------------------------|
-| name     | String            | 命令或子菜单的名称        | 任何字符串值                                   |
-| inputs   | Object (Optional) | 输入的键值对           | {"key1": "default1", "key2": "default2"} |
-| command  | String (Optional) | 要执行的命令（如果这是一个命令） | 表示命令的任何字符串值                              |
-| commands | Array (Optional)  | 顺序执行的命令列表        | 任何字符串数组，每个字符串都是一个命令                      |
-| submenu  | Array (Optional)  | 子命令列表（如果这是一个子菜单） | 参见上方的命令参数                                |
-| hotkey   | String (Optional) | 触发命令的全局热键        | 任何有效的热键组合，例如 "Ctrl+Shift+E"              |
-
-### 命令执行逻辑
-
-SwitchShuttle 支持使用 `command` 参数定义单个命令，使用 `commands` 参数定义命令列表，或同时使用这两个参数。如果同时指定了 `command` 和 `commands`，则先执行单个命令，然后执行列表中的命令。
-
-#### 执行示例流程
-
-1. **单个命令**：如果仅指定了 `command`，则执行该命令。
-2. **多个命令**：如果仅指定了 `commands`，则按顺序执行列表中的每个命令。
-3. **同时指定**：如果同时指定了 `command` 和 `commands`，则先执行单个命令，然后按顺序执行 `commands` 列表中的每个命令。
-
-### 动态输入
-
-SwitchShuttle 允许您为命令定义动态输入。在执行命令之前，这些输入将从用户处获取。您可以使用命令配置中的 `inputs` 参数来定义输入。
-
-#### 带有输入的示例配置
+创建提示用户输入的交互式命令：
 
 ```json
 {
-  "name": "带输入的示例多命令",
+  "name": "📝 创建新组件",
   "inputs": {
-    "key1": "默认值1",
-    "key2": "默认值2"
+    "componentName": "MyComponent",
+    "componentType": "functional"
   },
-  "command": null,
   "commands": [
-    "export MY_VAR=$(echo '步骤1: [key1]')",
-    "RESULT=$(echo '步骤2: [key2]' && echo $MY_VAR)",
-    "echo 步骤3: 完成 && echo $RESULT"
+    "mkdir -p src/components/[componentName]",
+    "touch src/components/[componentName]/index.tsx",
+    "echo 'import React from \"react\";' > src/components/[componentName]/index.tsx",
+    "echo 'export const [componentName] = () => <div>[componentName]</div>;' >> src/components/[componentName]/index.tsx"
   ],
-  "submenu": null,
-  "hotkey": "Ctrl+Shift+M"
+  "hotkey": "Ctrl+Shift+N"
 }
 ```
 
-### 热键
+#### 🔄 多命令
 
-您可以通过在命令配置中添加 `hotkey` 参数来为命令分配全局热键。热键组合必须遵循修饰键（Ctrl、Shift、Alt、Win）与键（A-Z、0-9 等）相结合的格式。例如，要为命令设置 "Ctrl+Shift+E" 作为热键：
+执行命令序列：
 
 ```json
 {
-  "name": "示例命令",
-  "command": "echo 你好，世界！",
-  "submenu": null,
-  "hotkey": "Ctrl+Shift+E",
-  "commands": null
+  "name": "🔄 完整开发周期",
+  "commands": [
+    "git pull origin main",
+    "npm install",
+    "npm run lint",
+    "npm run test",
+    "npm run build"
+  ],
+  "hotkey": "Ctrl+Shift+F"
 }
 ```
 
-参数 `hotkey` 是可选的。如果没有指定，该命令将没有与之关联的全局热键。
+#### 📁 嵌套子菜单
 
-### 如何使用热键
+在层次菜单中组织命令：
 
-1. **分配热键**：编辑配置文件，以包含 `hotkey` 参数，为您希望通过全局热键触发的命令。
-2. **使用热键**：重新启动应用程序后，使用分配的热键触发相应的命令，无论当前焦点在哪个应用程序上。
+```json
+{
+  "name": "🐳 Docker 操作",
+  "submenu": [
+    {
+      "name": "🚀 启动服务",
+      "submenu": [
+        {
+          "name": "🏗️ 开发",
+          "command": "docker-compose -f docker-compose.dev.yml up -d"
+        },
+        {
+          "name": "🏭 生产",
+          "command": "docker-compose -f docker-compose.prod.yml up -d"
+        }
+      ]
+    },
+    {
+      "name": "🛑 停止所有",
+      "command": "docker-compose down"
+    }
+  ]
+}
+```
 
-## 如何使用
+## ⚙️ 配置参考
 
-1. **Edit Config**：右键单击托盘图标并选择 "Edit Config" 以在默认编辑器中打开配置文件。根据需要修改配置。
-2. **Show Config Folder**：右键单击托盘图标并选择 "Show Config Folder" 以在文件管理器中打开配置目录。
-3. **Toggle Launch at Login**：右键单击托盘图标并选择 "Toggle Launch at Login" 以启用或禁用应用程序在登录时启动。
-4. **Execute Command**：左键单击托盘图标并从菜单
+### 主配置
 
-中选择您要执行的命令。该命令将在指定的终端应用程序中执行。
+| 参数 | 类型 | 描述 | 默认值 |
+|------|------|------|--------|
+| `terminal` | String | 使用的终端应用程序 | `"terminal"` |
+| `launch_in` | String | 命令启动位置 | `"current"` |
+| `theme` | String | 终端主题（如果支持） | - |
+| `title` | String | 窗口/标签页标题 | - |
+| `menu_hotkey` | String | 打开菜单的全局热键 | - |
+| `commands` | Array | 命令配置列表 | `[]` |
 
-### 创建子菜单
+### 终端选项
 
-要创建子菜单，请将 `command` 字段设置为 `null` 并在 `submenu` 字段中提供子命令列表。子命令也可以有自己的子菜单，从而允许嵌套菜单。
+| 终端 | macOS | Windows | Linux |
+|------|-------|---------|-------|
+| `iterm` | ✅ | ❌ | ❌ |
+| `terminal` | ✅ | ✅ | ✅ |
+| `warp` | ✅ | ❌ | ❌ |
+| `alacritty` | ✅ | ✅ | ✅ |
+| `hyper` | ✅ | ✅ | ✅ |
 
-## 构建应用程序
+### 启动模式
+
+| 模式 | 描述 |
+|------|------|
+| `current` | 在当前终端窗口中执行 |
+| `new_tab` | 打开新标签页并执行 |
+| `new_window` | 打开新窗口并执行 |
+
+### 命令配置
+
+| 参数 | 类型 | 必需 | 描述 |
+|------|------|------|------|
+| `name` | String | ✅ | 命令的显示名称 |
+| `command` | String | ❌ | 要执行的单个命令 |
+| `commands` | Array | ❌ | 要执行的多个命令 |
+| `submenu` | Array | ❌ | 嵌套子命令 |
+| `inputs` | Object | ❌ | 动态输入字段 |
+| `hotkey` | String | ❌ | 全局热键 |
+
+## 🎯 使用场景
+
+### 👨‍💻 开发者
+- **快速项目导航** - 立即跳转到不同项目
+- **构建和测试工作流** - 一键开发周期
+- **Docker 管理** - 使用热键启动/停止容器
+- **Git 操作** - 常用 Git 命令触手可及
+
+### 🛠️ DevOps 工程师
+- **服务器管理** - SSH 连接和服务器命令
+- **监控工具** - 快速访问日志和指标
+- **部署脚本** - 自动化部署工作流
+- **数据库操作** - 常用数据库命令
+
+### 🎨 设计师
+- **资源优化** - 图像处理和优化
+- **设计系统工具** - 组件生成和更新
+- **原型服务器** - 快速设计服务器启动
+
+## 🔧 从源码构建
 
 ### 先决条件
 
-- [Rust](https://www.rust-lang.org/tools/install)
-- [Tauri](https://tauri.app/v1/guides/getting-started/prerequisites/)
+- [Rust](https://www.rust-lang.org/tools/install) (最新稳定版)
+- [Node.js](https://nodejs.org/) (v16 或更高)
+- [Tauri CLI](https://tauri.app/v1/guides/getting-started/prerequisites/)
 
-### 步骤
+### 构建步骤
 
-1. 克隆存储库：
-```sh
+```bash
+# 克隆仓库
 git clone https://github.com/s00d/switchshuttle.git
 cd switchshuttle
-npm i
+
+# 安装依赖
+npm install
+
+# 开发模式
+npm run tauri dev
+
+# 生产构建
+npm run tauri build
 ```
 
-2. 构建应用程序：
-```sh
-cargo tauri build
-```
+### 平台特定说明
 
-3. 运行应用程序：
-```sh
-cargo tauri dev
-```
-
-## 下载
-
-可以从 [GitHub Releases](https://github.com/s00d/switchshuttle/releases) 页面下载最新版本的 SwitchShuttle。
-
-### macOS
-
-应用程序签名
-
-如果您使用的是 macOS，可能需要在运行应用程序之前对其进行签名。步骤如下：
-
-1. 使二进制文件可执行：
-
+#### macOS
 ```bash
+# 如果遇到签名问题
 chmod +x /Applications/switch-shuttle.app
+xattr -cr /Applications/switch-shuttle.app
+codesign --force --deep --sign - /Applications/switch-shuttle.app
 ```
 
-2. 清除扩展属性并签署二进制文件：
+## 🤝 贡献
 
-```bash
-xattr -cr /Applications/switch-shuttle.app && codesign --force --deep --sign - /Applications/switch-shuttle.app
-```
+我们欢迎贡献！以下是您可以提供帮助的方式：
 
-## 贡献
+1. **Fork** 仓库
+2. **创建** 功能分支 (`git checkout -b feature/amazing-feature`)
+3. **提交** 您的更改 (`git commit -m 'Add amazing feature'`)
+4. **推送** 到分支 (`git push origin feature/amazing-feature`)
+5. **打开** Pull Request
 
-欢迎贡献！请随时提交拉取请求或在 GitHub 上打开问题。
+### 开发指南
 
-## 许可证
+- 遵循现有代码风格
+- 为新功能添加测试
+- 根据需要更新文档
+- 确保跨平台兼容性
 
-本项目依据 MIT 许可证授权。详情请参见 [LICENSE](LICENSE) 文件。
+## 📄 许可证
+
+本项目在 MIT 许可证下授权 - 详情请参阅 [LICENSE](LICENSE) 文件。
+
+## 🙏 致谢
+
+- 受原始 [Shuttle](https://github.com/fitztrev/shuttle) 项目启发
+- 使用 [Tauri](https://tauri.app/) 构建跨平台桌面应用
+- UI 由 [Vue.js](https://vuejs.org/) 驱动
+
+## 📞 支持
+
+- **Issues**: [GitHub Issues](https://github.com/s00d/switchshuttle/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/s00d/switchshuttle/discussions)
+- **Releases**: [GitHub Releases](https://github.com/s00d/switchshuttle/releases)
 
 ---
 
-享受使用 SwitchShuttle 轻松管理您的终端命令吧！
+<div align="center">
+  <p>由 SwitchShuttle 社区用 ❤️ 制作</p>
+  <p>⭐ 如果这个仓库对您有用，请给它一个星标！</p>
+</div>

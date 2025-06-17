@@ -88,24 +88,90 @@ const languageNames = {
     'zh': '中文'
 };
 
-const cleanMarkdown = (markdown) => {
+const cleanMarkdownForHeaders = (markdown) => {
     return markdown
+        // Удаление HTML-блоков с командами и примерами
+        .replace(/```bash[\s\S]*?```/g, '') // Удаляем блоки кода bash
+        .replace(/```json[\s\S]*?```/g, '') // Удаляем блоки кода json
+        .replace(/```[\s\S]*?```/g, '') // Удаляем все остальные блоки кода
+        .replace(/<div[\s\S]*?<\/div>/g, '') // Удаляем div блоки
+        .replace(/<span[\s\S]*?<\/span>/g, '') // Удаляем span блоки
+        .replace(/<img[\s\S]*?>/g, '') // Удаляем img теги
+        .replace(/<a[\s\S]*?<\/a>/g, '') // Удаляем ссылки
+        .replace(/<svg[\s\S]*?<\/svg>/g, '') // Удаляем SVG
+        .replace(/<path[\s\S]*?>/g, '') // Удаляем path теги
+        .replace(/<button[\s\S]*?<\/button>/g, '') // Удаляем button теги
+        .replace(/<nav[\s\S]*?<\/nav>/g, '') // Удаляем nav блоки
+        .replace(/<header[\s\S]*?<\/header>/g, '') // Удаляем header блоки
+        .replace(/<aside[\s\S]*?<\/aside>/g, '') // Удаляем aside блоки
+        .replace(/<main[\s\S]*?<\/main>/g, '') // Удаляем main блоки
+        .replace(/<footer[\s\S]*?<\/footer>/g, '') // Удаляем footer блоки
+        .replace(/<script[\s\S]*?<\/script>/g, '') // Удаляем script блоки
+        .replace(/<style[\s\S]*?<\/style>/g, '') // Удаляем style блоки
+        .replace(/<link[\s\S]*?>/g, '') // Удаляем link теги
+        .replace(/<meta[\s\S]*?>/g, '') // Удаляем meta теги
+        .replace(/<title[\s\S]*?<\/title>/g, '') // Удаляем title теги
+        .replace(/<head[\s\S]*?<\/head>/g, '') // Удаляем head блоки
+        .replace(/<body[\s\S]*?<\/body>/g, '') // Удаляем body блоки
+        .replace(/<html[\s\S]*?<\/html>/g, '') // Удаляем html блоки
+        .replace(/<!DOCTYPE[\s\S]*?>/g, '') // Удаляем DOCTYPE
+        .replace(/<!--[\s\S]*?-->/g, '') // Удаляем комментарии
+        // Удаление разделов, которые не должны быть в меню
         .replace(/## License[\s\S]*?(?=\n## |$)/g, '') // Удаление раздела License
+        .replace(/## Contributing[\s\S]*?(?=\n## |$)/g, '') // Удаление раздела Contributing
+        .replace(/## Support[\s\S]*?(?=\n## |$)/g, '') // Удаление раздела Support
+        .replace(/## Acknowledgments[\s\S]*?(?=\n## |$)/g, '') // Удаление раздела Acknowledgments
+        .replace(/## Download[\s\S]*?(?=\n## |$)/g, '') // Удаление раздела Download
+        .replace(/## Building[\s\S]*?(?=\n## |$)/g, '') // Удаление раздела Building
+        .replace(/## Prerequisites[\s\S]*?(?=\n## |$)/g, '') // Удаление раздела Prerequisites
+        .replace(/## Steps[\s\S]*?(?=\n## |$)/g, '') // Удаление раздела Steps
+        .replace(/## Build Steps[\s\S]*?(?=\n## |$)/g, '') // Удаление раздела Build Steps
+        .replace(/## Platform-Specific Notes[\s\S]*?(?=\n## |$)/g, '') // Удаление раздела Platform-Specific Notes
+        .replace(/## Development Guidelines[\s\S]*?(?=\n## |$)/g, '') // Удаление раздела Development Guidelines
         .replace(/<span class="locale">[\s\S]*?<\/span>/g, ''); // Удаление переключений языков
+};
+
+const cleanMarkdownForContent = (markdown) => {
+    return markdown
+        // Удаляем только переключения языков, но сохраняем все остальное
+        .replace(/<span class="locale">[\s\S]*?<\/span>/g, '') // Удаление переключений языков
+        .replace(/<div class="locale">[\s\S]*?<\/div>/g, ''); // Удаление переключений языков
 };
 
 // Функция для извлечения заголовков из Markdown
 const extractHeaders = (markdown) => {
     const lines = markdown.split('\n');
     const headers = lines
-        .filter(line => line.startsWith('#'))
+        .filter(line => {
+            // Проверяем, что строка начинается с # и содержит текст
+            const isHeader = line.match(/^#{1,6}\s+/);
+            if (!isHeader) return false;
+            
+            // Извлекаем текст заголовка
+            const text = line.replace(/^#{1,6}\s+/, '').trim();
+            
+            // Игнорируем пустые заголовки
+            if (!text) return false;
+            
+            // Игнорируем заголовки, которые содержат только специальные символы
+            if (/^[^\wа-яёА-ЯЁ]*$/.test(text)) return false;
+            
+            // Игнорируем заголовки, которые выглядят как команды или пути
+            if (text.includes('```') || text.includes('npm') || text.includes('git') || 
+                text.includes('chmod') || text.includes('xattr') || text.includes('codesign')) {
+                return false;
+            }
+            
+            return true;
+        })
         .map(line => {
             const level = line.match(/^#+/)[0].length;
-            const text = line.replace(/^#+\s*/, '');
+            const text = line.replace(/^#+\s*/, '').trim();
             const id = transliterate(text);
             return { level, text, id };
         })
-        .filter(header => header.level <= 2); // Только h1 и h2
+        .filter(header => header.level <= 2 && header.text.length > 0); // Только h1 и h2 с непустым текстом
+    
     return headers;
 };
 
@@ -130,12 +196,16 @@ const generateHtmlForLanguage = (lang, inputPath, outputPath) => {
             return;
         }
 
-        data = cleanMarkdown(data);
-
-        // Преобразование Markdown в HTML
-        const htmlContent = marked(data, { renderer });
-        const headers = extractHeaders(data);
+        // Очищаем markdown для извлечения заголовков (удаляем HTML)
+        const cleanDataForHeaders = cleanMarkdownForHeaders(data);
+        const headers = extractHeaders(cleanDataForHeaders);
         const menuHtml = generateMenu(headers);
+
+        // Очищаем markdown для контента (сохраняем изображения)
+        const cleanDataForContent = cleanMarkdownForContent(data);
+        
+        // Преобразование Markdown в HTML
+        const htmlContent = marked(cleanDataForContent, { renderer });
 
         // Генерация языкового меню
         const languageMenu = Object.entries(readmeFiles).map(([code, _]) => {

@@ -65,43 +65,53 @@
                 <nav class="sidebar-nav">
                     <ul class="sidebar-menu">
                         <li class="menu-item level-2 indent-1">
-            <a href="#switchshuttle" class="menu-link">
-                <span class="menu-text">SwitchShuttle</span>
+            <a href="#what-is-switchshuttle" class="menu-link">
+                <span class="menu-text">✨ What is SwitchShuttle?</span>
             </a>
         </li>
 <li class="menu-item level-2 indent-1">
-            <a href="#about" class="menu-link">
-                <span class="menu-text">About</span>
+            <a href="#quick-start" class="menu-link">
+                <span class="menu-text">🚀 Quick Start</span>
             </a>
         </li>
 <li class="menu-item level-2 indent-1">
-            <a href="#features" class="menu-link">
-                <span class="menu-text">Features</span>
+            <a href="#configuration-guide" class="menu-link">
+                <span class="menu-text">📋 Configuration Guide</span>
             </a>
         </li>
 <li class="menu-item level-2 indent-1">
-            <a href="#configuration" class="menu-link">
-                <span class="menu-text">Configuration</span>
+            <a href="#configuration-reference" class="menu-link">
+                <span class="menu-text">⚙️ Configuration Reference</span>
             </a>
         </li>
 <li class="menu-item level-2 indent-1">
-            <a href="#how-to-use" class="menu-link">
-                <span class="menu-text">How to Use</span>
+            <a href="#use-cases" class="menu-link">
+                <span class="menu-text">🎯 Use Cases</span>
             </a>
         </li>
 <li class="menu-item level-2 indent-1">
-            <a href="#building-the-application" class="menu-link">
-                <span class="menu-text">Building the Application</span>
-            </a>
-        </li>
-<li class="menu-item level-2 indent-1">
-            <a href="#download" class="menu-link">
-                <span class="menu-text">Download</span>
+            <a href="#building-from-source" class="menu-link">
+                <span class="menu-text">🔧 Building from Source</span>
             </a>
         </li>
 <li class="menu-item level-2 indent-1">
             <a href="#contributing" class="menu-link">
-                <span class="menu-text">Contributing</span>
+                <span class="menu-text">🤝 Contributing</span>
+            </a>
+        </li>
+<li class="menu-item level-2 indent-1">
+            <a href="#license" class="menu-link">
+                <span class="menu-text">📄 License</span>
+            </a>
+        </li>
+<li class="menu-item level-2 indent-1">
+            <a href="#acknowledgments" class="menu-link">
+                <span class="menu-text">🙏 Acknowledgments</span>
+            </a>
+        </li>
+<li class="menu-item level-2 indent-1">
+            <a href="#support" class="menu-link">
+                <span class="menu-text">📞 Support</span>
             </a>
         </li>
                     </ul>
@@ -111,245 +121,343 @@
             <!-- Content -->
             <main class="content">
                 <div class="content-wrapper">
-                    <p><img src="https://raw.githubusercontent.com/s00d/switchshuttle/refs/heads/main/icons/logo-min.png" alt="SwitchShuttle">
-<img src="https://github.com/s00d/switchshuttle/blob/main/icons/intro.gif?raw=true" alt="intro"></p>
-<h2 id="switchshuttle" class="heading-2">SwitchShuttle</h2><p>SwitchShuttle is a cross-platform system tray application that allows users to run predefined commands in various terminal applications. It supports macOS, Windows, and Linux, offering a simple and customizable way to manage and execute your frequently used commands.</p>
-<h2 id="about" class="heading-2">About</h2><p>SwitchShuttle is a reimagining and extension of the <a href="https://github.com/fitztrev/shuttle">Shuttle</a> application. While Shuttle provides a simple and effective way to manage commands shortcuts in macOS, SwitchShuttle expands upon this concept, offering support for multiple operating systems and terminal emulators, along with enhanced configuration capabilities and user customization options.</p>
-<h2 id="features" class="heading-2">Features</h2><ul>
-<li>Supports multiple terminal applications: iTerm, Terminal, Warp, Alacritty, Hyper.</li>
-<li>Run commands in different modes: current window, new tab, new window.</li>
-<li>Toggle launch at login.</li>
-<li>Edit configuration directly from the tray menu.</li>
-<li>Open configuration folder from the tray menu.</li>
-<li>Supports submenus for better organization of commands.</li>
-<li>Supports dynamic inputs for commands.</li>
-<li><strong>New</strong>: Trigger context menu with a hotkey.</li>
+                    <div align="center">
+  <img src="https://raw.githubusercontent.com/s00d/switchshuttle/refs/heads/main/icons/logo-min.png" alt="SwitchShuttle Logo" width="600">
+  
+<h1 id="switchshuttle" class="heading-1">SwitchShuttle</h1><p>  <strong>🚀 Cross-platform terminal command manager with global hotkeys</strong></p>
+<p>  <a href="https://github.com/s00d/switchshuttle"><img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-blue.svg" alt="Platform"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License"></a>
+  <a href="https://github.com/s00d/switchshuttle/releases"><img src="https://img.shields.io/github/v/release/s00d/switchshuttle" alt="Release"></a>
+  <a href="https://github.com/s00d/switchshuttle/releases"><img src="https://img.shields.io/github/downloads/s00d/switchshuttle/total" alt="Downloads"></a></p>
+  <img src="https://github.com/s00d/switchshuttle/blob/main/icons/intro.gif?raw=true" alt="SwitchShuttle Demo" width="600">
+  
+</div>
+
+<hr>
+<h2 id="what-is-switchshuttle" class="heading-2">✨ What is SwitchShuttle?</h2><p>SwitchShuttle is a powerful cross-platform system tray application that revolutionizes how you manage and execute terminal commands. Built with modern technologies (Rust + Tauri + Vue.js), it provides a sleek interface for organizing, customizing, and quickly accessing your most-used terminal operations.</p>
+<h3 id="key-features" class="heading-3">🎯 Key Features</h3><ul>
+<li><strong>🖥️ Multi-Platform Support</strong> - Works seamlessly on macOS, Windows, and Linux</li>
+<li><strong>⚡ Global Hotkeys</strong> - Execute commands instantly from anywhere with keyboard shortcuts</li>
+<li><strong>🎨 Multiple Terminal Support</strong> - iTerm, Terminal, Warp, Alacritty, Hyper, and more</li>
+<li><strong>📁 Smart Organization</strong> - Create nested submenus for better command organization</li>
+<li><strong>🔧 Dynamic Inputs</strong> - Interactive prompts for commands that need user input</li>
+<li><strong>🔄 Multiple Execution Modes</strong> - Run in current window, new tab, or new window</li>
+<li><strong>🚀 Auto-Start</strong> - Launch at system startup for instant access</li>
+<li><strong>🎨 Modern UI</strong> - Beautiful, intuitive interface built with Vue.js</li>
 </ul>
-<h2 id="configuration" class="heading-2">Configuration</h2><p>The configuration is stored in JSON files located in the user&#39;s configuration directory. The default path is <code>~/.config/switch-shuttle/</code> on Linux and macOS, and <code>C:\Users\&lt;Username&gt;\AppData\Roaming\switch-shuttle\</code> on Windows. You can store multiple configuration files in this directory, each representing a different set of commands and settings.</p>
-<p>Here is an example of a configuration file:</p>
-<pre class="code-block"><code class="language-json">{
+<h2 id="quick-start" class="heading-2">🚀 Quick Start</h2><h3 id="download-amp-install" class="heading-3">Download &amp; Install</h3><ol>
+<li><strong>Download</strong> the latest release for your platform from <a href="https://github.com/s00d/switchshuttle/releases">GitHub Releases</a></li>
+<li><strong>Install</strong> the application</li>
+<li><strong>Launch</strong> SwitchShuttle - it will appear in your system tray</li>
+<li><strong>Right-click</strong> the tray icon to access the menu</li>
+</ol>
+<h3 id="first-configuration" class="heading-3">First Configuration</h3><ol>
+<li><strong>Edit Config</strong> → Opens your configuration file in your default editor</li>
+<li><strong>Add your commands</strong> using the JSON format (see examples below)</li>
+<li><strong>Save and restart</strong> the application</li>
+<li><strong>Enjoy</strong> your organized command shortcuts!</li>
+</ol>
+<h2 id="configuration-guide" class="heading-2">📋 Configuration Guide</h2><h3 id="basic-structure" class="heading-3">Basic Structure</h3><p>SwitchShuttle uses JSON configuration files stored in:</p>
+<ul>
+<li><strong>macOS/Linux</strong>: <code>~/.config/switch-shuttle/</code></li>
+<li><strong>Windows</strong>: <code>C:\Users\&lt;Username&gt;\AppData\Roaming\switch-shuttle\</code></li>
+</ul>
+<h3 id="simple-example" class="heading-3">Simple Example</h3><pre class="code-block"><code class="language-json">{
   "terminal": "iterm",
-  "launch_in": "current",
-  "theme": "Homebrew",
-  "title": "New tab",
-  "menu_hotkey": "Ctrl+Shift+M",
+  "launch_in": "new_tab",
+  "title": "My Commands",
   "commands": [
     {
-      "name": "Command",
-      "inputs": null,
-      "command": null,
-      "commands": null,
-      "hotkey": null,
+      "name": "🚀 Start Development Server",
+      "command": "npm run dev",
+      "hotkey": "Ctrl+Shift+D"
+    },
+    {
+      "name": "📦 Install Dependencies",
+      "command": "npm install",
+      "hotkey": "Ctrl+Shift+I"
+    },
+    {
+      "name": "🔧 Development Tools",
       "submenu": [
         {
-          "name": "Example Command",
-          "inputs": null,
-          "command": "echo Hello, world!",
-          "commands": null,
-          "submenu": null,
-          "hotkey": "Ctrl+Shift+E"
+          "name": "🧪 Run Tests",
+          "command": "npm test",
+          "hotkey": "Ctrl+Shift+T"
         },
         {
-          "name": "Example Multi-Command with input",
-          "inputs": {
-            "key1": "default1",
-            "key2": "default2"
-          },
-          "command": null,
-          "commands": [
-            "export MY_VAR=$(echo 'Step 1: [key1]')",
-            "RESULT=$(echo 'Step 2: [key2]' && echo $MY_VAR)",
-            "echo Step 3: Finalize && echo $RESULT"
-          ],
-          "submenu": null,
-          "hotkey": "Ctrl+Shift+M"
-        },
-        {
-          "name": "Example Submenu",
-          "inputs": null,
-          "command": null,
-          "commands": null,
-          "submenu": [
-            {
-              "name": "Subcommand 1",
-              "inputs": null,
-              "command": "echo Subcommand 1",
-              "commands": null,
-              "submenu": null,
-              "hotkey": "Ctrl+Shift+S"
-            },
-            {
-              "name": "Subcommand 2",
-              "inputs": null,
-              "command": "echo Subcommand 2",
-              "commands": null,
-              "submenu": null,
-              "hotkey": null
-            }
-          ],
-          "hotkey": null
+          "name": "📊 Build Project",
+          "command": "npm run build",
+          "hotkey": "Ctrl+Shift+B"
         }
       ]
     }
   ]
-}</code></pre><h3 id="configuration-parameters" class="heading-3">Configuration Parameters</h3><table>
+}</code></pre><h3 id="advanced-features" class="heading-3">Advanced Features</h3><h4 id="dynamic-inputs" class="heading-4">🔧 Dynamic Inputs</h4><p>Create interactive commands that prompt for user input:</p>
+<pre class="code-block"><code class="language-json">{
+  "name": "📝 Create New Component",
+  "inputs": {
+    "componentName": "MyComponent",
+    "componentType": "functional"
+  },
+  "commands": [
+    "mkdir -p src/components/[componentName]",
+    "touch src/components/[componentName]/index.tsx",
+    "echo 'import React from \"react\";' > src/components/[componentName]/index.tsx",
+    "echo 'export const [componentName] = () => <div>[componentName]</div>;' >> src/components/[componentName]/index.tsx"
+  ],
+  "hotkey": "Ctrl+Shift+N"
+}</code></pre><h4 id="multiple-commands" class="heading-4">🔄 Multiple Commands</h4><p>Execute a sequence of commands:</p>
+<pre class="code-block"><code class="language-json">{
+  "name": "🔄 Full Development Cycle",
+  "commands": [
+    "git pull origin main",
+    "npm install",
+    "npm run lint",
+    "npm run test",
+    "npm run build"
+  ],
+  "hotkey": "Ctrl+Shift+F"
+}</code></pre><h4 id="nested-submenus" class="heading-4">📁 Nested Submenus</h4><p>Organize commands in hierarchical menus:</p>
+<pre class="code-block"><code class="language-json">{
+  "name": "🐳 Docker Operations",
+  "submenu": [
+    {
+      "name": "🚀 Start Services",
+      "submenu": [
+        {
+          "name": "🏗️ Development",
+          "command": "docker-compose -f docker-compose.dev.yml up -d"
+        },
+        {
+          "name": "🏭 Production",
+          "command": "docker-compose -f docker-compose.prod.yml up -d"
+        }
+      ]
+    },
+    {
+      "name": "🛑 Stop All",
+      "command": "docker-compose down"
+    }
+  ]
+}</code></pre><h2 id="configuration-reference" class="heading-2">⚙️ Configuration Reference</h2><h3 id="main-configuration" class="heading-3">Main Configuration</h3><table>
 <thead>
 <tr>
 <th>Parameter</th>
 <th>Type</th>
 <th>Description</th>
-<th>Valid Values</th>
+<th>Default</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>terminal</td>
+<td><code>terminal</code></td>
 <td>String</td>
-<td>The terminal application to use</td>
-<td>&quot;iterm&quot;, &quot;terminal&quot;, &quot;warp&quot;</td>
+<td>Terminal application to use</td>
+<td><code>&quot;terminal&quot;</code></td>
 </tr>
 <tr>
-<td>launch_in</td>
+<td><code>launch_in</code></td>
 <td>String</td>
-<td>Where to launch the command</td>
-<td>&quot;current&quot;, &quot;new_tab&quot;, &quot;new_window&quot;</td>
+<td>Where to launch commands</td>
+<td><code>&quot;current&quot;</code></td>
 </tr>
 <tr>
-<td>theme</td>
+<td><code>theme</code></td>
 <td>String</td>
-<td>The theme to use (if supported by the terminal)</td>
-<td>Any string value representing a theme</td>
+<td>Terminal theme (if supported)</td>
+<td>-</td>
 </tr>
 <tr>
-<td>title</td>
+<td><code>title</code></td>
 <td>String</td>
-<td>The title to set for the terminal window/tab</td>
-<td>Any string value</td>
+<td>Window/tab title</td>
+<td>-</td>
 </tr>
 <tr>
-<td>menu_hotkey</td>
-<td>String (Optional)</td>
-<td>The global hotkey to trigger the context menu</td>
-<td>Any valid hotkey combination, e.g., &quot;Ctrl+Shift+M&quot;</td>
+<td><code>menu_hotkey</code></td>
+<td>String</td>
+<td>Global hotkey to open menu</td>
+<td>-</td>
 </tr>
 <tr>
-<td>commands</td>
+<td><code>commands</code></td>
 <td>Array</td>
 <td>List of command configurations</td>
-<td>See below for command parameters</td>
+<td><code>[]</code></td>
 </tr>
 </tbody></table>
-<h3 id="command-parameters" class="heading-3">Command Parameters</h3><table>
+<h3 id="terminal-options" class="heading-3">Terminal Options</h3><table>
+<thead>
+<tr>
+<th>Terminal</th>
+<th>macOS</th>
+<th>Windows</th>
+<th>Linux</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>iterm</code></td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>terminal</code></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>warp</code></td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>alacritty</code></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>hyper</code></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+</tbody></table>
+<h3 id="launch-modes" class="heading-3">Launch Modes</h3><table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>current</code></td>
+<td>Execute in current terminal window</td>
+</tr>
+<tr>
+<td><code>new_tab</code></td>
+<td>Open new tab and execute</td>
+</tr>
+<tr>
+<td><code>new_window</code></td>
+<td>Open new window and execute</td>
+</tr>
+</tbody></table>
+<h3 id="command-configuration" class="heading-3">Command Configuration</h3><table>
 <thead>
 <tr>
 <th>Parameter</th>
 <th>Type</th>
+<th>Required</th>
 <th>Description</th>
-<th>Valid Values</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>name</td>
+<td><code>name</code></td>
 <td>String</td>
-<td>The name of the command or submenu</td>
-<td>Any string value</td>
+<td>✅</td>
+<td>Display name for the command</td>
 </tr>
 <tr>
-<td>inputs</td>
-<td>Object (Optional)</td>
-<td>Key-value pairs for inputs</td>
-<td>{&quot;key1&quot;: &quot;default1&quot;, &quot;key2&quot;: &quot;default2&quot;}</td>
+<td><code>command</code></td>
+<td>String</td>
+<td>❌</td>
+<td>Single command to execute</td>
 </tr>
 <tr>
-<td>command</td>
-<td>String (Optional)</td>
-<td>The command to execute (if this is a command)</td>
-<td>Any string value representing a command</td>
+<td><code>commands</code></td>
+<td>Array</td>
+<td>❌</td>
+<td>Multiple commands to execute</td>
 </tr>
 <tr>
-<td>commands</td>
-<td>Array (Optional)</td>
-<td>List of commands to execute sequentially</td>
-<td>Any array of strings, each string a command</td>
+<td><code>submenu</code></td>
+<td>Array</td>
+<td>❌</td>
+<td>Nested subcommands</td>
 </tr>
 <tr>
-<td>submenu</td>
-<td>Array (Optional)</td>
-<td>List of subcommands (if this is a submenu)</td>
-<td>See above for command parameters</td>
+<td><code>inputs</code></td>
+<td>Object</td>
+<td>❌</td>
+<td>Dynamic input fields</td>
 </tr>
 <tr>
-<td>hotkey</td>
-<td>String (Optional)</td>
-<td>The global hotkey to trigger the command</td>
-<td>Any valid hotkey combination, e.g., &quot;Ctrl+Shift+E&quot;</td>
+<td><code>hotkey</code></td>
+<td>String</td>
+<td>❌</td>
+<td>Global hotkey shortcut</td>
 </tr>
 </tbody></table>
-<h3 id="command-execution-logic" class="heading-3">Command Execution Logic</h3><p>SwitchShuttle supports defining a single command using the <code>command</code> parameter, a list of commands using the <code>commands</code> parameter, or both. If both <code>command</code> and <code>commands</code> are specified, the single command will be executed first, followed by the commands in the list.</p>
-<h4 id="example-execution-flow" class="heading-4">Example Execution Flow</h4><ol>
-<li><strong>Single Command</strong>: If only <code>command</code> is specified, that command is executed.</li>
-<li><strong>Multiple Commands</strong>: If only <code>commands</code> is specified, each command in the list is executed sequentially.</li>
-<li><strong>Both Command and Commands</strong>: If both <code>command</code> and <code>commands</code> are specified, the single command is executed first, followed by each command in the <code>commands</code> list.</li>
-</ol>
-<h3 id="dynamic-inputs" class="heading-3">Dynamic Inputs</h3><p>SwitchShuttle allows you to define dynamic inputs for commands. These inputs will be requested from the user before the command is executed. You can define inputs using the <code>inputs</code> parameter in the command configuration.</p>
-<h4 id="example-configuration-with-inputs" class="heading-4">Example Configuration with Inputs</h4><pre class="code-block"><code class="language-json">{
-  "name": "Example Multi-Command with input",
-  "inputs": {
-    "key1": "default1",
-    "key2": "default2"
-  },
-  "command": null,
-  "commands": [
-    "export MY_VAR=$(echo 'Step 1: [key1]')",
-    "RESULT=$(echo 'Step 2: [key2]' && echo $MY_VAR)",
-    "echo Step 3: Finalize && echo $RESULT"
-  ],
-  "submenu": null,
-  "hotkey": "Ctrl+Shift+M"
-}</code></pre><h3 id="hotkeys" class="heading-3">Hotkeys</h3><p>You can assign global hotkeys to commands by adding the <code>hotkey</code> parameter to the command configuration. The hotkey combination must follow the format of modifier keys (Ctrl, Shift, Alt, Win) combined with a key (A-Z, 0-9, etc.). For example, to set &quot;Ctrl+Shift+E&quot; as a hotkey for a command:</p>
-<pre class="code-block"><code class="language-json">{
-  "name": "Example Command",
-  "command": "echo Hello, world!",
-  "submenu": null,
-  "hotkey": "Ctrl+Shift+E",
-  "commands": null
-}</code></pre><p>The hotkey parameter is optional. If it is not specified, the command will not have a global hotkey associated with it.</p>
-<h3 id="how-to-use-hotkeys" class="heading-3">How to Use Hotkeys</h3><ol>
-<li><strong>Assign Hotkeys</strong>: Edit the configuration file to include the <code>hotkey</code> parameter for the commands you want to trigger with global hotkeys.</li>
-<li><strong>Use Hotkeys</strong>: After restarting the application, use the assigned hotkeys to trigger the corresponding commands, no matter which application is currently in focus.</li>
-</ol>
-<h2 id="how-to-use" class="heading-2">How to Use</h2><ol>
-<li><strong>Edit Config</strong>: Right-click the tray icon and select config to open the configuration file in your default editor. Modify the configuration as needed.</li>
-<li><strong>Show Config Folder</strong>: Right-click the tray icon and select &quot;Show Config Folder&quot; to open the configuration directory in your file explorer.</li>
-<li><strong>Toggle Launch at Login</strong>: Right-click the tray icon and select &quot;Toggle Launch at Login&quot; to enable or disable the application to start at login.</li>
-<li><strong>Execute Command</strong>: Left-click the tray icon and select the command you want to run from the menu. The command will be executed in the specified terminal application.</li>
-</ol>
-<h3 id="creating-submenus" class="heading-3">Creating Submenus</h3><p>To create submenus, set the <code>command</code> and <code>commands</code> field to <code>null</code> and provide a list of subcommands in the <code>submenu</code> field. Subcommands can also have their own submenus, allowing for nested menus.</p>
-<h2 id="building-the-application" class="heading-2">Building the Application</h2><h3 id="prerequisites" class="heading-3">Prerequisites</h3><ul>
-<li><a href="https://www.rust-lang.org/tools/install">Rust</a></li>
-<li><a href="https://tauri.app/v1/guides/getting-started/prerequisites/">Tauri</a></li>
+<h2 id="use-cases" class="heading-2">🎯 Use Cases</h2><h3 id="developers" class="heading-3">👨‍💻 Developers</h3><ul>
+<li><strong>Quick project navigation</strong> - Jump to different projects instantly</li>
+<li><strong>Build and test workflows</strong> - One-click development cycles</li>
+<li><strong>Docker management</strong> - Start/stop containers with hotkeys</li>
+<li><strong>Git operations</strong> - Common git commands at your fingertips</li>
 </ul>
-<h3 id="steps" class="heading-3">Steps</h3><ol>
-<li>Clone the repository:</li>
-</ol>
-<pre class="code-block"><code class="language-sh">git clone https://github.com/s00d/switchshuttle.git
+<h3 id="devops-engineers" class="heading-3">🛠️ DevOps Engineers</h3><ul>
+<li><strong>Server management</strong> - SSH connections and server commands</li>
+<li><strong>Monitoring tools</strong> - Quick access to logs and metrics</li>
+<li><strong>Deployment scripts</strong> - Automated deployment workflows</li>
+<li><strong>Database operations</strong> - Common database commands</li>
+</ul>
+<h3 id="designers" class="heading-3">🎨 Designers</h3><ul>
+<li><strong>Asset optimization</strong> - Image processing and optimization</li>
+<li><strong>Design system tools</strong> - Component generation and updates</li>
+<li><strong>Prototype servers</strong> - Quick design server startup</li>
+</ul>
+<h2 id="building-from-source" class="heading-2">🔧 Building from Source</h2><h3 id="prerequisites" class="heading-3">Prerequisites</h3><ul>
+<li><a href="https://www.rust-lang.org/tools/install">Rust</a> (latest stable)</li>
+<li><a href="https://nodejs.org/">Node.js</a> (v16 or higher)</li>
+<li><a href="https://tauri.app/v1/guides/getting-started/prerequisites/">Tauri CLI</a></li>
+</ul>
+<h3 id="build-steps" class="heading-3">Build Steps</h3><pre class="code-block"><code class="language-bash"># Clone the repository
+git clone https://github.com/s00d/switchshuttle.git
 cd switchshuttle
-npm i</code></pre><ol start="2">
-<li>Build the application:</li>
-</ol>
-<pre class="code-block"><code class="language-sh">cargo tauri build</code></pre><ol start="3">
-<li>Run the application:</li>
-</ol>
-<pre class="code-block"><code class="language-sh">cargo tauri dev</code></pre><h2 id="download" class="heading-2">Download</h2><p>The latest version of SwitchShuttle can be downloaded from the <a href="https://github.com/s00d/switchshuttle/releases">GitHub Releases</a> page.</p>
-<h3 id="mac" class="heading-3">mac</h3><p>OS Sign</p>
-<p>If you are on macOS, you may need to sign the application before running it. Here are the steps:</p>
+
+# Install dependencies
+npm install
+
+# Development mode
+npm run tauri dev
+
+# Build for production
+npm run tauri build</code></pre><h3 id="platform-specific-notes" class="heading-3">Platform-Specific Notes</h3><h4 id="macos" class="heading-4">macOS</h4><pre class="code-block"><code class="language-bash"># If you encounter signing issues
+chmod +x /Applications/switch-shuttle.app
+xattr -cr /Applications/switch-shuttle.app
+codesign --force --deep --sign - /Applications/switch-shuttle.app</code></pre><h2 id="contributing" class="heading-2">🤝 Contributing</h2><p>We welcome contributions! Here&#39;s how you can help:</p>
 <ol>
-<li>Make the binary executable:</li>
+<li><strong>Fork</strong> the repository</li>
+<li><strong>Create</strong> a feature branch (<code>git checkout -b feature/amazing-feature</code>)</li>
+<li><strong>Commit</strong> your changes (<code>git commit -m &#39;Add amazing feature&#39;</code>)</li>
+<li><strong>Push</strong> to the branch (<code>git push origin feature/amazing-feature</code>)</li>
+<li><strong>Open</strong> a Pull Request</li>
 </ol>
-<pre class="code-block"><code class="language-bash">chmod +x /Applications/switch-shuttle.app</code></pre><ol start="2">
-<li>Clear extended attributes</li>
-</ol>
-<p>and sign the binary:</p>
-<pre class="code-block"><code class="language-bash">xattr -cr /Applications/switch-shuttle.app && codesign --force --deep --sign - /Applications/switch-shuttle.app</code></pre><h2 id="contributing" class="heading-2">Contributing</h2><p>Contributions are welcome! Please feel free to submit a pull request or open an issue on GitHub.</p>
+<h3 id="development-guidelines" class="heading-3">Development Guidelines</h3><ul>
+<li>Follow the existing code style</li>
+<li>Add tests for new features</li>
+<li>Update documentation as needed</li>
+<li>Ensure cross-platform compatibility</li>
+</ul>
+<h2 id="license" class="heading-2">📄 License</h2><p>This project is licensed under the MIT License - see the <a href="LICENSE">LICENSE</a> file for details.</p>
+<h2 id="acknowledgments" class="heading-2">🙏 Acknowledgments</h2><ul>
+<li>Inspired by the original <a href="https://github.com/fitztrev/shuttle">Shuttle</a> project</li>
+<li>Built with <a href="https://tauri.app/">Tauri</a> for cross-platform desktop apps</li>
+<li>UI powered by <a href="https://vuejs.org/">Vue.js</a></li>
+</ul>
+<h2 id="support" class="heading-2">📞 Support</h2><ul>
+<li><strong>Issues</strong>: <a href="https://github.com/s00d/switchshuttle/issues">GitHub Issues</a></li>
+<li><strong>Discussions</strong>: <a href="https://github.com/s00d/switchshuttle/discussions">GitHub Discussions</a></li>
+<li><strong>Releases</strong>: <a href="https://github.com/s00d/switchshuttle/releases">GitHub Releases</a></li>
+</ul>
+<hr>
+<div align="center">
+  <p>Made with ❤️ by the SwitchShuttle community</p>
+  <p>⭐ Star this repository if you find it useful!</p>
+</div>
 
                 </div>
             </main>
