@@ -1,19 +1,14 @@
 <template>
-  <div id="app" class="h-screen w-screen bg-gray-100 text-sm font-sans">
-    <div data-tauri-drag-region class="fixed top-0 left-0 z-50 flex h-6 w-full items-center justify-between bg-gray-200 px-2">
-      <div data-tauri-drag-region class="text-xs text-gray-700 pl-4">{{ title }}</div>
-      <div class="flex items-center gap-2">
-        <button @click="onClose" class="h-3 w-3 rounded-full bg-red-500 hover:bg-red-600 transition-all" />
-      </div>
-    </div>
-    <div class="pt-6 h-full overflow-hidden">
+  <div id="app" class="h-screen w-screen bg-slate-50 text-sm font-sans antialiased">
+    <AppHeader />
+    <main class="pt-16 h-full overflow-auto">
       <router-view />
-    </div>
+    </main>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { getCurrentWindow, cursorPosition } from '@tauri-apps/api/window';
 import { useRouter } from 'vue-router';
 import { listen, emit } from '@tauri-apps/api/event';
@@ -29,17 +24,11 @@ import {
 import { register, unregister } from "@tauri-apps/plugin-global-shortcut";
 import { PhysicalPosition } from "@tauri-apps/api/dpi";
 import type { Command } from './types';
+import AppHeader from './components/AppHeader.vue';
 
-const title = ref('Switch Shuttle');
 const router = useRouter();
 
-function onClose() {
-  router.push('/').catch(() => {});
-  getCurrentWindow().hide();
-}
-
 listen('navigate', async (event: any) => {
-  title.value = event.payload[1];
   try {
     await router.push(event.payload[0]);
     emit('navigation_complete', { route: event.payload[0] });
