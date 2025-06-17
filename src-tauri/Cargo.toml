@@ -5,22 +5,22 @@ edition = "2021"
 
 [dependencies]
 tauri = { version = "^2.5.1", features = ["wry", "tray-icon", "unstable", "image-png"] }
-tauri-plugin-fs = "^2.2.1"
-tauri-plugin-dialog = "2.2.1"
-tauri-plugin-log = { version = "2.4.0", features = ["colored"] }
+tauri-plugin-fs = "^2.3.0"
+tauri-plugin-dialog = "2.2.2"
+tauri-plugin-log = { version = "2.5.0", features = ["colored"] }
 log = "0.4.20"
-tauri-plugin-notification = "2.2.2"
-tauri-plugin-shell = "2.2.1"
-tauri-plugin-store = "2.2.0"
-tauri-plugin-process = "2.2.1"
+tauri-plugin-notification = "2.2.3"
+tauri-plugin-shell = "2.2.2"
+tauri-plugin-store = "2.2.1"
+tauri-plugin-process = "2.2.2"
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
 dirs = "6.0.0"
 include_dir = "0.7"
-reqwest = { version = "0.12.15", features = ["json", "blocking"] }
+reqwest = { version = "0.12.20", features = ["json", "blocking"] }
 once_cell = "1.21.3"
 openssl = { version = "0.10.72", features = ["vendored"] }
-tauri-plugin-opener = "2.2.6"
+tauri-plugin-opener = "2.3.0"
 
 [lib]
 name = "app_lib"
@@ -30,14 +30,14 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 winreg = "0.55.0"
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
-tauri-plugin-autostart = "2.3.0"
-tauri-plugin-cli = "2.2.0"
-tauri-plugin-global-shortcut = "2.2.0"
-tauri-plugin-positioner = { version = "2.2.0", features = ["tray-icon"] }
-tauri-plugin-updater = "2.7.1"
+tauri-plugin-autostart = "2.4.0"
+tauri-plugin-cli = "2.2.1"
+tauri-plugin-global-shortcut = "2.2.1"
+tauri-plugin-positioner = { version = "2.2.1", features = ["tray-icon"] }
+tauri-plugin-updater = "2.8.1"
 
 [build-dependencies]
-tauri-build = { version = "^2.0.3", features = [] }
+tauri-build = { version = "^2.2.0", features = [] }
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!
