@@ -91,18 +91,7 @@ pub fn create_system_tray_menu(
     tray_menu_builder = tray_menu_builder.separator();
 
     let mut edit_config_submenu = SubmenuBuilder::new(app, "Edit Config");
-
-    let icon_path = app
-        .path()
-        .resolve("icons/create.png", BaseDirectory::Resource)
-        .unwrap();
-    edit_config_submenu = edit_config_submenu.item(
-        &IconMenuItemBuilder::with_id("add_new_config", "Create New Config")
-            .icon(Image::from_path(icon_path).unwrap())
-            .build(app)
-            .unwrap(),
-    );
-    edit_config_submenu = edit_config_submenu.separator();
+    
     for path in &config_manager.config_paths {
         let file_name = path.file_name().unwrap().to_string_lossy().to_string();
         let icon_path = app
@@ -146,7 +135,7 @@ pub fn create_system_tray_menu(
         .resolve("icons/refresh_settings.png", BaseDirectory::Resource)
         .unwrap();
     edit_config_submenu = edit_config_submenu.item(
-        &IconMenuItemBuilder::with_id("reload", "Reload App")
+        &IconMenuItemBuilder::with_id("refresh_configurations", "Refresh Configurations")
             .icon(Image::from_path(icon_path).unwrap())
             .build(app)
             .unwrap(),
@@ -238,18 +227,25 @@ pub fn handle_system_tray_event(
 ) {
     let config_path = get_config_path();
 
-    config_manager
-        .lock()
-        .unwrap()
-        .load_configs(Some(&app))
-        .expect("Failed to reload configs");
-
     match event.id().0.as_str() {
         "about" => {
-            create_window(&app, "About", "about", 400.0, 580.0, true);
+            create_window(&app, "About", "about", 800.0, 600.0, true);
         }
         "quit" => std::process::exit(0),
-        "reload" => app.restart(),
+        "refresh_configurations" => {
+            // Перезагружаем конфигурации и обновляем меню
+            let mut config_manager = config_manager.lock().unwrap();
+            config_manager.load_configs(Some(&app))
+                .expect("Failed to reload configs");
+            
+            // Обновляем меню в трее
+            let new_system_tray_menu = create_system_tray_menu(
+                app, 
+                app.autolaunch().is_enabled().unwrap_or(false), 
+                &config_manager
+            );
+            app.set_menu(new_system_tray_menu).unwrap();
+        }
         "edit_config" => open_in_default_editor(&config_path),
         "open_config_folder" => {
             open_folder_in_default_explorer(&config_path.parent().unwrap().to_path_buf())
@@ -275,10 +271,7 @@ pub fn handle_system_tray_event(
             opener.open_url(homepage_url, None::<&str>).unwrap();
         }
         "check_updates" => {
-            create_window(&app, "Update Available", "update", 400.0, 300.0, true);
-        }
-        "add_new_config" => {
-            create_window(&app, "Create New Config", "create", 400.0, 300.0, true);
+            create_window(&app, "Update Available", "update", 800.0, 600.0, true);
         }
         "open_devtools" => {
             if cfg!(debug_assertions) {
