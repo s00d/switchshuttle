@@ -260,7 +260,7 @@ impl Config {
         None
     }
 
-    fn clear_ids(&mut self) {
+    pub fn clear_ids(&mut self) {
         for command in &mut self.commands {
             command.clear_id();
         }
