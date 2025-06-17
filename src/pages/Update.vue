@@ -1,28 +1,30 @@
 <template>
-  <div class="flex flex-col items-center justify-center min-h-screen bg-white px-4 text-center">
-    <h1 class="text-2xl font-semibold text-gray-800 mb-6">
+  <div class="flex flex-col items-center justify-center min-h-screen bg-slate-50 px-6 text-center">
+    <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-8 max-w-md w-full">
+      <h1 class="text-3xl font-bold text-slate-800 mb-6">
       {{ url ? 'Update Available' : 'Update Not Available' }}
     </h1>
 
-    <div v-if="loading" class="w-10 h-10 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin mb-4"></div>
-    <div v-if="loading" class="text-sm text-gray-600 mb-4">loading...</div>
+      <div v-if="loading" class="w-16 h-16 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin mb-6 mx-auto shadow-lg"></div>
+      <div v-if="loading" class="text-lg text-slate-600 mb-6 font-medium">Checking for updates...</div>
 
-    <p v-if="!loading" class="text-base text-gray-700 mb-6">{{ message }}</p>
+      <p v-if="!loading" class="text-base text-slate-700 mb-8 leading-relaxed">{{ message }}</p>
 
     <div v-if="!loading" class="flex gap-4 justify-center">
-      <button
+        <Button
           v-if="url"
+          variant="primary"
           @click="update"
-          class="bg-blue-600 text-white px-5 py-2 text-sm hover:bg-blue-700 transition"
-      >
-        Update
-      </button>
-      <button
+        >
+          Download Update
+        </Button>
+        <Button
+          variant="secondary"
           @click="onClose"
-          class="bg-gray-300 text-black px-5 py-2 text-sm hover:bg-gray-400 transition"
       >
         Close
-      </button>
+        </Button>
+      </div>
     </div>
   </div>
 </template>
@@ -34,6 +36,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { open } from '@tauri-apps/plugin-shell';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { useRouter } from 'vue-router';
+import Button from '../components/Button.vue';
 
 const router = useRouter();
 const message = ref('');
