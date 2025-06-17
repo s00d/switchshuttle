@@ -9,7 +9,7 @@ use crate::commands::{
     fetch_input_data, get_menu_data, get_version, get_configurations, delete_configuration,
     save_configuration, get_config_files, load_config, save_configuration_by_id,
     create_new_configuration, duplicate_configuration, validate_configuration, get_unique_config_title,
-    open_configuration, update_configuration, refresh_configurations
+    open_configuration, update_configuration, refresh_configurations, open_config_folder
 };
 use crate::menu::{create_system_tray_menu, handle_system_tray_event};
 use config::ConfigManager;
@@ -83,7 +83,8 @@ pub fn run() {
             execute,
             about_message,
             fetch_input_data,
-            refresh_configurations
+            refresh_configurations,
+            open_config_folder
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -7,12 +7,21 @@ use std::sync::{Arc, Mutex};
 use tauri::{State};
 
 use crate::config::{CommandConfig, Config, ConfigManager};
-use crate::helpers::{execute_command, get_config_path, open_in_default_editor};
+use crate::helpers::{execute_command, get_config_path, open_in_default_editor, open_folder_in_default_explorer};
 
 #[derive(Deserialize)]
 struct GitHubRelease {
     tag_name: String,
     html_url: String,
+}
+
+#[tauri::command]
+pub fn open_config_folder() -> Result<(), String> {
+    let config_path = get_config_path();
+    let config_dir = config_path.parent().unwrap().to_path_buf();
+    
+    open_folder_in_default_explorer(&config_dir);
+    Ok(())
 }
 
 #[tauri::command]
@@ -570,15 +579,15 @@ pub fn update_configuration(
         return Err(format!("Configuration file not found: {}", original_title));
     }
     
-    // Генерируем уникальное имя файла для нового заголовка
-    let unique_title = generate_unique_title(&config_dir, &config.title);
-    let new_config_file = config_dir.join(format!("{}.json", unique_title));
-    
     // Очищаем ID перед сохранением
     config.clear_ids();
     
-    // Если заголовок изменился, переименовываем файл
-    if unique_title != original_title {
+    // Если заголовок изменился, генерируем уникальное имя файла
+    if config.title != original_title {
+        // Генерируем уникальное имя файла для нового заголовка
+        let unique_title = generate_unique_title(&config_dir, &config.title);
+        let new_config_file = config_dir.join(format!("{}.json", unique_title));
+        
         // Удаляем старый файл если новый файл уже существует
         if new_config_file.exists() {
             std::fs::remove_file(&new_config_file)
@@ -593,17 +602,15 @@ pub fn update_configuration(
         if unique_title != config.title {
             config.title = unique_title.clone();
         }
-    }
-    
-    // Сохраняем конфигурацию в файл (используем правильный путь)
-    let save_path = if unique_title != original_title {
-        &new_config_file
+        
+        // Сохраняем конфигурацию в новый файл
+        config.save(&new_config_file)
+            .map_err(|e| format!("Failed to save configuration: {}", e))?;
     } else {
-        &original_config_file
-    };
-    
-    config.save(save_path)
-        .map_err(|e| format!("Failed to save configuration: {}", e))?;
+        // Если заголовок не изменился, сохраняем в тот же файл
+        config.save(&original_config_file)
+            .map_err(|e| format!("Failed to save configuration: {}", e))?;
+    }
     
     // Перезагружаем конфигурации в ConfigManager
     let mut config_manager = state.lock().unwrap();
