@@ -1,7 +1,8 @@
 <template>
-  <div class="flex flex-col items-center justify-center h-screen w-screen bg-white">
-    <div class="w-10 h-10 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin mb-4"></div>
-    <div class="text-sm text-gray-600">loading...</div>
+  <div class="flex flex-col items-center justify-center h-screen w-screen bg-slate-50">
+    <div class="w-16 h-16 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin mb-6 shadow-lg"></div>
+    <div class="text-lg text-slate-600 font-medium">Loading...</div>
+    <div class="text-sm text-slate-500 mt-2">Please wait while we prepare your application</div>
   </div>
 </template>
 
