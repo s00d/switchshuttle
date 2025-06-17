@@ -324,7 +324,7 @@ const handleCommandTypeChange = (type: string) => {
 
 // Computed properties for determining logic
 const isRootLevel = computed(() => props.level === 0);
-const isSubmenuLevel = computed(() => props.level > 0);
+// const isSubmenuLevel = computed(() => props.level > 0);
 
 // Functions for handling inputs
 const handleAddInput = () => {

@@ -64,9 +64,7 @@
 import { computed, ref, watch } from 'vue';
 import { PropType } from 'vue';
 import { Command } from '../types';
-import Input from './Input.vue';
 import Button from './Button.vue';
-import HotkeyInput from './HotkeyInput.vue';
 import CommandItem from './CommandItem.vue';
 
 const props = defineProps({
