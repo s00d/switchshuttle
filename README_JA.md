@@ -12,7 +12,7 @@
   
   <img src="https://github.com/s00d/switchshuttle/blob/main/icons/intro.gif?raw=true" alt="SwitchShuttle Demo" width="600">
   
-  <div>
+  <div class="locale">
     <a href="README.md">🇺🇸 English</a> • 
     <a href="README_ZH.md">🇨🇳 中文</a> • 
     <a href="README_RU.md">🇷🇺 Русский</a> • 
