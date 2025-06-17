@@ -4,12 +4,13 @@ export interface ConfigFile {
 }
 
 export interface Command {
-  id?: string,
+  id?: string;
   name: string;
-  command: string;
-  hotkey: string | null;
-  submenu: Command[]|null;
-  commands: string[];
+  command?: string | undefined;
+  hotkey?: string | undefined;
+  submenu?: Command[] | null;
+  commands?: string[] | null;
+  inputs?: Record<string, string> | null;
 }
 
 export interface Config {
@@ -18,5 +19,5 @@ export interface Config {
   theme: string;
   title: string;
   commands: Command[];
-  menu_hotkey: string;
+  menu_hotkey?: string | null;
 }
