@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2025-01-18
+### Added
+- New modern logo design for better brand recognition
+- Loading spinner component for async operations
+- CommandTypeSelector component for better command type management
+- CommandItem component for improved command rendering
+- "Open Config Folder" functionality in editor
+- Enhanced gradient background in AppHeader
+
+### Changed
+- Updated dependencies in Cargo.toml and package.json
+- Simplified command rendering with CommandItem component
+- Enhanced UI with no-drag class for better window management
+- Updated window settings in tauri.conf for improved UI experience
+- Refactored components to remove redundant elements
+
+### Fixed
+- Cleaned up unused imports and props definitions
+- Removed redundant commands header in ConfigEditor
+- Improved component structure and organization
+
+### Removed
+- Outdated improvement tasks document (todos)
+
 ## [1.4.1] - 2025-05-18
 ### Feat
 - fix editor
