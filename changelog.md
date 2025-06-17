@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [1.5.0] - 2025-06-18
+
 ### Added
 - New modern logo design for better brand recognition
 - Loading spinner component for async operations
@@ -30,121 +31,152 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Outdated improvement tasks document (todos)
 
 ## [1.4.1] - 2025-05-18
-### Feat
-- fix editor
-- update deps
-- add tailwindcss
+
+### Added
+- TailwindCSS integration for improved styling
+
+### Changed
+- Updated dependencies to latest versions
+
+### Fixed
+- Editor functionality issues
 
 ## [1.3.12] - 2024-12-21
-### Feat
-- add opener plugin
+
+### Added
+- Opener plugin for enhanced functionality
 
 ## [1.3.11] - 2024-12-21
-### Chore
-- update dependencies
+
+### Changed
+- Updated project dependencies
 
 ## [1.3.10] - 2024-11-07
-### Fixed
-- update deps
+
+### Changed
+- Updated dependencies to latest versions
 
 ## [1.3.9] - 2024-10-17
+
 ### Fixed
-- TaoApp activate fix
+- TaoApp activation issues
 
 ## [1.3.8] - 2024-10-16
+
 ### Changed
-- tauri v2 release
+- Migrated to Tauri v2 release
 
 ## [1.3.5] - 2024-08-07
+
 ### Added
-- tauri v2
-- icons
-- refactor
-- update ui
+- Tauri v2 integration
+- New application icons
+- UI refactoring
+
+### Changed
+- Updated user interface design
 
 ## [1.2.3] - 2024-08-02
+
 ### Added
-- add devtools in dev
+- Developer tools in development mode
 
 ### Changed
-- update editor ui
+- Updated editor user interface
 
 ## [1.2.2] - 2024-08-01
+
 ### Fixed
-- Inputs component now retrieves ID from route and fetches corresponding input data correctly.
-- Fixed various UI issues to improve user experience.
+- Inputs component now retrieves ID from route and fetches corresponding input data correctly
+- Fixed various UI issues to improve user experience
 
 ## [1.2.1] - 2024-08-01
+
 ### Changed
-- update ui
+- Updated user interface design
 
 ## [1.1.8] - 2024-08-31
+
 ### Added
-- Added a window to display errors in case of validation issues using Tauri.
+- Error display window for validation issues using Tauri
+
 ### Fixed
-- Fixed a check to ensure that only JSON format configuration files are loaded.
+- Configuration file loading now ensures only JSON format files are processed
 
 ## [1.1.7] - 2024-08-31
+
 ### Fixed
-- Buffer restore.
+- Buffer restoration functionality
 
 ## [1.1.6] - 2024-08-31
+
 ### Added
-- Added support for new terminal applications: Alacritty and Hyper.
+- Support for new terminal applications: Alacritty and Hyper
 
 ### Fixed
-- Fixed text insertion from clipboard for improved reliability.
-- Fixed issues with Warp terminal integration, ensuring smoother operation.
+- Text insertion from clipboard for improved reliability
+- Warp terminal integration issues for smoother operation
 
 ## [1.1.5] - 2024-08-30
+
 ### Changed
-- update ui
+- Updated user interface design
 
 ## [1.1.4] - 2024-08-30
+
 ### Changed
-- update ui
+- Updated user interface design
 
 ## [1.1.3] - 2024-07-30
+
 ### Changed
-- Sorted configuration files by name before processing, ensuring a consistent order of execution.
-- Added unique IDs to each command and submenu item on loading configurations, ensuring distinct identifiers across different configurations.
+- Configuration files are now sorted by name before processing for consistent execution order
+- Added unique IDs to each command and submenu item on loading configurations
 
 ## [1.1.2] - 2024-07-30
+
 ### Fixed
-- Fixed subcommand search during execution. The application now correctly identifies and executes subcommands nested within submenus.
-- Fixed input form handling for commands. Input forms are now properly cleared before displaying new inputs, ensuring that old inputs do not persist across different commands.
+- Subcommand search during execution now correctly identifies and executes nested subcommands
+- Input form handling - forms are now properly cleared before displaying new inputs
 
 ## [1.1.1] - 2024-07-30
+
 ### Added
-- Introduced context menu triggered by a hotkey. Users can now open a context menu at the cursor's position using a predefined hotkey.
+- Context menu triggered by hotkey at cursor position
 
 ### Fixed
-- Fixed hotkey event handling to only trigger actions on key release, ensuring more precise and expected behavior.
+- Hotkey event handling now only triggers actions on key release for more precise behavior
 
 ## [1.1.0] - 2024-07-29
+
 ### Added
-- Introduced input fields for commands. Now commands can have input fields specified in the configuration file. When a command with inputs is triggered, a form will be displayed to the user to provide the necessary values. These values are then substituted into the command before execution.
+- Input fields for commands with form display for user input
+- Values are substituted into commands before execution
 
 ### Changed
-- Updated menu rendering logic. The `menu_title` parameter has been removed, and submenus are now created using the `submenu` field directly in the configuration file.
-- Enhanced window management logic. Windows are now created only when needed, rather than being pre-created.
-- Improved configuration file loading logic for better performance and reliability.
+- Updated menu rendering logic - removed `menu_title` parameter
+- Submenus now use `submenu` field directly in configuration
+- Enhanced window management - windows created only when needed
+- Improved configuration file loading logic
 
 ### Fixed
-- Fixed issues with updating the configuration when opening it for editing.
+- Configuration update issues when opening for editing
 
 ## [1.0.7] - 2024-07-28
+
 ### Added
-- Added the ability to run multiple commands sequentially. This feature allows defining a series of commands that execute in order, enhancing the automation capabilities of the application.
+- Sequential command execution - ability to run multiple commands in order
 
 ## [1.0.6] - 2024-07-27
+
 ### Fixed
-- Improved compatibility with different terminals on macOS. Adjustments were made to ensure smooth operation across various terminal applications.
+- Improved compatibility with different terminals on macOS
 
 ## [1.0.5] - 2024-07-26
+
 ### Added
-- Introduced a configuration editor for easier management of config files.
+- Configuration editor for easier config file management
 
 ---
 
-Dates in the changelog are for illustrative purposes and should be updated accordingly.
+*Note: Dates in the changelog are for illustrative purposes and should be updated accordingly.*
