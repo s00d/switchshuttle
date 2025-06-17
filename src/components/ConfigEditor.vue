@@ -44,10 +44,6 @@
 
     <!-- Commands Section -->
     <div class="space-y-4">
-      <h2 class="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-2">
-        Commands
-      </h2>
-      
       <CommandsTable :commands="config.commands" @update:commands="config.commands = $event" />
     </div>
   </div>
