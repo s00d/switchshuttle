@@ -1,181 +1,376 @@
 <template>
-  <div class="flex flex-col px-10 py-6 overflow-x-auto h-full w-full bg-white">
-    <h1 class="text-2xl font-semibold text-gray-800 mb-6">Config Editor</h1>
+  <div class="min-h-screen bg-slate-50">
+    <main class="container mx-auto px-4 py-6">
+      <div class="max-w-6xl mx-auto space-y-6">
+        <!-- Header -->
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-bold text-slate-900">Configuration Editor</h1>
+            <p class="text-slate-600 mt-1">Manage and edit terminal configurations</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <Button @click="createNewConfig" size="lg" title="Create new configuration">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+            </Button>
+            <Button @click="importConfig" variant="secondary" size="lg" title="Import configuration">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+              </svg>
+            </Button>
+          </div>
+        </div>
 
-    <div v-if="notificationMessage" :class="notificationClass" class="w-4/5 mx-auto mb-4 rounded px-4 py-3 text-sm font-medium text-center">
-      {{ notificationMessage }}
-    </div>
+        <!-- Configurations List -->
+        <Card>
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-lg font-semibold text-slate-900">Configurations</h2>
+            <div class="flex items-center space-x-2">
+              <div class="relative">
+                <input
+                  v-model="searchQuery"
+                  type="text"
+                  placeholder="Search configurations..."
+                  class="w-64 px-3 py-1.5 pr-8 border border-slate-300 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                <svg class="w-4 h-4 text-slate-400 absolute right-2.5 top-1/2 transform -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <Button @click="loadConfigurations" variant="ghost" size="sm" title="Refresh list">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </Button>
+            </div>
+          </div>
 
-    <ConfigSelector
-        v-model="config"
-        @showAddConfigModal="showAddConfigModal"
-        @showDeleteConfigModal="showDeleteConfigModal"
-    />
+          <div v-if="loading" class="text-center py-12">
+            <div class="w-8 h-8 border-2 border-slate-200 border-t-blue-500 animate-spin mx-auto mb-4"></div>
+            <p class="text-slate-500">Loading configurations...</p>
+          </div>
 
-    <ConfigEditor
-        :config="config"
-        :commands="config.commands"
-        @saveConfig="saveConfig"
-        @onClose="onClose"
-    />
+          <div v-else-if="filteredConfigurations.length === 0" class="text-center py-12">
+            <div class="w-16 h-16 bg-slate-100 flex items-center justify-center mx-auto mb-4 rounded-lg">
+              <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <p class="text-slate-500 mb-2">
+              {{ searchQuery ? 'No configurations found' : 'No configurations found' }}
+            </p>
+            <Button @click="createNewConfig" v-if="!searchQuery">
+              Create first configuration
+            </Button>
+          </div>
 
-    <!-- Add Config Modal -->
-    <Modal :show="addConfigModal" title="Add New Config" @close="closeAddConfigModal">
-      <div class="flex flex-col gap-2 mb-4">
-        <label for="new-config-name" class="text-sm font-medium text-gray-700">Config Name</label>
-        <input
-            type="text"
-            id="new-config-name"
-            v-model="newConfigName"
-            class="border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          <div v-else class="space-y-3">
+            <div
+              v-for="(config, index) in filteredConfigurations"
+              :key="`${config.title}-${index}`"
+              class="flex items-center justify-between p-4 border border-slate-200 hover:border-slate-300 transition-colors rounded-lg"
+            >
+              <div class="flex items-center space-x-4 min-w-0 flex-1">
+                <div class="w-10 h-10 bg-blue-100 flex items-center justify-center rounded-lg flex-shrink-0">
+                  <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <h3 class="font-semibold text-slate-900 truncate">{{ config.title || `Configuration ${index + 1}` }}</h3>
+                  <div class="flex items-center space-x-4 text-sm text-slate-500 mt-1 flex-wrap">
+                    <span class="flex items-center space-x-1">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <span>{{ config.terminal }}</span>
+                    </span>
+                    <span class="flex items-center space-x-1">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
+                      </svg>
+                      <span>{{ config.theme }}</span>
+                    </span>
+                    <span class="flex items-center space-x-1">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      <span>{{ config.commands.length }} commands</span>
+                    </span>
+                    <span v-if="config.menu_hotkey" class="flex items-center space-x-1">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      <span>{{ config.menu_hotkey }}</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="flex items-center space-x-1 flex-shrink-0">
+                <Button @click="openConfig(config)" variant="ghost" size="sm" title="Open in editor">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </Button>
+                <Button @click="editConfig(config)" variant="ghost" size="sm" title="Edit">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </Button>
+                <Button @click="duplicateConfig(config)" variant="ghost" size="sm" title="Duplicate">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </Button>
+                <Button @click="deleteConfig(config)" variant="danger" size="sm" title="Delete">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+    </main>
+
+    <!-- Visual Editor Modal -->
+    <Modal :is-open="showEditor" @close="closeEditor">
+      <template #header>
+        <h2 class="text-xl font-semibold text-slate-900">
+          {{ editingConfig ? 'Edit Configuration' : 'Create Configuration' }}
+        </h2>
+      </template>
+      
+      <div v-if="currentConfig" class="space-y-6">
+        <ConfigEditor 
+          :config="currentConfig" 
+          :commands="currentConfig.commands"
         />
       </div>
+      
       <template #footer>
-        <button class="bg-blue-600 text-white px-4 py-2 text-sm hover:bg-blue-700" @click="addNewConfig">Add</button>
-        <button class="bg-gray-300 text-black px-4 py-2 text-sm hover:bg-gray-400" @click="closeAddConfigModal">Cancel</button>
+        <div class="flex items-center justify-end space-x-2">
+          <Button @click="closeEditor" variant="ghost" size="sm" :disabled="saving">
+            Cancel
+          </Button>
+          <Button @click="validateAndSave" variant="primary" size="sm" :disabled="saving">
+            <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            {{ saving ? 'Saving...' : 'Save' }}
+          </Button>
+        </div>
       </template>
     </Modal>
 
-    <!-- Delete Config Modal -->
-    <Modal :show="deleteConfigModal" title="Confirm Delete" @close="closeDeleteConfigModal">
-      <p class="text-sm text-gray-800 mb-4">Are you sure you want to delete this config?</p>
+    <!-- Delete Confirmation Modal -->
+    <Modal :is-open="showDeleteConfirm" @close="closeDeleteConfirm">
+      <template #header>
+        <h2 class="text-xl font-semibold text-slate-900">Confirm Deletion</h2>
+      </template>
+      
+      <div class="space-y-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-red-100 flex items-center justify-center rounded-full">
+            <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-slate-900 font-medium">Delete configuration?</p>
+            <p class="text-slate-600 text-sm">This action cannot be undone</p>
+          </div>
+        </div>
+        
+        <div class="bg-slate-50 p-3 rounded-lg">
+          <p class="text-slate-700">
+            <span class="font-medium">Title:</span> {{ configToDelete?.title }}
+          </p>
+          <p class="text-slate-700">
+            <span class="font-medium">Terminal:</span> {{ configToDelete?.terminal }}
+          </p>
+          <p class="text-slate-700">
+            <span class="font-medium">Theme:</span> {{ configToDelete?.theme }}
+          </p>
+        </div>
+      </div>
+      
       <template #footer>
-        <button class="bg-red-600 text-white px-4 py-2 text-sm hover:bg-red-700" @click="deleteConfig">Delete</button>
-        <button class="bg-gray-300 text-black px-4 py-2 text-sm hover:bg-gray-400" @click="closeDeleteConfigModal">Cancel</button>
+        <div class="flex items-center justify-end space-x-2">
+          <Button @click="closeDeleteConfirm" variant="ghost" size="sm" :disabled="deleting">
+            Cancel
+          </Button>
+          <Button @click="confirmDelete" variant="danger" size="sm" :disabled="deleting">
+            <svg v-if="deleting" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            {{ deleting ? 'Deleting...' : 'Delete' }}
+          </Button>
+        </div>
       </template>
     </Modal>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
-import { writeTextFile, readTextFile, exists, readDir, remove } from '@tauri-apps/plugin-fs';
-import { getCurrentWindow } from '@tauri-apps/api/window';
-import { path as tauriPath } from '@tauri-apps/api';
-import { useRouter } from 'vue-router';
-
-import ConfigSelector from '../components/ConfigSelector.vue';
+import { ref, computed, onMounted } from 'vue';
+import { invoke } from '@tauri-apps/api/core';
+import Card from '../components/Card.vue';
+import Button from '../components/Button.vue';
+import Modal from '../components/Modal.vue';
 import ConfigEditor from '../components/ConfigEditor.vue';
-import Modal from '../components/Model.vue';
+import type { Config } from '../types';
 
-import { ConfigFile, Config } from '../types';
+const configurations = ref<Config[]>([]);
+const searchQuery = ref('');
+const loading = ref(false);
+const showEditor = ref(false);
+const currentConfig = ref<Config | null>(null);
+const editingConfig = ref<Config | null>(null);
+const originalFileName = ref<string>('');
+const saving = ref(false);
+const showDeleteConfirm = ref(false);
+const configToDelete = ref<Config | null>(null);
+const deleting = ref(false);
 
-const router = useRouter();
-const configFiles = ref<ConfigFile[]>([]);
-const currentConfig = ref<string>('');
-const config = ref<Config>({
-  terminal: 'iterm',
-  launch_in: 'current',
-  theme: '',
-  title: '',
-  commands: [],
-  menu_hotkey: ''
+const filteredConfigurations = computed(() => {
+  if (!searchQuery.value) return configurations.value;
+  
+  const query = searchQuery.value.toLowerCase();
+  return configurations.value.filter(config => 
+    config.title.toLowerCase().includes(query) ||
+    config.terminal.toLowerCase().includes(query) ||
+    config.theme.toLowerCase().includes(query)
+  );
 });
-const newConfigName = ref<string>('');
-const notificationMessage = ref<string>('');
-const notificationClass = ref<string>('');
-const addConfigModal = ref<boolean>(false);
-const deleteConfigModal = ref<boolean>(false);
 
-async function loadConfigs() {
-  const configDir = await tauriPath.configDir();
-  const configFilesList = await readDir(`${configDir}/switch-shuttle`);
-  configFiles.value = configFilesList.filter(file => file.name?.endsWith('.json')).map(file => ({
-    path: `${configDir}/switch-shuttle`,
-    name: file.name?.replace('.json', '') ?? ''
-  }));
-  if (configFiles.value.length > 0) {
-    currentConfig.value = configFiles.value[0].path;
-    loadConfig();
-  }
-}
-
-async function loadConfig() {
-  if (await exists(currentConfig.value)) {
-    const configContent = await readTextFile(currentConfig.value);
-    config.value = JSON.parse(configContent);
-  }
-}
-
-async function saveConfig() {
+const loadConfigurations = async () => {
+  loading.value = true;
   try {
-    await writeTextFile(currentConfig.value, JSON.stringify(config.value, null, 2));
-    showNotification('Config saved successfully', 'success');
+    configurations.value = await invoke('get_configurations');
   } catch (error) {
-    showNotification('Failed to save config', 'error');
+    console.error('Failed to load configurations:', error);
+    configurations.value = [];
+  } finally {
+    loading.value = false;
   }
-}
+};
 
-function showNotification(message: string, type: string) {
-  notificationMessage.value = message;
-  notificationClass.value = `alert-${type}`;
-  setTimeout(() => {
-    notificationMessage.value = '';
-    notificationClass.value = '';
-  }, 3000);
-}
-
-function showAddConfigModal() {
-  addConfigModal.value = true;
-}
-
-function closeAddConfigModal() {
-  addConfigModal.value = false;
-}
-
-function showDeleteConfigModal() {
-  deleteConfigModal.value = true;
-}
-
-function closeDeleteConfigModal() {
-  deleteConfigModal.value = false;
-}
-
-async function addNewConfig() {
-  if (!newConfigName.value) {
-    showNotification('Config name cannot be empty', 'error');
-    return;
-  }
-  const configDir = await tauriPath.configDir();
-  const newConfigPath = `${configDir}/switch-shuttle/${newConfigName.value}.json`;
-  const defaultConfig: Config = {
-    terminal: "iterm",
-    launch_in: "current",
-    theme: "Homebrew",
-    title: "New tab",
-    commands: [],
-    menu_hotkey: ''
-  };
+const createNewConfig = async () => {
   try {
-    await writeTextFile(newConfigPath, JSON.stringify(defaultConfig, null, 2));
-    showNotification('New config added successfully', 'success');
-    closeAddConfigModal();
-    loadConfigs();
+    currentConfig.value = await invoke('create_new_configuration');
+    editingConfig.value = null;
+    showEditor.value = true;
   } catch (error) {
-    showNotification('Failed to add new config', 'error');
+    console.error('Failed to create new configuration:', error);
+    alert(`Error creating: ${error}`);
   }
-}
+};
 
-async function deleteConfig() {
-  if (!currentConfig.value) {
-    showNotification('No config selected to delete', 'error');
-    return;
-  }
+const editConfig = (config: Config) => {
+  currentConfig.value = { ...config };
+  editingConfig.value = config;
+  originalFileName.value = config.title;
+  showEditor.value = true;
+};
+
+const duplicateConfig = async (config: Config) => {
   try {
-    await remove(currentConfig.value);
-    showNotification('Config deleted successfully', 'success');
-    closeDeleteConfigModal();
-    loadConfigs();
+    currentConfig.value = await invoke('duplicate_configuration', { config });
+    editingConfig.value = null;
+    showEditor.value = true;
   } catch (error) {
-    showNotification('Failed to delete config', 'error');
+    console.error('Failed to duplicate configuration:', error);
+    alert(`Error duplicating: ${error}`);
   }
-}
+};
 
-function onClose() {
-  router.push('/').catch(() => {});
-  getCurrentWindow().hide()
-}
+const validateAndSave = async () => {
+  if (!currentConfig.value) return;
+  
+  saving.value = true;
+  try {
+    if (editingConfig.value) {
+      // Update existing configuration without renaming file
+      await invoke('update_configuration', { 
+        config: currentConfig.value,
+        originalTitle: originalFileName.value
+      });
+    } else {
+      // Save new configuration
+      await invoke('save_configuration', { config: currentConfig.value });
+    }
+    
+    closeEditor();
+    // Refresh configurations list after saving
+    await loadConfigurations();
+  } catch (error) {
+    console.error('Error saving configuration:', error);
+    alert('Failed to save configuration');
+  } finally {
+    saving.value = false;
+  }
+};
 
-onMounted(loadConfigs);
+const closeEditor = () => {
+  showEditor.value = false;
+  currentConfig.value = null;
+  editingConfig.value = null;
+  originalFileName.value = '';
+};
+
+const openConfig = async (config: Config) => {
+  try {
+    await invoke('open_configuration', { id: config.title });
+  } catch (error) {
+    console.error('Failed to open configuration:', error);
+    alert(`Error opening configuration: ${error}`);
+  }
+};
+
+const deleteConfig = async (config: Config) => {
+  configToDelete.value = config;
+  showDeleteConfirm.value = true;
+};
+
+const closeDeleteConfirm = () => {
+  showDeleteConfirm.value = false;
+  configToDelete.value = null;
+};
+
+const confirmDelete = async () => {
+  if (!configToDelete.value) return;
+  
+  deleting.value = true;
+  try {
+    await invoke('delete_configuration', { id: configToDelete.value.title });
+    // Refresh configurations list after deletion
+    await loadConfigurations();
+    closeDeleteConfirm();
+  } catch (error) {
+    console.error('Failed to delete configuration:', error);
+    alert(`Error deleting: ${error}`);
+  } finally {
+    deleting.value = false;
+  }
+};
+
+const importConfig = () => {
+  // TODO: Implement configuration import
+  console.log('Import config');
+};
+
+onMounted(() => {
+  loadConfigurations();
+});
 </script>
 
