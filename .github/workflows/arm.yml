@@ -15,10 +15,12 @@ jobs:
             deb: arm64
             rpm: aarch64
             appimage: aarch64
+            linker: aarch64-linux-gnu-gcc
           - target: armv7-unknown-linux-gnueabihf
             deb: armhf
             rpm: armv7hl
             appimage: armv7l
+            linker: arm-linux-gnueabihf-gcc
 
     steps:
       - uses: actions/checkout@v4
@@ -42,7 +44,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf
 
       - uses: actions/cache@v4
         with:
@@ -60,7 +62,7 @@ jobs:
 
       - name: Build Tauri app
         run: |
-          export CARGO_TARGET_${{ matrix.target }}_LINKER=arm-linux-gnueabihf-gcc
+          export CARGO_TARGET_$(echo ${{ matrix.target }} | tr '-' '_')_LINKER=${{ matrix.linker }}
           pnpm run tauri build -- --target ${{ matrix.target }}
 
       - name: Get app version
