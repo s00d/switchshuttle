@@ -965,6 +965,8 @@ img {
     border-top: 1px solid var(--border-medium);
     padding: var(--space-lg) 0;
     margin-top: auto;
+    margin-left: 280px;
+    width: calc(100vw - 280px);
 }
 
 .footer-content {
@@ -997,7 +999,19 @@ img {
     color: var(--primary);
 }
 
+@media (max-width: 1024px) {
+    .footer {
+        margin-left: 250px;
+        width: calc(100vw - 250px);
+    }
+}
+
 @media (max-width: 768px) {
+    .footer {
+        margin-left: 0;
+        width: 100vw;
+    }
+    
     .footer-content {
         flex-direction: column;
         gap: var(--space-md);
