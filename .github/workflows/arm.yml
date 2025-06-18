@@ -16,20 +16,32 @@ jobs:
             base_image: https://dietpi.com/downloads/images/DietPi_RPi-ARMv8-Bookworm.img.xz
             deb: arm64
             rpm: aarch64
+            appimage: aarch64
 
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Cache rust build artifacts
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: src-tauri
-          cache-on-failure: true
+      - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
         with:
           version: 9.15.4
           run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+            src-tauri/target/
+          key: ${{ runner.os }}-arm-${{ matrix.arch }}-${{ hashFiles('Cargo.lock') }}
 
       - name: Build app
         uses: pguyot/arm-runner-action@v2.6.5
@@ -65,21 +77,20 @@ jobs:
       - name: Get app version
         run: echo "APP_VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
 
-      # TODO: Combine this with the basic workflow and upload the files to the Release.
       - name: Upload deb bundle
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: Debian Bundle
-          path: ${{ github.workspace }}/src-tauri/target/release/bundle/deb/appname_${{ env.APP_VERSION }}_${{ matrix.deb }}.deb
+          name: Debian Bundle ARM
+          path: ${{ github.workspace }}/src-tauri/target/release/bundle/deb/switch-shuttle_${{ env.APP_VERSION }}_${{ matrix.deb }}.deb
 
       - name: Upload rpm bundle
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: RPM Bundle
-          path: ${{ github.workspace }}/src-tauri/target/release/bundle/rpm/appname-${{ env.APP_VERSION }}-1.${{ matrix.rpm }}.rpm
+          name: RPM Bundle ARM
+          path: ${{ github.workspace }}/src-tauri/target/release/bundle/rpm/switch-shuttle-${{ env.APP_VERSION }}-1.${{ matrix.rpm }}.rpm
 
       - name: Upload appimage bundle
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: AppImage Bundle
-          path: ${{ github.workspace }}/src-tauri/target/release/bundle/appimage/appname_${{ env.APP_VERSION }}_${{ matrix.appimage }}.AppImage
+          name: AppImage Bundle ARM
+          path: ${{ github.workspace }}/src-tauri/target/release/bundle/appimage/switch-shuttle_${{ env.APP_VERSION }}_${{ matrix.appimage }}.AppImage
