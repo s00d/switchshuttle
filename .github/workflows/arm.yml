@@ -16,11 +16,13 @@ jobs:
             rpm: aarch64
             appimage: aarch64
             linker: aarch64-linux-gnu-gcc
+            pkg_config: aarch64-linux-gnu-pkg-config
           - target: armv7-unknown-linux-gnueabihf
             deb: armhf
             rpm: armv7hl
             appimage: armv7l
             linker: arm-linux-gnueabihf-gcc
+            pkg_config: arm-linux-gnueabihf-pkg-config
 
     steps:
       - uses: actions/checkout@v4
@@ -44,7 +46,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf pkg-config-aarch64-linux-gnu pkg-config-arm-linux-gnueabihf
 
       - uses: actions/cache@v4
         with:
@@ -61,8 +63,12 @@ jobs:
         run: pnpm install
 
       - name: Build Tauri app
+        env:
+          PKG_CONFIG_ALLOW_CROSS: 1
+          PKG_CONFIG: ${{ matrix.pkg_config }}
         run: |
           export CARGO_TARGET_$(echo ${{ matrix.target }} | tr '-' '_')_LINKER=${{ matrix.linker }}
+          export PKG_CONFIG_PATH="/usr/lib/${{ matrix.target }}/pkgconfig:/usr/share/pkgconfig"
           pnpm run tauri build -- --target ${{ matrix.target }}
 
       - name: Get app version
