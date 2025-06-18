@@ -15,12 +15,10 @@ jobs:
             deb: arm64
             rpm: aarch64
             appimage: aarch64
-            docker_image: ghcr.io/tauri-apps/tauri-action:node18
           - target: armv7-unknown-linux-gnueabihf
             deb: armhf
             rpm: armv7hl
             appimage: armv7l
-            docker_image: ghcr.io/tauri-apps/tauri-action:node18
 
     steps:
       - uses: actions/checkout@v4
@@ -61,13 +59,12 @@ jobs:
         run: pnpm install
 
       - name: Build Tauri app
+        env:
+          PKG_CONFIG_ALLOW_CROSS: 1
         run: |
-          docker run --rm -v "$PWD:/app" -w /app ${{ matrix.docker_image }} bash -c "
-            apt-get update && apt-get install -y gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf
-            export CARGO_TARGET_$(echo ${{ matrix.target }} | tr '-' '_')_LINKER=$(echo ${{ matrix.target }} | sed 's/-unknown-linux-gnu/-linux-gnu/' | sed 's/-unknown-linux-gnueabihf/-linux-gnueabihf/')-gcc
-            export PKG_CONFIG_ALLOW_CROSS=1
-            pnpm run tauri build -- --target ${{ matrix.target }}
-          "
+          export CARGO_TARGET_$(echo ${{ matrix.target }} | tr '-' '_')_LINKER=$(echo ${{ matrix.target }} | sed 's/-unknown-linux-gnu/-linux-gnu/' | sed 's/-unknown-linux-gnueabihf/-linux-gnueabihf/')-gcc
+          export PKG_CONFIG_PATH="/usr/lib/$(echo ${{ matrix.target }} | sed 's/-unknown-linux-gnu/-linux-gnu/' | sed 's/-unknown-linux-gnueabihf/-linux-gnueabihf/')/pkgconfig:/usr/share/pkgconfig"
+          pnpm run tauri build -- --target ${{ matrix.target }}
 
       - name: Get app version
         run: echo "APP_VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
