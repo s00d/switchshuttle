@@ -7,62 +7,51 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="https://github.com/s00d/switchshuttle/blob/main/icons/128x128_white.png?raw=true">
 </head>
 <body>
     <div class="app">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-content">
-                <div class="logo">
-                    <a href="https://github.com/s00d/switchshuttle/" class="logo-link">
-                        <img src="https://github.com/s00d/switchshuttle/blob/main/icons/128x128_white.png?raw=true" alt="SwitchShuttle" class="logo-img">
-                        <span class="logo-text">SwitchShuttle</span>
-                    </a>
-                </div>
-                
-                <nav class="nav">
-                    <div class="nav-links">
-                        <a href="https://github.com/s00d/switchshuttle/" class="nav-link">
-                            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                            </svg>
-                            GitHub
-                        </a>
-                        <a href="https://github.com/s00d/switchshuttle/issues" class="nav-link">
-                            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                            </svg>
-                            Issues
-                        </a>
-                    </div>
-                    
-                    <div class="language-selector">
-                        <div class="language-dropdown">
-                            <button class="language-btn">
+        <header class="header" role="banner">
+            <div class="header-content container">
+                <a href="https://github.com/s00d/switchshuttle/" class="logo-link" aria-label="SwitchShuttle на GitHub">
+                    <img src="https://github.com/s00d/switchshuttle/blob/main/icons/128x128_white.png?raw=true" alt="SwitchShuttle" class="logo-img">
+                    <span class="logo-text">SwitchShuttle</span>
+                    <span class="console-cursor" aria-hidden="true">_</span>
+                </a>
+                <nav class="nav" aria-label="Основная навигация">
+                    <ul class="nav-links">
+                        <li><a href="https://github.com/s00d/switchshuttle/" class="nav-link"><span class="nav-text">GitHub</span></a></li>
+                        <li><a href="https://github.com/s00d/switchshuttle/issues" class="nav-link"><span class="nav-text">Issues</span></a></li>
+                        <li><a href="https://github.com/s00d/switchshuttle/releases" class="nav-link"><span class="nav-text">Releases</span></a></li>
+                        <li class="language-selector">
+                            <button class="language-btn" aria-haspopup="listbox" aria-expanded="false">
                                 <span class="current-lang">日本語</span>
-                                <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M7 10l5 5 5-5z"/>
-                                </svg>
+                                <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
                             </button>
-                            <div class="language-menu">
+                            <div class="language-menu" role="listbox">
                                 <a href="index.html" class="lang-item ">English</a><a href="index_de.html" class="lang-item ">Deutsch</a><a href="index_ja.html" class="lang-item active">日本語</a><a href="index_ru.html" class="lang-item ">Русский</a><a href="index_zh.html" class="lang-item ">中文</a>
                             </div>
-                        </div>
-                    </div>
+                        </li>
+                    </ul>
                 </nav>
+                <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
             </div>
         </header>
-
-        <!-- Main Content -->
-        <div class="main-container">
-            <!-- Sidebar -->
-            <aside class="sidebar">
+        <div class="mobile-overlay" aria-hidden="true"></div>
+        <div class="main-container container">
+            <aside class="sidebar" role="complementary" aria-label="Содержание">
                 <div class="sidebar-header">
-                    <h3 class="sidebar-title">Contents</h3>
+                    <div class="sidebar-title-wrapper">
+                        <svg class="sidebar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+                        <h3 class="sidebar-title">Contents</h3>
+                    </div>
                 </div>
-                <nav class="sidebar-nav">
+                <nav class="sidebar-nav" aria-label="Навигация по разделам">
                     <ul class="sidebar-menu">
                         <li class="menu-item level-2 indent-1">
             <a href="#switchshuttletoha" class="menu-link">
@@ -72,10 +61,8 @@
                     </ul>
                 </nav>
             </aside>
-
-            <!-- Content -->
-            <main class="content">
-                <div class="content-wrapper">
+            <main class="content" id="main-content" tabindex="-1" role="main">
+                <section class="content-wrapper">
                     <div align="center">
   
 <p>  <a href="https://github.com/s00d/switchshuttle"><img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-blue?style=for-the-badge" alt="Platform"></a>
@@ -418,62 +405,63 @@ codesign --force --deep --sign - /Applications/switch-shuttle.app</code></pre><h
   <p>⭐ このリポジトリが役立つと思ったら星をつけてください！</p>
 </div>
 
-                </div>
+                </section>
             </main>
         </div>
+        <footer class="footer" role="contentinfo">
+            <div class="footer-content container">
+                <div class="footer-left">
+                    <span>© 2025 SwitchShuttle</span>
+                </div>
+                <div class="footer-right">
+                    <a href="https://github.com/s00d/switchshuttle/" class="footer-link">GitHub</a>
+                    <a href="https://boosty.to/s00d" class="footer-link">Donate</a>
+                </div>
+            </div>
+        </footer>
     </div>
-
     <script>
+        // Консольный курсор
+        const cursor = document.querySelector('.console-cursor');
+        if (cursor) {
+            setInterval(() => {
+                cursor.style.opacity = cursor.style.opacity === '0' ? '1' : '0';
+            }, 500);
+        }
         // Плавная прокрутка к якорям
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+                const href = this.getAttribute('href');
+                if (href && href.startsWith('#')) {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
                 }
             });
         });
-
         // Подсветка активного пункта меню через отслеживание скролла
         const updateActiveMenuItem = () => {
-            const scrollPosition = window.scrollY + 100; // Небольшой отступ
-            
-            // Получаем все ссылки из меню
+            const scrollPosition = window.scrollY + 100;
             const menuLinks = document.querySelectorAll('.sidebar-menu a');
             let activeLink = null;
-            
-            // Проверяем каждую ссылку из меню
             menuLinks.forEach(link => {
                 const href = link.getAttribute('href');
                 if (href && href.startsWith('#')) {
                     const targetId = href.substring(1);
                     const targetElement = document.getElementById(targetId);
-                    
                     if (targetElement) {
                         const elementTop = targetElement.offsetTop;
-                        
                         if (elementTop <= scrollPosition) {
                             activeLink = link;
                         }
                     }
                 }
             });
-            
-            // Обновляем активный пункт меню
-            menuLinks.forEach(link => {
-                link.classList.remove('active');
-            });
-            
-            if (activeLink) {
-                activeLink.classList.add('active');
-            }
+            menuLinks.forEach(link => link.classList.remove('active'));
+            if (activeLink) activeLink.classList.add('active');
         };
-
-        // Добавляем обработчик скролла с throttling
         let ticking = false;
         window.addEventListener('scroll', () => {
             if (!ticking) {
@@ -484,35 +472,72 @@ codesign --force --deep --sign - /Applications/switch-shuttle.app</code></pre><h
                 ticking = true;
             }
         });
-
-        // Инициализируем активный пункт при загрузке
         updateActiveMenuItem();
-
         // Переключение языкового меню
         const languageBtn = document.querySelector('.language-btn');
         const languageMenu = document.querySelector('.language-menu');
-        
         if (languageBtn && languageMenu) {
             languageBtn.addEventListener('click', () => {
                 languageMenu.classList.toggle('open');
+                languageBtn.setAttribute('aria-expanded', languageMenu.classList.contains('open'));
             });
-
             document.addEventListener('click', (e) => {
                 if (!languageBtn.contains(e.target) && !languageMenu.contains(e.target)) {
                     languageMenu.classList.remove('open');
+                    languageBtn.setAttribute('aria-expanded', 'false');
                 }
             });
         }
-
         // Мобильное меню
         const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
         const sidebar = document.querySelector('.sidebar');
+        const mobileOverlay = document.querySelector('.mobile-overlay');
         
-        if (mobileMenuBtn && sidebar) {
+        if (mobileMenuBtn && sidebar && mobileOverlay) {
             mobileMenuBtn.addEventListener('click', () => {
+                const isOpen = sidebar.classList.contains('mobile-open');
                 sidebar.classList.toggle('mobile-open');
+                mobileOverlay.classList.toggle('active');
+                mobileMenuBtn.classList.toggle('active');
+                mobileMenuBtn.setAttribute('aria-expanded', !isOpen);
+                document.body.style.overflow = isOpen ? '' : 'hidden';
+            });
+
+            mobileOverlay.addEventListener('click', () => {
+                sidebar.classList.remove('mobile-open');
+                mobileOverlay.classList.remove('active');
+                mobileMenuBtn.classList.remove('active');
+                mobileMenuBtn.setAttribute('aria-expanded', 'false');
+                document.body.style.overflow = '';
+            });
+
+            // Закрытие меню при клике на ссылку в мобильном меню
+            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('mobile-open');
+                        mobileOverlay.classList.remove('active');
+                        mobileMenuBtn.classList.remove('active');
+                        mobileMenuBtn.setAttribute('aria-expanded', 'false');
+                        document.body.style.overflow = '';
+                    }
+                });
             });
         }
+        // Простая подсветка кода
+        document.querySelectorAll('.code-block').forEach(block => {
+            const code = block.querySelector('code');
+            if (code) {
+                let text = code.textContent;
+                // Простая подсветка без сложных регулярных выражений
+                const keywords = ['let', 'const', 'var', 'function', 'return', 'if', 'else', 'for', 'while', 'switch', 'case', 'break', 'import', 'from', 'export', 'class', 'new', 'await', 'async', 'try', 'catch', 'throw'];
+                keywords.forEach(keyword => {
+                    const regex = new RegExp('\\b' + keyword + '\\b', 'g');
+                    text = text.replace(regex, '<span class="keyword">' + keyword + '</span>');
+                });
+                code.innerHTML = text;
+            }
+        });
     </script>
 </body>
 </html>
