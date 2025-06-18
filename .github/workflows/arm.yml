@@ -62,7 +62,7 @@ jobs:
         env:
           PKG_CONFIG_ALLOW_CROSS: 1
         run: |
-          export CARGO_TARGET_$(echo ${{ matrix.target }} | tr '-' '_')_LINKER=$(echo ${{ matrix.target }} | sed 's/-unknown-linux-gnu/-linux-gnu/' | sed 's/-unknown-linux-gnueabihf/-linux-gnueabihf/')-gcc
+          export CARGO_TARGET_$(echo ${{ matrix.target }} | tr '[:lower:]' '[:upper:]' | tr '-' '_')_LINKER=$(echo ${{ matrix.target }} | sed 's/-unknown-linux-gnu/-linux-gnu/' | sed 's/-unknown-linux-gnueabihf/-linux-gnueabihf/')-gcc
           export PKG_CONFIG_PATH="/usr/lib/$(echo ${{ matrix.target }} | sed 's/-unknown-linux-gnu/-linux-gnu/' | sed 's/-unknown-linux-gnueabihf/-linux-gnueabihf/')/pkgconfig:/usr/share/pkgconfig"
           pnpm run tauri build -- --target ${{ matrix.target }}
 
