@@ -13,7 +13,7 @@ jobs:
         include:
           - arch: aarch64
             cpu: cortex-a72
-            base_image: https://dietpi.com/downloads/images/DietPi_RPi-ARMv8-Bookworm.img.xz
+            base_image: https://dietpi.com/downloads/images/DietPi_RPi5-ARMv8-Bookworm.img.xz
             deb: arm64
             rpm: aarch64
             appimage: aarch64
@@ -80,17 +80,17 @@ jobs:
       - name: Upload deb bundle
         uses: actions/upload-artifact@v4
         with:
-          name: Debian Bundle ARM
+          name: Debian Bundle ARM ${{ matrix.arch }}
           path: ${{ github.workspace }}/src-tauri/target/release/bundle/deb/switch-shuttle_${{ env.APP_VERSION }}_${{ matrix.deb }}.deb
 
       - name: Upload rpm bundle
         uses: actions/upload-artifact@v4
         with:
-          name: RPM Bundle ARM
+          name: RPM Bundle ARM ${{ matrix.arch }}
           path: ${{ github.workspace }}/src-tauri/target/release/bundle/rpm/switch-shuttle-${{ env.APP_VERSION }}-1.${{ matrix.rpm }}.rpm
 
       - name: Upload appimage bundle
         uses: actions/upload-artifact@v4
         with:
-          name: AppImage Bundle ARM
+          name: AppImage Bundle ARM ${{ matrix.arch }}
           path: ${{ github.workspace }}/src-tauri/target/release/bundle/appimage/switch-shuttle_${{ env.APP_VERSION }}_${{ matrix.appimage }}.AppImage
