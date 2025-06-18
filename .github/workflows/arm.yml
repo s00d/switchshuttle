@@ -9,17 +9,13 @@ jobs:
 
     strategy:
       matrix:
-        arch: [aarch64, armv7l]
+        target: [aarch64-unknown-linux-gnu, armv7-unknown-linux-gnueabihf]
         include:
-          - arch: aarch64
-            cpu: cortex-a72
-            base_image: https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-arm64.img
+          - target: aarch64-unknown-linux-gnu
             deb: arm64
             rpm: aarch64
             appimage: aarch64
-          - arch: armv7l
-            cpu: cortex-a7
-            base_image: https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-armhf.img
+          - target: armv7-unknown-linux-gnueabihf
             deb: armhf
             rpm: armv7hl
             appimage: armv7l
@@ -38,6 +34,16 @@ jobs:
           node-version: 20
           cache: 'pnpm'
 
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev
+
       - uses: actions/cache@v4
         with:
           path: |
@@ -47,38 +53,15 @@ jobs:
             ~/.cargo/git/db/
             target/
             src-tauri/target/
-          key: ${{ runner.os }}-arm-${{ matrix.arch }}-${{ hashFiles('Cargo.lock') }}
+          key: ${{ runner.os }}-arm-${{ matrix.target }}-${{ hashFiles('Cargo.lock') }}
 
-      - name: Build app
-        uses: pguyot/arm-runner-action@v2.6.5
-        with:
-          base_image: ${{ matrix.base_image }}
-          cpu: ${{ matrix.cpu }}
-          bind_mount_repository: true
-          image_additional_mb: 10240
-          optimize_image: no
-          exit_on_fail: no
-          commands: |
-            # Prevent Rust from complaining about $HOME not matching eid home
-            export HOME=/root
+      - name: Install frontend dependencies
+        run: pnpm install
 
-            # Workaround to CI worker being stuck on Updating crates.io index
-            export CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse
-
-            # Install setup prerequisites
-            apt-get update -y --allow-releaseinfo-change
-            apt-get autoremove -y
-            apt-get install -y --no-install-recommends --no-install-suggests curl libwebkit2gtk-4.1-dev build-essential libssl-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev patchelf libfuse2 file
-            curl https://sh.rustup.rs -sSf | sh -s -- -y
-            . "$HOME/.cargo/env"
-            curl -fsSL https://deb.nodesource.com/setup_lts.x | bash
-            apt-get install -y nodejs
-
-            # Install frontend dependencies
-            pnpm install
-
-            # Build the application
-            pnpm run tauri build -- --verbose
+      - name: Build Tauri app
+        run: |
+          export CARGO_TARGET_${{ matrix.target }}_LINKER=arm-linux-gnueabihf-gcc
+          pnpm run tauri build -- --target ${{ matrix.target }}
 
       - name: Get app version
         run: echo "APP_VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
@@ -86,17 +69,17 @@ jobs:
       - name: Upload deb bundle
         uses: actions/upload-artifact@v4
         with:
-          name: Debian Bundle ARM ${{ matrix.arch }}
-          path: ${{ github.workspace }}/src-tauri/target/release/bundle/deb/switch-shuttle_${{ env.APP_VERSION }}_${{ matrix.deb }}.deb
+          name: Debian Bundle ARM ${{ matrix.target }}
+          path: ${{ github.workspace }}/src-tauri/target/${{ matrix.target }}/release/bundle/deb/switch-shuttle_${{ env.APP_VERSION }}_${{ matrix.deb }}.deb
 
       - name: Upload rpm bundle
         uses: actions/upload-artifact@v4
         with:
-          name: RPM Bundle ARM ${{ matrix.arch }}
-          path: ${{ github.workspace }}/src-tauri/target/release/bundle/rpm/switch-shuttle-${{ env.APP_VERSION }}-1.${{ matrix.rpm }}.rpm
+          name: RPM Bundle ARM ${{ matrix.target }}
+          path: ${{ github.workspace }}/src-tauri/target/${{ matrix.target }}/release/bundle/rpm/switch-shuttle-${{ env.APP_VERSION }}-1.${{ matrix.rpm }}.rpm
 
       - name: Upload appimage bundle
         uses: actions/upload-artifact@v4
         with:
-          name: AppImage Bundle ARM ${{ matrix.arch }}
-          path: ${{ github.workspace }}/src-tauri/target/release/bundle/appimage/switch-shuttle_${{ env.APP_VERSION }}_${{ matrix.appimage }}.AppImage
+          name: AppImage Bundle ARM ${{ matrix.target }}
+          path: ${{ github.workspace }}/src-tauri/target/${{ matrix.target }}/release/bundle/appimage/switch-shuttle_${{ env.APP_VERSION }}_${{ matrix.appimage }}.AppImage
