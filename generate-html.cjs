@@ -178,8 +178,8 @@ const extractHeaders = (markdown) => {
 // Генерация меню на основе заголовков
 const generateMenu = (headers) => {
     const menuItems = headers.map(header => {
-        const indentClass = header.level === 2 ? 'indent-1' : '';
-        return `<li class="menu-item level-${header.level} ${indentClass}">
+        const indentClass = header.level === 2 ? 'level-1' : '';
+        return `<li class="menu-item ${indentClass}">
             <a href="#${header.id}" class="menu-link">
                 <span class="menu-text">${header.text}</span>
             </a>
@@ -203,7 +203,7 @@ const generateHtmlForLanguage = (lang, inputPath, outputPath) => {
 
         // Очищаем markdown для контента (сохраняем изображения)
         const cleanDataForContent = cleanMarkdownForContent(data);
-        
+
         // Преобразование Markdown в HTML
         const htmlContent = marked(cleanDataForContent, { renderer });
 
@@ -211,7 +211,7 @@ const generateHtmlForLanguage = (lang, inputPath, outputPath) => {
         const languageMenu = Object.entries(readmeFiles).map(([code, _]) => {
             const fileName = code === 'en' ? 'index.html' : `index_${code}.html`;
             const isActive = code === lang;
-            return `<a href="${fileName}" class="lang-item ${isActive ? 'active' : ''}">${languageNames[code]}</a>`;
+            return `<a href="${fileName}" class="nav-link ${isActive ? 'active' : ''}">${languageNames[code]}</a>`;
         }).join('');
 
         // Обертывание в современную структуру HTML
@@ -224,32 +224,30 @@ const generateHtmlForLanguage = (lang, inputPath, outputPath) => {
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="https://github.com/s00d/switchshuttle/blob/main/icons/128x128_white.png?raw=true">
+    <meta name="description" content="SwitchShuttle - Cross-platform system tray application for managing terminal configurations and commands">
+    <meta name="keywords" content="terminal, configuration, system tray, cross-platform, development tools">
+    <meta name="author" content="SwitchShuttle Team">
+    <meta property="og:title" content="SwitchShuttle Documentation">
+    <meta property="og:description" content="Cross-platform system tray application for managing terminal configurations and commands">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://github.com/s00d/switchshuttle">
+    <meta property="og:image" content="https://github.com/s00d/switchshuttle/blob/main/icons/128x128_white.png?raw=true">
 </head>
 <body>
     <div class="app">
         <header class="header" role="banner">
-            <div class="header-content container">
+            <div class="header-content">
                 <a href="https://github.com/s00d/switchshuttle/" class="logo-link" aria-label="SwitchShuttle на GitHub">
                     <img src="https://github.com/s00d/switchshuttle/blob/main/icons/128x128_white.png?raw=true" alt="SwitchShuttle" class="logo-img">
                     <span class="logo-text">SwitchShuttle</span>
-                    <span class="console-cursor" aria-hidden="true">_</span>
                 </a>
                 <nav class="nav" aria-label="Основная навигация">
                     <ul class="nav-links">
-                        <li><a href="https://github.com/s00d/switchshuttle/" class="nav-link"><span class="nav-text">GitHub</span></a></li>
-                        <li><a href="https://github.com/s00d/switchshuttle/issues" class="nav-link"><span class="nav-text">Issues</span></a></li>
-                        <li><a href="https://github.com/s00d/switchshuttle/releases" class="nav-link"><span class="nav-text">Releases</span></a></li>
-                        <li class="language-selector">
-                            <button class="language-btn" aria-haspopup="listbox" aria-expanded="false">
-                                <span class="current-lang">${languageNames[lang]}</span>
-                                <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
-                            </button>
-                            <div class="language-menu" role="listbox">
-                                ${languageMenu}
-                            </div>
-                        </li>
+                        <li><a href="https://github.com/s00d/switchshuttle/" class="nav-link">GitHub</a></li>
+                        <li><a href="https://github.com/s00d/switchshuttle/issues" class="nav-link">Issues</a></li>
+                        <li><a href="https://github.com/s00d/switchshuttle/releases" class="nav-link">Releases</a></li>
                     </ul>
                 </nav>
                 <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
@@ -259,29 +257,44 @@ const generateHtmlForLanguage = (lang, inputPath, outputPath) => {
                 </button>
             </div>
         </header>
-        <div class="mobile-overlay" aria-hidden="true"></div>
-        <div class="main-container container">
+        
+        <div class="main-container">
             <aside class="sidebar" role="complementary" aria-label="Содержание">
                 <div class="sidebar-header">
-                    <div class="sidebar-title-wrapper">
-                        <svg class="sidebar-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
-                        <h3 class="sidebar-title">Contents</h3>
-                    </div>
+                    <h3 class="sidebar-title">📋 Содержание</h3>
                 </div>
                 <nav class="sidebar-nav" aria-label="Навигация по разделам">
                     <ul class="sidebar-menu">
                         ${menuHtml}
                     </ul>
                 </nav>
+                <div class="sidebar-footer">
+                    <div class="language-selector">
+                        <button class="language-btn" aria-label="Переключить язык">
+                            <span class="current-lang">🌐 ${languageNames[lang]}</span>
+                            <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6,9 12,15 18,9"></polyline>
+                            </svg>
+                        </button>
+                        <div class="language-menu">
+                            ${languageMenu}
+                        </div>
+                    </div>
+                </div>
             </aside>
+            
             <main class="content" id="main-content" tabindex="-1" role="main">
                 <section class="content-wrapper">
                     ${htmlContent}
                 </section>
             </main>
         </div>
+        
+        <!-- Мобильный оверлей -->
+        <div class="mobile-overlay" aria-hidden="true"></div>
+        
         <footer class="footer" role="contentinfo">
-            <div class="footer-content container">
+            <div class="footer-content">
                 <div class="footer-left">
                     <span>© ${new Date().getFullYear()} SwitchShuttle</span>
                 </div>
@@ -292,14 +305,8 @@ const generateHtmlForLanguage = (lang, inputPath, outputPath) => {
             </div>
         </footer>
     </div>
+    
     <script>
-        // Консольный курсор
-        const cursor = document.querySelector('.console-cursor');
-        if (cursor) {
-            setInterval(() => {
-                cursor.style.opacity = cursor.style.opacity === '0' ? '1' : '0';
-            }, 500);
-        }
         // Плавная прокрутка к якорям
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
@@ -313,11 +320,13 @@ const generateHtmlForLanguage = (lang, inputPath, outputPath) => {
                 }
             });
         });
+        
         // Подсветка активного пункта меню через отслеживание скролла
         const updateActiveMenuItem = () => {
             const scrollPosition = window.scrollY + 100;
-            const menuLinks = document.querySelectorAll('.sidebar-menu a');
+            const menuLinks = document.querySelectorAll('.menu-link');
             let activeLink = null;
+            
             menuLinks.forEach(link => {
                 const href = link.getAttribute('href');
                 if (href && href.startsWith('#')) {
@@ -331,9 +340,11 @@ const generateHtmlForLanguage = (lang, inputPath, outputPath) => {
                     }
                 }
             });
+            
             menuLinks.forEach(link => link.classList.remove('active'));
             if (activeLink) activeLink.classList.add('active');
         };
+        
         let ticking = false;
         window.addEventListener('scroll', () => {
             if (!ticking) {
@@ -345,71 +356,126 @@ const generateHtmlForLanguage = (lang, inputPath, outputPath) => {
             }
         });
         updateActiveMenuItem();
-        // Переключение языкового меню
-        const languageBtn = document.querySelector('.language-btn');
-        const languageMenu = document.querySelector('.language-menu');
-        if (languageBtn && languageMenu) {
-            languageBtn.addEventListener('click', () => {
-                languageMenu.classList.toggle('open');
-                languageBtn.setAttribute('aria-expanded', languageMenu.classList.contains('open'));
-            });
-            document.addEventListener('click', (e) => {
-                if (!languageBtn.contains(e.target) && !languageMenu.contains(e.target)) {
-                    languageMenu.classList.remove('open');
-                    languageBtn.setAttribute('aria-expanded', 'false');
-                }
-            });
-        }
+        
         // Мобильное меню
         const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
         const sidebar = document.querySelector('.sidebar');
-        const mobileOverlay = document.querySelector('.mobile-overlay');
+        const overlay = document.querySelector('.mobile-overlay');
         
-        if (mobileMenuBtn && sidebar && mobileOverlay) {
+        if (mobileMenuBtn && sidebar) {
             mobileMenuBtn.addEventListener('click', () => {
-                const isOpen = sidebar.classList.contains('mobile-open');
-                sidebar.classList.toggle('mobile-open');
-                mobileOverlay.classList.toggle('active');
+                const isOpen = sidebar.classList.contains('open');
+                sidebar.classList.toggle('open');
                 mobileMenuBtn.classList.toggle('active');
                 mobileMenuBtn.setAttribute('aria-expanded', !isOpen);
+                
+                // Управление оверлеем
+                if (overlay) {
+                    if (!isOpen) {
+                        overlay.classList.add('active');
+                    } else {
+                        overlay.classList.remove('active');
+                    }
+                }
+                
                 document.body.style.overflow = isOpen ? '' : 'hidden';
             });
 
-            mobileOverlay.addEventListener('click', () => {
-                sidebar.classList.remove('mobile-open');
-                mobileOverlay.classList.remove('active');
-                mobileMenuBtn.classList.remove('active');
-                mobileMenuBtn.setAttribute('aria-expanded', 'false');
-                document.body.style.overflow = '';
-            });
+            // Закрытие меню при клике на оверлей
+            if (overlay) {
+                overlay.addEventListener('click', () => {
+                    sidebar.classList.remove('open');
+                    mobileMenuBtn.classList.remove('active');
+                    mobileMenuBtn.setAttribute('aria-expanded', 'false');
+                    overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            }
 
             // Закрытие меню при клике на ссылку в мобильном меню
-            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+            document.querySelectorAll('.menu-link').forEach(link => {
                 link.addEventListener('click', () => {
                     if (window.innerWidth <= 768) {
-                        sidebar.classList.remove('mobile-open');
-                        mobileOverlay.classList.remove('active');
+                        sidebar.classList.remove('open');
                         mobileMenuBtn.classList.remove('active');
                         mobileMenuBtn.setAttribute('aria-expanded', 'false');
+                        if (overlay) {
+                            overlay.classList.remove('active');
+                        }
                         document.body.style.overflow = '';
                     }
                 });
             });
         }
+        
         // Простая подсветка кода
         document.querySelectorAll('.code-block').forEach(block => {
             const code = block.querySelector('code');
             if (code) {
                 let text = code.textContent;
-                // Простая подсветка без сложных регулярных выражений
-                const keywords = ['let', 'const', 'var', 'function', 'return', 'if', 'else', 'for', 'while', 'switch', 'case', 'break', 'import', 'from', 'export', 'class', 'new', 'await', 'async', 'try', 'catch', 'throw'];
+                
+                // Подсветка ключевых слов
+                const keywords = ['let', 'const', 'var', 'function', 'return', 'if', 'else', 'for', 'while', 'switch', 'case', 'break', 'import', 'from', 'export', 'class', 'new', 'await', 'async', 'try', 'catch', 'throw', 'console', 'log', 'error', 'warn', 'info', 'debug', 'require', 'module', 'exports', 'default', 'static', 'public', 'private', 'protected', 'extends', 'implements', 'interface', 'type', 'enum', 'namespace', 'declare', 'abstract', 'final', 'super', 'this', 'null', 'undefined', 'true', 'false', 'NaN', 'Infinity'];
+                
                 keywords.forEach(keyword => {
-                    const regex = new RegExp('\\\\b' + keyword + '\\\\b', 'g');
+                    const regex = new RegExp('\\\\b' + keyword + '\\\\b', 'gi');
                     text = text.replace(regex, '<span class="keyword">' + keyword + '</span>');
                 });
+                
                 code.innerHTML = text;
             }
         });
+        
+        // Анимация появления элементов при скролле
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Анимация только для заголовков
+                    if (entry.target.tagName === 'H1') {
+                        entry.target.classList.add('animate-on-scroll', 'fade-in-right');
+                    } else if (entry.target.tagName === 'H2') {
+                        entry.target.classList.add('animate-on-scroll', 'fade-in-right');
+                    } else if (entry.target.tagName === 'H3') {
+                        entry.target.classList.add('animate-on-scroll', 'fade-in-right');
+                    }
+                }
+            });
+        }, observerOptions);
+        
+        // Наблюдаем только за заголовками
+        document.querySelectorAll('h1, h2, h3').forEach(el => {
+            observer.observe(el);
+        });
+        
+        // Переключение языка
+        const languageBtn = document.querySelector('.sidebar .language-btn');
+        const languageMenu = document.querySelector('.sidebar .language-menu');
+        
+        if (languageBtn && languageMenu) {
+            languageBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                languageMenu.classList.toggle('open');
+            });
+            
+            // Закрытие меню при клике вне его
+            document.addEventListener('click', (e) => {
+                if (!languageBtn.contains(e.target) && !languageMenu.contains(e.target)) {
+                    languageMenu.classList.remove('open');
+                }
+            });
+            
+            // Закрытие меню при клике на пункт меню
+            languageMenu.querySelectorAll('.lang-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    languageMenu.classList.remove('open');
+                });
+            });
+        }
     </script>
 </body>
 </html>`;
