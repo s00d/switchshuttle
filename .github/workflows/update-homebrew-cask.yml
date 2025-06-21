@@ -1,6 +1,8 @@
 name: Update Homebrew Cask
 
 on:
+  release:
+    types: [published]  # Триггер при публикации релиза
   push:
     tags:
       - 'app-v*'  # Триггер при создании тега с префиксом app-v
@@ -36,6 +38,11 @@ jobs:
         if [ -n "${{ github.event.inputs.version }}" ]; then
           VERSION="${{ github.event.inputs.version }}"
           echo "Using manual version: $VERSION"
+        elif [ "${{ github.event_name }}" = "release" ]; then
+          VERSION="${{ github.event.release.tag_name }}"
+          # Убираем префикс app-v если есть
+          VERSION=${VERSION#app-v}
+          echo "Using release version: $VERSION"
         else
           VERSION=$(node -p "require('./package.json').version")
           echo "Using version from package.json: $VERSION"
