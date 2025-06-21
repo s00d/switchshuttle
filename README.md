@@ -45,6 +45,14 @@ SwitchShuttle is a powerful cross-platform system tray application that revoluti
 
 ### Download & Install
 
+#### Option 1: Homebrew (macOS - Recommended)
+```bash
+# Install via Homebrew
+brew tap s00d/switchshuttle
+brew install --cask switchshuttle
+```
+
+#### Option 2: Manual Download
 1. **Download** the latest release for your platform from [GitHub Releases](https://github.com/s00d/switchshuttle/releases)
 2. **Install** the application
 3. **Launch** SwitchShuttle - it will appear in your system tray
