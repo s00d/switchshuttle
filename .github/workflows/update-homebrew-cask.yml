@@ -1,0 +1,145 @@
+name: Update Homebrew Cask
+
+on:
+  push:
+    tags:
+      - 'app-v*'  # Триггер при создании тега с префиксом app-v
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to update (leave empty to use package.json)'
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  update-cask:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout SwitchShuttle repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Get version
+      id: version
+      run: |
+        if [ -n "${{ github.event.inputs.version }}" ]; then
+          VERSION="${{ github.event.inputs.version }}"
+          echo "Using manual version: $VERSION"
+        else
+          VERSION=$(node -p "require('./package.json').version")
+          echo "Using version from package.json: $VERSION"
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Version: $VERSION"
+        
+    - name: Check if releases exist
+      run: |
+        VERSION=${{ steps.version.outputs.version }}
+        X64_URL="https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle_${VERSION}_x64.dmg"
+        AARCH64_URL="https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle_${VERSION}_aarch64.dmg"
+        
+        echo "Checking Intel release: $X64_URL"
+        if ! curl --output /dev/null --silent --head --fail "$X64_URL"; then
+          echo "❌ Intel release not found: $X64_URL"
+          exit 1
+        fi
+        echo "✅ Intel release found"
+        
+        echo "Checking Apple Silicon release: $AARCH64_URL"
+        if ! curl --output /dev/null --silent --head --fail "$AARCH64_URL"; then
+          echo "❌ Apple Silicon release not found: $AARCH64_URL"
+          exit 1
+        fi
+        echo "✅ Apple Silicon release found"
+        
+    - name: Calculate SHA256 hashes
+      id: hashes
+      run: |
+        VERSION=${{ steps.version.outputs.version }}
+        X64_URL="https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle_${VERSION}_x64.dmg"
+        AARCH64_URL="https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle_${VERSION}_aarch64.dmg"
+        
+        echo "Calculating Intel SHA256..."
+        X64_SHA256=$(curl -sL "$X64_URL" | shasum -a 256 | cut -d' ' -f1)
+        echo "Intel SHA256: $X64_SHA256"
+        
+        echo "Calculating Apple Silicon SHA256..."
+        AARCH64_SHA256=$(curl -sL "$AARCH64_URL" | shasum -a 256 | cut -d' ' -f1)
+        echo "Apple Silicon SHA256: $AARCH64_SHA256"
+        
+        echo "x64_sha256=$X64_SHA256" >> $GITHUB_OUTPUT
+        echo "aarch64_sha256=$AARCH64_SHA256" >> $GITHUB_OUTPUT
+        
+    - name: Checkout homebrew-switchshuttle repository
+      uses: actions/checkout@v4
+      with:
+        repository: s00d/homebrew-switchshuttle
+        token: ${{ secrets.GITHUB_TOKEN }}
+        path: homebrew-switchshuttle
+        
+    - name: Update cask file
+      run: |
+        VERSION=${{ steps.version.outputs.version }}
+        X64_SHA256=${{ steps.hashes.outputs.x64_sha256 }}
+        AARCH64_SHA256=${{ steps.hashes.outputs.aarch64_sha256 }}
+        
+        cd homebrew-switchshuttle/Casks
+        
+        # Update version
+        sed -i "s/version \"[^\"]*\"/version \"$VERSION\"/" switchshuttle.rb
+        
+        # Update Intel SHA256 (first occurrence)
+        sed -i "0,/sha256 \"[^\"]*\"/{s/sha256 \"[^\"]*\"/sha256 \"$X64_SHA256\"/}" switchshuttle.rb
+        
+        # Update Apple Silicon SHA256 (second occurrence)
+        sed -i "0,/sha256 \"[^\"]*\"/{s/sha256 \"[^\"]*\"/sha256 \"$AARCH64_SHA256\"/}" switchshuttle.rb
+        
+        echo "Updated cask with version $VERSION"
+        echo "Intel SHA256: $X64_SHA256"
+        echo "Apple Silicon SHA256: $AARCH64_SHA256"
+        
+    - name: Setup Homebrew
+      run: |
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        echo "$(/opt/homebrew/bin/brew --prefix)/bin" >> $GITHUB_PATH
+        
+    - name: Validate cask syntax
+      run: |
+        cd homebrew-switchshuttle
+        brew audit --cask --new Casks/switchshuttle.rb
+        
+    - name: Commit and push changes
+      run: |
+        cd homebrew-switchshuttle
+        
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        
+        git add Casks/switchshuttle.rb
+        git commit -m "Update SwitchShuttle to v${{ steps.version.outputs.version }}"
+        git push
+        
+    - name: Create summary
+      run: |
+        echo "## ✅ Homebrew Cask Updated Successfully!" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Version:** ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Intel SHA256:** ${{ steps.hashes.outputs.x64_sha256 }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Apple Silicon SHA256:** ${{ steps.hashes.outputs.aarch64_sha256 }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Users can now install with:" >> $GITHUB_STEP_SUMMARY
+        echo "```bash" >> $GITHUB_STEP_SUMMARY
+        echo "brew tap s00d/switchshuttle" >> $GITHUB_STEP_SUMMARY
+        echo "brew install --cask switchshuttle" >> $GITHUB_STEP_SUMMARY
+        echo "```" >> $GITHUB_STEP_SUMMARY 
