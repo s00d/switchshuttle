@@ -118,7 +118,7 @@ jobs:
         
         git add Casks/switchshuttle.rb
         git commit -m "Update SwitchShuttle to v${{ steps.version.outputs.version }}"
-        git push
+        git push origin main
         
     - name: Create summary
       run: |
