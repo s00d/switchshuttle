@@ -46,6 +46,14 @@ SwitchShuttle ist eine leistungsstarke plattformübergreifende System-Tray-Anwen
 
 ### Download & Installation
 
+#### Option 1: Homebrew (macOS - Empfohlen)
+```bash
+# Installation über Homebrew
+brew tap s00d/switchshuttle
+brew install --cask switchshuttle
+```
+
+#### Option 2: Manueller Download
 1. **Laden Sie** die neueste Version für Ihre Plattform von [GitHub Releases](https://github.com/s00d/switchshuttle/releases) herunter
 2. **Installieren Sie** die Anwendung
 3. **Starten Sie** SwitchShuttle - es erscheint in Ihrem System-Tray

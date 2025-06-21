@@ -46,6 +46,14 @@ SwitchShuttleは、ターミナルコマンドの管理と実行方法を革新�
 
 ### ダウンロードとインストール
 
+#### オプション1: Homebrew (macOS - 推奨)
+```bash
+# Homebrew経由でインストール
+brew tap s00d/switchshuttle
+brew install --cask switchshuttle
+```
+
+#### オプション2: 手動ダウンロード
 1. **ダウンロード** [GitHub Releases](https://github.com/s00d/switchshuttle/releases)からお使いのプラットフォーム用の最新リリースをダウンロード
 2. **インストール** アプリケーションをインストール
 3. **起動** SwitchShuttleを起動 - システムトレイに表示されます

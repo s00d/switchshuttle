@@ -46,6 +46,14 @@ SwitchShuttle 是一个强大的跨平台系统托盘应用程序，它彻底改
 
 ### 下载和安装
 
+#### 选项 1: Homebrew (macOS - 推荐)
+```bash
+# 通过 Homebrew 安装
+brew tap s00d/switchshuttle
+brew install --cask switchshuttle
+```
+
+#### 选项 2: 手动下载
 1. **下载** 从 [GitHub Releases](https://github.com/s00d/switchshuttle/releases) 下载您平台的最新版本
 2. **安装** 应用程序
 3. **启动** SwitchShuttle - 它将出现在系统托盘中
