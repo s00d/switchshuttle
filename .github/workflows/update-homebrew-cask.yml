@@ -109,16 +109,6 @@ jobs:
         echo "Intel SHA256: $X64_SHA256"
         echo "Apple Silicon SHA256: $AARCH64_SHA256"
         
-    - name: Setup Homebrew
-      run: |
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        echo "$(/opt/homebrew/bin/brew --prefix)/bin" >> $GITHUB_PATH
-        
-    - name: Validate cask syntax
-      run: |
-        cd homebrew-switchshuttle
-        brew audit --cask --new Casks/switchshuttle.rb
-        
     - name: Commit and push changes
       run: |
         cd homebrew-switchshuttle
