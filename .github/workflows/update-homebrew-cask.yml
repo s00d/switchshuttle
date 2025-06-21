@@ -85,7 +85,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: s00d/homebrew-switchshuttle
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.HOMEBREW_TOKEN }}
         path: homebrew-switchshuttle
         
     - name: Update cask file
