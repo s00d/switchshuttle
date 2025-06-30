@@ -91,7 +91,7 @@ pub fn create_system_tray_menu(
     tray_menu_builder = tray_menu_builder.separator();
 
     let mut edit_config_submenu = SubmenuBuilder::new(app, "Edit Config");
-    
+
     for path in &config_manager.config_paths {
         let file_name = path.file_name().unwrap().to_string_lossy().to_string();
         let icon_path = app
@@ -287,17 +287,19 @@ pub fn handle_system_tray_event(
                 let config_manager = config_manager.lock().unwrap();
                 match config_manager.find_command_by_id(event.id().0.as_str()) {
                     Some((command, config)) => {
-                        if let Some(_inputs) = &command.inputs {
-                            if let Some(id) = &command.id {
-                                create_window(
-                                    &app,
-                                    "Provide Inputs",
-                                    &format!("inputs/{}", id),
-                                    400.0,
-                                    300.0,
-                                    true,
-                                );
-                            }
+                        let should_show_inputs = command.inputs.as_ref()
+                            .map(|inputs| !inputs.is_empty())
+                            .unwrap_or(false) && command.id.is_some();
+                        
+                        if should_show_inputs {
+                            create_window(
+                                &app,
+                                "Provide Inputs",
+                                &format!("inputs/{}", command.id.as_ref().unwrap()),
+                                400.0,
+                                300.0,
+                                true,
+                            );
                         } else {
                             helpers::execute_command(
                                 command,
