@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.3] - 2025-06-30
+
+### Added
+- CLI module refactoring for better code organization
+- Improved CLI command handling with separate module
+- Auto-focus on first input field after loading
+- Command line interface (CLI) for executing commands by ID or name
+- CLI commands: list all commands and search by name
+
+### Changed
+- Updated dependencies to latest versions
+- Improved input window logic for better command execution flow
+- Enhanced form layout with horizontal label-input arrangement
+
 ## [1.5.2] - 2025-06-30
 
 ### Added
@@ -193,6 +207,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Configuration editor for easier config file management
+
+### Fixed
+- Updated window identifiers for routing consistency
 
 ---
 
