@@ -229,7 +229,7 @@ pub fn handle_system_tray_event(
 
     match event.id().0.as_str() {
         "about" => {
-            create_window(&app, "About", "about", 800.0, 600.0, true);
+            create_window(&app, "About", "/about", 800.0, 600.0, true);
         }
         "quit" => std::process::exit(0),
         "refresh_configurations" => {
@@ -251,7 +251,7 @@ pub fn handle_system_tray_event(
             open_folder_in_default_explorer(&config_path.parent().unwrap().to_path_buf())
         }
         "open_config_editor" => {
-            create_window(&app, "Config Editor", "editor", 800.0, 600.0, true);
+            create_window(&app, "Config Editor", "/editor", 800.0, 600.0, true);
         }
         "toggle_launch_at_login" => {
             let autostart_manager = app.autolaunch();
@@ -271,7 +271,7 @@ pub fn handle_system_tray_event(
             opener.open_url(homepage_url, None::<&str>).unwrap();
         }
         "check_updates" => {
-            create_window(&app, "Update Available", "update", 800.0, 600.0, true);
+            create_window(&app, "Update Available", "/update", 800.0, 600.0, true);
         }
         "open_devtools" => {
             if cfg!(debug_assertions) {
