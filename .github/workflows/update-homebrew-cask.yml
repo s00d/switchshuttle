@@ -3,9 +3,6 @@ name: Update Homebrew Cask
 on:
   release:
     types: [published]  # Триггер при публикации релиза
-  push:
-    tags:
-      - 'app-v*'  # Триггер при создании тега с префиксом app-v
   workflow_dispatch:
     inputs:
       version:
@@ -21,9 +18,7 @@ permissions:
 jobs:
   update-cask:
     runs-on: ubuntu-latest
-    # Запускаем только при создании тегов с префиксом app-v
-    if: contains(github.ref, 'app-v') == false
-    
+
     steps:
     - name: Checkout SwitchShuttle repository
       uses: actions/checkout@v4
