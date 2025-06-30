@@ -106,11 +106,17 @@ jobs:
         # Update version
         sed -i "s/version \"[^\"]*\"/version \"$VERSION\"/" switchshuttle.rb
         
-        # Update Intel SHA256 (first occurrence)
-        sed -i "0,/sha256 \"[^\"]*\"/{s/sha256 \"[^\"]*\"/sha256 \"$X64_SHA256\"/}" switchshuttle.rb
-        
-        # Update Apple Silicon SHA256 (second occurrence)
-        sed -i "0,/sha256 \"[^\"]*\"/{s/sha256 \"[^\"]*\"/sha256 \"$AARCH64_SHA256\"/}" switchshuttle.rb
+        # Update SHA256 hashes using awk for more reliable replacement
+        awk -v x64_sha="$X64_SHA256" -v aarch64_sha="$AARCH64_SHA256" '
+        /sha256 "/ {
+          if (++count == 1) {
+            gsub(/sha256 "[^"]*"/, "sha256 \"" x64_sha "\"")
+          } else if (count == 2) {
+            gsub(/sha256 "[^"]*"/, "sha256 \"" aarch64_sha "\"")
+          }
+        }
+        { print }
+        ' switchshuttle.rb > switchshuttle_temp.rb && mv switchshuttle_temp.rb switchshuttle.rb
         
         echo "Updated cask with version $VERSION"
         echo "Intel SHA256: $X64_SHA256"
