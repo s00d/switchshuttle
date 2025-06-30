@@ -112,11 +112,28 @@ function fetchInputData() {
 }
 
 function onClose() {
-  router.push('/').catch((error) => {});
-  getCurrentWindow().hide();
+  // Reset form state
+  inputs.value = {};
+  errorMessage.value = '';
+  command.value = '';
+  
+  // Navigate to home and hide window
+  router.push('/').then(() => {
+    getCurrentWindow().hide();
+  }).catch(() => {
+    // If navigation fails, just hide the window
+    getCurrentWindow().hide();
+  });
 }
 
 onMounted(() => {
+  // Check if route params are valid
+  if (!route.params.id) {
+    console.warn('No command ID provided, redirecting to home');
+    router.push('/').catch(() => {});
+    return;
+  }
+  
   command.value = route.params.id; // Get the ID from the route parameters
   fetchInputData(); // Fetch the input data using the ID
   

@@ -295,7 +295,7 @@ pub fn handle_system_tray_event(
                             create_window(
                                 &app,
                                 "Provide Inputs",
-                                &format!("inputs/{}", command.id.as_ref().unwrap()),
+                                &format!("/inputs/{}", command.id.as_ref().unwrap()),
                                 400.0,
                                 300.0,
                                 true,

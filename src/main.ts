@@ -24,6 +24,15 @@ const router = createRouter({
     routes
 });
 
+// Handle router errors
+router.onError((error) => {
+    console.warn('Router error:', error);
+    // Redirect to home page if route not found
+    if (error.message.includes('No match found')) {
+        router.push('/').catch(() => {});
+    }
+});
+
 const app = createApp(App);
 
 app.use(router);
