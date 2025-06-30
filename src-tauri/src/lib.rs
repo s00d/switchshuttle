@@ -1,5 +1,6 @@
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 mod commands;
+mod cli;
 mod config;
 mod helpers;
 mod menu;
@@ -12,9 +13,11 @@ use crate::commands::{
     open_configuration, update_configuration, refresh_configurations, open_config_folder
 };
 use crate::menu::{create_system_tray_menu, handle_system_tray_event};
+use crate::cli::handle_cli_commands;
 use config::ConfigManager;
 use std::sync::{Arc, Mutex};
 use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
+use tauri_plugin_cli::CliExt;
 
 pub fn run() {
     let config_manager = Arc::new(Mutex::new(ConfigManager::new()));
@@ -36,7 +39,7 @@ pub fn run() {
         .plugin(tauri_plugin_log::Builder::new().build())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
-        // .plugin(tauri_plugin_cli::init())
+        .plugin(tauri_plugin_cli::init())
         .plugin(tauri_plugin_autostart::init(
             MacosLauncher::LaunchAgent,
             None,
@@ -46,6 +49,22 @@ pub fn run() {
             #[cfg(target_os = "macos")]
             {
                 app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+            }
+
+            // Handle CLI commands
+            let config_manager_clone = config_manager.clone();
+            
+            match app.cli().matches() {
+                Ok(matches) => {
+                    // Handle CLI commands and exit if any were processed
+                    if handle_cli_commands(&matches, &config_manager_clone) {
+                        // CLI command was handled, app will exit
+                        return Ok(());
+                    }
+                }
+                Err(_) => {
+                    // No CLI arguments or error, continue with normal app startup
+                }
             }
 
             let autostart_manager = app.autolaunch();

@@ -40,6 +40,7 @@ SwitchShuttle is a powerful cross-platform system tray application that revoluti
 - **🔄 Multiple Execution Modes** - Run in current window, new tab, or new window
 - **🚀 Auto-Start** - Launch at system startup for instant access
 - **🎨 Modern UI** - Beautiful, intuitive interface built with Vue.js
+- **💻 Command Line Interface** - Execute commands directly from terminal with CLI
 
 ## 🚀 Quick Start
 
@@ -64,6 +65,63 @@ brew install --cask switchshuttle
 2. **Add your commands** using the JSON format (see examples below)
 3. **Save and restart** the application
 4. **Enjoy** your organized command shortcuts!
+
+## 🖥️ Command Line Interface (CLI)
+
+SwitchShuttle also provides a powerful command-line interface for quick command execution without opening the GUI.
+
+### CLI Usage
+
+#### Execute Commands
+```bash
+# Execute by command ID
+switch-shuttle cmd_8
+
+# Execute by command name (case-insensitive)
+switch-shuttle "Example Command"
+```
+
+#### List All Commands
+```bash
+# Show all available commands with their IDs
+switch-shuttle --list
+# or
+switch-shuttle -l
+```
+
+#### Search Commands
+```bash
+# Search for commands containing specific text
+switch-shuttle --search "git"
+# or
+switch-shuttle -s "docker"
+```
+
+### CLI Examples
+
+```bash
+# Quick git operations
+switch-shuttle "git status"
+switch-shuttle "git pull"
+
+# Development workflows
+switch-shuttle "npm run dev"
+switch-shuttle "docker-compose up"
+
+# List all available commands
+switch-shuttle --list
+
+# Find commands related to database
+switch-shuttle --search "database"
+```
+
+### CLI Features
+
+- **🚀 Fast Execution** - Run commands instantly from terminal
+- **🔍 Smart Search** - Find commands by ID or name
+- **📋 Command Listing** - View all available commands
+- **⚡ No GUI Required** - Perfect for automation and scripts
+- **🔄 Exit After Execution** - Clean terminal experience
 
 ## 📋 Configuration Guide
 

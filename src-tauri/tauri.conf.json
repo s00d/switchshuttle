@@ -30,6 +30,28 @@
   "version": "../package.json",
   "identifier": "com.SwitchShuttle.app",
   "plugins": {
+    "cli": {
+      "description": "SwitchShuttle - Cross-platform terminal command manager",
+      "args": [
+        {
+          "name": "command",
+          "index": 1,
+          "takesValue": true,
+          "description": "Command ID or name to execute"
+        },
+        {
+          "name": "list",
+          "short": "l",
+          "description": "List all available commands"
+        },
+        {
+          "name": "search",
+          "short": "s",
+          "takesValue": true,
+          "description": "Search commands by name"
+        }
+      ]
+    },
     "deep-link": {
       "mobile": [
         { "host": "com.SwitchShuttle.app" }
