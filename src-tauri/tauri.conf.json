@@ -28,7 +28,7 @@
   },
   "productName": "switch-shuttle",
   "version": "../package.json",
-  "identifier": "com.SwitchShuttle.app",
+  "identifier": "com.SwitchShuttle",
   "plugins": {
     "cli": {
       "description": "SwitchShuttle - Cross-platform terminal command manager",
@@ -54,7 +54,7 @@
     },
     "deep-link": {
       "mobile": [
-        { "host": "com.SwitchShuttle.app" }
+        { "host": "com.SwitchShuttle" }
       ],
       "desktop": {
         "schemes": ["switchshuttle", "switch-shuttle"]

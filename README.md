@@ -97,6 +97,46 @@ switch-shuttle --search "git"
 switch-shuttle -s "docker"
 ```
 
+### Running CLI on Different Operating Systems
+
+#### macOS
+```bash
+# If installed via Homebrew
+switch-shuttle --list
+
+# If installed manually
+/Applications/switch-shuttle.app/Contents/MacOS/SwitchShuttle --list
+
+# Create an alias for easier access
+echo 'alias switch-shuttle="/Applications/switch-shuttle.app/Contents/MacOS/SwitchShuttle"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+#### Windows
+```bash
+# If installed via installer
+"C:\Program Files\SwitchShuttle\switch-shuttle.exe" --list
+
+# If installed via winget or chocolatey
+switch-shuttle --list
+
+# Add to PATH for easier access
+# Add "C:\Program Files\SwitchShuttle" to your system PATH
+```
+
+#### Linux
+```bash
+# If installed via package manager
+switch-shuttle --list
+
+# If installed manually
+./switch-shuttle --list
+
+# Make executable and add to PATH
+chmod +x switch-shuttle
+sudo mv switch-shuttle /usr/local/bin/
+```
+
 ### CLI Examples
 
 ```bash

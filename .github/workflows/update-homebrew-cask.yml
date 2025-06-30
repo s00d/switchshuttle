@@ -22,7 +22,7 @@ jobs:
   update-cask:
     runs-on: ubuntu-latest
     # Запускаем только при создании тегов с префиксом app-v
-    if: startsWith(github.ref, 'refs/tags/app-v')
+    if: contains(github.ref, 'app-v') == false
     
     steps:
     - name: Checkout SwitchShuttle repository
