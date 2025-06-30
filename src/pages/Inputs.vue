@@ -68,7 +68,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import { invoke } from '@tauri-apps/api/core';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { useRouter, useRoute } from 'vue-router';
@@ -140,6 +140,19 @@ onMounted(() => {
   // Add global keyboard listener
   document.addEventListener('keydown', handleKeydown);
 });
+
+// Watch for inputs to be loaded and focus first field
+watch(inputs, (newInputs) => {
+  if (newInputs && Object.keys(newInputs).length > 0) {
+    // Focus on first input field after a short delay to ensure DOM is ready
+    nextTick(() => {
+      const firstInput = document.querySelector('input');
+      if (firstInput) {
+        firstInput.focus();
+      }
+    });
+  }
+}, { immediate: true });
 
 onUnmounted(() => {
   // Clean up keyboard listener
