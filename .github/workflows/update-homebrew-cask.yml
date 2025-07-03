@@ -50,7 +50,7 @@ jobs:
     - name: Check if release exists
       run: |
         VERSION=${{ steps.version.outputs.version }}
-        UNIVERSAL_URL="https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle_${VERSION}_universal.dmg"
+        UNIVERSAL_URL="https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle-macos_${VERSION}_universal.dmg"
         
         echo "Checking Universal release: $UNIVERSAL_URL"
         if ! curl --output /dev/null --silent --head --fail "$UNIVERSAL_URL"; then
@@ -63,7 +63,7 @@ jobs:
       id: hashes
       run: |
         VERSION=${{ steps.version.outputs.version }}
-        UNIVERSAL_URL="https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle_${VERSION}_universal.dmg"
+        UNIVERSAL_URL="https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle-macos_${VERSION}_universal.dmg"
         
         echo "Calculating Universal SHA256..."
         UNIVERSAL_SHA256=$(curl -sL "$UNIVERSAL_URL" | shasum -a 256 | cut -d' ' -f1)
@@ -89,8 +89,8 @@ jobs:
         sed -i "s/version \"[^\"]*\"/version \"$VERSION\"/" switchshuttle.rb
         
         # Update URL to universal
-        sed -i "s|url \".*_x64\.dmg\"|url \"https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle_${VERSION}_universal.dmg\"|" switchshuttle.rb
-        sed -i "s|url \".*_aarch64\.dmg\"|url \"https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle_${VERSION}_universal.dmg\"|" switchshuttle.rb
+        sed -i "s|url \".*_x64\.dmg\"|url \"https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle-macos_${VERSION}_universal.dmg\"|" switchshuttle.rb
+        sed -i "s|url \".*_aarch64\.dmg\"|url \"https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle-macos_${VERSION}_universal.dmg\"|" switchshuttle.rb
         
         # Remove conditional logic and update to single SHA256
         awk -v universal_sha="$UNIVERSAL_SHA256" '

@@ -12,16 +12,16 @@ jobs:
       matrix:
         include:
           - platform: 'macos-latest' # Universal build for both ARM and Intel Macs
-            args: '--target universal-apple-darwin'
+            args: '--target universal-apple-darwin --config src-tauri/tauri.macos.conf.json'
             os: 'macos'
           - platform: 'ubuntu-22.04' # for Tauri v1 you could replace this with ubuntu-20.04
-            args: ''
+            args: '--config src-tauri/tauri.linux.conf.json'
             os: 'linux'
           - platform: 'windows-latest'
-            args: ''
+            args: '--config src-tauri/tauri.windows.conf.json'
             os: 'windows'
           - platform: 'windows-latest'
-            args: '--target i686-pc-windows-msvc'
+            args: '--target i686-pc-windows-msvc --config src-tauri/tauri.windows.conf.json'
             suffix: 'windows'
 
     runs-on: ${{ matrix.platform }}
@@ -84,7 +84,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: app-v__VERSION__ # the action automatically replaces __VERSION__ with the app version.
-          appName: 'switch-shuttle_${{ matrix.os }}'
+          appName: 'switch-shuttle_${{ matrix.os }}_v__VERSION__'
           releaseName: 'Release v__VERSION__'
           releaseBody: 'See the assets to download this version and install.'
           releaseDraft: true

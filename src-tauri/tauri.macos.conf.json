@@ -1,0 +1,103 @@
+{
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420"
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "resources": [
+      "icons/*"
+    ],
+    "macOS": {
+      "files": {
+        "README.md": "../README.md",
+        "post_install.sh": "../post_install.sh"
+      }
+    },
+    "createUpdaterArtifacts": true
+  },
+  "productName": "switch-shuttle-macos",
+  "version": "../package.json",
+  "identifier": "com.SwitchShuttle",
+  "plugins": {
+    "cli": {
+      "description": "SwitchShuttle - Cross-platform terminal command manager",
+      "args": [
+        {
+          "name": "command",
+          "index": 1,
+          "takesValue": true,
+          "description": "Command ID or name to execute"
+        },
+        {
+          "name": "list",
+          "short": "l",
+          "description": "List all available commands"
+        },
+        {
+          "name": "search",
+          "short": "s",
+          "takesValue": true,
+          "description": "Search commands by name"
+        }
+      ]
+    },
+    "deep-link": {
+      "mobile": [
+        { "host": "com.SwitchShuttle" }
+      ],
+      "desktop": {
+        "schemes": ["switchshuttle", "switch-shuttle"]
+      }
+    },
+    "updater": {
+      "active": true,
+      "endpoints": [
+        "https://raw.githubusercontent.com/s00d/switchshuttle/update/latest.json",
+        "https://github.com/s00d/switchshuttle/releases/latest/download/latest.json"
+      ],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDQ1Q0IzNkFDQkZFMjRDQjkKUldTNVRPSy9yRGJMUlVVSlZYaUlTc1ZkZkFHYnFSb1pnWmNVeTVXdnFKK3BZZHVWamptM0RHT00K",
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "SwitchShuttle",
+        "width": 800,
+        "height": 600,
+        "minWidth": 400,
+        "minHeight": 300,
+        "fullscreen": false,
+        "resizable": true,
+        "decorations": false,
+        "visible": false,
+        "alwaysOnTop": true,
+        "acceptFirstMouse": true,
+        "skipTaskbar": true,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": null
+    },
+    "trayIcon": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true,
+      "id": "switch-shuttle-tray"
+    }
+  }
+} 
