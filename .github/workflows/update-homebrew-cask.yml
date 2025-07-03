@@ -47,43 +47,29 @@ jobs:
         echo "version=$VERSION" >> $GITHUB_OUTPUT
         echo "Version: $VERSION"
         
-    - name: Check if releases exist
+    - name: Check if release exists
       run: |
         VERSION=${{ steps.version.outputs.version }}
-        X64_URL="https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle_${VERSION}_x64.dmg"
-        AARCH64_URL="https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle_${VERSION}_aarch64.dmg"
+        UNIVERSAL_URL="https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle_${VERSION}_universal.dmg"
         
-        echo "Checking Intel release: $X64_URL"
-        if ! curl --output /dev/null --silent --head --fail "$X64_URL"; then
-          echo "❌ Intel release not found: $X64_URL"
+        echo "Checking Universal release: $UNIVERSAL_URL"
+        if ! curl --output /dev/null --silent --head --fail "$UNIVERSAL_URL"; then
+          echo "❌ Universal release not found: $UNIVERSAL_URL"
           exit 1
         fi
-        echo "✅ Intel release found"
+        echo "✅ Universal release found"
         
-        echo "Checking Apple Silicon release: $AARCH64_URL"
-        if ! curl --output /dev/null --silent --head --fail "$AARCH64_URL"; then
-          echo "❌ Apple Silicon release not found: $AARCH64_URL"
-          exit 1
-        fi
-        echo "✅ Apple Silicon release found"
-        
-    - name: Calculate SHA256 hashes
+    - name: Calculate SHA256 hash
       id: hashes
       run: |
         VERSION=${{ steps.version.outputs.version }}
-        X64_URL="https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle_${VERSION}_x64.dmg"
-        AARCH64_URL="https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle_${VERSION}_aarch64.dmg"
+        UNIVERSAL_URL="https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle_${VERSION}_universal.dmg"
         
-        echo "Calculating Intel SHA256..."
-        X64_SHA256=$(curl -sL "$X64_URL" | shasum -a 256 | cut -d' ' -f1)
-        echo "Intel SHA256: $X64_SHA256"
+        echo "Calculating Universal SHA256..."
+        UNIVERSAL_SHA256=$(curl -sL "$UNIVERSAL_URL" | shasum -a 256 | cut -d' ' -f1)
+        echo "Universal SHA256: $UNIVERSAL_SHA256"
         
-        echo "Calculating Apple Silicon SHA256..."
-        AARCH64_SHA256=$(curl -sL "$AARCH64_URL" | shasum -a 256 | cut -d' ' -f1)
-        echo "Apple Silicon SHA256: $AARCH64_SHA256"
-        
-        echo "x64_sha256=$X64_SHA256" >> $GITHUB_OUTPUT
-        echo "aarch64_sha256=$AARCH64_SHA256" >> $GITHUB_OUTPUT
+        echo "universal_sha256=$UNIVERSAL_SHA256" >> $GITHUB_OUTPUT
         
     - name: Checkout homebrew-switchshuttle repository
       uses: actions/checkout@v4
@@ -95,29 +81,29 @@ jobs:
     - name: Update cask file
       run: |
         VERSION=${{ steps.version.outputs.version }}
-        X64_SHA256=${{ steps.hashes.outputs.x64_sha256 }}
-        AARCH64_SHA256=${{ steps.hashes.outputs.aarch64_sha256 }}
+        UNIVERSAL_SHA256=${{ steps.hashes.outputs.universal_sha256 }}
         
         cd homebrew-switchshuttle/Casks
         
         # Update version
         sed -i "s/version \"[^\"]*\"/version \"$VERSION\"/" switchshuttle.rb
         
-        # Update SHA256 hashes using awk for more reliable replacement
-        awk -v x64_sha="$X64_SHA256" -v aarch64_sha="$AARCH64_SHA256" '
-        /sha256 "/ {
-          if (++count == 1) {
-            gsub(/sha256 "[^"]*"/, "sha256 \"" x64_sha "\"")
-          } else if (count == 2) {
-            gsub(/sha256 "[^"]*"/, "sha256 \"" aarch64_sha "\"")
-          }
-        }
+        # Update URL to universal
+        sed -i "s|url \".*_x64\.dmg\"|url \"https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle_${VERSION}_universal.dmg\"|" switchshuttle.rb
+        sed -i "s|url \".*_aarch64\.dmg\"|url \"https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle_${VERSION}_universal.dmg\"|" switchshuttle.rb
+        
+        # Remove conditional logic and update to single SHA256
+        awk -v universal_sha="$UNIVERSAL_SHA256" '
+        /if Hardware::CPU.intel\?/ { in_conditional = 1; next }
+        /else/ { in_conditional = 1; next }
+        /end/ { if (in_conditional) { in_conditional = 0; next } }
+        in_conditional { next }
+        /sha256 "/ { gsub(/sha256 "[^"]*"/, "sha256 \"" universal_sha "\""); print; next }
         { print }
         ' switchshuttle.rb > switchshuttle_temp.rb && mv switchshuttle_temp.rb switchshuttle.rb
         
         echo "Updated cask with version $VERSION"
-        echo "Intel SHA256: $X64_SHA256"
-        echo "Apple Silicon SHA256: $AARCH64_SHA256"
+        echo "Universal SHA256: $UNIVERSAL_SHA256"
         
     - name: Commit and push changes
       run: |
@@ -135,8 +121,7 @@ jobs:
         echo "## ✅ Homebrew Cask Updated Successfully!" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "**Version:** ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-        echo "**Intel SHA256:** ${{ steps.hashes.outputs.x64_sha256 }}" >> $GITHUB_STEP_SUMMARY
-        echo "**Apple Silicon SHA256:** ${{ steps.hashes.outputs.aarch64_sha256 }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Universal SHA256:** ${{ steps.hashes.outputs.universal_sha256 }}" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "Users can now install with:" >> $GITHUB_STEP_SUMMARY
         echo "```bash" >> $GITHUB_STEP_SUMMARY
