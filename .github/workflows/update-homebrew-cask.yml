@@ -20,111 +20,111 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout SwitchShuttle repository
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        
-    - name: Get version
-      id: version
-      run: |
-        if [ -n "${{ github.event.inputs.version }}" ]; then
-          VERSION="${{ github.event.inputs.version }}"
-          echo "Using manual version: $VERSION"
-        elif [ "${{ github.event_name }}" = "release" ]; then
-          VERSION="${{ github.event.release.tag_name }}"
-          # Убираем префикс app-v если есть
-          VERSION=${VERSION#app-v}
-          echo "Using release version: $VERSION"
-        else
-          VERSION=$(node -p "require('./package.json').version")
-          echo "Using version from package.json: $VERSION"
-        fi
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
-        echo "Version: $VERSION"
-        
-    - name: Check if release exists
-      run: |
-        VERSION=${{ steps.version.outputs.version }}
-        UNIVERSAL_URL="https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle-macos_${VERSION}_universal.dmg"
-        
-        echo "Checking Universal release: $UNIVERSAL_URL"
-        if ! curl --output /dev/null --silent --head --fail "$UNIVERSAL_URL"; then
-          echo "❌ Universal release not found: $UNIVERSAL_URL"
-          exit 1
-        fi
-        echo "✅ Universal release found"
-        
-    - name: Calculate SHA256 hash
-      id: hashes
-      run: |
-        VERSION=${{ steps.version.outputs.version }}
-        UNIVERSAL_URL="https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle-macos_${VERSION}_universal.dmg"
-        
-        echo "Calculating Universal SHA256..."
-        UNIVERSAL_SHA256=$(curl -sL "$UNIVERSAL_URL" | shasum -a 256 | cut -d' ' -f1)
-        echo "Universal SHA256: $UNIVERSAL_SHA256"
-        
-        echo "universal_sha256=$UNIVERSAL_SHA256" >> $GITHUB_OUTPUT
-        
-    - name: Checkout homebrew-switchshuttle repository
-      uses: actions/checkout@v4
-      with:
-        repository: s00d/homebrew-switchshuttle
-        token: ${{ secrets.HOMEBREW_TOKEN }}
-        path: homebrew-switchshuttle
-        
-    - name: Update cask file
-      run: |
-        VERSION=${{ steps.version.outputs.version }}
-        UNIVERSAL_SHA256=${{ steps.hashes.outputs.universal_sha256 }}
-        
-        cd homebrew-switchshuttle/Casks
-        
-        # Update version
-        sed -i "s/version \"[^\"]*\"/version \"$VERSION\"/" switchshuttle.rb
-        
-        # Update URL to universal
-        sed -i "s|url \".*_x64\.dmg\"|url \"https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle-macos_${VERSION}_universal.dmg\"|" switchshuttle.rb
-        sed -i "s|url \".*_aarch64\.dmg\"|url \"https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle-macos_${VERSION}_universal.dmg\"|" switchshuttle.rb
-        
-        # Remove conditional logic and update to single SHA256
-        awk -v universal_sha="$UNIVERSAL_SHA256" '
-        /if Hardware::CPU.intel\?/ { in_conditional = 1; next }
-        /else/ { in_conditional = 1; next }
-        /end/ { if (in_conditional) { in_conditional = 0; next } }
-        in_conditional { next }
-        /sha256 "/ { gsub(/sha256 "[^"]*"/, "sha256 \"" universal_sha "\""); print; next }
-        { print }
-        ' switchshuttle.rb > switchshuttle_temp.rb && mv switchshuttle_temp.rb switchshuttle.rb
-        
-        echo "Updated cask with version $VERSION"
-        echo "Universal SHA256: $UNIVERSAL_SHA256"
-        
-    - name: Commit and push changes
-      run: |
-        cd homebrew-switchshuttle
-        
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        
-        git add Casks/switchshuttle.rb
-        git commit -m "Update SwitchShuttle to v${{ steps.version.outputs.version }}"
-        git push origin main
-        
-    - name: Create summary
-      run: |
-        echo "## ✅ Homebrew Cask Updated Successfully!" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "**Version:** ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-        echo "**Universal SHA256:** ${{ steps.hashes.outputs.universal_sha256 }}" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "Users can now install with:" >> $GITHUB_STEP_SUMMARY
-        echo "```bash" >> $GITHUB_STEP_SUMMARY
-        echo "brew tap s00d/switchshuttle" >> $GITHUB_STEP_SUMMARY
-        echo "brew install --cask switchshuttle" >> $GITHUB_STEP_SUMMARY
-        echo "```" >> $GITHUB_STEP_SUMMARY 
+      - name: Checkout SwitchShuttle repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Get version
+        id: version
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+            echo "Using manual version: $VERSION"
+          elif [ "${{ github.event_name }}" = "release" ]; then
+            VERSION="${{ github.event.release.tag_name }}"
+            # Убираем префикс app-v если есть
+            VERSION=${VERSION#app-v}
+            echo "Using release version: $VERSION"
+          else
+            VERSION=$(node -p "require('./package.json').version")
+            echo "Using version from package.json: $VERSION"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Check if release exists
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          UNIVERSAL_URL="https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle_${VERSION}_universal.dmg"
+          
+          echo "Checking Universal release: $UNIVERSAL_URL"
+          if ! curl --output /dev/null --silent --head --fail "$UNIVERSAL_URL"; then
+            echo "❌ Universal release not found: $UNIVERSAL_URL"
+            exit 1
+          fi
+          echo "✅ Universal release found"
+
+      - name: Calculate SHA256 hash
+        id: hashes
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          UNIVERSAL_URL="https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle_${VERSION}_universal.dmg"
+          
+          echo "Calculating Universal SHA256..."
+          UNIVERSAL_SHA256=$(curl -sL "$UNIVERSAL_URL" | shasum -a 256 | cut -d' ' -f1)
+          echo "Universal SHA256: $UNIVERSAL_SHA256"
+          
+          echo "universal_sha256=$UNIVERSAL_SHA256" >> $GITHUB_OUTPUT
+
+      - name: Checkout homebrew-switchshuttle repository
+        uses: actions/checkout@v4
+        with:
+          repository: s00d/homebrew-switchshuttle
+          token: ${{ secrets.HOMEBREW_TOKEN }}
+          path: homebrew-switchshuttle
+
+      - name: Update cask file
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          UNIVERSAL_SHA256=${{ steps.hashes.outputs.universal_sha256 }}
+          
+          cd homebrew-switchshuttle/Casks
+          
+          # Update version
+          sed -i "s/version \"[^\"]*\"/version \"$VERSION\"/" switchshuttle.rb
+          
+          # Update URL to universal
+          sed -i "s|url \".*_x64\.dmg\"|url \"https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle_${VERSION}_universal.dmg\"|" switchshuttle.rb
+          sed -i "s|url \".*_aarch64\.dmg\"|url \"https://github.com/s00d/switchshuttle/releases/download/app-v$VERSION/switch-shuttle_${VERSION}_universal.dmg\"|" switchshuttle.rb
+          
+          # Remove conditional logic and update to single SHA256
+          awk -v universal_sha="$UNIVERSAL_SHA256" '
+          /if Hardware::CPU.intel\?/ { in_conditional = 1; next }
+          /else/ { in_conditional = 1; next }
+          /end/ { if (in_conditional) { in_conditional = 0; next } }
+          in_conditional { next }
+          /sha256 "/ { gsub(/sha256 "[^"]*"/, "sha256 \"" universal_sha "\""); print; next }
+          { print }
+          ' switchshuttle.rb > switchshuttle_temp.rb && mv switchshuttle_temp.rb switchshuttle.rb
+          
+          echo "Updated cask with version $VERSION"
+          echo "Universal SHA256: $UNIVERSAL_SHA256"
+
+      - name: Commit and push changes
+        run: |
+          cd homebrew-switchshuttle
+          
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add Casks/switchshuttle.rb
+          git commit -m "Update SwitchShuttle to v${{ steps.version.outputs.version }}"
+          git push origin main
+
+      - name: Create summary
+        run: |
+          echo "## ✅ Homebrew Cask Updated Successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Universal SHA256:** ${{ steps.hashes.outputs.universal_sha256 }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Users can now install with:" >> $GITHUB_STEP_SUMMARY
+          echo "```bash" >> $GITHUB_STEP_SUMMARY
+          echo "brew tap s00d/switchshuttle" >> $GITHUB_STEP_SUMMARY
+          echo "brew install --cask switchshuttle" >> $GITHUB_STEP_SUMMARY
+          echo "```" >> $GITHUB_STEP_SUMMARY
