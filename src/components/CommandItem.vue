@@ -1,10 +1,9 @@
 <template>
   <div 
-    class="border border-slate-200 rounded-xl p-6 space-y-6 bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
-    :style="{ marginLeft: `${level * 20}px` }"
+    class="border border-slate-200 rounded-xl p-6 space-y-6 bg-white shadow-md hover:shadow-lg transition-shadow duration-200"
   >
     <!-- Command Header -->
-    <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+    <div class="flex items-center justify-between pb-4 border-b border-slate-200 -mx-6 px-6">
       <div class="flex items-center space-x-3">
         <div class="w-8 h-8 bg-blue-100 flex items-center justify-center rounded-lg">
           <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,7 +51,10 @@
     </div>
 
     <!-- Basic Command Fields -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div :class="[
+      'grid gap-6',
+      commandType === 'submenu' ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'
+    ]">
       <Input
         v-model="command.name"
         label="Name"
@@ -69,10 +71,15 @@
     </div>
 
     <!-- Command Type Selection -->
-    <CommandTypeSelector 
-      v-model="commandType" 
-      @update:modelValue="handleCommandTypeChange"
-    />
+    <div class="space-y-4">
+      <CommandTypeSelector 
+        v-model="commandType" 
+        @update:modelValue="handleCommandTypeChange"
+      />
+    </div>
+
+    <!-- Divider after Command Type -->
+    <div class="border-t-2 border-slate-200/70 my-8 -mx-6"></div>
 
     <!-- Single Command -->
     <div v-if="commandType === 'single'" class="space-y-6">
@@ -84,8 +91,11 @@
         rows="3"
       />
       
+      <!-- Divider -->
+      <div class="border-t-2 border-slate-200/70 my-8 -mx-6"></div>
+      
       <!-- Inputs Section -->
-      <div class="space-y-4 p-4 bg-slate-50 rounded-lg border border-slate-100">
+      <div class="space-y-4">
         <div class="flex items-center justify-between">
           <label class="block text-sm font-semibold text-slate-700">Inputs</label>
           <Button @click="handleAddInput" variant="ghost" size="sm" class="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
@@ -96,24 +106,30 @@
           </Button>
         </div>
         
-        <div v-if="command.inputs && Object.keys(command.inputs).length > 0" class="space-y-3">
+        <div v-if="command.inputs && Object.keys(command.inputs).length > 0" class="space-y-2">
           <div
             v-for="(_, key) in command.inputs"
             :key="key"
-            class="flex items-center space-x-3 p-3 bg-white rounded-lg border border-slate-200"
+            class="flex items-center gap-2 py-1"
           >
-            <Input
-              :model-value="isRootLevel ? inputKeys[index][key] : key"
-              placeholder="Key"
-              size="sm"
-              @input="handleInputKeyChange(key, $event)"
-            />
-            <Input
-              v-model="command.inputs[key]"
-              placeholder="Default value"
-              size="sm"
-            />
-            <Button @click="handleRemoveInput(key)" variant="danger" size="sm" class="text-red-600 hover:text-red-700 hover:bg-red-50">
+            <div class="flex-1">
+              <Input
+                :model-value="isRootLevel ? inputKeys[index][key] : key"
+                placeholder="Key"
+                size="sm"
+                input-class="!border !border-slate-300 !bg-white !rounded !px-2 !py-1 focus:!border-blue-400 focus:!ring-0"
+                @input="handleInputKeyChange(key, $event)"
+              />
+            </div>
+            <div class="flex-1">
+              <Input
+                v-model="command.inputs[key]"
+                placeholder="Default value"
+                size="sm"
+                input-class="!border !border-slate-300 !bg-white !rounded !px-2 !py-1 focus:!border-blue-400 focus:!ring-0"
+              />
+            </div>
+            <Button @click="handleRemoveInput(key)" variant="danger" size="sm" class="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -125,7 +141,7 @@
 
     <!-- Multiple Commands -->
     <div v-if="commandType === 'multiple'" class="space-y-6">
-      <div class="space-y-4 p-4 bg-slate-50 rounded-lg border border-slate-100">
+      <div class="space-y-4">
         <div class="flex items-center justify-between">
           <label class="block text-sm font-semibold text-slate-700">Commands</label>
           <Button @click="handleAddMultipleCommand" variant="ghost" size="sm" class="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
@@ -136,17 +152,18 @@
           </Button>
         </div>
         
-        <div v-if="command.commands && command.commands.length > 0" class="space-y-3">
+        <div v-if="command.commands && command.commands.length > 0" class="space-y-2">
           <div
             v-for="(_, cmdIndex) in command.commands"
             :key="cmdIndex"
-            class="flex items-center space-x-3 p-3 bg-white rounded-lg border border-slate-200"
+            class="flex items-center gap-2 py-1"
           >
             <div class="flex-1">
               <Input
                 v-model="command.commands[cmdIndex]"
                 placeholder="Enter command"
                 size="sm"
+                input-class="!border !border-slate-300 !bg-white !rounded !px-2 !py-1 focus:!border-blue-400 focus:!ring-0"
               />
             </div>
             <Button @click="handleRemoveMultipleCommand(cmdIndex)" variant="danger" size="sm" class="text-red-600 hover:text-red-700 hover:bg-red-50">
@@ -158,8 +175,11 @@
         </div>
       </div>
       
+      <!-- Divider -->
+      <div class="border-t-2 border-slate-200/70 my-8 -mx-6"></div>
+      
       <!-- Inputs for multiple commands -->
-      <div class="space-y-4 p-4 bg-slate-50 rounded-lg border border-slate-100">
+      <div class="space-y-4">
         <div class="flex items-center justify-between">
           <label class="block text-sm font-semibold text-slate-700">Inputs</label>
           <Button @click="handleAddInput" variant="ghost" size="sm" class="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
@@ -170,24 +190,30 @@
           </Button>
         </div>
         
-        <div v-if="command.inputs && Object.keys(command.inputs).length > 0" class="space-y-3">
+        <div v-if="command.inputs && Object.keys(command.inputs).length > 0" class="space-y-2">
           <div
             v-for="(_, key) in command.inputs"
             :key="key"
-            class="flex items-center space-x-3 p-3 bg-white rounded-lg border border-slate-200"
+            class="flex items-center gap-2 py-1"
           >
-            <Input
-              :model-value="isRootLevel ? inputKeys[index][key] : key"
-              placeholder="Key"
-              size="sm"
-              @input="handleInputKeyChange(key, $event)"
-            />
-            <Input
-              v-model="command.inputs[key]"
-              placeholder="Default value"
-              size="sm"
-            />
-            <Button @click="handleRemoveInput(key)" variant="danger" size="sm" class="text-red-600 hover:text-red-700 hover:bg-red-50">
+            <div class="flex-1">
+              <Input
+                :model-value="isRootLevel ? inputKeys[index][key] : key"
+                placeholder="Key"
+                size="sm"
+                input-class="!border !border-slate-300 !bg-white !rounded !px-2 !py-1 focus:!border-blue-400 focus:!ring-0"
+                @input="handleInputKeyChange(key, $event)"
+              />
+            </div>
+            <div class="flex-1">
+              <Input
+                v-model="command.inputs[key]"
+                placeholder="Default value"
+                size="sm"
+                input-class="!border !border-slate-300 !bg-white !rounded !px-2 !py-1 focus:!border-blue-400 focus:!ring-0"
+              />
+            </div>
+            <Button @click="handleRemoveInput(key)" variant="danger" size="sm" class="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -198,10 +224,17 @@
     </div>
 
     <!-- Submenu -->
-    <div v-if="commandType === 'submenu'" class="space-y-6">
-      <div class="space-y-4 p-4 bg-slate-50 rounded-lg border border-slate-100">
+    <div v-if="commandType === 'submenu'" class="space-y-4">
+      <div class="space-y-4">
         <div class="flex items-center justify-between">
-          <label class="block text-sm font-semibold text-slate-700">Submenu</label>
+          <div class="flex items-center gap-2">
+            <button @click="toggleSubmenu" type="button" class="focus:outline-none">
+              <svg :class="['w-5 h-5 transition-transform', submenuCollapsed ? 'rotate-[-90deg]' : 'rotate-0']" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+            <label class="block text-sm font-semibold text-slate-700">Submenu</label>
+          </div>
           <Button @click="addSubmenuCommand" variant="ghost" size="sm" class="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -209,8 +242,7 @@
             Add Submenu Command
           </Button>
         </div>
-        
-        <div v-if="command.submenu && command.submenu.length > 0" class="space-y-4">
+        <div v-if="command.submenu && command.submenu.length > 0 && !submenuCollapsed" class="space-y-4">
           <CommandItem
             v-for="(subCmd, subIndex) in command.submenu"
             :key="subIndex"
@@ -509,5 +541,11 @@ const removeSubmenuSubmenuCommand = (subIndex: number, subSubIndex: number) => {
     subCommand.submenu.splice(subSubIndex, 1);
     emit('update:command', props.command);
   }
+};
+
+// Сворачивание секции Submenu
+const submenuCollapsed = ref(false);
+const toggleSubmenu = () => {
+  submenuCollapsed.value = !submenuCollapsed.value;
 };
 </script> 
