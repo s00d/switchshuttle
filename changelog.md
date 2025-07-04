@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2025-07-04
+
+### Added
+- **Configuration Enable/Disable Feature** - Toggle individual configuration files on/off without deleting them
+- **Visual Configuration Status** - See enabled/disabled status in the configuration list
+- **Configuration Editor Toggle** - Easy enable/disable switch in the visual editor
+- **Background Switch Commands** - Execute system toggle commands silently without opening terminal
+- **Switch Command Status Checking** - Automatically detect current state of system features
+- **Switch Command Notifications** - Success and error notifications for switch commands
+- **Cross-Platform Switch Support** - macOS, Windows, and Linux switch command templates
+
+### Changed
+- Updated configuration structure to include `enabled` field
+- Enhanced system tray menu to respect disabled configurations
+- Improved CLI commands to skip disabled configurations
+- Updated configuration loading to set default `enabled: true` for existing configs
+
+### Fixed
+- Switch commands now execute silently in background
+- Proper status checking for switch commands across platforms
+- Configuration filtering in all backend operations
+
 ## [1.6.1] - 2025-07-04
 
 ### Added
