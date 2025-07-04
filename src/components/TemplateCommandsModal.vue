@@ -79,16 +79,8 @@
               v-for="command in template.commands" 
               :key="command.id"
               class="bg-white border-2 border-slate-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all duration-200 group relative flex flex-col"
-              :class="{ 'border-blue-500 bg-blue-50': isCommandSelected(command, template) }"
             >
-              <!-- Selection Indicator -->
-              <div v-if="isCommandSelected(command, template)" class="absolute top-2 right-2">
-                <div class="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                  <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-              </div>
+
               
               <!-- Command Header -->
               <div class="flex items-start justify-between mb-3">
@@ -106,10 +98,8 @@
                       <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <span class="truncate">{{ template.config.terminal }}</span>
+                      <span class="truncate">{{ template.category }}</span>
                     </span>
-                    <span class="w-1 h-1 bg-slate-300 rounded-full flex-shrink-0"></span>
-                    <span class="truncate">{{ template.config.launch_in }}</span>
                   </div>
                 </div>
               </div>
@@ -153,11 +143,11 @@
               <div class="mt-3 pt-2 border-t border-slate-200">
                 <Button 
                   @click="selectCommand(command, template)"
-                  :variant="isCommandSelected(command, template) ? 'ghost' : 'primary'"
+                  variant="primary"
                   size="sm"
                   class="w-full text-xs py-1"
                 >
-                  {{ isCommandSelected(command, template) ? 'Selected' : 'Select Command' }}
+                  Select Command
                 </Button>
               </div>
 
@@ -196,7 +186,6 @@ defineProps<Props>();
 // State
 const searchQuery = ref('');
 const selectedCategory = ref('');
-const selectedCommands = ref<Array<{ command: Command; template: Template }>>([]);
 
 // Computed
 const filteredTemplates = computed(() => {
@@ -230,37 +219,21 @@ const categoryOptions = computed(() => {
 const groupedCommands = computed(() => {
   return filteredTemplates.value.map(template => ({
     ...template,
-    commands: template.config.commands.filter(command => {
+    commands: template.commands.filter((command: any) => {
       if (!searchQuery.value) return true;
       
       const query = searchQuery.value.toLowerCase();
       return command.name.toLowerCase().includes(query) ||
              (command.command && command.command.toLowerCase().includes(query)) ||
-             (command.commands && command.commands.some(cmd => cmd.toLowerCase().includes(query)));
+             (command.commands && command.commands.some((cmd: any) => cmd.toLowerCase().includes(query)));
     })
   })).filter(template => template.commands.length > 0);
 });
 
 // Methods
-function isCommandSelected(command: Command, template: Template): boolean {
-  return selectedCommands.value.some(
-    item => item.command.id === command.id && item.template.id === template.id
-  );
-}
-
 function selectCommand(command: Command, template: Template) {
-  const existingIndex = selectedCommands.value.findIndex(
-    item => item.command.id === command.id && item.template.id === template.id
-  );
-  
-  if (existingIndex >= 0) {
-    selectedCommands.value.splice(existingIndex, 1);
-  } else {
-    // Add command immediately and emit
-    selectedCommands.value.push({ command, template });
-    emit('commandsSelected', [command]);
-    selectedCommands.value = []; // Clear selection after adding
-  }
+  // Add command immediately and close modal
+  emit('commandsSelected', [command]);
 }
 
 function clearFilters() {
