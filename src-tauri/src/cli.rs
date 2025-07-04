@@ -22,6 +22,13 @@ pub fn handle_cli_commands(matches: &Matches, config_manager: &Arc<Mutex<ConfigM
                 // Try to find by name
                 let mut found = false;
                 for config in &config_manager.configs {
+                    // Пропускаем отключенные конфигурации
+                    if let Some(enabled) = config.enabled {
+                        if !enabled {
+                            continue;
+                        }
+                    }
+                    
                     for cmd in &config.commands {
                         if cmd.name.to_lowercase() == command_value.to_lowercase() {
                             helpers::execute_command(
@@ -55,6 +62,13 @@ pub fn handle_cli_commands(matches: &Matches, config_manager: &Arc<Mutex<ConfigM
             let config_manager = config_manager.lock().unwrap();
             println!("Available commands:");
             for config in &config_manager.configs {
+                // Пропускаем отключенные конфигурации
+                if let Some(enabled) = config.enabled {
+                    if !enabled {
+                        continue;
+                    }
+                }
+                
                 for cmd in &config.commands {
                     if let Some(id) = &cmd.id {
                         println!("  {} (ID: {})", cmd.name, id);
@@ -75,6 +89,13 @@ pub fn handle_cli_commands(matches: &Matches, config_manager: &Arc<Mutex<ConfigM
             println!("Searching for commands containing '{}':", search_value);
             let mut found = false;
             for config in &config_manager.configs {
+                // Пропускаем отключенные конфигурации
+                if let Some(enabled) = config.enabled {
+                    if !enabled {
+                        continue;
+                    }
+                }
+                
                 for cmd in &config.commands {
                     if cmd.name.to_lowercase().contains(&search_value.to_lowercase()) {
                         if let Some(id) = &cmd.id {
