@@ -2,7 +2,10 @@ use include_dir::{include_dir, Dir};
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
-use tauri::{AppHandle, Emitter, Manager};
+use tauri::{AppHandle, Emitter, Manager, Wry};
+use tauri::menu::{IconMenuItem, IconMenuItemBuilder};
+use tauri::image::Image;
+use tauri::path::BaseDirectory;
 
 use crate::config::CommandConfig;
 
@@ -161,6 +164,52 @@ pub fn execute_command(
     }
 }
 
+pub fn execute_command_silent(
+    command: &str,
+) -> Result<String, String> {
+    if cfg!(target_os = "macos") {
+        // На macOS используем sh для выполнения команды
+        let output = Command::new("sh")
+            .arg("-c")
+            .arg(command)
+            .output()
+            .map_err(|e| format!("Failed to execute command: {}", e))?;
+
+        if output.status.success() {
+            Ok(String::from_utf8_lossy(&output.stdout).to_string())
+        } else {
+            Err(String::from_utf8_lossy(&output.stderr).to_string())
+        }
+    } else if cfg!(target_os = "windows") {
+        // На Windows используем cmd для выполнения команды
+        let output = Command::new("cmd")
+            .args(&["/C", command])
+            .output()
+            .map_err(|e| format!("Failed to execute command: {}", e))?;
+
+        if output.status.success() {
+            Ok(String::from_utf8_lossy(&output.stdout).to_string())
+        } else {
+            Err(String::from_utf8_lossy(&output.stderr).to_string())
+        }
+    } else if cfg!(target_os = "linux") {
+        // На Linux используем sh для выполнения команды
+        let output = Command::new("sh")
+            .arg("-c")
+            .arg(command)
+            .output()
+            .map_err(|e| format!("Failed to execute command: {}", e))?;
+
+        if output.status.success() {
+            Ok(String::from_utf8_lossy(&output.stdout).to_string())
+        } else {
+            Err(String::from_utf8_lossy(&output.stderr).to_string())
+        }
+    } else {
+        Err("Unsupported operating system".to_string())
+    }
+}
+
 pub fn open_in_default_editor(path: &PathBuf) {
     #[cfg(target_os = "macos")]
     {
@@ -263,3 +312,42 @@ pub fn change_devtools(app: &AppHandle) {
 
 #[cfg(not(debug_assertions))]
 pub fn change_devtools(_app: &AppHandle) {}
+
+/// Создает пункт меню с иконкой
+pub fn create_menu_item(
+    app: &AppHandle<Wry>,
+    id: &str,
+    text: &str,
+    icon_name: &str,
+) -> IconMenuItem<Wry> {
+    let mut builder = IconMenuItemBuilder::with_id(id, text);
+    
+    // Пытаемся загрузить иконку, но не падаем если её нет
+    if let Ok(icon_path) = app.path().resolve(&format!("icons/{}.png", icon_name), BaseDirectory::Resource) {
+        if let Ok(image) = Image::from_path(icon_path) {
+            builder = builder.icon(image);
+        }
+    }
+    
+    builder.build(app).unwrap()
+}
+
+/// Создает пункт меню с иконкой и горячей клавишей
+pub fn create_menu_item_with_hotkey(
+    app: &AppHandle<Wry>,
+    id: &str,
+    text: &str,
+    icon_name: &str,
+    hotkey: &str,
+) -> IconMenuItem<Wry> {
+    let mut builder = IconMenuItemBuilder::with_id(id, text);
+    
+    // Пытаемся загрузить иконку, но не падаем если её нет
+    if let Ok(icon_path) = app.path().resolve(&format!("icons/{}.png", icon_name), BaseDirectory::Resource) {
+        if let Ok(image) = Image::from_path(icon_path) {
+            builder = builder.icon(image);
+        }
+    }
+    
+    builder.accelerator(hotkey).build(app).unwrap()
+}
