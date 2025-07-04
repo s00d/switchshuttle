@@ -5,8 +5,10 @@ use serde_json::json;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use tauri::{State};
+use tauri_plugin_notification::NotificationExt;
 
 use crate::config::{CommandConfig, Config, ConfigManager};
+use crate::helpers;
 use crate::helpers::{execute_command, get_config_path, open_in_default_editor, open_folder_in_default_explorer};
 
 #[derive(Deserialize)]
@@ -93,6 +95,7 @@ pub fn execute_command_with_inputs(
     state: State<'_, Arc<Mutex<ConfigManager>>>,
     inputs: HashMap<String, String>,
     command: String,
+    app: tauri::AppHandle,
 ) -> Result<String, String> {
     println!("execute_command_with_inputs {:?} {:?}", inputs, command);
 
@@ -105,6 +108,7 @@ pub fn execute_command_with_inputs(
 
     let mut cmd = command.command.clone();
     let mut cmds = command.commands.clone();
+    let mut switch_cmd = command.switch.clone();
 
     if let Some(ref mut cmd) = cmd {
         for (key, value) in &inputs {
@@ -120,6 +124,12 @@ pub fn execute_command_with_inputs(
         }
     }
 
+    if let Some(ref mut switch_cmd) = switch_cmd {
+        for (key, value) in &inputs {
+            *switch_cmd = switch_cmd.replace(&format!("[{}]", key), value);
+        }
+    }
+
     let updated_command = CommandConfig {
         id: command.id.clone(),
         name: command.name.clone(),
@@ -128,15 +138,46 @@ pub fn execute_command_with_inputs(
         commands: cmds,
         submenu: command.submenu.clone(),
         hotkey: command.hotkey.clone(),
+        switch: switch_cmd,
     };
 
-    execute_command(
-        &updated_command,
-        &config.terminal,
-        &config.launch_in,
-        &config.theme,
-        &config.title,
-    );
+    // Проверяем, является ли это switch командой
+    if command.switch.is_some() {
+        // Для switch команд используем execute_command_silent
+        if let Some(toggle_command) = &updated_command.command {
+            match helpers::execute_command_silent(toggle_command) {
+                Ok(_) => {
+                    println!("Switch command executed successfully");
+                    // Показываем уведомление об успешном выполнении
+                    if let Ok(_) = app.notification().builder()
+                        .title("SwitchShuttle Success")
+                        .body(&format!("Switch command '{}' executed successfully", command.name))
+                        .show() {
+                        // Уведомление отправлено
+                    }
+                }
+                Err(e) => {
+                    eprintln!("Failed to execute switch command: {}", e);
+                    // Показываем уведомление об ошибке
+                    if let Ok(_) = app.notification().builder()
+                        .title("SwitchShuttle Error")
+                        .body(&format!("Failed to execute switch command: {}", e))
+                        .show() {
+                        // Уведомление отправлено
+                    }
+                }
+            }
+        }
+    } else {
+        // Для обычных команд используем execute_command
+        execute_command(
+            &updated_command,
+            &config.terminal,
+            &config.launch_in,
+            &config.theme,
+            &config.title,
+        );
+    }
     Ok("Ok".to_string())
 }
 
@@ -177,6 +218,13 @@ pub fn get_menu_data(state: State<'_, Arc<Mutex<ConfigManager>>>) -> Result<Stri
 
     let mut grouped_items: HashMap<String, Vec<serde_json::Value>> = HashMap::new();
     for config in &config_manager.configs {
+        // Пропускаем отключенные конфигурации
+        if let Some(enabled) = config.enabled {
+            if !enabled {
+                continue;
+            }
+        }
+        
         let items = build_menu_items(&config.commands);
         if let Some(hotkey) = &config.menu_hotkey {
             grouped_items
