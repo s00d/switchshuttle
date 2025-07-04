@@ -14,7 +14,8 @@
           'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
           'disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed',
           sizeClasses[size],
-          error && 'border-red-500 focus:ring-red-500 focus:border-red-500'
+          error && 'border-red-500 focus:ring-red-500 focus:border-red-500',
+          inputClass
         ]"
         @change="$emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
         @blur="$emit('blur')"
@@ -37,7 +38,8 @@
           'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
           'disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed',
           sizeClasses[size],
-          error && 'border-red-500 focus:ring-red-500 focus:border-red-500'
+          error && 'border-red-500 focus:ring-red-500 focus:border-red-500',
+          inputClass
         ]"
         @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
         @blur="$emit('blur')"
@@ -68,6 +70,7 @@ interface Props {
   hint?: string;
   size?: 'sm' | 'md' | 'lg';
   options?: Option[];
+  inputClass?: string;
 }
 
 withDefaults(defineProps<Props>(), {
@@ -75,7 +78,8 @@ withDefaults(defineProps<Props>(), {
   type: 'text',
   disabled: false,
   size: 'md',
-  options: () => []
+  options: () => [],
+  inputClass: ''
 });
 
 defineEmits<{
