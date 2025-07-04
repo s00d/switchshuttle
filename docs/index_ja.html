@@ -632,7 +632,7 @@ codesign --force --deep --sign - /Applications/switch-shuttle.app</code></pre><h
                 const keywords = ['let', 'const', 'var', 'function', 'return', 'if', 'else', 'for', 'while', 'switch', 'case', 'break', 'import', 'from', 'export', 'class', 'new', 'await', 'async', 'try', 'catch', 'throw', 'console', 'log', 'error', 'warn', 'info', 'debug', 'require', 'module', 'exports', 'default', 'static', 'public', 'private', 'protected', 'extends', 'implements', 'interface', 'type', 'enum', 'namespace', 'declare', 'abstract', 'final', 'super', 'this', 'null', 'undefined', 'true', 'false', 'NaN', 'Infinity'];
                 
                 keywords.forEach(keyword => {
-                    const regex = new RegExp('\\b' + keyword + '\\b', 'gi');
+                    const regex = new RegExp('\b' + keyword + '\b', 'gi');
                     text = text.replace(regex, '<span class="keyword">' + keyword + '</span>');
                 });
                 
