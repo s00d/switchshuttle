@@ -142,7 +142,7 @@
               <!-- Action Button -->
               <div class="mt-3 pt-2 border-t border-slate-200">
                 <Button 
-                  @click="selectCommand(command, template)"
+                  @click="selectCommand(command)"
                   variant="primary"
                   size="sm"
                   class="w-full text-xs py-1"
@@ -231,7 +231,7 @@ const groupedCommands = computed(() => {
 });
 
 // Methods
-function selectCommand(command: Command, template: Template) {
+function selectCommand(command: Command) {
   // Add command immediately and close modal
   emit('commandsSelected', [command]);
 }
