@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <Transition name="modal">
-      <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 pt-20">
         <!-- Backdrop -->
         <div 
           class="absolute inset-0 bg-black/50 backdrop-blur-sm"
@@ -10,7 +10,7 @@
         
         <!-- Modal -->
         <div 
-          class="relative bg-white border border-slate-300 shadow-xl w-full max-w-6xl max-h-[95vh] overflow-hidden flex flex-col"
+          class="relative bg-white border border-slate-300 shadow-xl w-full max-w-6xl max-h-[calc(95vh-5rem)] overflow-hidden flex flex-col"
           @click.stop
         >
           <!-- Header -->
