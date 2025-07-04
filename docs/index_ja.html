@@ -100,6 +100,9 @@
 <li><strong>🔄 複数の実行モード</strong> - 現在のウィンドウ、新しいタブ、または新しいウィンドウで実行</li>
 <li><strong>🚀 自動起動</strong> - システム起動時に起動して即座にアクセス可能</li>
 <li><strong>🎨 モダンUI</strong> - Vue.jsで構築された美しく直感的なインターフェース</li>
+<li><strong>💻 コマンドラインインターフェース</strong> - CLIでターミナルから直接コマンドを実行</li>
+<li><strong>⚙️ 設定管理</strong> - 削除せずに設定を有効/無効にする</li>
+<li><strong>🔄 スイッチコマンド</strong> - バックグラウンド実行でシステム機能を切り替え</li>
 </ul>
 <h2 id="" class="heading-2">🚀 クイックスタート</h2><h3 id="to" class="heading-3">ダウンロードとインストール</h3><h4 id="1-homebrew-macos" class="heading-4">オプション1: Homebrew (macOS - 推奨)</h4><pre class="code-block"><code class="language-bash"># Homebrew経由でインストール
 brew tap s00d/switchshuttle
@@ -198,7 +201,34 @@ brew install --cask switchshuttle</code></pre><h4 id="2" class="heading-4">オ�
       "command": "docker-compose down"
     }
   ]
-}</code></pre><h2 id="" class="heading-2">⚙️ 設定リファレンス</h2><h3 id="" class="heading-3">メイン設定</h3><table>
+}</code></pre><h4 id="" class="heading-4">🔄 スイッチコマンド</h4><p>バックグラウンド実行でシステム機能を切り替え：</p>
+<pre class="code-block"><code class="language-json">{
+  "name": "🔧 システム制御",
+  "submenu": [
+    {
+      "name": "📶 WiFiを切り替え",
+      "command": "networksetup -setairportpower en0 toggle",
+      "switch": "networksetup -getairportpower en0 | grep -q 'On' && echo 'true' || echo 'false'"
+    },
+    {
+      "name": "🔊 ブルートゥースを切り替え",
+      "command": "blueutil -p toggle",
+      "switch": "blueutil -p | grep -q '1' && echo 'true' || echo 'false'"
+    },
+    {
+      "name": "🌙 ダークモードを切り替え",
+      "command": "osascript -e 'tell app \"System Events\" to tell appearance preferences to set dark mode to not dark mode'",
+      "switch": "osascript -e 'tell app \"System Events\" to tell appearance preferences to get dark mode'"
+    }
+  ]
+}</code></pre><p><strong>スイッチコマンド機能：</strong></p>
+<ul>
+<li><strong>バックグラウンド実行</strong> - ターミナルを開かずにコマンドが静かに実行される</li>
+<li><strong>ステータスチェック</strong> - 現在の状態を自動的に検出</li>
+<li><strong>視覚的フィードバック</strong> - メニューで有効/無効の状態を表示</li>
+<li><strong>クロスプラットフォーム</strong> - macOS、Windows、Linuxで動作</li>
+</ul>
+<h2 id="" class="heading-2">⚙️ 設定リファレンス</h2><h3 id="" class="heading-3">メイン設定</h3><table>
 <thead>
 <tr>
 <th>パラメータ</th>
@@ -242,6 +272,12 @@ brew install --cask switchshuttle</code></pre><h4 id="2" class="heading-4">オ�
 <td>Array</td>
 <td>コマンド設定のリスト</td>
 <td><code>[]</code></td>
+</tr>
+<tr>
+<td><code>enabled</code></td>
+<td>Boolean</td>
+<td>この設定を読み込むかどうか</td>
+<td><code>true</code></td>
 </tr>
 </tbody></table>
 <h3 id="" class="heading-3">ターミナルオプション</h3><table>
@@ -349,7 +385,55 @@ brew install --cask switchshuttle</code></pre><h4 id="2" class="heading-4">オ�
 <td>❌</td>
 <td>グローバルホットキー</td>
 </tr>
+<tr>
+<td><code>switch</code></td>
+<td>String</td>
+<td>❌</td>
+<td>現在の状態をチェックするコマンド（スイッチコマンド用）</td>
+</tr>
 </tbody></table>
+<h3 id="" class="heading-3">設定管理</h3><h4 id="no" class="heading-4">設定の有効/無効</h4><p>個別の設定ファイルを有効または無効にして、システムトレイメニューで利用可能なコマンドを制御できます。これは以下に役立ちます：</p>
+<ul>
+<li><strong>一時的な無効化</strong> - 削除せずに設定を無効にする</li>
+<li><strong>テスト</strong> - 開発中に設定を有効/無効にする</li>
+<li><strong>整理</strong> - 複数の設定を保持するが、特定の設定のみを使用する</li>
+</ul>
+<p><strong>ビジュアルエディターで：</strong></p>
+<ul>
+<li>設定エディターを開く</li>
+<li>「設定ステータス」セクションでトグルスイッチを使用</li>
+<li>有効な設定は読み込まれ、メニューで利用可能になる</li>
+<li>無効な設定は無視される</li>
+</ul>
+<p><strong>JSON設定で：</strong></p>
+<pre class="code-block"><code class="language-json">{
+  "terminal": "iterm",
+  "launch_in": "current",
+  "title": "マイコマンド",
+  "enabled": true,
+  "commands": [
+    {
+      "name": "サンプルコマンド",
+      "command": "echo Hello World"
+    }
+  ]
+}</code></pre><table>
+<thead>
+<tr>
+<th>パラメータ</th>
+<th>タイプ</th>
+<th>デフォルト</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>enabled</code></td>
+<td>Boolean</td>
+<td><code>true</code></td>
+<td>この設定を読み込み、メニューで利用可能にするかどうか</td>
+</tr>
+</tbody></table>
+<p><strong>注意：</strong> <code>enabled</code>が<code>false</code>に設定されているか省略されている場合、設定は無視され、そのコマンドはシステムトレイメニューに表示されません。</p>
 <h2 id="" class="heading-2">🎯 ユースケース</h2><h3 id="" class="heading-3">👨‍💻 開発者</h3><ul>
 <li><strong>クイックプロジェクトナビゲーション</strong> - 異なるプロジェクトに即座にジャンプ</li>
 <li><strong>ビルドとテストワークフロー</strong> - ワンクリックで開発サイクル</li>

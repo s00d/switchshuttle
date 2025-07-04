@@ -41,6 +41,9 @@ SwitchShuttleは、ターミナルコマンドの管理と実行方法を革新�
 - **🔄 複数の実行モード** - 現在のウィンドウ、新しいタブ、または新しいウィンドウで実行
 - **🚀 自動起動** - システム起動時に起動して即座にアクセス可能
 - **🎨 モダンUI** - Vue.jsで構築された美しく直感的なインターフェース
+- **💻 コマンドラインインターフェース** - CLIでターミナルから直接コマンドを実行
+- **⚙️ 設定管理** - 削除せずに設定を有効/無効にする
+- **🔄 スイッチコマンド** - バックグラウンド実行でシステム機能を切り替え
 
 ## 🚀 クイックスタート
 
@@ -181,6 +184,39 @@ SwitchShuttleはJSON設定ファイルを使用し、以下に保存されます
 }
 ```
 
+#### 🔄 スイッチコマンド
+
+バックグラウンド実行でシステム機能を切り替え：
+
+```json
+{
+  "name": "🔧 システム制御",
+  "submenu": [
+    {
+      "name": "📶 WiFiを切り替え",
+      "command": "networksetup -setairportpower en0 toggle",
+      "switch": "networksetup -getairportpower en0 | grep -q 'On' && echo 'true' || echo 'false'"
+    },
+    {
+      "name": "🔊 ブルートゥースを切り替え",
+      "command": "blueutil -p toggle",
+      "switch": "blueutil -p | grep -q '1' && echo 'true' || echo 'false'"
+    },
+    {
+      "name": "🌙 ダークモードを切り替え",
+      "command": "osascript -e 'tell app \"System Events\" to tell appearance preferences to set dark mode to not dark mode'",
+      "switch": "osascript -e 'tell app \"System Events\" to tell appearance preferences to get dark mode'"
+    }
+  ]
+}
+```
+
+**スイッチコマンド機能：**
+- **バックグラウンド実行** - ターミナルを開かずにコマンドが静かに実行される
+- **ステータスチェック** - 現在の状態を自動的に検出
+- **視覚的フィードバック** - メニューで有効/無効の状態を表示
+- **クロスプラットフォーム** - macOS、Windows、Linuxで動作
+
 ## ⚙️ 設定リファレンス
 
 ### メイン設定
@@ -193,6 +229,7 @@ SwitchShuttleはJSON設定ファイルを使用し、以下に保存されます
 | `title` | String | ウィンドウ/タブのタイトル | - |
 | `menu_hotkey` | String | メニューを開くためのグローバルホットキー | - |
 | `commands` | Array | コマンド設定のリスト | `[]` |
+| `enabled` | Boolean | この設定を読み込むかどうか | `true` |
 
 ### ターミナルオプション
 
@@ -222,6 +259,45 @@ SwitchShuttleはJSON設定ファイルを使用し、以下に保存されます
 | `submenu` | Array | ❌ | ネストしたサブコマンド |
 | `inputs` | Object | ❌ | 動的入力フィールド |
 | `hotkey` | String | ❌ | グローバルホットキー |
+| `switch` | String | ❌ | 現在の状態をチェックするコマンド（スイッチコマンド用） |
+
+### 設定管理
+
+#### 設定の有効/無効
+
+個別の設定ファイルを有効または無効にして、システムトレイメニューで利用可能なコマンドを制御できます。これは以下に役立ちます：
+
+- **一時的な無効化** - 削除せずに設定を無効にする
+- **テスト** - 開発中に設定を有効/無効にする
+- **整理** - 複数の設定を保持するが、特定の設定のみを使用する
+
+**ビジュアルエディターで：**
+- 設定エディターを開く
+- 「設定ステータス」セクションでトグルスイッチを使用
+- 有効な設定は読み込まれ、メニューで利用可能になる
+- 無効な設定は無視される
+
+**JSON設定で：**
+```json
+{
+  "terminal": "iterm",
+  "launch_in": "current",
+  "title": "マイコマンド",
+  "enabled": true,
+  "commands": [
+    {
+      "name": "サンプルコマンド",
+      "command": "echo Hello World"
+    }
+  ]
+}
+```
+
+| パラメータ | タイプ | デフォルト | 説明 |
+|-----------|--------|------------|------|
+| `enabled` | Boolean | `true` | この設定を読み込み、メニューで利用可能にするかどうか |
+
+**注意：** `enabled`が`false`に設定されているか省略されている場合、設定は無視され、そのコマンドはシステムトレイメニューに表示されません。
 
 ## 🎯 ユースケース
 

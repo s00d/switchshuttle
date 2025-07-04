@@ -145,6 +145,9 @@
 <li><strong>🔄 Mehrere Ausführungsmodi</strong> - Ausführung im aktuellen Fenster, neuer Tab oder neues Fenster</li>
 <li><strong>🚀 Auto-Start</strong> - Start beim Systemstart für sofortigen Zugriff</li>
 <li><strong>🎨 Moderne UI</strong> - Schöne, intuitive Oberfläche entwickelt mit Vue.js</li>
+<li><strong>💻 Kommandozeilen-Interface</strong> - Führen Sie Befehle direkt aus dem Terminal mit CLI aus</li>
+<li><strong>⚙️ Konfigurationsverwaltung</strong> - Aktivieren/Deaktivieren von Konfigurationen ohne Löschung</li>
+<li><strong>🔄 Schalter-Befehle</strong> - Systemfunktionen mit Hintergrundausführung umschalten</li>
 </ul>
 <h2 id="schnellstart" class="heading-2">🚀 Schnellstart</h2><h3 id="download-amp-installation" class="heading-3">Download &amp; Installation</h3><h4 id="option-1-homebrew-macos-empfohlen" class="heading-4">Option 1: Homebrew (macOS - Empfohlen)</h4><pre class="code-block"><code class="language-bash"># Installation über Homebrew
 brew tap s00d/switchshuttle
@@ -243,7 +246,34 @@ brew install --cask switchshuttle</code></pre><h4 id="option-2-manueller-downloa
       "command": "docker-compose down"
     }
   ]
-}</code></pre><h2 id="konfigurationsreferenz" class="heading-2">⚙️ Konfigurationsreferenz</h2><h3 id="hauptkonfiguration" class="heading-3">Hauptkonfiguration</h3><table>
+}</code></pre><h4 id="schalter-befehle" class="heading-4">🔄 Schalter-Befehle</h4><p>Systemfunktionen mit Hintergrundausführung umschalten:</p>
+<pre class="code-block"><code class="language-json">{
+  "name": "🔧 Systemsteuerung",
+  "submenu": [
+    {
+      "name": "📶 WiFi umschalten",
+      "command": "networksetup -setairportpower en0 toggle",
+      "switch": "networksetup -getairportpower en0 | grep -q 'On' && echo 'true' || echo 'false'"
+    },
+    {
+      "name": "🔊 Bluetooth umschalten",
+      "command": "blueutil -p toggle",
+      "switch": "blueutil -p | grep -q '1' && echo 'true' || echo 'false'"
+    },
+    {
+      "name": "🌙 Dunklen Modus umschalten",
+      "command": "osascript -e 'tell app \"System Events\" to tell appearance preferences to set dark mode to not dark mode'",
+      "switch": "osascript -e 'tell app \"System Events\" to tell appearance preferences to get dark mode'"
+    }
+  ]
+}</code></pre><p><strong>Schalter-Befehl-Funktionen:</strong></p>
+<ul>
+<li><strong>Hintergrundausführung</strong> - Befehle werden leise ausgeführt ohne Terminal zu öffnen</li>
+<li><strong>Statusprüfung</strong> - Erkennt automatisch den aktuellen Zustand</li>
+<li><strong>Visuelles Feedback</strong> - Zeigt aktiviert/deaktiviert Status im Menü</li>
+<li><strong>Plattformübergreifend</strong> - Funktioniert auf macOS, Windows und Linux</li>
+</ul>
+<h2 id="konfigurationsreferenz" class="heading-2">⚙️ Konfigurationsreferenz</h2><h3 id="hauptkonfiguration" class="heading-3">Hauptkonfiguration</h3><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -287,6 +317,12 @@ brew install --cask switchshuttle</code></pre><h4 id="option-2-manueller-downloa
 <td>Array</td>
 <td>Liste der Befehls-Konfigurationen</td>
 <td><code>[]</code></td>
+</tr>
+<tr>
+<td><code>enabled</code></td>
+<td>Boolean</td>
+<td>Ob diese Konfiguration geladen werden soll</td>
+<td><code>true</code></td>
 </tr>
 </tbody></table>
 <h3 id="terminal-optionen" class="heading-3">Terminal-Optionen</h3><table>
@@ -394,7 +430,55 @@ brew install --cask switchshuttle</code></pre><h4 id="option-2-manueller-downloa
 <td>❌</td>
 <td>Globaler Hotkey</td>
 </tr>
+<tr>
+<td><code>switch</code></td>
+<td>String</td>
+<td>❌</td>
+<td>Befehl zum Überprüfen des aktuellen Status (für Schalter-Befehle)</td>
+</tr>
 </tbody></table>
+<h3 id="konfigurationsverwaltung" class="heading-3">Konfigurationsverwaltung</h3><h4 id="konfigurationen-aktivierendeaktivieren" class="heading-4">Konfigurationen aktivieren/deaktivieren</h4><p>Sie können einzelne Konfigurationsdateien aktivieren oder deaktivieren, um zu steuern, welche Befehle im System-Tray-Menü verfügbar sind. Dies ist nützlich für:</p>
+<ul>
+<li><strong>Temporäres Deaktivieren</strong> - Deaktivieren Sie Konfigurationen ohne Löschung</li>
+<li><strong>Tests</strong> - Aktivieren/Deaktivieren von Konfigurationen während der Entwicklung</li>
+<li><strong>Organisation</strong> - Behalten Sie mehrere Konfigurationen, verwenden Sie aber nur bestimmte</li>
+</ul>
+<p><strong>Im visuellen Editor:</strong></p>
+<ul>
+<li>Öffnen Sie den Konfigurationseditor</li>
+<li>Verwenden Sie den Umschalter im Abschnitt &quot;Konfigurationsstatus&quot;</li>
+<li>Aktivierte Konfigurationen werden geladen und im Menü verfügbar sein</li>
+<li>Deaktivierte Konfigurationen werden ignoriert</li>
+</ul>
+<p><strong>In JSON-Konfiguration:</strong></p>
+<pre class="code-block"><code class="language-json">{
+  "terminal": "iterm",
+  "launch_in": "current",
+  "title": "Meine Befehle",
+  "enabled": true,
+  "commands": [
+    {
+      "name": "Beispiel-Befehl",
+      "command": "echo Hello World"
+    }
+  ]
+}</code></pre><table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Typ</th>
+<th>Standard</th>
+<th>Beschreibung</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>enabled</code></td>
+<td>Boolean</td>
+<td><code>true</code></td>
+<td>Ob diese Konfiguration geladen und im Menü verfügbar sein soll</td>
+</tr>
+</tbody></table>
+<p><strong>Hinweis:</strong> Wenn <code>enabled</code> auf <code>false</code> gesetzt oder weggelassen wird, wird die Konfiguration ignoriert und ihre Befehle erscheinen nicht im System-Tray-Menü.</p>
 <h2 id="anwendungsfaelle" class="heading-2">🎯 Anwendungsfälle</h2><h3 id="entwickler" class="heading-3">👨‍💻 Entwickler</h3><ul>
 <li><strong>Schnelle Projektnavigation</strong> - Springen Sie sofort zu verschiedenen Projekten</li>
 <li><strong>Build- und Test-Workflows</strong> - Entwicklungszyklen mit einem Klick</li>

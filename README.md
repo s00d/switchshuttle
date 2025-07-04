@@ -41,6 +41,8 @@ SwitchShuttle is a powerful cross-platform system tray application that revoluti
 - **🚀 Auto-Start** - Launch at system startup for instant access
 - **🎨 Modern UI** - Beautiful, intuitive interface built with Vue.js
 - **💻 Command Line Interface** - Execute commands directly from terminal with CLI
+- **⚙️ Configuration Management** - Enable/disable configurations without deleting them
+- **🔄 Switch Commands** - Toggle system features with background execution
 
 ## 🚀 Quick Start
 
@@ -278,6 +280,39 @@ Organize commands in hierarchical menus:
 }
 ```
 
+#### 🔄 Switch Commands
+
+Toggle system features with background execution:
+
+```json
+{
+  "name": "🔧 System Controls",
+  "submenu": [
+    {
+      "name": "📶 Toggle WiFi",
+      "command": "networksetup -setairportpower en0 toggle",
+      "switch": "networksetup -getairportpower en0 | grep -q 'On' && echo 'true' || echo 'false'"
+    },
+    {
+      "name": "🔊 Toggle Bluetooth",
+      "command": "blueutil -p toggle",
+      "switch": "blueutil -p | grep -q '1' && echo 'true' || echo 'false'"
+    },
+    {
+      "name": "🌙 Toggle Dark Mode",
+      "command": "osascript -e 'tell app \"System Events\" to tell appearance preferences to set dark mode to not dark mode'",
+      "switch": "osascript -e 'tell app \"System Events\" to tell appearance preferences to get dark mode'"
+    }
+  ]
+}
+```
+
+**Switch Command Features:**
+- **Background Execution** - Commands run silently without opening terminal
+- **Status Checking** - Automatically detects current state
+- **Visual Feedback** - Shows enabled/disabled status in menu
+- **Cross-Platform** - Works on macOS, Windows, and Linux
+
 ## ⚙️ Configuration Reference
 
 ### Main Configuration
@@ -290,6 +325,7 @@ Organize commands in hierarchical menus:
 | `title` | String | Window/tab title | - |
 | `menu_hotkey` | String | Global hotkey to open menu | - |
 | `commands` | Array | List of command configurations | `[]` |
+| `enabled` | Boolean | Whether this configuration should be loaded | `true` |
 
 ### Terminal Options
 
@@ -319,6 +355,45 @@ Organize commands in hierarchical menus:
 | `submenu` | Array | ❌ | Nested subcommands |
 | `inputs` | Object | ❌ | Dynamic input fields |
 | `hotkey` | String | ❌ | Global hotkey shortcut |
+| `switch` | String | ❌ | Command to check current status (for toggle commands) |
+
+### Configuration Management
+
+#### Enable/Disable Configurations
+
+You can enable or disable individual configuration files to control which commands are available in the system tray menu. This is useful for:
+
+- **Temporary disabling** - Disable configurations without deleting them
+- **Testing** - Enable/disable configurations during development
+- **Organization** - Keep multiple configurations but only use specific ones
+
+**In the Visual Editor:**
+- Open the Configuration Editor
+- Use the toggle switch in the "Configuration Status" section
+- Enabled configurations will be loaded and available in the menu
+- Disabled configurations will be ignored
+
+**In JSON Configuration:**
+```json
+{
+  "terminal": "iterm",
+  "launch_in": "current",
+  "title": "My Commands",
+  "enabled": true,
+  "commands": [
+    {
+      "name": "Example Command",
+      "command": "echo Hello World"
+    }
+  ]
+}
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `enabled` | Boolean | `true` | Whether this configuration should be loaded and available in the menu |
+
+**Note:** When `enabled` is set to `false` or omitted, the configuration will be ignored and its commands won't appear in the system tray menu.
 
 ## 🎯 Use Cases
 

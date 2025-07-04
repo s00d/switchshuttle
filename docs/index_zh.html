@@ -100,6 +100,9 @@
 <li><strong>🔄 多种执行模式</strong> - 在当前窗口、新标签页或新窗口中执行</li>
 <li><strong>🚀 自动启动</strong> - 系统启动时启动以立即访问</li>
 <li><strong>🎨 现代界面</strong> - 使用 Vue.js 构建的美丽直观界面</li>
+<li><strong>💻 命令行界面</strong> - 直接从终端执行命令的 CLI</li>
+<li><strong>⚙️ 配置管理</strong> - 启用/禁用配置而无需删除</li>
+<li><strong>🔄 开关命令</strong> - 通过后台执行切换系统功能</li>
 </ul>
 <h2 id="kaishi" class="heading-2">🚀 快速开始</h2><h3 id="xiaanzhuang" class="heading-3">下载和安装</h3><h4 id="1-homebrew-macos" class="heading-4">选项 1: Homebrew (macOS - 推荐)</h4><pre class="code-block"><code class="language-bash"># 通过 Homebrew 安装
 brew tap s00d/switchshuttle
@@ -198,7 +201,34 @@ brew install --cask switchshuttle</code></pre><h4 id="2-xia" class="heading-4">�
       "command": "docker-compose down"
     }
   ]
-}</code></pre><h2 id="zhi" class="heading-2">⚙️ 配置参考</h2><h3 id="zhi" class="heading-3">主配置</h3><table>
+}</code></pre><h4 id="kaiguan" class="heading-4">🔄 开关命令</h4><p>通过后台执行切换系统功能：</p>
+<pre class="code-block"><code class="language-json">{
+  "name": "🔧 系统控制",
+  "submenu": [
+    {
+      "name": "📶 切换 WiFi",
+      "command": "networksetup -setairportpower en0 toggle",
+      "switch": "networksetup -getairportpower en0 | grep -q 'On' && echo 'true' || echo 'false'"
+    },
+    {
+      "name": "🔊 切换蓝牙",
+      "command": "blueutil -p toggle",
+      "switch": "blueutil -p | grep -q '1' && echo 'true' || echo 'false'"
+    },
+    {
+      "name": "🌙 切换深色模式",
+      "command": "osascript -e 'tell app \"System Events\" to tell appearance preferences to set dark mode to not dark mode'",
+      "switch": "osascript -e 'tell app \"System Events\" to tell appearance preferences to get dark mode'"
+    }
+  ]
+}</code></pre><p><strong>开关命令功能：</strong></p>
+<ul>
+<li><strong>后台执行</strong> - 命令静默运行，不打开终端</li>
+<li><strong>状态检查</strong> - 自动检测当前状态</li>
+<li><strong>视觉反馈</strong> - 在菜单中显示启用/禁用状态</li>
+<li><strong>跨平台</strong> - 在 macOS、Windows 和 Linux 上工作</li>
+</ul>
+<h2 id="zhi" class="heading-2">⚙️ 配置参考</h2><h3 id="zhi" class="heading-3">主配置</h3><table>
 <thead>
 <tr>
 <th>参数</th>
@@ -242,6 +272,12 @@ brew install --cask switchshuttle</code></pre><h4 id="2-xia" class="heading-4">�
 <td>Array</td>
 <td>命令配置列表</td>
 <td><code>[]</code></td>
+</tr>
+<tr>
+<td><code>enabled</code></td>
+<td>Boolean</td>
+<td>是否应加载此配置</td>
+<td><code>true</code></td>
 </tr>
 </tbody></table>
 <h3 id="" class="heading-3">终端选项</h3><table>
@@ -349,7 +385,55 @@ brew install --cask switchshuttle</code></pre><h4 id="2-xia" class="heading-4">�
 <td>❌</td>
 <td>全局热键</td>
 </tr>
+<tr>
+<td><code>switch</code></td>
+<td>String</td>
+<td>❌</td>
+<td>检查当前状态的命令（用于开关命令）</td>
+</tr>
 </tbody></table>
+<h3 id="zhi" class="heading-3">配置管理</h3><h4 id="yongyongzhi" class="heading-4">启用/禁用配置</h4><p>您可以启用或禁用单个配置文件来控制系统托盘菜单中可用的命令。这对于以下情况很有用：</p>
+<ul>
+<li><strong>临时禁用</strong> - 禁用配置而不删除它们</li>
+<li><strong>测试</strong> - 在开发过程中启用/禁用配置</li>
+<li><strong>组织</strong> - 保持多个配置但仅使用特定配置</li>
+</ul>
+<p><strong>在可视化编辑器中：</strong></p>
+<ul>
+<li>打开配置编辑器</li>
+<li>在&quot;配置状态&quot;部分使用切换开关</li>
+<li>启用的配置将被加载并在菜单中可用</li>
+<li>禁用的配置将被忽略</li>
+</ul>
+<p><strong>在 JSON 配置中：</strong></p>
+<pre class="code-block"><code class="language-json">{
+  "terminal": "iterm",
+  "launch_in": "current",
+  "title": "我的命令",
+  "enabled": true,
+  "commands": [
+    {
+      "name": "示例命令",
+      "command": "echo Hello World"
+    }
+  ]
+}</code></pre><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>类型</th>
+<th>默认值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>enabled</code></td>
+<td>Boolean</td>
+<td><code>true</code></td>
+<td>此配置是否应加载并在菜单中可用</td>
+</tr>
+</tbody></table>
+<p><strong>注意：</strong> 当 <code>enabled</code> 设置为 <code>false</code> 或省略时，配置将被忽略，其命令不会出现在系统托盘菜单中。</p>
 <h2 id="shiyong" class="heading-2">🎯 使用场景</h2><h3 id="kaifa" class="heading-3">👨‍💻 开发者</h3><ul>
 <li><strong>快速项目导航</strong> - 立即跳转到不同项目</li>
 <li><strong>构建和测试工作流</strong> - 一键开发周期</li>

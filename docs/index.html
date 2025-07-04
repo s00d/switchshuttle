@@ -59,6 +59,11 @@
             </a>
         </li>
 <li class="menu-item level-1">
+            <a href="#command-line-interface-cli" class="menu-link">
+                <span class="menu-text">🖥️ Command Line Interface (CLI)</span>
+            </a>
+        </li>
+<li class="menu-item level-1">
             <a href="#configuration-guide" class="menu-link">
                 <span class="menu-text">📋 Configuration Guide</span>
             </a>
@@ -144,6 +149,9 @@
 <li><strong>🔄 Multiple Execution Modes</strong> - Run in current window, new tab, or new window</li>
 <li><strong>🚀 Auto-Start</strong> - Launch at system startup for instant access</li>
 <li><strong>🎨 Modern UI</strong> - Beautiful, intuitive interface built with Vue.js</li>
+<li><strong>💻 Command Line Interface</strong> - Execute commands directly from terminal with CLI</li>
+<li><strong>⚙️ Configuration Management</strong> - Enable/disable configurations without deleting them</li>
+<li><strong>🔄 Switch Commands</strong> - Toggle system features with background execution</li>
 </ul>
 <h2 id="quick-start" class="heading-2">🚀 Quick Start</h2><h3 id="download-amp-install" class="heading-3">Download &amp; Install</h3><h4 id="option-1-homebrew-macos-recommended" class="heading-4">Option 1: Homebrew (macOS - Recommended)</h4><pre class="code-block"><code class="language-bash"># Install via Homebrew
 brew tap s00d/switchshuttle
@@ -159,6 +167,59 @@ brew install --cask switchshuttle</code></pre><h4 id="option-2-manual-download" 
 <li><strong>Save and restart</strong> the application</li>
 <li><strong>Enjoy</strong> your organized command shortcuts!</li>
 </ol>
+<h2 id="command-line-interface-cli" class="heading-2">🖥️ Command Line Interface (CLI)</h2><p>SwitchShuttle also provides a powerful command-line interface for quick command execution without opening the GUI.</p>
+<h3 id="cli-usage" class="heading-3">CLI Usage</h3><h4 id="execute-commands" class="heading-4">Execute Commands</h4><pre class="code-block"><code class="language-bash"># Execute by command ID
+switch-shuttle cmd_8
+
+# Execute by command name (case-insensitive)
+switch-shuttle "Example Command"</code></pre><h4 id="list-all-commands" class="heading-4">List All Commands</h4><pre class="code-block"><code class="language-bash"># Show all available commands with their IDs
+switch-shuttle --list
+# or
+switch-shuttle -l</code></pre><h4 id="search-commands" class="heading-4">Search Commands</h4><pre class="code-block"><code class="language-bash"># Search for commands containing specific text
+switch-shuttle --search "git"
+# or
+switch-shuttle -s "docker"</code></pre><h3 id="running-cli-on-different-operating-systems" class="heading-3">Running CLI on Different Operating Systems</h3><h4 id="macos" class="heading-4">macOS</h4><pre class="code-block"><code class="language-bash"># If installed via Homebrew
+switch-shuttle --list
+
+# If installed manually
+/Applications/switch-shuttle.app/Contents/MacOS/SwitchShuttle --list
+
+# Create an alias for easier access
+echo 'alias switch-shuttle="/Applications/switch-shuttle.app/Contents/MacOS/SwitchShuttle"' >> ~/.zshrc
+source ~/.zshrc</code></pre><h4 id="windows" class="heading-4">Windows</h4><pre class="code-block"><code class="language-bash"># If installed via installer
+"C:\Program Files\SwitchShuttle\switch-shuttle.exe" --list
+
+# If installed via winget or chocolatey
+switch-shuttle --list
+
+# Add to PATH for easier access
+# Add "C:\Program Files\SwitchShuttle" to your system PATH</code></pre><h4 id="linux" class="heading-4">Linux</h4><pre class="code-block"><code class="language-bash"># If installed via package manager
+switch-shuttle --list
+
+# If installed manually
+./switch-shuttle --list
+
+# Make executable and add to PATH
+chmod +x switch-shuttle
+sudo mv switch-shuttle /usr/local/bin/</code></pre><h3 id="cli-examples" class="heading-3">CLI Examples</h3><pre class="code-block"><code class="language-bash"># Quick git operations
+switch-shuttle "git status"
+switch-shuttle "git pull"
+
+# Development workflows
+switch-shuttle "npm run dev"
+switch-shuttle "docker-compose up"
+
+# List all available commands
+switch-shuttle --list
+
+# Find commands related to database
+switch-shuttle --search "database"</code></pre><h3 id="cli-features" class="heading-3">CLI Features</h3><ul>
+<li><strong>🚀 Fast Execution</strong> - Run commands instantly from terminal</li>
+<li><strong>🔍 Smart Search</strong> - Find commands by ID or name</li>
+<li><strong>📋 Command Listing</strong> - View all available commands</li>
+<li><strong>⚡ No GUI Required</strong> - Perfect for automation and scripts</li>
+<li><strong>🔄 Exit After Execution</strong> - Clean terminal experience</li>
+</ul>
 <h2 id="configuration-guide" class="heading-2">📋 Configuration Guide</h2><h3 id="basic-structure" class="heading-3">Basic Structure</h3><p>SwitchShuttle uses JSON configuration files stored in:</p>
 <ul>
 <li><strong>macOS/Linux</strong>: <code>~/.config/switch-shuttle/</code></li>
@@ -242,7 +303,34 @@ brew install --cask switchshuttle</code></pre><h4 id="option-2-manual-download" 
       "command": "docker-compose down"
     }
   ]
-}</code></pre><h2 id="configuration-reference" class="heading-2">⚙️ Configuration Reference</h2><h3 id="main-configuration" class="heading-3">Main Configuration</h3><table>
+}</code></pre><h4 id="switch-commands" class="heading-4">🔄 Switch Commands</h4><p>Toggle system features with background execution:</p>
+<pre class="code-block"><code class="language-json">{
+  "name": "🔧 System Controls",
+  "submenu": [
+    {
+      "name": "📶 Toggle WiFi",
+      "command": "networksetup -setairportpower en0 toggle",
+      "switch": "networksetup -getairportpower en0 | grep -q 'On' && echo 'true' || echo 'false'"
+    },
+    {
+      "name": "🔊 Toggle Bluetooth",
+      "command": "blueutil -p toggle",
+      "switch": "blueutil -p | grep -q '1' && echo 'true' || echo 'false'"
+    },
+    {
+      "name": "🌙 Toggle Dark Mode",
+      "command": "osascript -e 'tell app \"System Events\" to tell appearance preferences to set dark mode to not dark mode'",
+      "switch": "osascript -e 'tell app \"System Events\" to tell appearance preferences to get dark mode'"
+    }
+  ]
+}</code></pre><p><strong>Switch Command Features:</strong></p>
+<ul>
+<li><strong>Background Execution</strong> - Commands run silently without opening terminal</li>
+<li><strong>Status Checking</strong> - Automatically detects current state</li>
+<li><strong>Visual Feedback</strong> - Shows enabled/disabled status in menu</li>
+<li><strong>Cross-Platform</strong> - Works on macOS, Windows, and Linux</li>
+</ul>
+<h2 id="configuration-reference" class="heading-2">⚙️ Configuration Reference</h2><h3 id="main-configuration" class="heading-3">Main Configuration</h3><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -286,6 +374,12 @@ brew install --cask switchshuttle</code></pre><h4 id="option-2-manual-download" 
 <td>Array</td>
 <td>List of command configurations</td>
 <td><code>[]</code></td>
+</tr>
+<tr>
+<td><code>enabled</code></td>
+<td>Boolean</td>
+<td>Whether this configuration should be loaded</td>
+<td><code>true</code></td>
 </tr>
 </tbody></table>
 <h3 id="terminal-options" class="heading-3">Terminal Options</h3><table>
@@ -393,7 +487,55 @@ brew install --cask switchshuttle</code></pre><h4 id="option-2-manual-download" 
 <td>❌</td>
 <td>Global hotkey shortcut</td>
 </tr>
+<tr>
+<td><code>switch</code></td>
+<td>String</td>
+<td>❌</td>
+<td>Command to check current status (for toggle commands)</td>
+</tr>
 </tbody></table>
+<h3 id="configuration-management" class="heading-3">Configuration Management</h3><h4 id="enabledisable-configurations" class="heading-4">Enable/Disable Configurations</h4><p>You can enable or disable individual configuration files to control which commands are available in the system tray menu. This is useful for:</p>
+<ul>
+<li><strong>Temporary disabling</strong> - Disable configurations without deleting them</li>
+<li><strong>Testing</strong> - Enable/disable configurations during development</li>
+<li><strong>Organization</strong> - Keep multiple configurations but only use specific ones</li>
+</ul>
+<p><strong>In the Visual Editor:</strong></p>
+<ul>
+<li>Open the Configuration Editor</li>
+<li>Use the toggle switch in the &quot;Configuration Status&quot; section</li>
+<li>Enabled configurations will be loaded and available in the menu</li>
+<li>Disabled configurations will be ignored</li>
+</ul>
+<p><strong>In JSON Configuration:</strong></p>
+<pre class="code-block"><code class="language-json">{
+  "terminal": "iterm",
+  "launch_in": "current",
+  "title": "My Commands",
+  "enabled": true,
+  "commands": [
+    {
+      "name": "Example Command",
+      "command": "echo Hello World"
+    }
+  ]
+}</code></pre><table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>enabled</code></td>
+<td>Boolean</td>
+<td><code>true</code></td>
+<td>Whether this configuration should be loaded and available in the menu</td>
+</tr>
+</tbody></table>
+<p><strong>Note:</strong> When <code>enabled</code> is set to <code>false</code> or omitted, the configuration will be ignored and its commands won&#39;t appear in the system tray menu.</p>
 <h2 id="use-cases" class="heading-2">🎯 Use Cases</h2><h3 id="developers" class="heading-3">👨‍💻 Developers</h3><ul>
 <li><strong>Quick project navigation</strong> - Jump to different projects instantly</li>
 <li><strong>Build and test workflows</strong> - One-click development cycles</li>

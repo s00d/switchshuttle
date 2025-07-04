@@ -41,6 +41,9 @@ SwitchShuttle 是一个强大的跨平台系统托盘应用程序，它彻底改
 - **🔄 多种执行模式** - 在当前窗口、新标签页或新窗口中执行
 - **🚀 自动启动** - 系统启动时启动以立即访问
 - **🎨 现代界面** - 使用 Vue.js 构建的美丽直观界面
+- **💻 命令行界面** - 直接从终端执行命令的 CLI
+- **⚙️ 配置管理** - 启用/禁用配置而无需删除
+- **🔄 开关命令** - 通过后台执行切换系统功能
 
 ## 🚀 快速开始
 
@@ -181,6 +184,39 @@ SwitchShuttle 使用 JSON 配置文件，存储在：
 }
 ```
 
+#### 🔄 开关命令
+
+通过后台执行切换系统功能：
+
+```json
+{
+  "name": "🔧 系统控制",
+  "submenu": [
+    {
+      "name": "📶 切换 WiFi",
+      "command": "networksetup -setairportpower en0 toggle",
+      "switch": "networksetup -getairportpower en0 | grep -q 'On' && echo 'true' || echo 'false'"
+    },
+    {
+      "name": "🔊 切换蓝牙",
+      "command": "blueutil -p toggle",
+      "switch": "blueutil -p | grep -q '1' && echo 'true' || echo 'false'"
+    },
+    {
+      "name": "🌙 切换深色模式",
+      "command": "osascript -e 'tell app \"System Events\" to tell appearance preferences to set dark mode to not dark mode'",
+      "switch": "osascript -e 'tell app \"System Events\" to tell appearance preferences to get dark mode'"
+    }
+  ]
+}
+```
+
+**开关命令功能：**
+- **后台执行** - 命令静默运行，不打开终端
+- **状态检查** - 自动检测当前状态
+- **视觉反馈** - 在菜单中显示启用/禁用状态
+- **跨平台** - 在 macOS、Windows 和 Linux 上工作
+
 ## ⚙️ 配置参考
 
 ### 主配置
@@ -193,6 +229,7 @@ SwitchShuttle 使用 JSON 配置文件，存储在：
 | `title` | String | 窗口/标签页标题 | - |
 | `menu_hotkey` | String | 打开菜单的全局热键 | - |
 | `commands` | Array | 命令配置列表 | `[]` |
+| `enabled` | Boolean | 是否应加载此配置 | `true` |
 
 ### 终端选项
 
@@ -222,6 +259,45 @@ SwitchShuttle 使用 JSON 配置文件，存储在：
 | `submenu` | Array | ❌ | 嵌套子命令 |
 | `inputs` | Object | ❌ | 动态输入字段 |
 | `hotkey` | String | ❌ | 全局热键 |
+| `switch` | String | ❌ | 检查当前状态的命令（用于开关命令） |
+
+### 配置管理
+
+#### 启用/禁用配置
+
+您可以启用或禁用单个配置文件来控制系统托盘菜单中可用的命令。这对于以下情况很有用：
+
+- **临时禁用** - 禁用配置而不删除它们
+- **测试** - 在开发过程中启用/禁用配置
+- **组织** - 保持多个配置但仅使用特定配置
+
+**在可视化编辑器中：**
+- 打开配置编辑器
+- 在"配置状态"部分使用切换开关
+- 启用的配置将被加载并在菜单中可用
+- 禁用的配置将被忽略
+
+**在 JSON 配置中：**
+```json
+{
+  "terminal": "iterm",
+  "launch_in": "current",
+  "title": "我的命令",
+  "enabled": true,
+  "commands": [
+    {
+      "name": "示例命令",
+      "command": "echo Hello World"
+    }
+  ]
+}
+```
+
+| 参数 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `enabled` | Boolean | `true` | 此配置是否应加载并在菜单中可用 |
+
+**注意：** 当 `enabled` 设置为 `false` 或省略时，配置将被忽略，其命令不会出现在系统托盘菜单中。
 
 ## 🎯 使用场景
 

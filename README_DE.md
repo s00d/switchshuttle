@@ -41,6 +41,9 @@ SwitchShuttle ist eine leistungsstarke plattformübergreifende System-Tray-Anwen
 - **🔄 Mehrere Ausführungsmodi** - Ausführung im aktuellen Fenster, neuer Tab oder neues Fenster
 - **🚀 Auto-Start** - Start beim Systemstart für sofortigen Zugriff
 - **🎨 Moderne UI** - Schöne, intuitive Oberfläche entwickelt mit Vue.js
+- **💻 Kommandozeilen-Interface** - Führen Sie Befehle direkt aus dem Terminal mit CLI aus
+- **⚙️ Konfigurationsverwaltung** - Aktivieren/Deaktivieren von Konfigurationen ohne Löschung
+- **🔄 Schalter-Befehle** - Systemfunktionen mit Hintergrundausführung umschalten
 
 ## 🚀 Schnellstart
 
@@ -181,6 +184,39 @@ Organisieren Sie Befehle in hierarchischen Menüs:
 }
 ```
 
+#### 🔄 Schalter-Befehle
+
+Systemfunktionen mit Hintergrundausführung umschalten:
+
+```json
+{
+  "name": "🔧 Systemsteuerung",
+  "submenu": [
+    {
+      "name": "📶 WiFi umschalten",
+      "command": "networksetup -setairportpower en0 toggle",
+      "switch": "networksetup -getairportpower en0 | grep -q 'On' && echo 'true' || echo 'false'"
+    },
+    {
+      "name": "🔊 Bluetooth umschalten",
+      "command": "blueutil -p toggle",
+      "switch": "blueutil -p | grep -q '1' && echo 'true' || echo 'false'"
+    },
+    {
+      "name": "🌙 Dunklen Modus umschalten",
+      "command": "osascript -e 'tell app \"System Events\" to tell appearance preferences to set dark mode to not dark mode'",
+      "switch": "osascript -e 'tell app \"System Events\" to tell appearance preferences to get dark mode'"
+    }
+  ]
+}
+```
+
+**Schalter-Befehl-Funktionen:**
+- **Hintergrundausführung** - Befehle werden leise ausgeführt ohne Terminal zu öffnen
+- **Statusprüfung** - Erkennt automatisch den aktuellen Zustand
+- **Visuelles Feedback** - Zeigt aktiviert/deaktiviert Status im Menü
+- **Plattformübergreifend** - Funktioniert auf macOS, Windows und Linux
+
 ## ⚙️ Konfigurationsreferenz
 
 ### Hauptkonfiguration
@@ -193,6 +229,7 @@ Organisieren Sie Befehle in hierarchischen Menüs:
 | `title` | String | Fenster/Tab-Titel | - |
 | `menu_hotkey` | String | Globaler Hotkey zum Öffnen des Menüs | - |
 | `commands` | Array | Liste der Befehls-Konfigurationen | `[]` |
+| `enabled` | Boolean | Ob diese Konfiguration geladen werden soll | `true` |
 
 ### Terminal-Optionen
 
@@ -222,6 +259,45 @@ Organisieren Sie Befehle in hierarchischen Menüs:
 | `submenu` | Array | ❌ | Verschachtelte Unterbefehle |
 | `inputs` | Object | ❌ | Dynamische Eingabefelder |
 | `hotkey` | String | ❌ | Globaler Hotkey |
+| `switch` | String | ❌ | Befehl zum Überprüfen des aktuellen Status (für Schalter-Befehle) |
+
+### Konfigurationsverwaltung
+
+#### Konfigurationen aktivieren/deaktivieren
+
+Sie können einzelne Konfigurationsdateien aktivieren oder deaktivieren, um zu steuern, welche Befehle im System-Tray-Menü verfügbar sind. Dies ist nützlich für:
+
+- **Temporäres Deaktivieren** - Deaktivieren Sie Konfigurationen ohne Löschung
+- **Tests** - Aktivieren/Deaktivieren von Konfigurationen während der Entwicklung
+- **Organisation** - Behalten Sie mehrere Konfigurationen, verwenden Sie aber nur bestimmte
+
+**Im visuellen Editor:**
+- Öffnen Sie den Konfigurationseditor
+- Verwenden Sie den Umschalter im Abschnitt "Konfigurationsstatus"
+- Aktivierte Konfigurationen werden geladen und im Menü verfügbar sein
+- Deaktivierte Konfigurationen werden ignoriert
+
+**In JSON-Konfiguration:**
+```json
+{
+  "terminal": "iterm",
+  "launch_in": "current",
+  "title": "Meine Befehle",
+  "enabled": true,
+  "commands": [
+    {
+      "name": "Beispiel-Befehl",
+      "command": "echo Hello World"
+    }
+  ]
+}
+```
+
+| Parameter | Typ | Standard | Beschreibung |
+|-----------|-----|----------|--------------|
+| `enabled` | Boolean | `true` | Ob diese Konfiguration geladen und im Menü verfügbar sein soll |
+
+**Hinweis:** Wenn `enabled` auf `false` gesetzt oder weggelassen wird, wird die Konfiguration ignoriert und ihre Befehle erscheinen nicht im System-Tray-Menü.
 
 ## 🎯 Anwendungsfälle
 
