@@ -11,6 +11,7 @@ export interface Command {
   submenu?: Command[] | null;
   commands?: string[] | null;
   inputs?: Record<string, string> | null;
+  switch?: string | undefined;
 }
 
 export interface Config {
@@ -20,4 +21,5 @@ export interface Config {
   title: string;
   commands: Command[];
   menu_hotkey?: string | null;
+  enabled?: boolean;
 }
