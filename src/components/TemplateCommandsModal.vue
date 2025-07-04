@@ -174,7 +174,6 @@ import Button from './Button.vue';
 import Modal from './Modal.vue';
 import CustomSelect from './CustomSelect.vue';
 import { templates, searchTemplates, getTemplatesByCategory } from '../lib/templates';
-import type { Template } from '../lib/templates';
 import type { Command } from '../types';
 
 interface Props {
