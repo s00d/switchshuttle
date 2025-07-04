@@ -38,7 +38,26 @@ export const templates: Template[] = [
       { id: 'dev-readme', name: '📖 Create README file', command: 'touch README.md', hotkey: 'Ctrl+Shift+R' },
       { id: 'dev-license', name: '📄 Create LICENSE file', command: 'touch LICENSE', hotkey: 'Ctrl+Shift+L' },
       { id: 'dev-gitignore', name: '🚫 Create .gitignore file', command: 'touch .gitignore', hotkey: 'Ctrl+Shift+I' },
-      { id: 'dev-env', name: '🌍 Create .env files', command: 'touch .env.example && touch .env', hotkey: 'Ctrl+Shift+E' }
+      { id: 'dev-env', name: '🌍 Create .env files', command: 'touch .env.example && touch .env', hotkey: 'Ctrl+Shift+E' },
+      { id: 'dev-tauri-create', name: '⚡ Create App Tauri', command: 'cargo create-tauri-app [app_name]', inputs: { app_name: 'my-tauri-app' }, hotkey: 'Ctrl+Shift+T' },
+      { id: 'dev-tauri-dev', name: '🔄 Dev Mode Tauri', command: 'cargo tauri dev', hotkey: 'Ctrl+Shift+D' },
+      { id: 'dev-tauri-autostart', name: '🚀 Add Autostart Tauri', command: 'cargo tauri add autostart', hotkey: 'Ctrl+Shift+A' },
+      { id: 'dev-tauri-build', name: '📦 Build App Tauri', command: 'cargo tauri build', hotkey: 'Ctrl+Shift+B' },
+      { id: 'dev-git-clone', name: '📥 Clone Repository Git', command: 'git clone [repository_url]', inputs: { repository_url: 'https://github.com/user/repo.git' }, hotkey: 'Ctrl+Shift+C' },
+      { id: 'dev-git-pull', name: '⬇️ Pull Changes Git', command: 'git pull origin main', hotkey: 'Ctrl+Shift+P' },
+      { id: 'dev-git-push', name: '⬆️ Push Changes Git', command: 'git push origin main', hotkey: 'Ctrl+Shift+U' },
+      { id: 'dev-git-branch', name: '🌿 Create Branch Git', command: 'git checkout -b [branch_name]', inputs: { branch_name: 'feature/new-feature' }, hotkey: 'Ctrl+Shift+B' },
+      { id: 'dev-git-merge', name: '🔀 Merge Branch Git', command: 'git merge [branch_name]', inputs: { branch_name: 'feature/new-feature' }, hotkey: 'Ctrl+Shift+M' },
+      { id: 'dev-yarn-install', name: '📦 Install Dependencies Yarn', command: 'yarn install', hotkey: 'Ctrl+Shift+Y' },
+      { id: 'dev-yarn-add', name: '➕ Add Package Yarn', command: 'yarn add [package_name]', inputs: { package_name: 'lodash' }, hotkey: 'Ctrl+Shift+A' },
+      { id: 'dev-pnpm-install', name: '📦 Install Dependencies pnpm', command: 'pnpm install', hotkey: 'Ctrl+Shift+P' },
+      { id: 'dev-bun-install', name: '📦 Install Dependencies Bun', command: 'bun install', hotkey: 'Ctrl+Shift+B' },
+      { id: 'dev-docker-compose', name: '🐳 Compose Up Docker', command: 'docker-compose up -d', hotkey: 'Ctrl+Shift+U' },
+      { id: 'dev-docker-run', name: '▶️ Run Container Docker', command: 'docker run -d --name [container_name] [image_name]', inputs: { container_name: 'my-container', image_name: 'nginx' }, hotkey: 'Ctrl+Shift+R' },
+      { id: 'dev-docker-exec', name: '🔧 Exec Container Docker', command: 'docker exec -it [container_name] /bin/bash', inputs: { container_name: 'my-container' }, hotkey: 'Ctrl+Shift+E' },
+      { id: 'dev-npx-run', name: '⚡ Run Package npx', command: 'npx [package_name]', inputs: { package_name: 'create-react-app' }, hotkey: 'Ctrl+Shift+N' },
+      { id: 'dev-npm-audit-fix', name: '🔧 Fix Security npm', command: 'npm audit fix', hotkey: 'Ctrl+Shift+F' },
+      { id: 'dev-npm-outdated', name: '📋 Check Outdated npm', command: 'npm outdated', hotkey: 'Ctrl+Shift+O' }
     ]
   },
   {
@@ -97,7 +116,14 @@ export const templates: Template[] = [
       { id: 'frontend-state', name: '📊 Install State Management Redux', command: 'npm install @reduxjs/toolkit react-redux', hotkey: 'Ctrl+Shift+S' },
       { id: 'frontend-ui', name: '🎨 Install UI Library MUI', command: 'npm install @mui/material @emotion/react @emotion/styled', hotkey: 'Ctrl+Shift+U' },
       { id: 'frontend-storybook', name: '📚 Init Storybook', command: 'npx storybook@latest init', hotkey: 'Ctrl+Shift+K' },
-      { id: 'frontend-pwa', name: '📱 Install PWA Workbox', command: 'npm install workbox-webpack-plugin', hotkey: 'Ctrl+Shift+P' }
+      { id: 'frontend-pwa', name: '📱 Install PWA Workbox', command: 'npm install workbox-webpack-plugin', hotkey: 'Ctrl+Shift+P' },
+      { id: 'frontend-vite-create', name: '⚡ Create App Vite', command: 'npm create vite@latest [app_name]', inputs: { app_name: 'my-vite-app' }, hotkey: 'Ctrl+Shift+V' },
+      { id: 'frontend-sveltekit-create', name: '⚡ Create App SvelteKit', command: 'npm create svelte@latest [app_name]', inputs: { app_name: 'my-sveltekit-app' }, hotkey: 'Ctrl+Shift+S' },
+      { id: 'frontend-astro-create', name: '🚀 Create App Astro', command: 'npm create astro@latest [app_name]', inputs: { app_name: 'my-astro-app' }, hotkey: 'Ctrl+Shift+A' },
+      { id: 'frontend-remix-create', name: '⚡ Create App Remix', command: 'npx create-remix@latest [app_name]', inputs: { app_name: 'my-remix-app' }, hotkey: 'Ctrl+Shift+R' },
+      { id: 'frontend-nuxt-create', name: '🟢 Create App Nuxt', command: 'npx nuxi@latest init [app_name]', inputs: { app_name: 'my-nuxt-app' }, hotkey: 'Ctrl+Shift+N' },
+      { id: 'frontend-gatsby-create', name: '📚 Create App Gatsby', command: 'npx gatsby new [app_name]', inputs: { app_name: 'my-gatsby-app' }, hotkey: 'Ctrl+Shift+G' },
+      { id: 'frontend-tailwind-init', name: '🎨 Init Tailwind CSS', command: 'npx tailwindcss init', hotkey: 'Ctrl+Shift+T' }
     ]
   },
   {
@@ -118,6 +144,7 @@ export const templates: Template[] = [
       { id: 'backend-fastapi-create', name: '⚡ Install FastAPI App', command: 'pip install fastapi uvicorn', hotkey: 'Ctrl+Shift+A' },
       { id: 'backend-spring-create', name: '🍃 Create App Spring Boot', command: 'curl https://start.spring.io/starter.zip -d dependencies=web,data-jpa -d type=maven-project -o [app_name].zip', inputs: { app_name: 'my-app' }, hotkey: 'Ctrl+Shift+S' },
       { id: 'backend-laravel-create', name: '🦋 Create App Laravel', command: 'composer create-project laravel/laravel [app_name]', inputs: { app_name: 'my-app' }, hotkey: 'Ctrl+Shift+L' },
+      { id: 'backend-laravel-version', name: '🦋 Create App Laravel Version', command: 'composer create-project laravel/laravel:[version] [app_name]', inputs: { version: '9.0', app_name: 'my-laravel-app' }, hotkey: 'Ctrl+Shift+V' },
       { id: 'backend-rails-create', name: '💎 Create App Rails', command: 'rails new [app_name]', inputs: { app_name: 'my-app' }, hotkey: 'Ctrl+Shift+R' },
       { id: 'backend-go-create', name: '🐹 Create App Go', command: 'mkdir [app_name] && cd [app_name] && go mod init [app_name]', inputs: { app_name: 'my-app' }, hotkey: 'Ctrl+Shift+G' },
       { id: 'backend-rust-create', name: '🦀 Create App Rust', command: 'cargo new [app_name]', inputs: { app_name: 'my-app' }, hotkey: 'Ctrl+Shift+R' },
@@ -127,7 +154,15 @@ export const templates: Template[] = [
       { id: 'backend-lint', name: '🔍 Lint Code npm', command: 'npm run lint', hotkey: 'Ctrl+Shift+L' },
       { id: 'backend-build', name: '📦 Build Project npm', command: 'npm run build', hotkey: 'Ctrl+Shift+B' },
       { id: 'backend-migrate', name: '🗄️ Run Migrations npm', command: 'npm run migrate', hotkey: 'Ctrl+Shift+M' },
-      { id: 'backend-seed', name: '🌱 Seed Database npm', command: 'npm run seed', hotkey: 'Ctrl+Shift+S' }
+      { id: 'backend-seed', name: '🌱 Seed Database npm', command: 'npm run seed', hotkey: 'Ctrl+Shift+S' },
+      { id: 'backend-fastapi-install', name: '⚡ Install FastAPI', command: 'pip install fastapi uvicorn', hotkey: 'Ctrl+Shift+F' },
+      { id: 'backend-django-rest', name: '🔄 Install Django REST', command: 'pip install djangorestframework', hotkey: 'Ctrl+Shift+R' },
+      { id: 'backend-flask-sqlalchemy', name: '🗄️ Install Flask SQLAlchemy', command: 'pip install flask-sqlalchemy', hotkey: 'Ctrl+Shift+S' },
+      { id: 'backend-flask-cors', name: '🌐 Install Flask CORS', command: 'pip install flask-cors', hotkey: 'Ctrl+Shift+C' },
+      { id: 'backend-express-cors', name: '🌐 Install Express CORS', command: 'npm install cors', hotkey: 'Ctrl+Shift+C' },
+      { id: 'backend-express-helmet', name: '🛡️ Install Express Helmet', command: 'npm install helmet', hotkey: 'Ctrl+Shift+H' },
+      { id: 'backend-prisma-init', name: '🗄️ Init Prisma ORM', command: 'npx prisma init', hotkey: 'Ctrl+Shift+P' },
+      { id: 'backend-typeorm-install', name: '🗄️ Install TypeORM', command: 'npm install typeorm', hotkey: 'Ctrl+Shift+T' }
     ]
   },
   {
@@ -157,7 +192,13 @@ export const templates: Template[] = [
       { id: 'db-backup', name: '💾 Backup Database PostgreSQL', command: 'pg_dump [database] > backup_[date].sql', inputs: { database: 'testdb' }, hotkey: 'Ctrl+Shift+B' },
       { id: 'db-restore', name: '📥 Restore Database PostgreSQL', command: 'psql [database] < [backup_file]', inputs: { database: 'testdb', backup_file: 'backup.sql' }, hotkey: 'Ctrl+Shift+R' },
       { id: 'db-optimize', name: '⚡ Optimize Database PostgreSQL', command: 'VACUUM ANALYZE;', hotkey: 'Ctrl+Shift+O' },
-      { id: 'db-monitor', name: '📊 Monitor Database PostgreSQL', command: 'SELECT * FROM pg_stat_activity;', hotkey: 'Ctrl+Shift+M' }
+      { id: 'db-monitor', name: '📊 Monitor Database PostgreSQL', command: 'SELECT * FROM pg_stat_activity;', hotkey: 'Ctrl+Shift+M' },
+      { id: 'db-prisma-push', name: '🔄 Push Schema Prisma', command: 'npx prisma db push', hotkey: 'Ctrl+Shift+P' },
+      { id: 'db-prisma-studio', name: '🎨 Open Prisma Studio', command: 'npx prisma studio', hotkey: 'Ctrl+Shift+S' },
+      { id: 'db-sequelize-init', name: '🗄️ Init Sequelize CLI', command: 'npx sequelize-cli init', hotkey: 'Ctrl+Shift+I' },
+      { id: 'db-mongoose-install', name: '🍃 Install Mongoose', command: 'npm install mongoose', hotkey: 'Ctrl+Shift+M' },
+      { id: 'db-redis-ping', name: '🏓 Ping Redis', command: 'redis-cli ping', hotkey: 'Ctrl+Shift+P' },
+      { id: 'db-redis-flush', name: '🗑️ Flush Redis', command: 'redis-cli flushall', hotkey: 'Ctrl+Shift+F' }
     ]
   },
   {
@@ -186,7 +227,12 @@ export const templates: Template[] = [
       { id: 'cloud-k8s-services', name: '🌐 Get Services Kubernetes', command: 'kubectl get services -A', hotkey: 'Ctrl+Shift+S' },
       { id: 'cloud-k8s-nodes', name: '🖥️ Get Nodes Kubernetes', command: 'kubectl get nodes', hotkey: 'Ctrl+Shift+N' },
       { id: 'cloud-docker-images', name: '🐳 List Images Docker', command: 'docker images', hotkey: 'Ctrl+Shift+I' },
-      { id: 'cloud-docker-containers', name: '📦 List Containers Docker', command: 'docker ps -a', hotkey: 'Ctrl+Shift+C' }
+      { id: 'cloud-docker-containers', name: '📦 List Containers Docker', command: 'docker ps -a', hotkey: 'Ctrl+Shift+C' },
+      { id: 'cloud-github-repo', name: '📚 Create Repository GitHub', command: 'gh repo create [repo_name] --public', inputs: { repo_name: 'my-repo' }, hotkey: 'Ctrl+Shift+G' },
+      { id: 'cloud-github-pr', name: '🔀 Create PR GitHub', command: 'gh pr create --title "[title]"', inputs: { title: 'Add new feature' }, hotkey: 'Ctrl+Shift+P' },
+      { id: 'cloud-aws-sync', name: '🔄 Sync S3 AWS', command: 'aws s3 sync [local_path] s3://[bucket_name]', inputs: { local_path: './dist', bucket_name: 'my-bucket' }, hotkey: 'Ctrl+Shift+S' },
+      { id: 'cloud-terraform-validate', name: '✅ Validate Terraform', command: 'terraform validate', hotkey: 'Ctrl+Shift+V' },
+      { id: 'cloud-ansible-playbook', name: '📜 Run Playbook Ansible', command: 'ansible-playbook -i inventory [playbook.yml]', inputs: { playbook: 'playbook.yml' }, hotkey: 'Ctrl+Shift+A' }
     ]
   },
   {
@@ -209,13 +255,16 @@ export const templates: Template[] = [
       { id: 'security-metasploit', name: '🎯 Start Framework Metasploit', command: 'msfconsole', hotkey: 'Ctrl+Shift+M' },
       { id: 'security-burp-suite', name: '🕷️ Start Proxy Burp Suite', command: 'burpsuite', hotkey: 'Ctrl+Shift+B' },
       { id: 'security-wireshark-capture', name: '📡 Capture Traffic Wireshark', command: 'tshark -i [interface] -w capture.pcap', inputs: { interface: 'eth0' }, hotkey: 'Ctrl+Shift+T' },
-      { id: 'security-openssl-test', name: '�� Test SSL openssl', command: 'openssl s_client -connect [host]:[port] -servername [host]', inputs: { host: 'localhost', port: '443' }, hotkey: 'Ctrl+Shift+L' },
+      { id: 'security-openssl-test', name: '🔓 Test SSL openssl', command: 'openssl s_client -connect [host]:[port] -servername [host]', inputs: { host: 'localhost', port: '443' }, hotkey: 'Ctrl+Shift+L' },
       { id: 'security-nuclei-scan', name: '🎯 Scan Vulnerabilities nuclei', command: 'nuclei -u [url]', inputs: { url: 'http://example.com' }, hotkey: 'Ctrl+Shift+U' },
       { id: 'security-subfinder', name: '🔍 Find Subdomains subfinder', command: 'subfinder -d [domain]', inputs: { domain: 'example.com' }, hotkey: 'Ctrl+Shift+F' },
       { id: 'security-amass-scan', name: '🕸️ Scan Subdomains amass', command: 'amass enum -d [domain]', inputs: { domain: 'example.com' }, hotkey: 'Ctrl+Shift+A' },
       { id: 'security-masscan-scan', name: '⚡ Scan Ports masscan', command: 'masscan [target] -p [ports]', inputs: { target: '192.168.1.0/24', ports: '80,443,22' }, hotkey: 'Ctrl+Shift+P' },
       { id: 'security-responder', name: '🎣 Poison LLMNR Responder', command: 'responder -I [interface]', inputs: { interface: 'eth0' }, hotkey: 'Ctrl+Shift+R' },
-      { id: 'security-smb-enum', name: '📁 Enumerate SMB smbmap', command: 'smbmap -H [target] -smb2support', inputs: { target: '192.168.1.1' }, hotkey: 'Ctrl+Shift+I' }
+      { id: 'security-smb-enum', name: '📁 Enumerate SMB smbmap', command: 'smbmap -H [target] -smb2support', inputs: { target: '192.168.1.1' }, hotkey: 'Ctrl+Shift+I' },
+      { id: 'security-ssl-cert', name: '🔐 Generate SSL Certificate', command: 'openssl req -newkey rsa:2048 -keyout key.pem -out cert.pem', hotkey: 'Ctrl+Shift+S' },
+      { id: 'security-ssh-keygen', name: '🔑 Generate SSH Key', command: 'ssh-keygen -t rsa -b 4096 -C "[email]"', inputs: { email: 'user@example.com' }, hotkey: 'Ctrl+Shift+K' },
+      { id: 'security-certbot-nginx', name: '🔒 SSL Certificate Certbot', command: 'certbot --nginx -d [domain]', inputs: { domain: 'example.com' }, hotkey: 'Ctrl+Shift+C' }
     ]
   },
   {
@@ -245,7 +294,37 @@ export const templates: Template[] = [
       { id: 'testing-selenium-grid', name: '🌐 Start Grid Selenium', command: 'java -jar selenium-server.jar hub', hotkey: 'Ctrl+Shift+G' },
       { id: 'testing-appium', name: '📱 Start Server Appium', command: 'appium', hotkey: 'Ctrl+Shift+A' },
       { id: 'testing-detox', name: '🧪 Run E2E Tests Detox', command: 'detox test', hotkey: 'Ctrl+Shift+D' },
-      { id: 'testing-testcafe', name: '☕ Run Tests TestCafe', command: 'testcafe chrome tests/', hotkey: 'Ctrl+Shift+T' }
+      { id: 'testing-testcafe', name: '☕ Run Tests TestCafe', command: 'testcafe chrome tests/', hotkey: 'Ctrl+Shift+T' },
+      { id: 'testing-cypress-headed', name: '👁️ Run Cypress Headed', command: 'npx cypress run --headed', hotkey: 'Ctrl+Shift+H' },
+      { id: 'testing-playwright-install', name: '🎭 Install Playwright', command: 'npx playwright install', hotkey: 'Ctrl+Shift+I' },
+      { id: 'testing-vitest-ui', name: '⚡ UI Mode Vitest', command: 'npm run test:ui', hotkey: 'Ctrl+Shift+U' }
+    ]
+  },
+  {
+    id: 'utility-category',
+    name: 'Utility',
+    description: 'System utilities and file operations',
+    category: 'Utility',
+    icon: '🔧',
+    tags: ['utility', 'system', 'file', 'network', 'compression'],
+    commands: [
+      { id: 'utility-htop', name: '📊 System Monitor htop', command: 'htop', hotkey: 'Ctrl+Shift+H' },
+      { id: 'utility-disk-usage', name: '💾 Disk Usage df', command: 'df -h', hotkey: 'Ctrl+Shift+D' },
+      { id: 'utility-dir-size', name: '📁 Directory Size du', command: 'du -sh [directory]', inputs: { directory: '.' }, hotkey: 'Ctrl+Shift+S' },
+      { id: 'utility-process-list', name: '📋 Process List ps', command: 'ps aux', hotkey: 'Ctrl+Shift+P' },
+      { id: 'utility-ping', name: '🏓 Ping Host', command: 'ping [host]', inputs: { host: 'google.com' }, hotkey: 'Ctrl+Shift+P' },
+      { id: 'utility-curl', name: '🌐 HTTP Request curl', command: 'curl [url]', inputs: { url: 'https://httpbin.org/get' }, hotkey: 'Ctrl+Shift+C' },
+      { id: 'utility-wget', name: '⬇️ Download File wget', command: 'wget [url]', inputs: { url: 'https://example.com/file.zip' }, hotkey: 'Ctrl+Shift+W' },
+      { id: 'utility-nslookup', name: '🔍 DNS Lookup nslookup', command: 'nslookup [domain]', inputs: { domain: 'google.com' }, hotkey: 'Ctrl+Shift+N' },
+      { id: 'utility-find', name: '🔍 Find Files', command: 'find [path] -name "[pattern]"', inputs: { path: '.', pattern: '*.js' }, hotkey: 'Ctrl+Shift+F' },
+      { id: 'utility-grep', name: '🔍 Search Text grep', command: 'grep -r "[pattern]" [path]', inputs: { pattern: 'function', path: '.' }, hotkey: 'Ctrl+Shift+G' },
+      { id: 'utility-ripgrep', name: '⚡ Fast Search ripgrep', command: 'rg "[pattern]" [path]', inputs: { pattern: 'function', path: '.' }, hotkey: 'Ctrl+Shift+R' },
+      { id: 'utility-sed', name: '✏️ Text Replace sed', command: 'sed "s/[old]/[new]/g" [file]', inputs: { old: 'old-text', new: 'new-text', file: 'file.txt' }, hotkey: 'Ctrl+Shift+S' },
+      { id: 'utility-awk', name: '📊 Text Processing awk', command: 'awk "{print $1}" [file]', inputs: { file: 'data.txt' }, hotkey: 'Ctrl+Shift+A' },
+      { id: 'utility-tar-compress', name: '📦 Compress Archive tar', command: 'tar -czf [archive.tar.gz] [directory]', inputs: { archive: 'backup.tar.gz', directory: 'my-folder' }, hotkey: 'Ctrl+Shift+C' },
+      { id: 'utility-zip-compress', name: '📦 Compress ZIP', command: 'zip -r [archive.zip] [directory]', inputs: { archive: 'backup.zip', directory: 'my-folder' }, hotkey: 'Ctrl+Shift+Z' },
+      { id: 'utility-unzip', name: '📦 Extract ZIP', command: 'unzip [archive.zip]', inputs: { archive: 'backup.zip' }, hotkey: 'Ctrl+Shift+U' },
+      { id: 'utility-scp', name: '🔐 Secure Copy scp', command: 'scp [local_file] [user]@[host]:[remote_path]', inputs: { local_file: 'file.txt', user: 'user', host: 'example.com', remote_path: '/home/user/' }, hotkey: 'Ctrl+Shift+S' }
     ]
   }
 ];
@@ -257,11 +336,19 @@ export function getTemplatesByCategory(category?: string): Template[] {
 
 export function searchTemplates(query: string): Template[] {
   const lowercaseQuery = query.toLowerCase();
-  return templates.filter(template => 
-    template.name.toLowerCase().includes(lowercaseQuery) ||
-    template.description.toLowerCase().includes(lowercaseQuery) ||
-    template.tags.some(tag => tag.toLowerCase().includes(lowercaseQuery))
-  );
+  return templates.filter(template => {
+    // Поиск по названию шаблона, описанию и тегам
+    const templateMatch = template.name.toLowerCase().includes(lowercaseQuery) ||
+                         template.description.toLowerCase().includes(lowercaseQuery) ||
+                         template.tags.some(tag => tag.toLowerCase().includes(lowercaseQuery));
+    
+    // Поиск по названиям команд
+    const commandMatch = template.commands.some(command => 
+      command.name.toLowerCase().includes(lowercaseQuery)
+    );
+    
+    return templateMatch || commandMatch;
+  });
 }
 
 export function getTemplateById(id: string): Template | undefined {
