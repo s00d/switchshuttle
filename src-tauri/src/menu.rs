@@ -2,17 +2,16 @@ use crate::config::{CommandConfig, ConfigManager};
 use crate::helpers;
 use crate::helpers::{
     change_devtools, create_window, get_config_path, open_folder_in_default_explorer,
-    open_in_default_editor,
+    open_in_default_editor, create_menu_item, create_menu_item_with_hotkey,
 };
 use std::sync::{Arc, Mutex};
-use tauri::image::Image;
 use tauri::menu::{
-    CheckMenuItem, IconMenuItem, IconMenuItemBuilder, MenuBuilder, Submenu, SubmenuBuilder,
+    CheckMenuItem, IconMenuItem, MenuBuilder, Submenu, SubmenuBuilder,
 };
-use tauri::path::BaseDirectory;
 use tauri::{AppHandle, Manager, Wry};
 use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_opener::OpenerExt;
+use tauri_plugin_notification::NotificationExt;
 
 fn create_sub_menu(app: &AppHandle<Wry>, items: &[CommandConfig], title: &str) -> Submenu<Wry> {
     let mut submenu_builder = SubmenuBuilder::new(app, title);
@@ -22,16 +21,11 @@ fn create_sub_menu(app: &AppHandle<Wry>, items: &[CommandConfig], title: &str) -
             submenu_builder = submenu_builder.item(&sub_submenu);
         } else {
             let id = item.id.clone().unwrap_or(item.name.clone());
-            let icon_path = app
-                .path()
-                .resolve("icons/terminal.png", BaseDirectory::Resource)
-                .unwrap();
-            let mut menu_item = IconMenuItemBuilder::with_id(&id, &item.name)
-                .icon(Image::from_path(icon_path).unwrap());
             if let Some(hotkey) = &item.hotkey {
-                menu_item = menu_item.accelerator(hotkey);
+                submenu_builder = submenu_builder.item(&create_menu_item_with_hotkey(app, &id, &item.name, "terminal", hotkey));
+            } else {
+                submenu_builder = submenu_builder.item(&create_menu_item(app, &id, &item.name, "terminal"));
             }
-            submenu_builder = submenu_builder.item(&menu_item.build(app).unwrap());
         }
     }
     submenu_builder.build().unwrap()
@@ -41,6 +35,7 @@ enum MenuItemOrSubmenu {
     // MenuItem(MenuItem<Wry>),
     Submenu(Submenu<Wry>),
     IconItem(IconMenuItem<Wry>),
+    CheckItem(CheckMenuItem<Wry>),
 }
 
 pub fn create_system_tray_menu(
@@ -53,23 +48,42 @@ pub fn create_system_tray_menu(
     let mut menu_items = Vec::new();
 
     for config in &config_manager.configs {
+        // Пропускаем отключенные конфигурации
+        if let Some(enabled) = config.enabled {
+            if !enabled {
+                continue;
+            }
+        }
+        
         for command in &config.commands {
             if let Some(submenu_items) = &command.submenu {
                 let submenu = create_sub_menu(app, submenu_items, &command.name);
                 menu_items.push(MenuItemOrSubmenu::Submenu(submenu));
             } else {
                 let id = command.id.clone().unwrap_or(command.name.clone());
-                let icon_path = app
-                    .path()
-                    .resolve("icons/terminal.png", BaseDirectory::Resource)
+                
+                // Проверяем, является ли это переключателем
+                if command.switch.is_some() {
+                    let is_enabled = config_manager.is_switch_enabled(&id, Some(app));
+                    let menu_item = CheckMenuItem::with_id(
+                        app.app_handle(),
+                        &id,
+                        &command.name,
+                        true,
+                        is_enabled,
+                        None::<&str>,
+                    )
                     .unwrap();
-                let mut item = IconMenuItemBuilder::with_id(&id, &command.name)
-                    .icon(Image::from_path(icon_path).unwrap());
-                if let Some(hotkey) = &command.hotkey {
-                    item = item.accelerator(hotkey);
+                    menu_items.push(MenuItemOrSubmenu::CheckItem(menu_item));
+                } else {
+                    if let Some(hotkey) = &command.hotkey {
+                        let menu_item = create_menu_item_with_hotkey(app, &id, &command.name, "terminal", hotkey);
+                        menu_items.push(MenuItemOrSubmenu::IconItem(menu_item));
+                    } else {
+                        let menu_item = create_menu_item(app, &id, &command.name, "terminal");
+                        menu_items.push(MenuItemOrSubmenu::IconItem(menu_item));
+                    }
                 }
-                let menu_item = item.build(app).unwrap();
-                menu_items.push(MenuItemOrSubmenu::IconItem(menu_item));
             }
         }
     }
@@ -85,6 +99,9 @@ pub fn create_system_tray_menu(
             MenuItemOrSubmenu::IconItem(submenu) => {
                 tray_menu_builder = tray_menu_builder.item(&submenu);
             }
+            MenuItemOrSubmenu::CheckItem(check_item) => {
+                tray_menu_builder = tray_menu_builder.item(&check_item);
+            }
         }
     }
 
@@ -94,51 +111,22 @@ pub fn create_system_tray_menu(
 
     for path in &config_manager.config_paths {
         let file_name = path.file_name().unwrap().to_string_lossy().to_string();
-        let icon_path = app
-            .path()
-            .resolve("icons/edit.png", BaseDirectory::Resource)
-            .unwrap();
         edit_config_submenu = edit_config_submenu.item(
-            &IconMenuItemBuilder::with_id(&format!("edit_{}", file_name), &file_name)
-                .icon(Image::from_path(icon_path).unwrap())
-                .build(app)
-                .unwrap(),
+            &create_menu_item(app, &format!("edit_{}", file_name), &file_name, "edit")
         );
     }
 
     edit_config_submenu = edit_config_submenu.separator();
-    let icon_path = app
-        .path()
-        .resolve("icons/folder.png", BaseDirectory::Resource)
-        .unwrap();
     edit_config_submenu = edit_config_submenu.item(
-        &IconMenuItemBuilder::with_id("open_config_folder", "Show Config Folder")
-            .icon(Image::from_path(icon_path).unwrap())
-            .build(app)
-            .unwrap(),
+        &create_menu_item(app, "open_config_folder", "Show Config Folder", "folder")
     );
-    let icon_path = app
-        .path()
-        .resolve("icons/visual.png", BaseDirectory::Resource)
-        .unwrap();
     edit_config_submenu = edit_config_submenu.item(
-        &IconMenuItemBuilder::with_id("open_config_editor", "Open Visual Editor")
-            .icon(Image::from_path(icon_path).unwrap())
-            .build(app)
-            .unwrap(),
+        &create_menu_item(app, "open_config_editor", "Open Visual Editor", "visual")
     );
 
     edit_config_submenu = edit_config_submenu.separator();
-
-    let icon_path = app
-        .path()
-        .resolve("icons/refresh_settings.png", BaseDirectory::Resource)
-        .unwrap();
     edit_config_submenu = edit_config_submenu.item(
-        &IconMenuItemBuilder::with_id("refresh_configurations", "Refresh Configurations")
-            .icon(Image::from_path(icon_path).unwrap())
-            .build(app)
-            .unwrap(),
+        &create_menu_item(app, "refresh_configurations", "Refresh Configurations", "refresh_settings")
     );
 
     tray_menu_builder = tray_menu_builder.item(&edit_config_submenu.build().unwrap());
@@ -160,62 +148,20 @@ pub fn create_system_tray_menu(
     tray_menu_builder = tray_menu_builder.separator();
 
     if cfg!(debug_assertions) {
-        let icon_path = app
-            .path()
-            .resolve("icons/devtools.png", BaseDirectory::Resource)
-            .unwrap();
         tray_menu_builder = tray_menu_builder.item(
-            &IconMenuItemBuilder::with_id("open_devtools", "Open DevTools")
-                .icon(Image::from_path(icon_path).unwrap())
-                .build(app)
-                .unwrap(),
+            &create_menu_item(app, "open_devtools", "Open DevTools", "devtools")
         );
 
         tray_menu_builder = tray_menu_builder.separator();
     }
 
-    let icon_path = app
-        .path()
-        .resolve("icons/info.png", BaseDirectory::Resource)
-        .unwrap();
-    tray_menu_builder = tray_menu_builder.item(
-        &IconMenuItemBuilder::with_id("about", "About")
-            .icon(Image::from_path(icon_path).unwrap())
-            .build(app)
-            .unwrap(),
-    );
-    let icon_path = app
-        .path()
-        .resolve("icons/site.png", BaseDirectory::Resource)
-        .unwrap();
-    tray_menu_builder = tray_menu_builder.item(
-        &IconMenuItemBuilder::with_id("homepage", "Homepage")
-            .icon(Image::from_path(icon_path).unwrap())
-            .build(app)
-            .unwrap(),
-    );
-    let icon_path = app
-        .path()
-        .resolve("icons/update.png", BaseDirectory::Resource)
-        .unwrap();
-    tray_menu_builder = tray_menu_builder.item(
-        &IconMenuItemBuilder::with_id("check_updates", "Check for Updates")
-            .icon(Image::from_path(icon_path).unwrap())
-            .build(app)
-            .unwrap(),
-    );
+    tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "about", "About", "info"));
+    tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "help", "Help", "help"));
+    tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "homepage", "Homepage", "site"));
+    tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "check_updates", "Check for Updates", "update"));
 
     tray_menu_builder = tray_menu_builder.separator();
-    let icon_path = app
-        .path()
-        .resolve("icons/exit.png", BaseDirectory::Resource)
-        .unwrap();
-    tray_menu_builder = tray_menu_builder.item(
-        &IconMenuItemBuilder::with_id("quit", "Quit SwitchShuttle")
-            .icon(Image::from_path(icon_path).unwrap())
-            .build(app)
-            .unwrap(),
-    );
+    tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "quit", "Quit SwitchShuttle", "exit"));
 
     tray_menu_builder.build().unwrap()
 }
@@ -230,6 +176,9 @@ pub fn handle_system_tray_event(
     match event.id().0.as_str() {
         "about" => {
             create_window(&app, "About", "/about", 800.0, 600.0, true);
+        }
+        "help" => {
+            create_window(&app, "Help", "/help", 1000.0, 800.0, true);
         }
         "quit" => std::process::exit(0),
         "refresh_configurations" => {
@@ -287,27 +236,77 @@ pub fn handle_system_tray_event(
                 let config_manager = config_manager.lock().unwrap();
                 match config_manager.find_command_by_id(event.id().0.as_str()) {
                     Some((command, config)) => {
-                        let should_show_inputs = command.inputs.as_ref()
-                            .map(|inputs| !inputs.is_empty())
-                            .unwrap_or(false) && command.id.is_some();
-                        
-                        if should_show_inputs {
-                            create_window(
-                                &app,
-                                "Provide Inputs",
-                                &format!("/inputs/{}", command.id.as_ref().unwrap()),
-                                400.0,
-                                300.0,
-                                true,
-                            );
+                        // Проверяем, является ли это переключателем
+                        if command.switch.is_some() {
+                            let should_show_inputs = command.inputs.as_ref()
+                                .map(|inputs| !inputs.is_empty())
+                                .unwrap_or(false) && command.id.is_some();
+                            
+                            if should_show_inputs {
+                                create_window(
+                                    &app,
+                                    "Provide Inputs",
+                                    &format!("/inputs/{}", command.id.as_ref().unwrap()),
+                                    400.0,
+                                    300.0,
+                                    true,
+                                );
+                            } else {
+                                // Выполняем команду переключения через execute_command_silent
+                                if let Some(toggle_command) = &command.command {
+                                    match helpers::execute_command_silent(toggle_command) {
+                                        Ok(_) => {
+                                            // Показываем уведомление об успешном выполнении
+                                            if let Ok(_) = app.notification().builder()
+                                                .title("SwitchShuttle Success")
+                                                .body(&format!("Switch '{}' executed successfully", command.name))
+                                                .show() {
+                                                // Уведомление отправлено
+                                            }
+                                            // Обновляем меню после выполнения команды
+                                            let new_system_tray_menu = create_system_tray_menu(
+                                                app, 
+                                                app.autolaunch().is_enabled().unwrap_or(false), 
+                                                &config_manager
+                                            );
+                                            app.set_menu(new_system_tray_menu).unwrap();
+                                        }
+                                        Err(e) => {
+                                            eprintln!("Failed to execute switch command: {}", e);
+                                            // Показываем уведомление об ошибке
+                                            if let Ok(_) = app.notification().builder()
+                                                .title("SwitchShuttle Error")
+                                                .body(&format!("Failed to execute switch '{}': {}", command.name, e))
+                                                .show() {
+                                                // Уведомление отправлено
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         } else {
-                            helpers::execute_command(
-                                command,
-                                &config.terminal,
-                                &config.launch_in,
-                                &config.theme,
-                                &config.title,
-                            );
+                            let should_show_inputs = command.inputs.as_ref()
+                                .map(|inputs| !inputs.is_empty())
+                                .unwrap_or(false) && command.id.is_some();
+                            
+                            if should_show_inputs {
+                                create_window(
+                                    &app,
+                                    "Provide Inputs",
+                                    &format!("/inputs/{}", command.id.as_ref().unwrap()),
+                                    400.0,
+                                    300.0,
+                                    true,
+                                );
+                            } else {
+                                helpers::execute_command(
+                                    command,
+                                    &config.terminal,
+                                    &config.launch_in,
+                                    &config.theme,
+                                    &config.title,
+                                );
+                            }
                         }
                     }
                     None => eprintln!("Command '{}' not found", event.id().0),
