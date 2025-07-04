@@ -1,10 +1,10 @@
 <template>
   <div 
     :class="[
-      'bg-white border border-slate-300 transition-all duration-200',
-      hover && 'hover:border-slate-400 hover:shadow-md',
+      'card',
+      hover && 'card-hover',
       padding && padding,
-      !padding && 'p-4'
+      !padding && 'card-padding'
     ]"
   >
     <slot />
@@ -22,3 +22,20 @@ withDefaults(defineProps<Props>(), {
   padding: ''
 });
 </script> 
+
+<style scoped>
+.card {
+  background-color: white;
+  border: 1px solid var(--color-slate-300);
+  transition: all 0.2s;
+}
+
+.card-hover:hover {
+  border-color: var(--color-slate-400);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.card-padding {
+  padding: 1rem;
+}
+</style> 
