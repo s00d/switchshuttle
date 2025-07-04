@@ -1,5 +1,5 @@
 <template>
-  <header class="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200 shadow-sm backdrop-blur-sm" data-tauri-drag-region>
+  <header class="fixed top-0 left-0 right-0 z-[60] bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200 shadow-sm backdrop-blur-sm" data-tauri-drag-region>
 
     <div class="container mx-auto px-4" data-tauri-drag-region>
       <div class="flex items-center justify-between h-16" data-tauri-drag-region>
