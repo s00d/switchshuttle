@@ -14,6 +14,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-5l-2-2H5a2 2 0 00-2 2z" />
               </svg>
             </Button>
+
             <Button @click="createNewConfig" size="lg" title="Create new configuration">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -169,6 +170,8 @@
       </template>
     </Modal>
 
+
+
     <!-- Delete Confirmation Modal -->
     <Modal :is-open="showDeleteConfirm" @close="closeDeleteConfirm">
       <template #header>
@@ -228,12 +231,14 @@ import Card from '../components/Card.vue';
 import Button from '../components/Button.vue';
 import Modal from '../components/Modal.vue';
 import ConfigEditor from '../components/ConfigEditor.vue';
+
 import type { Config } from '../types';
 
 const configurations = ref<Config[]>([]);
 const searchQuery = ref('');
 const loading = ref(false);
 const showEditor = ref(false);
+
 const currentConfig = ref<Config | null>(null);
 const editingConfig = ref<Config | null>(null);
 const originalFileName = ref<string>('');
@@ -372,6 +377,8 @@ const openConfigFolder = async () => {
     console.error('Failed to open config folder:', error);
   }
 };
+
+
 
 onMounted(() => {
   loadConfigurations();
