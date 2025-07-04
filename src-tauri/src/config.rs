@@ -6,6 +6,8 @@ use std::sync::Arc;
 use std::{fs, io};
 use tauri::{AppHandle, Wry};
 use tauri_plugin_dialog::DialogExt;
+use tauri_plugin_notification::NotificationExt;
+use crate::helpers;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Config {
@@ -15,6 +17,7 @@ pub struct Config {
     pub title: String,
     pub commands: Vec<CommandConfig>,
     pub menu_hotkey: Option<String>,
+    pub enabled: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -26,6 +29,7 @@ pub struct CommandConfig {
     pub commands: Option<Vec<String>>,
     pub hotkey: Option<String>,
     pub submenu: Option<Vec<CommandConfig>>,
+    pub switch: Option<String>,
 }
 
 #[derive(Clone, Debug)]
@@ -76,6 +80,11 @@ impl ConfigManager {
             for path in paths {
                 match Config::load(&path) {
                     Ok(mut config) => {
+                        // Устанавливаем значение по умолчанию для enabled, если оно не задано
+                        if config.enabled.is_none() {
+                            config.enabled = Some(true);
+                        }
+                        
                         config.assign_ids(&self.counter);
                         self.config_paths.push(path);
                         self.configs.push(config);
@@ -114,11 +123,52 @@ impl ConfigManager {
 
     pub fn find_command_by_id(&self, id: &str) -> Option<(&CommandConfig, &Config)> {
         for config in &self.configs {
+            // Пропускаем отключенные конфигурации
+            if let Some(enabled) = config.enabled {
+                if !enabled {
+                    continue;
+                }
+            }
+            
             if let Some(command) = config.find_command_by_id(id) {
                 return Some((command, config));
             }
         }
         None
+    }
+
+
+
+    pub fn is_switch_enabled(&self, switch_id: &str, app: Option<&AppHandle<Wry>>) -> bool {
+        if let Some((command, _)) = self.find_command_by_id(switch_id) {
+            if let Some(switch_command) = &command.switch {
+                // Выполняем команду переключателя в фоне и получаем результат
+                match helpers::execute_command_silent(switch_command) {
+                    Ok(output) => {
+                        // Проверяем результат - если команда вернула "true" или непустую строку, считаем включенным
+                        let output = output.trim().to_lowercase();
+                        output == "true" || output == "1" || output == "enabled" || output == "on"
+                    }
+                    Err(e) => {
+                        eprintln!("Failed to check switch status: {}", e);
+                        // Показываем уведомление об ошибке, если app доступен
+                        if let Some(app_handle) = app {
+                            if let Ok(_) = app_handle.notification().builder()
+                                .title("SwitchShuttle Error")
+                                .body(&format!("Failed to check switch status: {}", e))
+                                .show() {
+                                // Уведомление отправлено
+                            }
+                        }
+                        false
+                    }
+                }
+            } else {
+                false
+            }
+        } else {
+            false
+        }
     }
 }
 
@@ -138,6 +188,7 @@ impl Config {
             title: title.to_string(),
             menu_hotkey,
             commands,
+            enabled: None,
         }
     }
 
@@ -164,18 +215,19 @@ impl Config {
     }
 
     pub fn default_config() -> Self {
-        Config::new(
+        let mut config = Config::new(
             "iterm",
             "current",
             "Homebrew",
             "New tab",
             Some("Ctrl+Shift+M".to_string()),
-            vec![CommandConfig {
+            vec![            CommandConfig {
                 id: None,
                 name: "Command".to_string(),
                 command: None,
                 inputs: None,
                 commands: None,
+                switch: None,
                 submenu: Some(vec![
                     CommandConfig {
                         id: None,
@@ -185,6 +237,7 @@ impl Config {
                         commands: None,
                         submenu: None,
                         hotkey: Some("Ctrl+Shift+E".to_string()),
+                        switch: None,
                     },
                     CommandConfig {
                         id: None,
@@ -201,6 +254,7 @@ impl Config {
                             ("key1".to_string(), "default1".to_string()),
                             ("key2".to_string(), "default2".to_string()),
                         ])),
+                        switch: None,
                     },
                     CommandConfig {
                         id: None,
@@ -209,6 +263,7 @@ impl Config {
                         command: None,
                         commands: None,
                         hotkey: None,
+                        switch: None,
                         submenu: Some(vec![
                             CommandConfig {
                                 id: None,
@@ -218,6 +273,7 @@ impl Config {
                                 commands: None,
                                 submenu: None,
                                 hotkey: Some("Ctrl+Shift+S".to_string()),
+                                switch: None,
                             },
                             CommandConfig {
                                 id: None,
@@ -227,13 +283,26 @@ impl Config {
                                 commands: None,
                                 submenu: None,
                                 hotkey: None,
+                                switch: None,
+                            },
+                            CommandConfig {
+                                id: None,
+                                name: "Toggle Notifications".to_string(),
+                                inputs: None,
+                                command: Some("echo 'Notifications toggled'".to_string()),
+                                commands: None,
+                                submenu: None,
+                                hotkey: None,
+                                switch: Some("echo 'true'".to_string()),
                             },
                         ]),
                     },
                 ]),
                 hotkey: None,
             }],
-        )
+        );
+        config.enabled = Some(true);
+        config
     }
 
     #[allow(dead_code)]
