@@ -129,11 +129,11 @@
                   <div class="text-xs text-slate-500 font-medium">Inputs</div>
                   <div class="space-y-1">
                     <div 
-                      v-for="(prompt, key) in command.inputs" 
+                      v-for="(default_value, key) in command.inputs"
                       :key="key"
                       class="bg-blue-50 border border-blue-200 text-blue-800 px-2 py-1 rounded text-xs line-clamp-1"
                     >
-                      <span class="font-medium">{{ key }}</span> - {{ prompt.replace(':', '') }}
+                      <span class="font-medium">{{ key }}</span> - {{ default_value }}
                     </div>
                   </div>
                 </div>

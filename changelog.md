@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1] - 2025-07-04
+
+### Added
+- Table headers for command inputs in CommandItem component for better UX
+- Streamlined command selection process in TemplateCommandsModal
+
+### Changed
+- Simplified template structure by removing config level and unnecessary fields
+- Updated template commands to use descriptive English names with tool/context indication
+- Replaced input placeholder text with default values in all templates
+- Improved TemplateCommandsModal to work with new simplified template structure
+
+### Fixed
+- TemplateCommandsModal compatibility with new template structure (removed config references)
+- Undefined inputKeys error in CommandItem component
+- Template commands not being added when selected from modal
+- Removed unused template parameter from selectCommand function
+- Cleaned up unused type imports in TemplateCommandsModal
+
+### Refactored
+- Simplified template structure by removing terminal, launch_in, theme, title, menu_hotkey fields
+- Made commands a direct property of templates instead of nested in config
+- Updated all template inputs to use default values instead of placeholder text
+
 ## [1.6.0] - 2025-07-04
 
 ### Added
