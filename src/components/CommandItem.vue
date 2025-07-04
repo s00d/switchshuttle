@@ -107,6 +107,17 @@
         </div>
         
         <div v-if="command.inputs && Object.keys(command.inputs).length > 0" class="space-y-2">
+          <!-- Table Headers -->
+          <div class="flex items-center gap-2 py-1 px-1 rounded-lg">
+            <div class="flex-1">
+              <span class="text-xs font-semibold text-slate-700 uppercase tracking-wide">Key</span>
+            </div>
+            <div class="flex-1">
+              <span class="text-xs font-semibold text-slate-700 uppercase tracking-wide">Default Value</span>
+            </div>
+            <div class="w-8"></div>
+          </div>
+          <!-- Table Rows -->
           <div
             v-for="(_, key) in command.inputs"
             :key="key"
@@ -114,7 +125,7 @@
           >
             <div class="flex-1">
               <Input
-                :model-value="isRootLevel ? inputKeys[index][key] : key"
+                :model-value="isRootLevel && inputKeys[index] ? inputKeys[index][key] : key"
                 placeholder="Key"
                 size="sm"
                 input-class="!border !border-slate-300 !bg-white !rounded !px-2 !py-1 focus:!border-blue-400 focus:!ring-0"
@@ -129,7 +140,7 @@
                 input-class="!border !border-slate-300 !bg-white !rounded !px-2 !py-1 focus:!border-blue-400 focus:!ring-0"
               />
             </div>
-            <Button @click="handleRemoveInput(key)" variant="danger" size="sm" class="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0">
+            <Button @click="handleRemoveInput(key)" variant="danger" size="sm" class="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0 w-8">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -191,6 +202,17 @@
         </div>
         
         <div v-if="command.inputs && Object.keys(command.inputs).length > 0" class="space-y-2">
+          <!-- Table Headers -->
+          <div class="flex items-center gap-2 py-1 px-1 rounded-lg">
+            <div class="flex-1">
+              <span class="text-xs font-semibold text-slate-700 uppercase tracking-wide">Key</span>
+            </div>
+            <div class="flex-1">
+              <span class="text-xs font-semibold text-slate-700 uppercase tracking-wide">Default Value</span>
+            </div>
+            <div class="w-8"></div>
+          </div>
+          <!-- Table Rows -->
           <div
             v-for="(_, key) in command.inputs"
             :key="key"
@@ -198,7 +220,7 @@
           >
             <div class="flex-1">
               <Input
-                :model-value="isRootLevel ? inputKeys[index][key] : key"
+                :model-value="isRootLevel && inputKeys[index] ? inputKeys[index][key] : key"
                 placeholder="Key"
                 size="sm"
                 input-class="!border !border-slate-300 !bg-white !rounded !px-2 !py-1 focus:!border-blue-400 focus:!ring-0"
@@ -213,7 +235,7 @@
                 input-class="!border !border-slate-300 !bg-white !rounded !px-2 !py-1 focus:!border-blue-400 focus:!ring-0"
               />
             </div>
-            <Button @click="handleRemoveInput(key)" variant="danger" size="sm" class="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0">
+            <Button @click="handleRemoveInput(key)" variant="danger" size="sm" class="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0 w-8">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
