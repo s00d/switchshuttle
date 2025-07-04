@@ -8,44 +8,50 @@
       </h2>
       
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Input
-          v-model="config.terminal"
-          label="Terminal"
-          type="select"
-          :options="terminalOptions"
-          required
-        />
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Terminal</label>
+          <CustomSelect
+            v-model="config.terminal"
+            :options="terminalOptions"
+            placeholder="Select terminal"
+            required
+          />
+        </div>
         
-        <Input
-          v-model="config.launch_in"
-          label="Launch in"
-          type="select"
-          :options="launchOptions"
-          required
-        />
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Launch in</label>
+          <CustomSelect
+            v-model="config.launch_in"
+            :options="launchOptions"
+            placeholder="Select launch option"
+            required
+          />
+        </div>
       </div>
       
-      <div class="grid grid-cols-1 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input
           v-model="config.title"
           label="Title"
           placeholder="Enter title"
           required
         />
+        
+        <HotkeyInput
+          v-model="config.menu_hotkey"
+          label="Menu Hotkey"
+          placeholder="Click to record"
+          hint="Leave empty to disable"
+        />
       </div>
-      
-      <HotkeyInput
-        v-model="config.menu_hotkey"
-        label="Menu Hotkey"
-        placeholder="Click to record"
-        hint="Leave empty to disable"
-      />
     </div>
 
     <!-- Commands Section -->
     <div class="space-y-4">
       <CommandsTable :commands="config.commands" @update:commands="config.commands = $event" />
     </div>
+
+
   </div>
 </template>
 
@@ -54,6 +60,8 @@ import { ref } from 'vue';
 import CommandsTable from './CommandsTable.vue';
 import Input from './Input.vue';
 import HotkeyInput from './HotkeyInput.vue';
+import CustomSelect from './CustomSelect.vue';
+
 import { Command, Config } from '../types';
 
 const props = defineProps<{
@@ -64,16 +72,16 @@ const props = defineProps<{
 const config = ref<Config>(props.config);
 
 const terminalOptions = [
-  { value: 'iterm', label: 'iTerm2' },
-  { value: 'terminal', label: 'Terminal.app' },
-  { value: 'alacritty', label: 'Alacritty' },
-  { value: 'hyper', label: 'Hyper' },
-  { value: 'warp', label: 'Warp' }
+  { value: 'iterm', label: 'iTerm2', icon: '🖥️' },
+  { value: 'terminal', label: 'Terminal.app', icon: '💻' },
+  { value: 'alacritty', label: 'Alacritty', icon: '⚡' },
+  { value: 'hyper', label: 'Hyper', icon: '🚀' },
+  { value: 'warp', label: 'Warp', icon: '⚡' }
 ];
 
 const launchOptions = [
-  { value: 'current', label: 'Current Window' },
-  { value: 'tab', label: 'New Tab' },
-  { value: 'window', label: 'New Window' }
+  { value: 'current', label: 'Current Window', icon: '🪟' },
+  { value: 'tab', label: 'New Tab', icon: '📑' },
+  { value: 'window', label: 'New Window', icon: '🪟' }
 ];
 </script>
