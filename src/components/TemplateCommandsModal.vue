@@ -23,11 +23,20 @@
         </div>
 
         <!-- Category Filter -->
-        <div class="w-64 flex-shrink-0" style="margin: 0">
+        <div class="w-48 flex-shrink-0" style="margin: 0">
           <CustomSelect
             v-model="selectedCategory"
             :options="categoryOptions"
             placeholder="Select Category"
+          />
+        </div>
+
+        <!-- Tags Filter -->
+        <div class="w-48 flex-shrink-0" style="margin: 0">
+          <CustomSelect
+            v-model="selectedTag"
+            :options="tagOptions"
+            placeholder="Select Tag"
           />
         </div>
       </div>
@@ -40,9 +49,9 @@
           </svg>
         </div>
         <p class="text-slate-500 mb-2">
-          {{ searchQuery || selectedCategory ? 'No commands found' : 'No commands available' }}
+          {{ searchQuery || selectedCategory || selectedTag ? 'No commands found' : 'No commands available' }}
         </p>
-        <Button @click="clearFilters" v-if="searchQuery || selectedCategory">
+        <Button @click="clearFilters" v-if="searchQuery || selectedCategory || selectedTag">
           Clear filters
         </Button>
       </div>
@@ -125,6 +134,16 @@
                   </div>
                 </div>
                 
+                <div v-if="command.switch" class="bg-green-50 border border-green-200 p-2 rounded text-xs">
+                  <div class="text-xs text-green-700 mb-1 font-medium flex items-center">
+                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Switch Command:
+                  </div>
+                  <div class="text-xs font-mono text-green-800 break-all line-clamp-2">{{ command.switch }}</div>
+                </div>
+                
                 <div v-if="command.inputs" class="space-y-1">
                   <div class="text-xs text-slate-500 font-medium">Inputs</div>
                   <div class="space-y-1">
@@ -185,6 +204,7 @@ defineProps<Props>();
 // State
 const searchQuery = ref('');
 const selectedCategory = ref('');
+const selectedTag = ref('');
 
 // Computed
 const filteredTemplates = computed(() => {
@@ -192,6 +212,12 @@ const filteredTemplates = computed(() => {
   
   if (selectedCategory.value && selectedCategory.value !== '') {
     filtered = getTemplatesByCategory(selectedCategory.value);
+  }
+  
+  if (selectedTag.value && selectedTag.value !== '') {
+    filtered = filtered.filter(template => 
+      template.tags.includes(selectedTag.value)
+    );
   }
   
   if (searchQuery.value) {
@@ -215,6 +241,21 @@ const categoryOptions = computed(() => {
   ];
 });
 
+const tagOptions = computed(() => {
+  // Get unique tags from templates
+  const allTags = templates.flatMap(template => template.tags);
+  const uniqueTags = [...new Set(allTags)];
+  
+  return [
+    { value: '', label: 'All Tags', icon: '🏷️' },
+    ...uniqueTags.map(tag => ({
+      value: tag,
+      label: tag,
+      icon: '🏷️'
+    }))
+  ];
+});
+
 const groupedCommands = computed(() => {
   return filteredTemplates.value.map(template => ({
     ...template,
@@ -224,7 +265,8 @@ const groupedCommands = computed(() => {
       const query = searchQuery.value.toLowerCase();
       return command.name.toLowerCase().includes(query) ||
              (command.command && command.command.toLowerCase().includes(query)) ||
-             (command.commands && command.commands.some((cmd: any) => cmd.toLowerCase().includes(query)));
+             (command.commands && command.commands.some((cmd: any) => cmd.toLowerCase().includes(query))) ||
+             (command.switch && command.switch.toLowerCase().includes(query));
     })
   })).filter(template => template.commands.length > 0);
 });
@@ -238,6 +280,7 @@ function selectCommand(command: Command) {
 function clearFilters() {
   searchQuery.value = '';
   selectedCategory.value = '';
+  selectedTag.value = '';
 }
 
 const emit = defineEmits<{
