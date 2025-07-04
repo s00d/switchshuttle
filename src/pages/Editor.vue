@@ -70,7 +70,12 @@
             <div
               v-for="(config, index) in filteredConfigurations"
               :key="`${config.title}-${index}`"
-              class="flex items-center justify-between p-4 border border-slate-200 hover:border-slate-300 transition-colors rounded-lg"
+              :class="[
+                'flex items-center justify-between p-4 border transition-colors rounded-lg',
+                config.enabled 
+                  ? 'border-slate-200 hover:border-slate-300 bg-white' 
+                  : 'border-slate-300 bg-slate-50'
+              ]"
             >
               <div class="flex items-center space-x-4 min-w-0 flex-1">
                 <div class="w-10 h-10 bg-blue-100 flex items-center justify-center rounded-lg flex-shrink-0">
@@ -105,6 +110,7 @@
                       </svg>
                       <span>{{ config.menu_hotkey }}</span>
                     </span>
+
                   </div>
                 </div>
               </div>
