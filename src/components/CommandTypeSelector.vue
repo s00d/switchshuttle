@@ -35,6 +35,17 @@
       >
         Submenu
       </button>
+      <button
+        @click="selectType('switch')"
+        :class="[
+          'flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
+          modelValue === 'switch'
+            ? 'bg-blue-600 text-white shadow-md'
+            : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 hover:border-slate-300'
+        ]"
+      >
+        Switch
+      </button>
     </div>
   </div>
 </template>
