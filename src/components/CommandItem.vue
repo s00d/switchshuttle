@@ -128,7 +128,7 @@
                 :model-value="isRootLevel && inputKeys[index] ? inputKeys[index][key] : key"
                 placeholder="Key"
                 size="sm"
-                input-class="!border !border-slate-300 !bg-white !rounded !px-2 !py-1 focus:!border-blue-400 focus:!ring-0"
+                input-class="border border-slate-300 bg-white rounded px-2 py-1 focus:border-blue-400 focus:ring-0"
                 @input="handleInputKeyChange(key, $event)"
               />
             </div>
@@ -137,7 +137,7 @@
                 v-model="command.inputs[key]"
                 placeholder="Default value"
                 size="sm"
-                input-class="!border !border-slate-300 !bg-white !rounded !px-2 !py-1 focus:!border-blue-400 focus:!ring-0"
+                input-class="border border-slate-300 bg-white rounded px-2 py-1 focus:border-blue-400 focus:ring-0"
               />
             </div>
             <Button @click="handleRemoveInput(key)" variant="danger" size="sm" class="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0 w-8">
@@ -174,7 +174,7 @@
                 v-model="command.commands[cmdIndex]"
                 placeholder="Enter command"
                 size="sm"
-                input-class="!border !border-slate-300 !bg-white !rounded !px-2 !py-1 focus:!border-blue-400 focus:!ring-0"
+                input-class="border border-slate-300 bg-white rounded px-2 py-1 focus:border-blue-400 focus:ring-0"
               />
             </div>
             <Button @click="handleRemoveMultipleCommand(cmdIndex)" variant="danger" size="sm" class="text-red-600 hover:text-red-700 hover:bg-red-50">
@@ -223,7 +223,7 @@
                 :model-value="isRootLevel && inputKeys[index] ? inputKeys[index][key] : key"
                 placeholder="Key"
                 size="sm"
-                input-class="!border !border-slate-300 !bg-white !rounded !px-2 !py-1 focus:!border-blue-400 focus:!ring-0"
+                input-class="border border-slate-300 bg-white rounded px-2 py-1 focus:border-blue-400 focus:ring-0"
                 @input="handleInputKeyChange(key, $event)"
               />
             </div>
@@ -232,7 +232,84 @@
                 v-model="command.inputs[key]"
                 placeholder="Default value"
                 size="sm"
-                input-class="!border !border-slate-300 !bg-white !rounded !px-2 !py-1 focus:!border-blue-400 focus:!ring-0"
+                input-class="border border-slate-300 bg-white rounded px-2 py-1 focus:border-blue-400 focus:ring-0"
+              />
+            </div>
+            <Button @click="handleRemoveInput(key)" variant="danger" size="sm" class="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0 w-8">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Switch -->
+    <div v-if="commandType === 'switch'" class="space-y-6">
+      <Input
+        v-model="command.command"
+        label="Toggle Command"
+        placeholder="Command to execute when toggled"
+        type="textarea"
+        rows="3"
+      />
+      
+      <Input
+        v-model="command.switch"
+        label="Switch Command"
+        placeholder="Command to check state (e.g., echo 'true')"
+        type="textarea"
+        rows="3"
+      />
+      
+      <!-- Divider -->
+      <div class="border-t-2 border-slate-200/70 my-8 -mx-6"></div>
+      
+      <!-- Inputs Section -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <label class="block text-sm font-semibold text-slate-700">Inputs</label>
+          <Button @click="handleAddInput" variant="ghost" size="sm" class="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Add Field
+          </Button>
+        </div>
+        
+        <div v-if="command.inputs && Object.keys(command.inputs).length > 0" class="space-y-2">
+          <!-- Table Headers -->
+          <div class="flex items-center gap-2 py-1 px-1 rounded-lg">
+            <div class="flex-1">
+              <span class="text-xs font-semibold text-slate-700 uppercase tracking-wide">Key</span>
+            </div>
+            <div class="flex-1">
+              <span class="text-xs font-semibold text-slate-700 uppercase tracking-wide">Default Value</span>
+            </div>
+            <div class="w-8"></div>
+          </div>
+          <!-- Table Rows -->
+          <div
+            v-for="(_, key) in command.inputs"
+            :key="key"
+            class="flex items-center gap-2 py-1"
+          >
+            <div class="flex-1">
+              <Input
+                :model-value="isRootLevel && inputKeys[index] ? inputKeys[index][key] : key"
+                placeholder="Key"
+                size="sm"
+                input-class="border border-slate-300 bg-white rounded px-2 py-1 focus:border-blue-400 focus:ring-0"
+                @input="handleInputKeyChange(key, $event)"
+              />
+            </div>
+            <div class="flex-1">
+              <Input
+                v-model="command.inputs[key]"
+                placeholder="Default value"
+                size="sm"
+                input-class="border border-slate-300 bg-white rounded px-2 py-1 focus:border-blue-400 focus:ring-0"
               />
             </div>
             <Button @click="handleRemoveInput(key)" variant="danger" size="sm" class="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0 w-8">
@@ -344,8 +421,13 @@ const commandType = ref<string>('single');
 const initializeCommandType = () => {
   const cmd = props.command;
   
+  // Проверяем наличие switch (только если это не null и не пустая строка)
+  if (cmd.switch !== undefined && cmd.switch !== null && cmd.switch !== '') {
+    commandType.value = 'switch';
+    return;
+  }
   // Проверяем наличие submenu с элементами
-  if (cmd.submenu && Array.isArray(cmd.submenu) && cmd.submenu.length > 0) {
+  else if (cmd.submenu && Array.isArray(cmd.submenu) && cmd.submenu.length > 0) {
     commandType.value = 'submenu';
     return;
   }
@@ -458,17 +540,26 @@ const updateSubmenuCommandType = (type: string) => {
       cmd.submenu = null;
       cmd.commands = null;
       cmd.inputs = null;
+      cmd.switch = undefined;
       // Не очищаем command, так как это основное поле для single команды
     } else if (type === 'multiple') {
       cmd.command = undefined;
       cmd.submenu = null;
+      cmd.switch = undefined;
       cmd.commands = cmd.commands || [];
       cmd.inputs = cmd.inputs || {};
     } else if (type === 'submenu') {
       cmd.command = undefined;
       cmd.commands = null;
       cmd.inputs = null;
+      cmd.switch = undefined;
       cmd.submenu = cmd.submenu || [];
+    } else if (type === 'switch') {
+      cmd.submenu = null;
+      cmd.commands = null;
+      cmd.inputs = cmd.inputs || {};
+      cmd.switch = cmd.switch || '';
+      // Не очищаем command, так как это поле для toggle команды
     }
     emit('update:command', props.command);
   }
