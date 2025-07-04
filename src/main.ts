@@ -5,6 +5,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 import About from './pages/About.vue';
 import Editor from './pages/Editor.vue';
+import Help from './pages/Help.vue';
 import Inputs from './pages/Inputs.vue';
 import Loading from './pages/Loading.vue';
 import Main from './pages/Main.vue';
@@ -14,6 +15,7 @@ const routes = [
     { path: '/', component: Main },
     { path: '/about', component: About },
     { path: '/editor', component: Editor },
+    { path: '/help', component: Help },
     { path: '/inputs/:id', component: Inputs },
     { path: '/loading', component: Loading },
     { path: '/update', component: Update }
