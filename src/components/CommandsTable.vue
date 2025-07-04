@@ -3,12 +3,20 @@
   <div class="space-y-4">
     <div class="flex items-center justify-between">
       <h3 class="text-lg font-semibold text-slate-900">Commands</h3>
-      <Button @click="addCommand" variant="secondary" size="sm">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-        </svg>
-        Add Command
-      </Button>
+      <div class="flex items-center space-x-2">
+        <Button @click="showTemplatesModal" variant="primary" size="sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          Templates
+        </Button>
+        <Button @click="addCommand" variant="secondary" size="sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          Add Command
+        </Button>
+      </div>
     </div>
     
     <div v-if="commands.length === 0" class="text-center py-8">
@@ -50,13 +58,28 @@
         <h4 class="text-sm font-semibold text-slate-800">Add New Command</h4>
         <p class="text-xs text-slate-500 mt-0.5">Create additional commands for your configuration</p>
       </div>
-      <Button @click="addCommand" variant="secondary" size="sm" class="shadow-sm">
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-        </svg>
-        Add Command
-      </Button>
+      <div class="flex items-center space-x-2">
+        <Button @click="showTemplatesModal" variant="primary" size="sm" class="shadow-sm">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          Templates
+        </Button>
+        <Button @click="addCommand" variant="secondary" size="sm" class="shadow-sm">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          Add Command
+        </Button>
+      </div>
     </div>
+
+    <!-- Templates Modal -->
+    <TemplateCommandsModal 
+      :is-open="isTemplatesModalOpen" 
+      @close="closeTemplatesModal"
+      @commands-selected="handleCommandsSelected"
+    />
   </div>
 </template>
 
@@ -66,6 +89,7 @@ import { PropType } from 'vue';
 import { Command } from '../types';
 import Button from './Button.vue';
 import CommandItem from './CommandItem.vue';
+import TemplateCommandsModal from './TemplateCommandsModal.vue';
 
 const props = defineProps({
   commands: {
@@ -85,6 +109,7 @@ const commands = computed({
 
 // Track input keys for UI
 const inputKeys = ref<Record<number, Record<string, string>>>({});
+const isTemplatesModalOpen = ref(false);
 
 // Initialize input keys
 watch(() => props.commands, (newCommands) => {
@@ -214,5 +239,19 @@ const removeSubmenuCommand = (commandIndex: number, subIndex: number) => {
   if (command.submenu) {
     command.submenu.splice(subIndex, 1);
   }
+};
+
+const showTemplatesModal = () => {
+  isTemplatesModalOpen.value = true;
+};
+
+const closeTemplatesModal = () => {
+  isTemplatesModalOpen.value = false;
+};
+
+const handleCommandsSelected = (selectedCommands: Command[]) => {
+  // Add selected commands to current commands list
+  commands.value.push(...selectedCommands);
+  closeTemplatesModal();
 };
 </script>
