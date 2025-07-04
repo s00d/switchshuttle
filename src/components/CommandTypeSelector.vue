@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-4 p-4 bg-slate-50 rounded-lg border border-slate-100">
+  <div class="space-y-4">
     <label class="block text-sm font-semibold text-slate-700">Command Type</label>
     <div class="flex space-x-2">
       <button
