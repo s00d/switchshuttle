@@ -44,13 +44,44 @@
           hint="Leave empty to disable"
         />
       </div>
+
+      <!-- Enable/Disable Configuration -->
+      <div class="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+        <div>
+          <h3 class="text-sm font-medium text-slate-900">Configuration Status</h3>
+          <p class="text-sm text-slate-600">
+            {{ config.enabled ? 'Configuration is enabled and will be loaded' : 'Configuration is disabled and will be ignored' }}
+          </p>
+        </div>
+        <div class="flex items-center">
+          <button
+            @click="toggleEnabled"
+            :class="[
+              'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
+              config.enabled ? 'bg-blue-600' : 'bg-slate-200'
+            ]"
+            :aria-checked="config.enabled"
+            role="switch"
+            type="button"
+          >
+            <span
+              :class="[
+                'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
+                config.enabled ? 'translate-x-6' : 'translate-x-1'
+              ]"
+            />
+          </button>
+          <span class="ml-3 text-sm font-medium text-slate-900">
+            {{ config.enabled ? 'Enabled' : 'Disabled' }}
+          </span>
+        </div>
+      </div>
     </div>
 
     <!-- Commands Section -->
     <div class="space-y-4">
       <CommandsTable :commands="config.commands" @update:commands="config.commands = $event" />
     </div>
-
 
   </div>
 </template>
@@ -70,6 +101,15 @@ const props = defineProps<{
 }>();
 
 const config = ref<Config>(props.config);
+
+// Убеждаемся, что enabled имеет значение по умолчанию
+if (config.value.enabled === undefined) {
+  config.value.enabled = true;
+}
+
+const toggleEnabled = () => {
+  config.value.enabled = !config.value.enabled;
+};
 
 const terminalOptions = [
   { value: 'iterm', label: 'iTerm2', icon: '🖥️' },
