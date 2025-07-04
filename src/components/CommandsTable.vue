@@ -158,16 +158,25 @@ const updateCommandType = (index: number, type: string) => {
     command.submenu = null;
     command.commands = null;
     command.inputs = null;
+    command.switch = undefined;
   } else if (type === 'multiple') {
     command.command = undefined;
     command.submenu = null;
+    command.switch = undefined;
     command.commands = command.commands || [];
     command.inputs = command.inputs || {};
   } else if (type === 'submenu') {
     command.command = undefined;
     command.commands = null;
     command.inputs = null;
+    command.switch = undefined;
     command.submenu = command.submenu || [];
+  } else if (type === 'switch') {
+    command.submenu = null;
+    command.commands = null;
+    command.inputs = command.inputs || {};
+    command.switch = command.switch || '';
+    // Не очищаем command, так как это поле для toggle команды
   }
 };
 
