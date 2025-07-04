@@ -1,6 +1,6 @@
 {
   "name": "switchshuttle",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "SwitchShuttle is a cross-platform system tray application that allows users to run predefined commands in various terminal applications. It supports macOS, Windows, and Linux, offering a simple and customizable way to manage and execute your frequently used commands.",
   "type": "module",
   "scripts": {
