@@ -2,31 +2,22 @@ use crate::config::{CommandConfig, ConfigManager};
 use crate::helpers;
 use crate::helpers::{
     change_devtools, create_window, get_config_path, open_folder_in_default_explorer,
-    open_in_default_editor, create_menu_item, create_menu_item_with_hotkey,
+    open_in_default_editor, create_menu_item, create_check_menu_item
 };
 use std::sync::{Arc, Mutex};
 use tauri::menu::{
     CheckMenuItem, IconMenuItem, MenuBuilder, Submenu, SubmenuBuilder,
 };
-use tauri::{AppHandle, Manager, Wry};
+use tauri::{AppHandle, Wry};
 use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_opener::OpenerExt;
 use tauri_plugin_notification::NotificationExt;
 
-fn create_sub_menu(app: &AppHandle<Wry>, items: &[CommandConfig], title: &str) -> Submenu<Wry> {
-    let mut submenu_builder = SubmenuBuilder::new(app, title);
-    for item in items {
-        if let Some(sub_items) = &item.submenu {
-            let sub_submenu = create_sub_menu(app, sub_items, &item.name);
-            submenu_builder = submenu_builder.item(&sub_submenu);
-        } else {
-            let id = item.id.clone().unwrap_or(item.name.clone());
-            if let Some(hotkey) = &item.hotkey {
-                submenu_builder = submenu_builder.item(&create_menu_item_with_hotkey(app, &id, &item.name, "terminal", hotkey));
-            } else {
-                submenu_builder = submenu_builder.item(&create_menu_item(app, &id, &item.name, "terminal"));
-            }
-        }
+fn create_sub_menu(app: &AppHandle<Wry>, submenu_items: &Vec<CommandConfig>, name: &str) -> Submenu<Wry> {
+    let mut submenu_builder = SubmenuBuilder::new(app, name);
+    for item in submenu_items {
+        let id = item.id.clone().unwrap_or(item.name.clone());
+        submenu_builder = submenu_builder.item(&create_menu_item(app, &id, &item.name, "terminal", item.hotkey.clone()));
     }
     submenu_builder.build().unwrap()
 }
@@ -57,32 +48,26 @@ pub fn create_system_tray_menu(
         
         for command in &config.commands {
             if let Some(submenu_items) = &command.submenu {
-                let submenu = create_sub_menu(app, submenu_items, &command.name);
+                let submenu = create_sub_menu(app, &submenu_items.clone(), &command.name);
                 menu_items.push(MenuItemOrSubmenu::Submenu(submenu));
             } else {
                 let id = command.id.clone().unwrap_or(command.name.clone());
                 
                 // Проверяем, является ли это переключателем
                 if command.switch.is_some() {
+                    // Это переключатель - получаем состояние
                     let is_enabled = config_manager.is_switch_enabled(&id, Some(app));
-                    let menu_item = CheckMenuItem::with_id(
-                        app.app_handle(),
+                    let menu_item = create_check_menu_item(
+                        app,
                         &id,
                         &command.name,
-                        true,
                         is_enabled,
-                        None::<&str>,
-                    )
-                    .unwrap();
+                        command.hotkey.clone(),
+                    );
                     menu_items.push(MenuItemOrSubmenu::CheckItem(menu_item));
                 } else {
-                    if let Some(hotkey) = &command.hotkey {
-                        let menu_item = create_menu_item_with_hotkey(app, &id, &command.name, "terminal", hotkey);
-                        menu_items.push(MenuItemOrSubmenu::IconItem(menu_item));
-                    } else {
-                        let menu_item = create_menu_item(app, &id, &command.name, "terminal");
-                        menu_items.push(MenuItemOrSubmenu::IconItem(menu_item));
-                    }
+                    let menu_item = create_menu_item(app, &id, &command.name, "terminal", command.hotkey.clone());
+                    menu_items.push(MenuItemOrSubmenu::IconItem(menu_item));
                 }
             }
         }
@@ -112,21 +97,21 @@ pub fn create_system_tray_menu(
     for path in &config_manager.config_paths {
         let file_name = path.file_name().unwrap().to_string_lossy().to_string();
         edit_config_submenu = edit_config_submenu.item(
-            &create_menu_item(app, &format!("edit_{}", file_name), &file_name, "edit")
+            &create_menu_item(app, &format!("edit_{}", file_name), &file_name, "edit",  None)
         );
     }
 
     edit_config_submenu = edit_config_submenu.separator();
     edit_config_submenu = edit_config_submenu.item(
-        &create_menu_item(app, "open_config_folder", "Show Config Folder", "folder")
+        &create_menu_item(app, "open_config_folder", "Show Config Folder", "folder",  None)
     );
     edit_config_submenu = edit_config_submenu.item(
-        &create_menu_item(app, "open_config_editor", "Open Visual Editor", "visual")
+        &create_menu_item(app, "open_config_editor", "Open Visual Editor", "visual",  None)
     );
 
     edit_config_submenu = edit_config_submenu.separator();
     edit_config_submenu = edit_config_submenu.item(
-        &create_menu_item(app, "refresh_configurations", "Refresh Configurations", "refresh_settings")
+        &create_menu_item(app, "refresh_configurations", "Refresh Configurations", "refresh_settings",  None)
     );
 
     tray_menu_builder = tray_menu_builder.item(&edit_config_submenu.build().unwrap());
@@ -134,34 +119,32 @@ pub fn create_system_tray_menu(
     tray_menu_builder = tray_menu_builder.separator();
 
     tray_menu_builder = tray_menu_builder.item(
-        &CheckMenuItem::with_id(
-            app.app_handle(),
+        &create_check_menu_item(
+            app,
             "toggle_launch_at_login",
             "Launch at Login",
-            true,
             autostart,
-            None::<&str>,
-        )
-        .unwrap(),
+            None,
+        ),
     );
 
     tray_menu_builder = tray_menu_builder.separator();
 
     if cfg!(debug_assertions) {
         tray_menu_builder = tray_menu_builder.item(
-            &create_menu_item(app, "open_devtools", "Open DevTools", "devtools")
+            &create_menu_item(app, "open_devtools", "Open DevTools", "devtools",  None)
         );
 
         tray_menu_builder = tray_menu_builder.separator();
     }
 
-    tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "about", "About", "info"));
-    tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "help", "Help", "help"));
-    tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "homepage", "Homepage", "site"));
-    tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "check_updates", "Check for Updates", "update"));
+    tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "about", "About", "info",  None));
+    tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "help", "Help", "help",  None));
+    tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "homepage", "Homepage", "site",  None));
+    tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "check_updates", "Check for Updates", "update",  None));
 
     tray_menu_builder = tray_menu_builder.separator();
-    tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "quit", "Quit SwitchShuttle", "exit"));
+    tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "quit", "Quit SwitchShuttle", "exit",  None));
 
     tray_menu_builder.build().unwrap()
 }
@@ -175,10 +158,14 @@ pub fn handle_system_tray_event(
 
     match event.id().0.as_str() {
         "about" => {
-            create_window(&app, "About", "/about", 800.0, 600.0, true);
+            if let Err(e) = create_window(&app, "about", "SwitchShuttle - About", "/about", 800.0, 600.0, true) {
+                eprintln!("Failed to create about window: {}", e);
+            }
         }
         "help" => {
-            create_window(&app, "Help", "/help", 1000.0, 800.0, true);
+            if let Err(e) = create_window(&app, "help", "SwitchShuttle - Help", "/help", 1000.0, 800.0, true) {
+                eprintln!("Failed to create help window: {}", e);
+            }
         }
         "quit" => std::process::exit(0),
         "refresh_configurations" => {
@@ -200,7 +187,9 @@ pub fn handle_system_tray_event(
             open_folder_in_default_explorer(&config_path.parent().unwrap().to_path_buf())
         }
         "open_config_editor" => {
-            create_window(&app, "Config Editor", "/editor", 800.0, 600.0, true);
+            if let Err(e) = create_window(&app, "main", "SwitchShuttle - Config Editor", "/editor", 800.0, 600.0, true) {
+                eprintln!("Failed to create config editor window: {}", e);
+            }
         }
         "toggle_launch_at_login" => {
             let autostart_manager = app.autolaunch();
@@ -220,7 +209,9 @@ pub fn handle_system_tray_event(
             opener.open_url(homepage_url, None::<&str>).unwrap();
         }
         "check_updates" => {
-            create_window(&app, "Update Available", "/update", 800.0, 600.0, true);
+            if let Err(e) = create_window(&app, "check_updates", "SwitchShuttle - Update", "/update", 800.0, 600.0, true) {
+                eprintln!("Failed to create check_updates window: {}", e);
+            }
         }
         "open_devtools" => {
             if cfg!(debug_assertions) {
@@ -243,14 +234,17 @@ pub fn handle_system_tray_event(
                                 .unwrap_or(false) && command.id.is_some();
                             
                             if should_show_inputs {
-                                create_window(
+                                if let Err(e) = create_window(
                                     &app,
-                                    "Provide Inputs",
+                                    "inputs",
+                                    "SwitchShuttle - Provide Inputs",
                                     &format!("/inputs/{}", command.id.as_ref().unwrap()),
                                     400.0,
                                     300.0,
                                     true,
-                                );
+                                ) {
+                                    eprintln!("Failed to create inputs window: {}", e);
+                                }
                             } else {
                                 // Выполняем команду переключения через execute_command_silent
                                 if let Some(toggle_command) = &command.command {
@@ -290,14 +284,17 @@ pub fn handle_system_tray_event(
                                 .unwrap_or(false) && command.id.is_some();
                             
                             if should_show_inputs {
-                                create_window(
+                                if let Err(e) = create_window(
                                     &app,
-                                    "Provide Inputs",
+                                    "main",
+                                    "SwitchShuttle - Provide Inputs",
                                     &format!("/inputs/{}", command.id.as_ref().unwrap()),
                                     400.0,
                                     300.0,
                                     true,
-                                );
+                                ) {
+                                    eprintln!("Failed to create inputs window: {}", e);
+                                }
                             } else {
                                 helpers::execute_command(
                                     command,
