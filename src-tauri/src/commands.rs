@@ -379,29 +379,72 @@ fn find_config_file_by_title(config_manager: &ConfigManager, title: &str) -> Opt
     None
 }
 
+// Универсальная функция для сохранения конфигураций
 #[tauri::command]
-pub fn save_configuration(
+pub fn save_or_update_configuration(
     mut config: Config,
+    original_title: Option<String>, // None для новых конфигураций, Some(title) для обновления
     state: State<'_, Arc<Mutex<ConfigManager>>>,
     app: tauri::AppHandle
 ) -> Result<(), String> {
     let config_path = get_config_path();
     let config_dir = config_path.parent().unwrap().to_path_buf();
     
-    // Генерируем уникальное имя файла
-    let unique_title = generate_unique_title(&config_dir, &config.title);
-    let config_file = config_dir.join(format!("{}.json", unique_title));
-    
-    // Обновляем заголовок конфигурации если он изменился
-    if unique_title != config.title {
-        config.title = unique_title.clone();
+    // Для обновления: проверяем что старый файл существует
+    if let Some(ref original_title) = original_title {
+        let original_config_file = config_dir.join(format!("{}.json", original_title));
+        if !original_config_file.exists() {
+            return Err(format!("Configuration file not found: {}", original_title));
+        }
     }
+    
+    // Сохраняем исходное название для возможной очистки
+    let original_config_title = config.title.clone();
     
     // Очищаем ID перед сохранением
     config.clear_ids();
     
-    config.save(&config_file)
-        .map_err(|e| format!("Failed to save configuration: {}", e))?;
+    // Определяем нужно ли переименование
+    let title_changed = original_title.as_ref().map_or(false, |orig| config.title != *orig);
+    
+    if title_changed || original_title.is_none() {
+        // Генерируем уникальное имя файла и сразу обновляем title для синхронизации
+        let unique_title = generate_unique_title(&config_dir, &config.title);
+        config.title = unique_title.clone();
+        
+        let new_config_file = config_dir.join(format!("{}.json", unique_title));
+        
+        // Если новый файл уже существует, удаляем его
+        if new_config_file.exists() {
+            std::fs::remove_file(&new_config_file)
+                .map_err(|e| format!("Failed to remove existing file: {}", e))?;
+        }
+        
+        // Сохраняем конфигурацию в новый файл
+        config.save(&new_config_file)
+            .map_err(|e| format!("Failed to save configuration: {}", e))?;
+        
+        // Удаляем старый файл если это обновление или если это новая конфигурация с измененным именем
+        if let Some(original_title) = original_title {
+            let original_config_file = config_dir.join(format!("{}.json", original_title));
+            std::fs::remove_file(&original_config_file)
+                .map_err(|e| format!("Failed to remove old configuration file: {}", e))?;
+        } else if original_config_title != unique_title {
+            // Для новых конфигураций: удаляем файл с исходным именем если он существует
+            let original_file = config_dir.join(format!("{}.json", original_config_title));
+            if original_file.exists() {
+                if let Err(e) = std::fs::remove_file(&original_file) {
+                    eprintln!("Warning: Could not remove duplicate file {}: {}", original_file.display(), e);
+                }
+            }
+        }
+    } else {
+        // Заголовок не изменился при обновлении - сохраняем в тот же файл
+        let original_title = original_title.unwrap(); // Safe unwrap, так как мы знаем что title_changed = false
+        let config_file = config_dir.join(format!("{}.json", original_title));
+        config.save(&config_file)
+            .map_err(|e| format!("Failed to save configuration: {}", e))?;
+    }
     
     // Перезагружаем конфигурации в ConfigManager
     let mut config_manager = state.lock().unwrap();
@@ -414,17 +457,34 @@ pub fn save_configuration(
 
 fn generate_unique_title(config_dir: &std::path::Path, base_title: &str) -> String {
     let mut counter = 1;
-    let mut title = base_title.to_string();
+    let mut title = base_title.trim().to_string();
     
     // Если заголовок пустой, используем базовый
-    if title.trim().is_empty() {
+    if title.is_empty() {
         title = "New Configuration".to_string();
     }
     
+    // Сохраняем исходный title для генерации вариантов
+    let original_title = title.clone();
+    
+    // Защита от бесконечного цикла (максимум 10000 попыток)
+    const MAX_ATTEMPTS: usize = 10000;
+    let mut attempts = 0;
+    
     // Проверяем, существует ли файл с таким именем
     while config_dir.join(format!("{}.json", title)).exists() {
-        title = format!("{} ({})", base_title, counter);
         counter += 1;
+        title = format!("{} ({})", original_title, counter);
+        
+        attempts += 1;
+        if attempts >= MAX_ATTEMPTS {
+            // В крайне редком случае, если не можем найти уникальное имя
+            title = format!("{}-{}", original_title, std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_millis());
+            break;
+        }
     }
     
     title
@@ -608,65 +668,6 @@ fn update_system_tray_menu(app: &tauri::AppHandle, config_manager: &ConfigManage
     }
     
     Ok(())
-}
-
-#[tauri::command]
-pub fn update_configuration(
-    mut config: Config,
-    original_title: String,
-    state: State<'_, Arc<Mutex<ConfigManager>>>,
-    app: tauri::AppHandle
-) -> Result<(), String> {
-    let config_path = get_config_path();
-    let config_dir = config_path.parent().unwrap().to_path_buf();
-    
-    // Используем оригинальный заголовок для поиска файла
-    let original_config_file = config_dir.join(format!("{}.json", original_title));
-    
-    if !original_config_file.exists() {
-        return Err(format!("Configuration file not found: {}", original_title));
-    }
-    
-    // Очищаем ID перед сохранением
-    config.clear_ids();
-    
-    // Если заголовок изменился, генерируем уникальное имя файла
-    if config.title != original_title {
-        // Генерируем уникальное имя файла для нового заголовка
-        let unique_title = generate_unique_title(&config_dir, &config.title);
-        let new_config_file = config_dir.join(format!("{}.json", unique_title));
-        
-        // Удаляем старый файл если новый файл уже существует
-        if new_config_file.exists() {
-            std::fs::remove_file(&new_config_file)
-                .map_err(|e| format!("Failed to remove existing file: {}", e))?;
-        }
-        
-        // Переименовываем файл
-        std::fs::rename(&original_config_file, &new_config_file)
-            .map_err(|e| format!("Failed to rename configuration file: {}", e))?;
-        
-        // Обновляем заголовок конфигурации если он изменился
-        if unique_title != config.title {
-            config.title = unique_title.clone();
-        }
-        
-        // Сохраняем конфигурацию в новый файл
-        config.save(&new_config_file)
-            .map_err(|e| format!("Failed to save configuration: {}", e))?;
-    } else {
-        // Если заголовок не изменился, сохраняем в тот же файл
-        config.save(&original_config_file)
-            .map_err(|e| format!("Failed to save configuration: {}", e))?;
-    }
-    
-    // Перезагружаем конфигурации в ConfigManager
-    let mut config_manager = state.lock().unwrap();
-    config_manager.load_configs(None)
-        .map_err(|e| format!("Failed to reload configurations: {}", e))?;
-    
-    // Обновляем меню в трее
-    update_system_tray_menu(&app, &config_manager)
 }
 
 #[tauri::command]
