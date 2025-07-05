@@ -6,7 +6,7 @@ use tauri::{AppHandle, Emitter, Manager, Wry, WebviewWindowBuilder};
 use tauri::menu::{IconMenuItem, IconMenuItemBuilder, CheckMenuItem};
 use tauri::image::Image;
 use tauri::path::BaseDirectory;
-
+use tauri_plugin_notification::NotificationExt;
 use crate::config::CommandConfig;
 
 static SCRIPTS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/scripts");
@@ -342,13 +342,23 @@ pub fn create_menu_item(
     text: &str,
     icon_name: &str,
     hotkey: Option<String>,
+    icon: Option<&str>,
 ) -> IconMenuItem<Wry> {
-    let mut builder = IconMenuItemBuilder::with_id(id, text);
+    let display_text = if let Some(icon_symbol) = icon {
+        format!("{} {}", icon_symbol, text)
+    } else {
+        text.to_string()
+    };
+    
+    let mut builder = IconMenuItemBuilder::with_id(id, &display_text);
     
     // Пытаемся загрузить иконку, но не падаем если её нет
-    if let Ok(icon_path) = app.path().resolve(&format!("icons/{}.png", icon_name), BaseDirectory::Resource) {
-        if let Ok(image) = Image::from_path(icon_path) {
-            builder = builder.icon(image);
+    // Добавляем иконку только если нет пользовательской иконки
+    if icon.is_none() {
+        if let Ok(icon_path) = app.path().resolve(&format!("icons/{}.png", icon_name), BaseDirectory::Resource) {
+            if let Ok(image) = Image::from_path(icon_path) {
+                builder = builder.icon(image);
+            }
         }
     }
     
@@ -367,16 +377,48 @@ pub fn create_check_menu_item(
     text: &str,
     checked: bool,
     hotkey: Option<String>,
+    icon: Option<&str>,
 ) -> CheckMenuItem<Wry> {
+    let display_text = if let Some(icon_symbol) = icon {
+        format!("{} {}", icon_symbol, text)
+    } else {
+        text.to_string()
+    };
+    
     let hotkey_ref = hotkey.as_ref().map(|s| s.as_str());
     
     CheckMenuItem::with_id(
         app.app_handle(),
         id,
-        text,
+        &display_text,
         true, // enabled
         checked,
         hotkey_ref,
     )
     .unwrap()
+}
+
+/// Проверяет состояние переключателя, выполняя команду
+pub fn is_switch_enabled(switch_command: &str, app: Option<&AppHandle<Wry>>) -> bool {
+    // Выполняем команду переключателя в фоне и получаем результат
+    match execute_command_silent(switch_command) {
+        Ok(output) => {
+            // Проверяем результат - если команда вернула "true" или непустую строку, считаем включенным
+            let output = output.trim().to_lowercase();
+            output == "true" || output == "1" || output == "enabled" || output == "on"
+        }
+        Err(e) => {
+            eprintln!("Failed to check switch status: {}", e);
+            // Показываем уведомление об ошибке, если app доступен
+            if let Some(app_handle) = app {
+                if let Ok(_) = app_handle.notification().builder()
+                    .title("SwitchShuttle Error")
+                    .body(&format!("Failed to check switch status: {}", e))
+                    .show() {
+                    // Уведомление отправлено
+                }
+            }
+            false
+        }
+    }
 }
