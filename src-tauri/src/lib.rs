@@ -8,9 +8,9 @@ mod menu;
 use crate::commands::{
     about_message, check_for_updates, create_new_config, execute, execute_command_with_inputs,
     fetch_input_data, get_menu_data, get_version, get_configurations, delete_configuration,
-    save_configuration, get_config_files, load_config, save_configuration_by_id,
+    save_or_update_configuration, get_config_files, load_config, save_configuration_by_id,
     create_new_configuration, duplicate_configuration, validate_configuration, get_unique_config_title,
-    open_configuration, update_configuration, refresh_configurations, open_config_folder
+    open_configuration, refresh_configurations, open_config_folder
 };
 use crate::menu::{create_system_tray_menu, handle_system_tray_event};
 use crate::cli::handle_cli_commands;
@@ -84,9 +84,8 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             get_configurations,
             delete_configuration,
-            save_configuration,
+            save_or_update_configuration,
             save_configuration_by_id,
-            update_configuration,
             open_configuration,
             create_new_configuration,
             duplicate_configuration,
