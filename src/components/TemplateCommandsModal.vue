@@ -95,7 +95,10 @@
               <div class="flex items-start justify-between mb-3">
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center justify-between mb-1">
-                    <h4 class="font-semibold text-slate-900 text-sm truncate">{{ command.name }}</h4>
+                    <div class="flex items-center space-x-2 flex-1 min-w-0">
+                      <span v-if="command.icon" class="text-lg flex-shrink-0">{{ command.icon }}</span>
+                      <h4 class="font-semibold text-slate-900 text-sm truncate">{{ command.name }}</h4>
+                    </div>
                     <span v-if="command.hotkey" class="px-2 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs rounded-md font-medium flex-shrink-0 shadow-sm">
                       {{ command.hotkey }}
                     </span>
@@ -142,6 +145,16 @@
                     Switch Command:
                   </div>
                   <div class="text-xs font-mono text-green-800 break-all line-clamp-2">{{ command.switch }}</div>
+                </div>
+                
+                <div v-if="command.monitor" class="bg-blue-50 border border-blue-200 p-2 rounded text-xs">
+                  <div class="text-xs text-blue-700 mb-1 font-medium flex items-center">
+                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    Monitor Command:
+                  </div>
+                  <div class="text-xs font-mono text-blue-800 break-all line-clamp-2">{{ command.monitor }}</div>
                 </div>
                 
                 <div v-if="command.inputs" class="space-y-1">
@@ -266,7 +279,8 @@ const groupedCommands = computed(() => {
       return command.name.toLowerCase().includes(query) ||
              (command.command && command.command.toLowerCase().includes(query)) ||
              (command.commands && command.commands.some((cmd: any) => cmd.toLowerCase().includes(query))) ||
-             (command.switch && command.switch.toLowerCase().includes(query));
+             (command.switch && command.switch.toLowerCase().includes(query)) ||
+             (command.monitor && command.monitor.toLowerCase().includes(query));
     })
   })).filter(template => template.commands.length > 0);
 });
