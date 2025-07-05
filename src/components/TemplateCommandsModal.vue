@@ -113,6 +113,12 @@
                       <span class="truncate">{{ template.category }}</span>
                     </span>
                   </div>
+                  <!-- Command Description -->
+                  <div v-if="command.description" class="mb-2">
+                    <div class="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                      {{ command.description }}
+                    </div>
+                  </div>
                 </div>
               </div>
               
