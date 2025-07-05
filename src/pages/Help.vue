@@ -1,170 +1,224 @@
 <template>
   <div class="container mx-auto px-6 py-8 max-w-4xl">
     <div class="bg-white rounded-lg shadow-lg p-8">
-      <h1 class="text-3xl font-bold text-slate-900 mb-8">Help & Documentation</h1>
+      <h1 class="text-3xl font-bold text-slate-900 mb-8">Help & FAQ</h1>
       
-      <!-- Table of Contents -->
-      <div class="mb-8 p-4 bg-slate-50 rounded-lg">
-        <h2 class="text-lg font-semibold text-slate-900 mb-3">Table of Contents</h2>
-        <ul class="space-y-1 text-sm">
-          <li><a href="#getting-started" class="text-blue-600 hover:text-blue-800">Getting Started</a></li>
-          <li><a href="#visual-editor" class="text-blue-600 hover:text-blue-800">Visual Editor Guide</a></li>
-          <li><a href="#json-configuration" class="text-blue-600 hover:text-blue-800">JSON Configuration</a></li>
-          <li><a href="#command-types" class="text-blue-600 hover:text-blue-800">Command Types</a></li>
-          <li><a href="#configuration-management" class="text-blue-600 hover:text-blue-800">Configuration Management</a></li>
-          <li><a href="#switch-commands" class="text-blue-600 hover:text-blue-800">Switch Commands</a></li>
-          <li><a href="#monitoring-commands" class="text-blue-600 hover:text-blue-800">Monitoring Commands</a></li>
-          <li><a href="#cli-usage" class="text-blue-600 hover:text-blue-800">CLI Usage</a></li>
-          <li><a href="#troubleshooting" class="text-blue-600 hover:text-blue-800">Troubleshooting</a></li>
-        </ul>
+      <!-- Search -->
+      <div class="mb-8">
+        <div class="relative">
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Search FAQ..."
+            class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+            <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
       </div>
 
-      <!-- Getting Started -->
-      <section id="getting-started" class="mb-12">
-        <h2 class="text-2xl font-bold text-slate-900 mb-4">Getting Started</h2>
-        
-        <div class="space-y-6">
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">Installation</h3>
-            <div class="bg-slate-50 p-4 rounded-lg">
-              <h4 class="font-medium text-slate-700 mb-2">macOS (Recommended)</h4>
-              <code class="block bg-slate-200 p-2 rounded text-sm">brew tap s00d/switchshuttle && brew install --cask switchshuttle</code>
-              
-              <h4 class="font-medium text-slate-700 mt-4 mb-2">Manual Download</h4>
-              <p class="text-sm text-slate-600">Download the latest release from <a href="https://github.com/s00d/switchshuttle/releases" class="text-blue-600 hover:text-blue-800">GitHub Releases</a> for your platform.</p>
-            </div>
-          </div>
-
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">First Launch</h3>
-            <ol class="list-decimal list-inside space-y-2 text-sm text-slate-700">
-              <li>Launch SwitchShuttle - it will appear in your system tray</li>
-              <li>Right-click the tray icon to access the menu</li>
-              <li>Click "Edit Configuration" to open the visual editor</li>
-              <li>Add your first command or import an existing configuration</li>
-              <li>Save and restart the application</li>
-            </ol>
-          </div>
-        </div>
-      </section>
-
-      <!-- Visual Editor Guide -->
-      <section id="visual-editor" class="mb-12">
-        <h2 class="text-2xl font-bold text-slate-900 mb-4">Visual Editor Guide</h2>
-        
-        <div class="space-y-6">
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">Opening the Editor</h3>
-            <p class="text-sm text-slate-700 mb-4">The visual editor provides an intuitive interface for managing your configurations without editing JSON directly.</p>
-            
-            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
-              <div class="flex">
-                <div class="flex-shrink-0">
-                  <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                  </svg>
-                </div>
-                <div class="ml-3">
-                  <p class="text-sm text-blue-700">
-                    <strong>Tip:</strong> You can access the editor by right-clicking the system tray icon and selecting "Edit Configuration"
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">Configuration Management</h3>
-            <div class="grid md:grid-cols-2 gap-4">
-              <div class="bg-slate-50 p-4 rounded-lg">
-                <h4 class="font-medium text-slate-700 mb-2">Adding New Configurations</h4>
-                <ol class="list-decimal list-inside space-y-1 text-sm text-slate-600">
-                  <li>Click "Add Configuration" button</li>
-                  <li>Fill in the basic settings (terminal, launch mode)</li>
-                  <li>Add commands using the "Add Command" button</li>
-                  <li>Configure each command's properties</li>
-                  <li>Save the configuration</li>
-                </ol>
-              </div>
-              
-              <div class="bg-slate-50 p-4 rounded-lg">
-                <h4 class="font-medium text-slate-700 mb-2">Editing Existing Configurations</h4>
-                <ol class="list-decimal list-inside space-y-1 text-sm text-slate-600">
-                  <li>Select the configuration from the dropdown</li>
-                  <li>Modify settings in the form fields</li>
-                  <li>Edit commands in the commands list</li>
-                  <li>Use the toggle to enable/disable configurations</li>
-                  <li>Save changes</li>
-                </ol>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">Command Editor</h3>
-            <div class="bg-slate-50 p-4 rounded-lg">
-              <h4 class="font-medium text-slate-700 mb-2">Adding Commands</h4>
-              <div class="space-y-3 text-sm text-slate-600">
-                <div>
-                  <strong>Basic Command:</strong>
-                  <ul class="list-disc list-inside ml-4 mt-1">
-                    <li>Enter the command name</li>
-                    <li>Add the terminal command</li>
-                    <li>Optionally set a hotkey</li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <strong>Submenu Command:</strong>
-                  <ul class="list-disc list-inside ml-4 mt-1">
-                    <li>Select "Submenu" type</li>
-                    <li>Add child commands</li>
-                    <li>Organize in hierarchical structure</li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <strong>Switch Command:</strong>
-                  <ul class="list-disc list-inside ml-4 mt-1">
-                    <li>Select "Switch" type</li>
-                    <li>Add the toggle command</li>
-                    <li>Add the status check command</li>
-                  </ul>
-                </div>
+      <!-- FAQ Categories -->
+      <div class="space-y-6">
+        <!-- Getting Started -->
+        <div class="bg-slate-50 rounded-lg p-6">
+          <h2 class="text-xl font-bold text-slate-900 mb-4">🚀 Getting Started</h2>
+          <div class="space-y-3">
+            <div v-for="item in filteredFaqs.gettingStarted" :key="item.id" class="bg-white rounded-lg border border-slate-200">
+              <button
+                @click="toggleFaq(item.id)"
+                class="w-full px-4 py-3 text-left flex justify-between items-center hover:bg-slate-50 transition-colors"
+              >
+                <span class="font-medium text-slate-900">{{ item.question }}</span>
+                <svg
+                  :class="['w-5 h-5 text-slate-500 transition-transform', { 'rotate-180': openFaqs.includes(item.id) }]"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div v-show="openFaqs.includes(item.id)" class="px-4 pb-4">
+                <div class="text-sm text-slate-700 leading-relaxed" v-html="item.answer"></div>
               </div>
             </div>
           </div>
         </div>
-      </section>
 
-      <!-- JSON Configuration -->
-      <section id="json-configuration" class="mb-12">
-        <h2 class="text-2xl font-bold text-slate-900 mb-4">JSON Configuration</h2>
-        
-        <div class="space-y-6">
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">Configuration Files Location</h3>
-            <div class="bg-slate-50 p-4 rounded-lg">
-              <div class="grid md:grid-cols-3 gap-4 text-sm">
-                <div>
-                  <strong class="text-slate-700">macOS/Linux:</strong>
-                  <code class="block bg-slate-200 p-2 rounded mt-1">~/.config/switch-shuttle/</code>
-                </div>
-                <div>
-                  <strong class="text-slate-700">Windows:</strong>
-                  <code class="block bg-slate-200 p-2 rounded mt-1">C:\Users\&lt;Username&gt;\AppData\Roaming\switch-shuttle\</code>
-                </div>
-                <div>
-                  <strong class="text-slate-700">File Format:</strong>
-                  <code class="block bg-slate-200 p-2 rounded mt-1">*.json</code>
-                </div>
+        <!-- Configuration -->
+        <div class="bg-slate-50 rounded-lg p-6">
+          <h2 class="text-xl font-bold text-slate-900 mb-4">⚙️ Configuration</h2>
+          <div class="space-y-3">
+            <div v-for="item in filteredFaqs.configuration" :key="item.id" class="bg-white rounded-lg border border-slate-200">
+              <button
+                @click="toggleFaq(item.id)"
+                class="w-full px-4 py-3 text-left flex justify-between items-center hover:bg-slate-50 transition-colors"
+              >
+                <span class="font-medium text-slate-900">{{ item.question }}</span>
+                <svg
+                  :class="['w-5 h-5 text-slate-500 transition-transform', { 'rotate-180': openFaqs.includes(item.id) }]"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div v-show="openFaqs.includes(item.id)" class="px-4 pb-4">
+                <div class="text-sm text-slate-700 leading-relaxed" v-html="item.answer"></div>
               </div>
             </div>
           </div>
+        </div>
 
+        <!-- Command Types -->
+        <div class="bg-slate-50 rounded-lg p-6">
+          <h2 class="text-xl font-bold text-slate-900 mb-4">🔧 Command Types</h2>
+          <div class="space-y-3">
+            <div v-for="item in filteredFaqs.commandTypes" :key="item.id" class="bg-white rounded-lg border border-slate-200">
+              <button
+                @click="toggleFaq(item.id)"
+                class="w-full px-4 py-3 text-left flex justify-between items-center hover:bg-slate-50 transition-colors"
+              >
+                <span class="font-medium text-slate-900">{{ item.question }}</span>
+                <svg
+                  :class="['w-5 h-5 text-slate-500 transition-transform', { 'rotate-180': openFaqs.includes(item.id) }]"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div v-show="openFaqs.includes(item.id)" class="px-4 pb-4">
+                <div class="text-sm text-slate-700 leading-relaxed" v-html="item.answer"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Advanced Features -->
+        <div class="bg-slate-50 rounded-lg p-6">
+          <h2 class="text-xl font-bold text-slate-900 mb-4">🚀 Advanced Features</h2>
+          <div class="space-y-3">
+            <div v-for="item in filteredFaqs.advancedFeatures" :key="item.id" class="bg-white rounded-lg border border-slate-200">
+              <button
+                @click="toggleFaq(item.id)"
+                class="w-full px-4 py-3 text-left flex justify-between items-center hover:bg-slate-50 transition-colors"
+              >
+                <span class="font-medium text-slate-900">{{ item.question }}</span>
+                <svg
+                  :class="['w-5 h-5 text-slate-500 transition-transform', { 'rotate-180': openFaqs.includes(item.id) }]"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div v-show="openFaqs.includes(item.id)" class="px-4 pb-4">
+                <div class="text-sm text-slate-700 leading-relaxed" v-html="item.answer"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Troubleshooting -->
+        <div class="bg-slate-50 rounded-lg p-6">
+          <h2 class="text-xl font-bold text-slate-900 mb-4">🔧 Troubleshooting</h2>
+          <div class="space-y-3">
+            <div v-for="item in filteredFaqs.troubleshooting" :key="item.id" class="bg-white rounded-lg border border-slate-200">
+              <button
+                @click="toggleFaq(item.id)"
+                class="w-full px-4 py-3 text-left flex justify-between items-center hover:bg-slate-50 transition-colors"
+              >
+                <span class="font-medium text-slate-900">{{ item.question }}</span>
+                <svg
+                  :class="['w-5 h-5 text-slate-500 transition-transform', { 'rotate-180': openFaqs.includes(item.id) }]"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div v-show="openFaqs.includes(item.id)" class="px-4 pb-4">
+                <div class="text-sm text-slate-700 leading-relaxed" v-html="item.answer"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="mt-12 pt-8 border-t border-slate-200">
+        <p class="text-sm text-slate-500 text-center">
+          Can't find what you're looking for? Visit our <a href="https://github.com/s00d/switchshuttle" class="text-blue-600 hover:text-blue-800">GitHub repository</a> for additional resources.
+        </p>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+
+const searchQuery = ref('')
+const openFaqs = ref<string[]>([])
+
+const faqData = {
+  gettingStarted: [
+    {
+      id: 'gs-1',
+      question: 'How do I install SwitchShuttle?',
+      answer: `
+        <p class="mb-3"><strong>macOS (Recommended):</strong></p>
+        <code class="block bg-slate-200 p-2 rounded text-sm mb-3">brew tap s00d/switchshuttle && brew install --cask switchshuttle</code>
+        
+        <p class="mb-3"><strong>Manual Download:</strong></p>
+        <p>Download the latest release from <a href="https://github.com/s00d/switchshuttle/releases" class="text-blue-600 hover:text-blue-800">GitHub Releases</a> for your platform.</p>
+      `
+    },
+    {
+      id: 'gs-2',
+      question: 'How do I get started after installation?',
+      answer: `
+        <ol class="list-decimal list-inside space-y-2">
+          <li>Launch SwitchShuttle - it will appear in your system tray</li>
+          <li>Right-click the tray icon to access the menu</li>
+          <li>Click "Edit Configuration" to open the visual editor</li>
+          <li>Add your first command or import an existing configuration</li>
+          <li>Save and restart the application</li>
+        </ol>
+      `
+    },
+    {
+      id: 'gs-3',
+      question: 'Where are configuration files stored?',
+      answer: `
+        <div class="grid md:grid-cols-2 gap-4">
           <div>
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">Basic Configuration Structure</h3>
-            <pre class="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm"><code>{
+            <strong class="text-slate-700">macOS/Linux:</strong>
+            <code class="block bg-slate-200 p-2 rounded text-sm mt-1">~/.config/switch-shuttle/</code>
+          </div>
+          <div>
+            <strong class="text-slate-700">Windows:</strong>
+            <code class="block bg-slate-200 p-2 rounded text-sm mt-1">C:\\Users\\&lt;Username&gt;\\AppData\\Roaming\\switch-shuttle\\</code>
+          </div>
+        </div>
+      `
+    }
+  ],
+  configuration: [
+    {
+      id: 'cfg-1',
+      question: 'How do I create a basic configuration?',
+      answer: `
+        <p class="mb-3">Here's a simple configuration example:</p>
+        <pre class="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm"><code>{
   "terminal": "iterm",
   "launch_in": "new_tab",
   "title": "My Commands",
@@ -177,78 +231,79 @@
     }
   ]
 }</code></pre>
-          </div>
-
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">Configuration Parameters</h3>
-            <div class="overflow-x-auto">
-              <table class="min-w-full bg-white border border-slate-200 rounded-lg">
-                <thead class="bg-slate-50">
-                  <tr>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Parameter</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Type</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Default</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Description</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-200">
-                  <tr>
-                    <td class="px-4 py-2 text-sm font-medium text-slate-900">terminal</td>
-                    <td class="px-4 py-2 text-sm text-slate-600">String</td>
-                    <td class="px-4 py-2 text-sm text-slate-600">"terminal"</td>
-                    <td class="px-4 py-2 text-sm text-slate-600">Terminal application to use</td>
-                  </tr>
-                  <tr>
-                    <td class="px-4 py-2 text-sm font-medium text-slate-900">launch_in</td>
-                    <td class="px-4 py-2 text-sm text-slate-600">String</td>
-                    <td class="px-4 py-2 text-sm text-slate-600">"current"</td>
-                    <td class="px-4 py-2 text-sm text-slate-600">Where to launch commands</td>
-                  </tr>
-                  <tr>
-                    <td class="px-4 py-2 text-sm font-medium text-slate-900">title</td>
-                    <td class="px-4 py-2 text-sm text-slate-600">String</td>
-                    <td class="px-4 py-2 text-sm text-slate-600">-</td>
-                    <td class="px-4 py-2 text-sm text-slate-600">Window/tab title</td>
-                  </tr>
-                  <tr>
-                    <td class="px-4 py-2 text-sm font-medium text-slate-900">enabled</td>
-                    <td class="px-4 py-2 text-sm text-slate-600">Boolean</td>
-                    <td class="px-4 py-2 text-sm text-slate-600">true</td>
-                    <td class="px-4 py-2 text-sm text-slate-600">Whether to load this configuration</td>
-                  </tr>
-                  <tr>
-                    <td class="px-4 py-2 text-sm font-medium text-slate-900">commands</td>
-                    <td class="px-4 py-2 text-sm text-slate-600">Array</td>
-                    <td class="px-4 py-2 text-sm text-slate-600">[]</td>
-                    <td class="px-4 py-2 text-sm text-slate-600">List of command configurations</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+      `
+    },
+    {
+      id: 'cfg-2',
+      question: 'What are the main configuration parameters?',
+      answer: `
+        <div class="overflow-x-auto">
+          <table class="min-w-full bg-white border border-slate-200 rounded-lg">
+            <thead class="bg-slate-50">
+              <tr>
+                <th class="px-4 py-2 text-left text-xs font-medium text-slate-500 uppercase">Parameter</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-slate-500 uppercase">Description</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200">
+              <tr>
+                <td class="px-4 py-2 text-sm font-medium text-slate-900">terminal</td>
+                <td class="px-4 py-2 text-sm text-slate-600">Terminal application to use (iterm, terminal, alacritty, etc.)</td>
+              </tr>
+              <tr>
+                <td class="px-4 py-2 text-sm font-medium text-slate-900">launch_in</td>
+                <td class="px-4 py-2 text-sm text-slate-600">Where to launch commands (current, new_tab, new_window)</td>
+              </tr>
+              <tr>
+                <td class="px-4 py-2 text-sm font-medium text-slate-900">title</td>
+                <td class="px-4 py-2 text-sm text-slate-600">Window/tab title for the terminal</td>
+              </tr>
+              <tr>
+                <td class="px-4 py-2 text-sm font-medium text-slate-900">enabled</td>
+                <td class="px-4 py-2 text-sm text-slate-600">Whether to load this configuration</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </section>
-
-      <!-- Command Types -->
-      <section id="command-types" class="mb-12">
-        <h2 class="text-2xl font-bold text-slate-900 mb-4">Command Types</h2>
+      `
+    },
+    {
+      id: 'cfg-3',
+      question: 'How do I enable/disable configurations?',
+      answer: `
+        <p class="mb-3">You can enable or disable individual configuration files to control which commands are available in the system tray menu.</p>
         
-        <div class="space-y-6">
-          <div class="grid md:grid-cols-2 gap-6">
-            <div class="bg-slate-50 p-6 rounded-lg">
-              <h3 class="text-lg font-semibold text-slate-800 mb-3">Basic Commands</h3>
-              <p class="text-sm text-slate-600 mb-4">Simple commands that execute in the terminal.</p>
-              <pre class="bg-slate-900 text-slate-100 p-3 rounded text-xs overflow-x-auto"><code>{
+        <p class="mb-3"><strong>Visual Editor Method:</strong></p>
+        <ol class="list-decimal list-inside space-y-1 mb-3">
+          <li>Open the configuration editor</li>
+          <li>Use the toggle switch in the "Configuration Status" section</li>
+          <li>Enabled configurations will be loaded and available in the menu</li>
+        </ol>
+        
+        <p class="mb-3"><strong>JSON Method:</strong></p>
+        <code class="block bg-slate-200 p-2 rounded text-sm">"enabled": true  // Set to false to disable</code>
+      `
+    }
+  ],
+  commandTypes: [
+    {
+      id: 'ct-1',
+      question: 'What types of commands are supported?',
+      answer: `
+        <div class="grid md:grid-cols-2 gap-4">
+          <div class="bg-slate-50 p-4 rounded-lg">
+            <h4 class="font-medium text-slate-700 mb-2">Basic Commands</h4>
+            <p class="text-sm text-slate-600">Simple commands that execute in the terminal.</p>
+            <pre class="bg-slate-900 text-slate-100 p-2 rounded text-xs mt-2"><code>{
   "name": "Start Server",
-  "command": "npm run dev",
-  "hotkey": "Ctrl+Shift+D"
+  "command": "npm run dev"
 }</code></pre>
-            </div>
-            
-            <div class="bg-slate-50 p-6 rounded-lg">
-              <h3 class="text-lg font-semibold text-slate-800 mb-3">Multiple Commands</h3>
-              <p class="text-sm text-slate-600 mb-4">Execute a sequence of commands.</p>
-              <pre class="bg-slate-900 text-slate-100 p-3 rounded text-xs overflow-x-auto"><code>{
+          </div>
+          
+          <div class="bg-slate-50 p-4 rounded-lg">
+            <h4 class="font-medium text-slate-700 mb-2">Multiple Commands</h4>
+            <p class="text-sm text-slate-600">Execute a sequence of commands.</p>
+            <pre class="bg-slate-900 text-slate-100 p-2 rounded text-xs mt-2"><code>{
   "name": "Full Dev Cycle",
   "commands": [
     "git pull origin main",
@@ -256,12 +311,12 @@
     "npm run build"
   ]
 }</code></pre>
-            </div>
-            
-            <div class="bg-slate-50 p-6 rounded-lg">
-              <h3 class="text-lg font-semibold text-slate-800 mb-3">Submenus</h3>
-              <p class="text-sm text-slate-600 mb-4">Organize commands in hierarchical menus.</p>
-              <pre class="bg-slate-900 text-slate-100 p-3 rounded text-xs overflow-x-auto"><code>{
+          </div>
+          
+          <div class="bg-slate-50 p-4 rounded-lg">
+            <h4 class="font-medium text-slate-700 mb-2">Submenus</h4>
+            <p class="text-sm text-slate-600">Organize commands in hierarchical menus.</p>
+            <pre class="bg-slate-900 text-slate-100 p-2 rounded text-xs mt-2"><code>{
   "name": "Docker Operations",
   "submenu": [
     {
@@ -270,12 +325,12 @@
     }
   ]
 }</code></pre>
-            </div>
-            
-            <div class="bg-slate-50 p-6 rounded-lg">
-              <h3 class="text-lg font-semibold text-slate-800 mb-3">Dynamic Inputs</h3>
-              <p class="text-sm text-slate-600 mb-4">Commands with user input prompts.</p>
-              <pre class="bg-slate-900 text-slate-100 p-3 rounded text-xs overflow-x-auto"><code>{
+          </div>
+          
+          <div class="bg-slate-50 p-4 rounded-lg">
+            <h4 class="font-medium text-slate-700 mb-2">Dynamic Inputs</h4>
+            <p class="text-sm text-slate-600">Commands with user input prompts.</p>
+            <pre class="bg-slate-900 text-slate-100 p-2 rounded text-xs mt-2"><code>{
   "name": "Create Component",
   "inputs": {
     "componentName": "MyComponent"
@@ -284,388 +339,256 @@
     "mkdir -p src/components/[componentName]"
   ]
 }</code></pre>
-            </div>
-            
-            <div class="bg-slate-50 p-6 rounded-lg">
-              <h3 class="text-lg font-semibold text-slate-800 mb-3">Monitoring Commands</h3>
-              <p class="text-sm text-slate-600 mb-4">Display real-time system information in the menu.</p>
-              <pre class="bg-slate-900 text-slate-100 p-3 rounded text-xs overflow-x-auto"><code>{
+          </div>
+        </div>
+      `
+    },
+    {
+      id: 'ct-2',
+      question: 'How do I add hotkeys to commands?',
+      answer: `
+        <p class="mb-3">You can assign global hotkeys to your commands for quick access:</p>
+        <pre class="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm"><code>{
+  "name": "Start Dev Server",
+  "command": "npm run dev",
+  "hotkey": "Ctrl+Shift+D"
+}</code></pre>
+        
+        <p class="mb-3"><strong>Supported hotkey formats:</strong></p>
+        <ul class="list-disc list-inside space-y-1 text-sm">
+          <li><code class="bg-slate-200 px-1 rounded">Ctrl+Shift+D</code> - Standard combination</li>
+          <li><code class="bg-slate-200 px-1 rounded">Cmd+Option+S</code> - macOS specific</li>
+          <li><code class="bg-slate-200 px-1 rounded">Alt+F1</code> - Function keys</li>
+        </ul>
+        
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mt-4">
+          <p class="text-sm text-yellow-700">
+            <strong>Note:</strong> Ensure no other applications are using the same hotkey combination to avoid conflicts.
+          </p>
+        </div>
+      `
+    }
+  ],
+  advancedFeatures: [
+    {
+      id: 'af-1',
+      question: 'What are Switch Commands?',
+      answer: `
+        <p class="mb-3">Switch commands allow you to toggle system functions with background execution. They provide visual feedback in the menu and automatically detect current status.</p>
+        
+        <p class="mb-3"><strong>Features:</strong></p>
+        <ul class="list-disc list-inside space-y-1 mb-3">
+          <li>Background execution without opening terminal windows</li>
+          <li>Automatic status detection</li>
+          <li>Visual feedback showing enabled/disabled status</li>
+          <li>Cross-platform support</li>
+        </ul>
+        
+        <p class="mb-3"><strong>Example:</strong></p>
+        <pre class="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm"><code>{
+  "name": "📶 Toggle WiFi",
+  "command": "networksetup -setairportpower en0 toggle",
+  "switch": "networksetup -getairportpower en0 | grep -q 'On' && echo 'true' || echo 'false'"
+}</code></pre>
+      `
+    },
+    {
+      id: 'af-2',
+      question: 'What are Monitoring Commands?',
+      answer: `
+        <p class="mb-3">Monitoring commands display real-time system information directly in the menu. They execute silently in the background and show the results in the menu item name.</p>
+        
+        <p class="mb-3"><strong>Features:</strong></p>
+        <ul class="list-disc list-inside space-y-1 mb-3">
+          <li>Real-time display of system metrics</li>
+          <li>Background execution without terminal windows</li>
+          <li>Click to execute additional commands</li>
+          <li>Cross-platform support</li>
+        </ul>
+        
+        <p class="mb-3"><strong>Example:</strong></p>
+        <pre class="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm"><code>{
   "name": "CPU Usage",
   "monitor": "top -l 1 | grep 'CPU usage' | awk '{print $3}'",
   "command": "top -o cpu"
 }</code></pre>
-            </div>
+        
+        <p class="mb-3"><strong>Best Practices:</strong></p>
+        <ul class="list-disc list-inside space-y-1">
+          <li>Keep monitor commands fast and lightweight</li>
+          <li>Use simple output formats (single values work best)</li>
+          <li>Add appropriate units (%, MB, GB, etc.) to the output</li>
+          <li>Handle errors gracefully</li>
+        </ul>
+      `
+    },
+    {
+      id: 'af-3',
+      question: 'How do I use the CLI interface?',
+      answer: `
+        <p class="mb-3">SwitchShuttle provides a command-line interface for executing commands directly from the terminal.</p>
+        
+        <p class="mb-3"><strong>Basic Usage:</strong></p>
+        <div class="space-y-2">
+          <code class="block bg-slate-200 p-2 rounded text-sm">switch-shuttle execute &lt;command-id&gt;</code>
+          <code class="block bg-slate-200 p-2 rounded text-sm">switch-shuttle list</code>
+          <code class="block bg-slate-200 p-2 rounded text-sm">switch-shuttle show &lt;command-id&gt;</code>
+        </div>
+        
+        <p class="mb-3"><strong>Advanced Usage:</strong></p>
+        <div class="space-y-2">
+          <code class="block bg-slate-200 p-2 rounded text-sm">switch-shuttle execute &lt;command-id&gt; --param value</code>
+          <code class="block bg-slate-200 p-2 rounded text-sm">switch-shuttle list --filter "server"</code>
+          <code class="block bg-slate-200 p-2 rounded text-sm">switch-shuttle export &gt; config.json</code>
+        </div>
+      `
+    }
+  ],
+  troubleshooting: [
+    {
+      id: 'ts-1',
+      question: 'My hotkeys are not working. What should I do?',
+      answer: `
+        <p class="mb-3">Hotkey conflicts are a common issue. Here's how to resolve them:</p>
+        
+        <ol class="list-decimal list-inside space-y-2 mb-3">
+          <li>Check if other applications are using the same hotkey combination</li>
+          <li>Try a different hotkey combination (e.g., Ctrl+Shift+Alt+D)</li>
+          <li>Restart SwitchShuttle after changing hotkeys</li>
+          <li>Check system permissions for accessibility features</li>
+        </ol>
+        
+        <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
+          <p class="text-sm text-blue-700">
+            <strong>Tip:</strong> On macOS, you may need to grant accessibility permissions to SwitchShuttle in System Preferences > Security & Privacy > Privacy > Accessibility.
+          </p>
+        </div>
+      `
+    },
+    {
+      id: 'ts-2',
+      question: 'My configuration is not loading. How do I fix this?',
+      answer: `
+        <p class="mb-3">Configuration loading issues can be caused by several factors:</p>
+        
+        <ul class="list-disc list-inside space-y-2 mb-3">
+          <li><strong>JSON Syntax Errors:</strong> Use a JSON validator to check your configuration file syntax</li>
+          <li><strong>File Location:</strong> Ensure configuration files are in the correct directory</li>
+          <li><strong>File Permissions:</strong> Check that the application can read the configuration files</li>
+          <li><strong>Application Restart:</strong> Restart SwitchShuttle after making configuration changes</li>
+        </ul>
+        
+        <p class="mb-3"><strong>Common JSON errors:</strong></p>
+        <ul class="list-disc list-inside space-y-1 text-sm">
+          <li>Missing commas between objects</li>
+          <li>Unclosed brackets or braces</li>
+          <li>Invalid string escaping</li>
+          <li>Trailing commas in arrays or objects</li>
+        </ul>
+      `
+    },
+    {
+      id: 'ts-3',
+      question: 'The terminal is not opening or commands are not executing. What is wrong?',
+      answer: `
+        <p class="mb-3">Terminal execution issues can be resolved by checking these common causes:</p>
+        
+        <div class="grid md:grid-cols-2 gap-4 mb-3">
+          <div class="bg-slate-50 p-4 rounded-lg">
+            <h4 class="font-medium text-slate-700 mb-2">Terminal Application</h4>
+            <ul class="list-disc list-inside space-y-1 text-sm text-slate-600">
+              <li>Verify the terminal application is installed</li>
+              <li>Check the terminal path in configuration</li>
+              <li>Try different terminal applications</li>
+            </ul>
+          </div>
+          
+          <div class="bg-slate-50 p-4 rounded-lg">
+            <h4 class="font-medium text-slate-700 mb-2">Command Path</h4>
+            <ul class="list-disc list-inside space-y-1 text-sm text-slate-600">
+              <li>Ensure commands are in system PATH</li>
+              <li>Use absolute paths for custom scripts</li>
+              <li>Check command syntax and parameters</li>
+            </ul>
           </div>
         </div>
-      </section>
-
-      <!-- Configuration Management -->
-      <section id="configuration-management" class="mb-12">
-        <h2 class="text-2xl font-bold text-slate-900 mb-4">Configuration Management</h2>
         
-        <div class="space-y-6">
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">Enabling/Disabling Configurations</h3>
-            <p class="text-sm text-slate-700 mb-4">You can enable or disable individual configuration files to control which commands are available in the system tray menu.</p>
-            
-            <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-4">
-              <div class="flex">
-                <div class="flex-shrink-0">
-                  <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                  </svg>
-                </div>
-                <div class="ml-3">
-                  <p class="text-sm text-green-700">
-                    <strong>Benefits:</strong> Temporarily disable configurations without deletion, test configurations during development, organize multiple configurations.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">Visual Editor Method</h3>
-            <ol class="list-decimal list-inside space-y-2 text-sm text-slate-700">
-              <li>Open the configuration editor</li>
-              <li>Use the toggle switch in the "Configuration Status" section</li>
-              <li>Enabled configurations will be loaded and available in the menu</li>
-              <li>Disabled configurations will be ignored</li>
-            </ol>
-          </div>
-
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">JSON Method</h3>
-            <pre class="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm"><code>{
-  "terminal": "iterm",
-  "launch_in": "current",
-  "title": "My Commands",
-  "enabled": true,  // Set to false to disable
-  "commands": [
+        <p class="mb-3"><strong>Supported terminals:</strong></p>
+        <ul class="list-disc list-inside space-y-1 text-sm">
+          <li>macOS: Terminal, iTerm2, Alacritty, Hyper</li>
+          <li>Windows: Command Prompt, PowerShell, Windows Terminal</li>
+          <li>Linux: gnome-terminal, konsole, xterm, alacritty</li>
+        </ul>
+      `
+    },
     {
-      "name": "Example Command",
-      "command": "echo Hello World"
+      id: 'ts-4',
+      question: 'How do I get help or report issues?',
+      answer: `
+        <p class="mb-3">There are several ways to get help and support:</p>
+        
+        <div class="space-y-3">
+          <div class="bg-slate-50 p-4 rounded-lg">
+            <h4 class="font-medium text-slate-700 mb-2">GitHub Resources</h4>
+            <ul class="space-y-2 text-sm text-slate-600">
+              <li><strong>Issues:</strong> <a href="https://github.com/s00d/switchshuttle/issues" class="text-blue-600 hover:text-blue-800">Report bugs and request features</a></li>
+              <li><strong>Documentation:</strong> <a href="https://github.com/s00d/switchshuttle#readme" class="text-blue-600 hover:text-blue-800">Complete documentation</a></li>
+              <li><strong>Discussions:</strong> <a href="https://github.com/s00d/switchshuttle/discussions" class="text-blue-600 hover:text-blue-800">Community discussions</a></li>
+            </ul>
+          </div>
+          
+          <div class="bg-slate-50 p-4 rounded-lg">
+            <h4 class="font-medium text-slate-700 mb-2">Debugging</h4>
+            <ul class="space-y-2 text-sm text-slate-600">
+              <li>Check application logs for error messages</li>
+              <li>Enable debug mode if available</li>
+              <li>Test commands manually in terminal</li>
+              <li>Validate JSON configuration syntax</li>
+            </ul>
+          </div>
+        </div>
+      `
     }
   ]
-}</code></pre>
-          </div>
-        </div>
-      </section>
+}
 
-      <!-- Switch Commands -->
-      <section id="switch-commands" class="mb-12">
-        <h2 class="text-2xl font-bold text-slate-900 mb-4">Switch Commands</h2>
-        
-        <div class="space-y-6">
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">Overview</h3>
-            <p class="text-sm text-slate-700 mb-4">Switch commands allow you to toggle system functions with background execution. They provide visual feedback in the menu and automatically detect current status.</p>
-          </div>
+const filteredFaqs = computed(() => {
+  const query = searchQuery.value.toLowerCase()
+  
+  if (!query) {
+    return faqData
+  }
+  
+  const filterCategory = (category: any[]) => {
+    return category.filter(item => 
+      item.question.toLowerCase().includes(query) || 
+      item.answer.toLowerCase().includes(query)
+    )
+  }
+  
+  return {
+    gettingStarted: filterCategory(faqData.gettingStarted),
+    configuration: filterCategory(faqData.configuration),
+    commandTypes: filterCategory(faqData.commandTypes),
+    advancedFeatures: filterCategory(faqData.advancedFeatures),
+    troubleshooting: filterCategory(faqData.troubleshooting)
+  }
+})
 
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">Features</h3>
-            <div class="grid md:grid-cols-2 gap-4">
-              <div class="bg-slate-50 p-4 rounded-lg">
-                <h4 class="font-medium text-slate-700 mb-2">Background Execution</h4>
-                <p class="text-sm text-slate-600">Commands run silently without opening a terminal window.</p>
-              </div>
-              
-              <div class="bg-slate-50 p-4 rounded-lg">
-                <h4 class="font-medium text-slate-700 mb-2">Status Detection</h4>
-                <p class="text-sm text-slate-600">Automatically detects the current state of the function.</p>
-              </div>
-              
-              <div class="bg-slate-50 p-4 rounded-lg">
-                <h4 class="font-medium text-slate-700 mb-2">Visual Feedback</h4>
-                <p class="text-sm text-slate-600">Shows enabled/disabled status in the menu.</p>
-              </div>
-              
-              <div class="bg-slate-50 p-4 rounded-lg">
-                <h4 class="font-medium text-slate-700 mb-2">Cross-Platform</h4>
-                <p class="text-sm text-slate-600">Works on macOS, Windows, and Linux.</p>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">Example Configuration</h3>
-            <pre class="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm"><code>{
-  "name": "🔧 System Controls",
-  "submenu": [
-    {
-      "name": "📶 Toggle WiFi",
-      "command": "networksetup -setairportpower en0 toggle",
-      "switch": "networksetup -getairportpower en0 | grep -q 'On' && echo 'true' || echo 'false'"
-    },
-    {
-      "name": "🔊 Toggle Bluetooth",
-      "command": "blueutil -p toggle",
-      "switch": "blueutil -p | grep -q '1' && echo 'true' || echo 'false'"
-    },
-    {
-      "name": "🌙 Toggle Dark Mode",
-      "command": "osascript -e 'tell app \"System Events\" to tell appearance preferences to set dark mode to not dark mode'",
-      "switch": "osascript -e 'tell app \"System Events\" to tell appearance preferences to get dark mode'"
-    }
-  ]
-}</code></pre>
-          </div>
-
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">Creating Switch Commands</h3>
-            <div class="bg-slate-50 p-4 rounded-lg">
-              <h4 class="font-medium text-slate-700 mb-2">Required Parameters</h4>
-              <ul class="space-y-2 text-sm text-slate-600">
-                <li><strong>command:</strong> The command to execute when toggling</li>
-                <li><strong>switch:</strong> Command that returns "true" or "false" to check current status</li>
-                <li><strong>name:</strong> Display name in the menu</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Monitoring Commands -->
-      <section id="monitoring-commands" class="mb-12">
-        <h2 class="text-2xl font-bold text-slate-900 mb-4">Monitoring Commands</h2>
-        
-        <div class="space-y-6">
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">Overview</h3>
-            <p class="text-sm text-slate-700 mb-4">Monitoring commands display real-time system information directly in the menu. They execute silently in the background and show the results in the menu item name, providing instant access to system metrics.</p>
-          </div>
-
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">Features</h3>
-            <div class="grid md:grid-cols-2 gap-4">
-              <div class="bg-slate-50 p-4 rounded-lg">
-                <h4 class="font-medium text-slate-700 mb-2">Real-time Display</h4>
-                <p class="text-sm text-slate-600">Shows monitoring results directly in the menu item name.</p>
-              </div>
-              
-              <div class="bg-slate-50 p-4 rounded-lg">
-                <h4 class="font-medium text-slate-700 mb-2">Background Execution</h4>
-                <p class="text-sm text-slate-600">Commands run silently without opening terminal windows.</p>
-              </div>
-              
-              <div class="bg-slate-50 p-4 rounded-lg">
-                <h4 class="font-medium text-slate-700 mb-2">Click to Execute</h4>
-                <p class="text-sm text-slate-600">Click the menu item to execute the associated command.</p>
-              </div>
-              
-              <div class="bg-slate-50 p-4 rounded-lg">
-                <h4 class="font-medium text-slate-700 mb-2">Cross-Platform</h4>
-                <p class="text-sm text-slate-600">Works on macOS, Windows, and Linux with platform-specific commands.</p>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">Example Configuration</h3>
-            <pre class="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm"><code>{
-  "name": "📊 System Monitoring",
-  "submenu": [
-    {
-      "name": "CPU Usage",
-      "monitor": "top -l 1 | grep 'CPU usage' | awk '{print $3}' | sed 's/%//'",
-      "command": "top -o cpu"
-    },
-    {
-      "name": "Memory Usage",
-      "monitor": "vm_stat | grep 'Pages active' | awk '{print $3}' | sed 's/\.//' | awk '{printf \"%.1f\", $1/1024/1024}'",
-      "command": "top -o mem"
-    },
-    {
-      "name": "Uptime",
-      "monitor": "uptime | awk '{print $3}' | sed 's/,//'",
-      "command": "uptime"
-    },
-    {
-      "name": "Disk Usage",
-      "monitor": "df -h / | tail -1 | awk '{print $5}'",
-      "command": "df -h"
-    }
-  ]
-}</code></pre>
-          </div>
-
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">Creating Monitoring Commands</h3>
-            <div class="bg-slate-50 p-4 rounded-lg">
-              <h4 class="font-medium text-slate-700 mb-2">Required Parameters</h4>
-              <ul class="space-y-2 text-sm text-slate-600">
-                <li><strong>monitor:</strong> Command that returns the value to display in the menu</li>
-                <li><strong>command:</strong> Command to execute when clicking the menu item (optional)</li>
-                <li><strong>name:</strong> Display name in the menu (will be appended with monitoring result)</li>
-              </ul>
-              
-              <h4 class="font-medium text-slate-700 mt-4 mb-2">Best Practices</h4>
-              <ul class="space-y-2 text-sm text-slate-600">
-                <li>Keep monitor commands fast and lightweight</li>
-                <li>Use simple output formats (single values work best)</li>
-                <li>Add appropriate units (%, MB, GB, etc.) to the output</li>
-                <li>Handle errors gracefully - the original name will be shown if the command fails</li>
-              </ul>
-            </div>
-          </div>
-
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">Platform-Specific Examples</h3>
-            <div class="grid md:grid-cols-2 gap-4">
-              <div class="bg-slate-50 p-4 rounded-lg">
-                <h4 class="font-medium text-slate-700 mb-2">macOS</h4>
-                <div class="space-y-2 text-sm text-slate-600">
-                  <div>
-                    <strong>CPU Usage:</strong>
-                    <code class="block bg-slate-200 p-1 rounded text-xs mt-1">top -l 1 | grep 'CPU usage' | awk '{print $3}' | sed 's/%//'</code>
-                  </div>
-                  <div>
-                    <strong>Memory Usage:</strong>
-                    <code class="block bg-slate-200 p-1 rounded text-xs mt-1">vm_stat | grep 'Pages active' | awk '{print $3}' | sed 's/\.//' | awk '{printf "%.1f", $1/1024/1024}'</code>
-                  </div>
-                  <div>
-                    <strong>Battery Level:</strong>
-                    <code class="block bg-slate-200 p-1 rounded text-xs mt-1">pmset -g batt | grep -o '[0-9]*%' | head -1</code>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="bg-slate-50 p-4 rounded-lg">
-                <h4 class="font-medium text-slate-700 mb-2">Linux</h4>
-                <div class="space-y-2 text-sm text-slate-600">
-                  <div>
-                    <strong>CPU Usage:</strong>
-                    <code class="block bg-slate-200 p-1 rounded text-xs mt-1">top -bn1 | grep "Cpu(s)" | awk '{print $2}' | sed 's/%us,//'</code>
-                  </div>
-                  <div>
-                    <strong>Memory Usage:</strong>
-                    <code class="block bg-slate-200 p-1 rounded text-xs mt-1">free | grep Mem | awk '{printf "%.1f", $3/$2 * 100.0}'</code>
-                  </div>
-                  <div>
-                    <strong>Disk Usage:</strong>
-                    <code class="block bg-slate-200 p-1 rounded text-xs mt-1">df -h / | tail -1 | awk '{print $5}' | sed 's/%//'</code>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- CLI Usage -->
-      <section id="cli-usage" class="mb-12">
-        <h2 class="text-2xl font-bold text-slate-900 mb-4">CLI Usage</h2>
-        
-        <div class="space-y-6">
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">Command Line Interface</h3>
-            <p class="text-sm text-slate-700 mb-4">SwitchShuttle provides a command-line interface for executing commands directly from the terminal.</p>
-          </div>
-
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">Basic Usage</h3>
-            <div class="bg-slate-50 p-4 rounded-lg">
-              <h4 class="font-medium text-slate-700 mb-2">Execute a command by ID</h4>
-              <code class="block bg-slate-200 p-2 rounded text-sm">switch-shuttle execute &lt;command-id&gt;</code>
-              
-              <h4 class="font-medium text-slate-700 mt-4 mb-2">List all available commands</h4>
-              <code class="block bg-slate-200 p-2 rounded text-sm">switch-shuttle list</code>
-              
-              <h4 class="font-medium text-slate-700 mt-4 mb-2">Show command details</h4>
-              <code class="block bg-slate-200 p-2 rounded text-sm">switch-shuttle show &lt;command-id&gt;</code>
-            </div>
-          </div>
-
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">Advanced Usage</h3>
-            <div class="bg-slate-50 p-4 rounded-lg">
-              <h4 class="font-medium text-slate-700 mb-2">Execute with parameters</h4>
-              <code class="block bg-slate-200 p-2 rounded text-sm">switch-shuttle execute &lt;command-id&gt; --param value</code>
-              
-              <h4 class="font-medium text-slate-700 mt-4 mb-2">Filter commands</h4>
-              <code class="block bg-slate-200 p-2 rounded text-sm">switch-shuttle list --filter "server"</code>
-              
-              <h4 class="font-medium text-slate-700 mt-4 mb-2">Export configuration</h4>
-              <code class="block bg-slate-200 p-2 rounded text-sm">switch-shuttle export &gt; config.json</code>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Troubleshooting -->
-      <section id="troubleshooting" class="mb-12">
-        <h2 class="text-2xl font-bold text-slate-900 mb-4">Troubleshooting</h2>
-        
-        <div class="space-y-6">
-          <div class="grid md:grid-cols-2 gap-6">
-            <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
-              <h3 class="text-lg font-semibold text-red-800 mb-2">Common Issues</h3>
-              <div class="space-y-3 text-sm text-red-700">
-                <div>
-                  <strong>Hotkey conflicts:</strong>
-                  <p>Ensure no other applications are using the same hotkey combination.</p>
-                </div>
-                <div>
-                  <strong>Terminal not found:</strong>
-                  <p>Verify the terminal application is installed and the path is correct.</p>
-                </div>
-                <div>
-                  <strong>Configuration not loading:</strong>
-                  <p>Check JSON syntax and ensure the configuration file is in the correct location.</p>
-                </div>
-              </div>
-            </div>
-            
-            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-lg">
-              <h3 class="text-lg font-semibold text-blue-800 mb-2">Solutions</h3>
-              <div class="space-y-3 text-sm text-blue-700">
-                <div>
-                  <strong>Restart the application:</strong>
-                  <p>After making configuration changes, restart SwitchShuttle to apply them.</p>
-                </div>
-                <div>
-                  <strong>Check logs:</strong>
-                  <p>Look for error messages in the application logs or system console.</p>
-                </div>
-                <div>
-                  <strong>Validate JSON:</strong>
-                  <p>Use a JSON validator to check your configuration file syntax.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">Getting Help</h3>
-            <div class="bg-slate-50 p-4 rounded-lg">
-              <ul class="space-y-2 text-sm text-slate-600">
-                <li><strong>GitHub Issues:</strong> <a href="https://github.com/s00d/switchshuttle/issues" class="text-blue-600 hover:text-blue-800">Report bugs and request features</a></li>
-                <li><strong>Documentation:</strong> <a href="https://github.com/s00d/switchshuttle#readme" class="text-blue-600 hover:text-blue-800">Complete documentation</a></li>
-                <li><strong>Discussions:</strong> <a href="https://github.com/s00d/switchshuttle/discussions" class="text-blue-600 hover:text-blue-800">Community discussions</a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Footer -->
-      <div class="mt-12 pt-8 border-t border-slate-200">
-        <p class="text-sm text-slate-500 text-center">
-          Need more help? Visit our <a href="https://github.com/s00d/switchshuttle" class="text-blue-600 hover:text-blue-800">GitHub repository</a> for additional resources.
-        </p>
-      </div>
-    </div>
-  </div>
-</template>
-
-<script setup lang="ts">
-// No additional logic needed for this help page
+const toggleFaq = (id: string) => {
+  const index = openFaqs.value.indexOf(id)
+  if (index > -1) {
+    openFaqs.value.splice(index, 1)
+  } else {
+    openFaqs.value.push(id)
+  }
+}
 </script>
 
 <style scoped>
-/* Smooth scrolling for anchor links */
-html {
-  scroll-behavior: smooth;
+/* Smooth transitions for FAQ toggles */
+.faq-content {
+  transition: all 0.3s ease-in-out;
 }
 
 /* Custom scrollbar for code blocks */
@@ -691,4 +614,4 @@ pre code::-webkit-scrollbar-thumb {
 pre code::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
-</style> 
+</style>
