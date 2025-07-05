@@ -6,8 +6,6 @@ use std::sync::Arc;
 use std::{fs, io};
 use tauri::{AppHandle, Wry};
 use tauri_plugin_dialog::DialogExt;
-use tauri_plugin_notification::NotificationExt;
-use crate::helpers;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Config {
@@ -30,6 +28,8 @@ pub struct CommandConfig {
     pub hotkey: Option<String>,
     pub submenu: Option<Vec<CommandConfig>>,
     pub switch: Option<String>,
+    pub monitor: Option<String>,
+    pub icon: Option<String>,
 }
 
 #[derive(Clone, Debug)]
@@ -139,37 +139,9 @@ impl ConfigManager {
 
 
 
-    pub fn is_switch_enabled(&self, switch_id: &str, app: Option<&AppHandle<Wry>>) -> bool {
-        if let Some((command, _)) = self.find_command_by_id(switch_id) {
-            if let Some(switch_command) = &command.switch {
-                // Выполняем команду переключателя в фоне и получаем результат
-                match helpers::execute_command_silent(switch_command) {
-                    Ok(output) => {
-                        // Проверяем результат - если команда вернула "true" или непустую строку, считаем включенным
-                        let output = output.trim().to_lowercase();
-                        output == "true" || output == "1" || output == "enabled" || output == "on"
-                    }
-                    Err(e) => {
-                        eprintln!("Failed to check switch status: {}", e);
-                        // Показываем уведомление об ошибке, если app доступен
-                        if let Some(app_handle) = app {
-                            if let Ok(_) = app_handle.notification().builder()
-                                .title("SwitchShuttle Error")
-                                .body(&format!("Failed to check switch status: {}", e))
-                                .show() {
-                                // Уведомление отправлено
-                            }
-                        }
-                        false
-                    }
-                }
-            } else {
-                false
-            }
-        } else {
-            false
-        }
-    }
+
+
+
 }
 
 impl Config {
@@ -228,6 +200,8 @@ impl Config {
                 inputs: None,
                 commands: None,
                 switch: None,
+                monitor: None,
+                icon: None,
                 submenu: Some(vec![
                     CommandConfig {
                         id: None,
@@ -238,6 +212,8 @@ impl Config {
                         submenu: None,
                         hotkey: Some("Ctrl+Shift+E".to_string()),
                         switch: None,
+                        monitor: None,
+                        icon: None,
                     },
                     CommandConfig {
                         id: None,
@@ -255,6 +231,8 @@ impl Config {
                             ("key2".to_string(), "default2".to_string()),
                         ])),
                         switch: None,
+                        monitor: None,
+                        icon: None,
                     },
                     CommandConfig {
                         id: None,
@@ -264,6 +242,8 @@ impl Config {
                         commands: None,
                         hotkey: None,
                         switch: None,
+                        monitor: None,
+                        icon: None,
                         submenu: Some(vec![
                             CommandConfig {
                                 id: None,
@@ -274,6 +254,8 @@ impl Config {
                                 submenu: None,
                                 hotkey: Some("Ctrl+Shift+S".to_string()),
                                 switch: None,
+                                monitor: None,
+                                icon: None,
                             },
                             CommandConfig {
                                 id: None,
@@ -284,6 +266,8 @@ impl Config {
                                 submenu: None,
                                 hotkey: None,
                                 switch: None,
+                                monitor: None,
+                                icon: None,
                             },
                             CommandConfig {
                                 id: None,
@@ -294,6 +278,8 @@ impl Config {
                                 submenu: None,
                                 hotkey: None,
                                 switch: Some("echo 'true'".to_string()),
+                                monitor: None,
+                                icon: None,
                             },
                         ]),
                     },
