@@ -297,6 +297,393 @@
       "hotkey": "Ctrl+Shift+X",
       "icon": "💥",
       "description": "Stops and deletes all traces of the Vagrant machine. The -f flag forces the destruction without confirmation prompts."
+    },
+    {
+      "id": "ssh-connect",
+      "name": "SSH Connect",
+      "command": "ssh [user]@[host]",
+      "inputs": {
+        "user": "ubuntu",
+        "host": "192.168.1.100"
+      },
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🔗",
+      "description": "Connects to a remote server via SSH. SSH (Secure Shell) provides secure remote access to servers and enables secure file transfers and command execution."
+    },
+    {
+      "id": "ssh-keygen",
+      "name": "Generate SSH Key",
+      "command": "ssh-keygen -t rsa -b 4096 -C [email]",
+      "inputs": {
+        "email": "user@example.com"
+      },
+      "hotkey": "Ctrl+Shift+K",
+      "icon": "🔑",
+      "description": "Generates a new SSH key pair for secure authentication. RSA keys with 4096 bits provide strong security for server access without password authentication."
+    },
+    {
+      "id": "ssh-copy-id",
+      "name": "Copy SSH Key to Server",
+      "command": "ssh-copy-id [user]@[host]",
+      "inputs": {
+        "user": "ubuntu",
+        "host": "192.168.1.100"
+      },
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "📋",
+      "description": "Copies the local SSH public key to a remote server for passwordless authentication. This enables secure login without entering passwords each time."
+    },
+    {
+      "id": "scp-upload",
+      "name": "SCP Upload File",
+      "command": "scp [local_file] [user]@[host]:[remote_path]",
+      "inputs": {
+        "local_file": "app.tar.gz",
+        "user": "ubuntu",
+        "host": "192.168.1.100",
+        "remote_path": "/home/ubuntu/"
+      },
+      "hotkey": "Ctrl+Shift+U",
+      "icon": "📤",
+      "description": "Uploads a file to a remote server using SCP (Secure Copy Protocol). SCP provides secure file transfer over SSH connection with encryption."
+    },
+    {
+      "id": "scp-download",
+      "name": "SCP Download File",
+      "command": "scp [user]@[host]:[remote_file] [local_path]",
+      "inputs": {
+        "user": "ubuntu",
+        "host": "192.168.1.100",
+        "remote_file": "/var/log/app.log",
+        "local_path": "./logs/"
+      },
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "📥",
+      "description": "Downloads a file from a remote server using SCP. Useful for retrieving logs, configuration files, or any data from remote systems securely."
+    },
+    {
+      "id": "rsync-sync",
+      "name": "Rsync Directory",
+      "command": "rsync -avz [source] [user]@[host]:[destination]",
+      "inputs": {
+        "source": "./app/",
+        "user": "ubuntu",
+        "host": "192.168.1.100",
+        "destination": "/var/www/app/"
+      },
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "🔄",
+      "description": "Synchronizes directories between local and remote systems using rsync. Rsync efficiently transfers only changed files and supports compression for faster transfers."
+    },
+    {
+      "id": "rsync-backup",
+      "name": "Rsync Backup",
+      "command": "rsync -avz --delete [source] [backup_path]",
+      "inputs": {
+        "source": "/var/www/app/",
+        "backup_path": "/backup/app/"
+      },
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "💾",
+      "description": "Creates a backup using rsync with mirroring. The --delete flag removes files in destination that don't exist in source, ensuring exact backup."
+    },
+    {
+      "id": "telnet-test",
+      "name": "Test Port with Telnet",
+      "command": "telnet [host] [port]",
+      "inputs": {
+        "host": "192.168.1.100",
+        "port": "22"
+      },
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "🔌",
+      "description": "Tests network connectivity to a specific port using telnet. Useful for checking if services are running and ports are accessible on remote systems."
+    },
+    {
+      "id": "nc-listen",
+      "name": "Netcat Listen",
+      "command": "nc -l [port]",
+      "inputs": {
+        "port": "8080"
+      },
+      "hotkey": "Ctrl+Shift+L",
+      "icon": "👂",
+      "description": "Starts a netcat listener on a specific port. Netcat is a versatile networking utility for reading/writing data across network connections."
+    },
+    {
+      "id": "nc-connect",
+      "name": "Netcat Connect",
+      "command": "nc [host] [port]",
+      "inputs": {
+        "host": "192.168.1.100",
+        "port": "8080"
+      },
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "🔗",
+      "description": "Connects to a remote host and port using netcat. Useful for testing network services, debugging connections, or creating simple client-server communication."
+    },
+    {
+      "id": "curl-get",
+      "name": "Curl GET Request",
+      "command": "curl -X GET [url]",
+      "inputs": {
+        "url": "http://api.example.com/status"
+      },
+      "hotkey": "Ctrl+Shift+G",
+      "icon": "🌐",
+      "description": "Makes a GET request to a URL using curl. Curl is a command-line tool for transferring data with various protocols including HTTP, HTTPS, FTP, and more."
+    },
+    {
+      "id": "curl-post",
+      "name": "Curl POST Request",
+      "command": "curl -X POST -H 'Content-Type: application/json' -d '[data]' [url]",
+      "inputs": {
+        "data": "{\"key\": \"value\"}",
+        "url": "http://api.example.com/data"
+      },
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "📤",
+      "description": "Makes a POST request with JSON data using curl. Useful for testing APIs, sending data to web services, or automating HTTP requests."
+    },
+    {
+      "id": "wget-download",
+      "name": "Wget Download",
+      "command": "wget [url]",
+      "inputs": {
+        "url": "https://example.com/file.zip"
+      },
+      "hotkey": "Ctrl+Shift+W",
+      "icon": "⬇️",
+      "description": "Downloads a file from a URL using wget. Wget is a free utility for non-interactive downloading of files from the web with support for recursive downloads."
+    },
+    {
+      "id": "ping-test",
+      "name": "Ping Host",
+      "command": "ping [host]",
+      "inputs": {
+        "host": "8.8.8.8"
+      },
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "🏓",
+      "description": "Tests network connectivity to a host using ping. Ping sends ICMP echo requests to measure round-trip time and packet loss for network troubleshooting."
+    },
+    {
+      "id": "traceroute",
+      "name": "Traceroute",
+      "command": "traceroute [host]",
+      "inputs": {
+        "host": "google.com"
+      },
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "🛣️",
+      "description": "Traces the network path to a destination host. Traceroute shows each hop along the route, helping identify network bottlenecks and routing issues."
+    },
+    {
+      "id": "nslookup",
+      "name": "DNS Lookup",
+      "command": "nslookup [domain]",
+      "inputs": {
+        "domain": "example.com"
+      },
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "🔍",
+      "description": "Performs DNS lookup to resolve domain names to IP addresses. Nslookup is a network administration tool for querying DNS servers and troubleshooting DNS issues."
+    },
+    {
+      "id": "dig-query",
+      "name": "Dig DNS Query",
+      "command": "dig [domain]",
+      "inputs": {
+        "domain": "example.com"
+      },
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "🔍",
+      "description": "Performs detailed DNS queries using dig. Dig provides comprehensive DNS information including A, MX, CNAME records and is useful for DNS troubleshooting."
+    },
+    {
+      "id": "netstat-connections",
+      "name": "Netstat Active Connections",
+      "command": "netstat -tuln",
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "📊",
+      "description": "Shows active network connections and listening ports. Netstat displays network statistics including TCP/UDP connections, routing tables, and interface statistics."
+    },
+    {
+      "id": "ss-sockets",
+      "name": "SS Socket Info",
+      "command": "ss -tuln",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🔌",
+      "description": "Shows socket statistics using ss (socket statistics). SS is a modern replacement for netstat that provides detailed information about network sockets and connections."
+    },
+    {
+      "id": "iftop-traffic",
+      "name": "Monitor Network Traffic",
+      "command": "sudo iftop",
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "📈",
+      "description": "Monitors network traffic in real-time using iftop. Iftop displays bandwidth usage on an interface by host connection, useful for identifying bandwidth hogs."
+    },
+    {
+      "id": "tcpdump-capture",
+      "name": "Tcpdump Capture",
+      "command": "sudo tcpdump -i [interface] -w [file.pcap]",
+      "inputs": {
+        "interface": "eth0",
+        "file.pcap": "capture.pcap"
+      },
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "📡",
+      "description": "Captures network packets using tcpdump. Tcpdump is a powerful packet analyzer that can capture and analyze network traffic for debugging and security analysis."
+    },
+    {
+      "id": "rclone-config",
+      "name": "Rclone Configure",
+      "command": "rclone config",
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "⚙️",
+      "description": "Opens the interactive configuration wizard for rclone. Rclone is a command line program to sync files and directories to and from cloud storage providers."
+    },
+    {
+      "id": "rclone-sync",
+      "name": "Rclone Sync",
+      "command": "rclone sync [source] [remote:path]",
+      "inputs": {
+        "source": "./backup/",
+        "remote:path": "gdrive:backups/"
+      },
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🔄",
+      "description": "Synchronizes files between local and remote storage using rclone. Sync makes the source and destination identical, deleting files in destination that don't exist in source."
+    },
+    {
+      "id": "rclone-copy",
+      "name": "Rclone Copy",
+      "command": "rclone copy [source] [remote:path]",
+      "inputs": {
+        "source": "./documents/",
+        "remote:path": "dropbox:documents/"
+      },
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "📋",
+      "description": "Copies files from source to destination using rclone. Copy only transfers new or changed files, preserving existing files in the destination."
+    },
+    {
+      "id": "rclone-move",
+      "name": "Rclone Move",
+      "command": "rclone move [source] [remote:path]",
+      "inputs": {
+        "source": "./temp/",
+        "remote:path": "s3:bucket/temp/"
+      },
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "🚚",
+      "description": "Moves files from source to destination using rclone. Move transfers files and then deletes them from the source, useful for archiving or cleanup operations."
+    },
+    {
+      "id": "rclone-ls",
+      "name": "Rclone List Files",
+      "command": "rclone ls [remote:path]",
+      "inputs": {
+        "remote:path": "gdrive:documents/"
+      },
+      "hotkey": "Ctrl+Shift+L",
+      "icon": "📋",
+      "description": "Lists files in a remote storage location using rclone. Shows file sizes, modification dates, and paths for files stored in cloud storage."
+    },
+    {
+      "id": "rclone-size",
+      "name": "Rclone Directory Size",
+      "command": "rclone size [remote:path]",
+      "inputs": {
+        "remote:path": "dropbox:photos/"
+      },
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "📊",
+      "description": "Calculates the total size of files in a remote directory using rclone. Useful for monitoring storage usage and planning backup strategies."
+    },
+    {
+      "id": "rclone-mount",
+      "name": "Rclone Mount",
+      "command": "rclone mount [remote:path] [mount_point]",
+      "inputs": {
+        "remote:path": "gdrive:",
+        "mount_point": "/mnt/gdrive"
+      },
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "📁",
+      "description": "Mounts a remote storage location as a local filesystem using rclone. Allows accessing cloud storage as if it were a local directory."
+    },
+    {
+      "id": "rclone-backup",
+      "name": "Rclone Backup",
+      "command": "rclone sync [source] [remote:path] --backup-dir [backup_path]",
+      "inputs": {
+        "source": "/home/user/documents/",
+        "remote:path": "gdrive:backups/documents/",
+        "backup_path": "gdrive:backups/archive/"
+      },
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "💾",
+      "description": "Creates a backup with versioning using rclone. The --backup-dir option moves deleted or changed files to a backup directory instead of deleting them."
+    },
+    {
+      "id": "rclone-crypt",
+      "name": "Rclone Encrypted Sync",
+      "command": "rclone sync [source] [remote:crypt]",
+      "inputs": {
+        "source": "./sensitive/",
+        "remote:crypt": "gdrive:crypt/"
+      },
+      "hotkey": "Ctrl+Shift+E",
+      "icon": "🔐",
+      "description": "Synchronizes files with encryption using rclone's crypt remote. Provides end-to-end encryption for sensitive data stored in cloud storage."
+    },
+    {
+      "id": "rclone-check",
+      "name": "Rclone Check",
+      "command": "rclone check [source] [remote:path]",
+      "inputs": {
+        "source": "./backup/",
+        "remote:path": "gdrive:backups/"
+      },
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "✅",
+      "description": "Checks the integrity of files between source and destination using rclone. Compares file sizes and hashes to ensure data integrity."
+    },
+    {
+      "id": "rclone-dedupe",
+      "name": "Rclone Dedupe",
+      "command": "rclone dedupe [remote:path]",
+      "inputs": {
+        "remote:path": "gdrive:documents/"
+      },
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "🧹",
+      "description": "Removes duplicate files from remote storage using rclone. Helps save storage space by identifying and removing duplicate files based on content."
+    },
+    {
+      "id": "rclone-purge",
+      "name": "Rclone Purge",
+      "command": "rclone purge [remote:path]",
+      "inputs": {
+        "remote:path": "gdrive:temp/"
+      },
+      "hotkey": "Ctrl+Shift+X",
+      "icon": "🗑️",
+      "description": "Completely removes a remote directory and all its contents using rclone. Use with caution as this operation cannot be undone."
+    },
+    {
+      "id": "rclone-bisync",
+      "name": "Rclone Bisync",
+      "command": "rclone bisync [source] [remote:path]",
+      "inputs": {
+        "source": "./documents/",
+        "remote:path": "dropbox:documents/"
+      },
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "🔄",
+      "description": "Performs bidirectional synchronization between local and remote storage using rclone. Syncs changes in both directions, useful for collaborative work."
     }
   ]
 }
