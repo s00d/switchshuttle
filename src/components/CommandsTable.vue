@@ -159,10 +159,12 @@ const updateCommandType = (index: number, type: string) => {
     command.commands = null;
     command.inputs = null;
     command.switch = undefined;
+    command.monitor = undefined;
   } else if (type === 'multiple') {
     command.command = undefined;
     command.submenu = null;
     command.switch = undefined;
+    command.monitor = undefined;
     command.commands = command.commands || [];
     command.inputs = command.inputs || {};
   } else if (type === 'submenu') {
@@ -170,13 +172,22 @@ const updateCommandType = (index: number, type: string) => {
     command.commands = null;
     command.inputs = null;
     command.switch = undefined;
+    command.monitor = undefined;
     command.submenu = command.submenu || [];
   } else if (type === 'switch') {
     command.submenu = null;
     command.commands = null;
     command.inputs = command.inputs || {};
     command.switch = command.switch || '';
+    command.monitor = undefined;
     // Не очищаем command, так как это поле для toggle команды
+  } else if (type === 'monitor') {
+    command.submenu = null;
+    command.commands = null;
+    command.inputs = command.inputs || {};
+    command.monitor = command.monitor || '';
+    command.switch = undefined;
+    // Не очищаем command, так как это поле для команды мониторинга
   }
 };
 
