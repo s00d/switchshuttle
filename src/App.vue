@@ -1,7 +1,6 @@
 <template>
   <div id="app" class="h-screen w-screen bg-slate-50 text-sm font-sans antialiased">
-    <AppHeader />
-    <main class="pt-16 h-full overflow-auto">
+    <main class="h-full overflow-auto">
       <router-view />
     </main>
   </div>
@@ -24,7 +23,6 @@ import {
 import { register, unregister } from "@tauri-apps/plugin-global-shortcut";
 import { PhysicalPosition } from "@tauri-apps/api/dpi";
 import type { Command } from './types';
-import AppHeader from './components/AppHeader.vue';
 
 const router = useRouter();
 

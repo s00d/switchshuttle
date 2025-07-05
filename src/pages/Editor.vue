@@ -94,15 +94,9 @@
                     </span>
                     <span class="flex items-center space-x-1">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
-                      </svg>
-                      <span>{{ config.theme }}</span>
-                    </span>
-                    <span class="flex items-center space-x-1">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
-                      <span>{{ config.commands.length }} commands</span>
+                      <span>{{ countAllCommands(config.commands) }} commands</span>
                     </span>
                     <span v-if="config.menu_hotkey" class="flex items-center space-x-1">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -238,7 +232,7 @@ import Button from '../components/Button.vue';
 import Modal from '../components/Modal.vue';
 import ConfigEditor from '../components/ConfigEditor.vue';
 
-import type { Config } from '../types';
+import type { Config, Command } from '../types';
 
 const configurations = ref<Config[]>([]);
 const searchQuery = ref('');
@@ -252,6 +246,18 @@ const saving = ref(false);
 const showDeleteConfirm = ref(false);
 const configToDelete = ref<Config | null>(null);
 const deleting = ref(false);
+
+// Функция для подсчета всех команд, включая подкоманды
+const countAllCommands = (commands: Command[]): number => {
+  let count = 0;
+  for (const command of commands) {
+    count++; // Считаем текущую команду
+    if (command.submenu && command.submenu.length > 0) {
+      count += countAllCommands(command.submenu); // Рекурсивно считаем подкоманды
+    }
+  }
+  return count;
+};
 
 const filteredConfigurations = computed(() => {
   if (!searchQuery.value) return configurations.value;
@@ -310,16 +316,13 @@ const validateAndSave = async () => {
   
   saving.value = true;
   try {
-    if (editingConfig.value) {
-      // Update existing configuration without renaming file
-      await invoke('update_configuration', { 
-        config: currentConfig.value,
-        originalTitle: originalFileName.value
-      });
-    } else {
-      // Save new configuration
-      await invoke('save_configuration', { config: currentConfig.value });
-    }
+    // Используем универсальную команду для сохранения/обновления
+    const originalTitle = editingConfig.value ? originalFileName.value : null;
+    
+    await invoke('save_or_update_configuration', { 
+      config: currentConfig.value,
+      originalTitle: originalTitle
+    });
     
     closeEditor();
     // Refresh configurations list after saving
