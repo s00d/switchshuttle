@@ -13,6 +13,7 @@
           <li><a href="#command-types" class="text-blue-600 hover:text-blue-800">Command Types</a></li>
           <li><a href="#configuration-management" class="text-blue-600 hover:text-blue-800">Configuration Management</a></li>
           <li><a href="#switch-commands" class="text-blue-600 hover:text-blue-800">Switch Commands</a></li>
+          <li><a href="#monitoring-commands" class="text-blue-600 hover:text-blue-800">Monitoring Commands</a></li>
           <li><a href="#cli-usage" class="text-blue-600 hover:text-blue-800">CLI Usage</a></li>
           <li><a href="#troubleshooting" class="text-blue-600 hover:text-blue-800">Troubleshooting</a></li>
         </ul>
@@ -284,6 +285,16 @@
   ]
 }</code></pre>
             </div>
+            
+            <div class="bg-slate-50 p-6 rounded-lg">
+              <h3 class="text-lg font-semibold text-slate-800 mb-3">Monitoring Commands</h3>
+              <p class="text-sm text-slate-600 mb-4">Display real-time system information in the menu.</p>
+              <pre class="bg-slate-900 text-slate-100 p-3 rounded text-xs overflow-x-auto"><code>{
+  "name": "CPU Usage",
+  "monitor": "top -l 1 | grep 'CPU usage' | awk '{print $3}'",
+  "command": "top -o cpu"
+}</code></pre>
+            </div>
           </div>
         </div>
       </section>
@@ -409,6 +420,133 @@
                 <li><strong>switch:</strong> Command that returns "true" or "false" to check current status</li>
                 <li><strong>name:</strong> Display name in the menu</li>
               </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Monitoring Commands -->
+      <section id="monitoring-commands" class="mb-12">
+        <h2 class="text-2xl font-bold text-slate-900 mb-4">Monitoring Commands</h2>
+        
+        <div class="space-y-6">
+          <div>
+            <h3 class="text-lg font-semibold text-slate-800 mb-2">Overview</h3>
+            <p class="text-sm text-slate-700 mb-4">Monitoring commands display real-time system information directly in the menu. They execute silently in the background and show the results in the menu item name, providing instant access to system metrics.</p>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-semibold text-slate-800 mb-2">Features</h3>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="bg-slate-50 p-4 rounded-lg">
+                <h4 class="font-medium text-slate-700 mb-2">Real-time Display</h4>
+                <p class="text-sm text-slate-600">Shows monitoring results directly in the menu item name.</p>
+              </div>
+              
+              <div class="bg-slate-50 p-4 rounded-lg">
+                <h4 class="font-medium text-slate-700 mb-2">Background Execution</h4>
+                <p class="text-sm text-slate-600">Commands run silently without opening terminal windows.</p>
+              </div>
+              
+              <div class="bg-slate-50 p-4 rounded-lg">
+                <h4 class="font-medium text-slate-700 mb-2">Click to Execute</h4>
+                <p class="text-sm text-slate-600">Click the menu item to execute the associated command.</p>
+              </div>
+              
+              <div class="bg-slate-50 p-4 rounded-lg">
+                <h4 class="font-medium text-slate-700 mb-2">Cross-Platform</h4>
+                <p class="text-sm text-slate-600">Works on macOS, Windows, and Linux with platform-specific commands.</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-semibold text-slate-800 mb-2">Example Configuration</h3>
+            <pre class="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm"><code>{
+  "name": "📊 System Monitoring",
+  "submenu": [
+    {
+      "name": "CPU Usage",
+      "monitor": "top -l 1 | grep 'CPU usage' | awk '{print $3}' | sed 's/%//'",
+      "command": "top -o cpu"
+    },
+    {
+      "name": "Memory Usage",
+      "monitor": "vm_stat | grep 'Pages active' | awk '{print $3}' | sed 's/\.//' | awk '{printf \"%.1f\", $1/1024/1024}'",
+      "command": "top -o mem"
+    },
+    {
+      "name": "Uptime",
+      "monitor": "uptime | awk '{print $3}' | sed 's/,//'",
+      "command": "uptime"
+    },
+    {
+      "name": "Disk Usage",
+      "monitor": "df -h / | tail -1 | awk '{print $5}'",
+      "command": "df -h"
+    }
+  ]
+}</code></pre>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-semibold text-slate-800 mb-2">Creating Monitoring Commands</h3>
+            <div class="bg-slate-50 p-4 rounded-lg">
+              <h4 class="font-medium text-slate-700 mb-2">Required Parameters</h4>
+              <ul class="space-y-2 text-sm text-slate-600">
+                <li><strong>monitor:</strong> Command that returns the value to display in the menu</li>
+                <li><strong>command:</strong> Command to execute when clicking the menu item (optional)</li>
+                <li><strong>name:</strong> Display name in the menu (will be appended with monitoring result)</li>
+              </ul>
+              
+              <h4 class="font-medium text-slate-700 mt-4 mb-2">Best Practices</h4>
+              <ul class="space-y-2 text-sm text-slate-600">
+                <li>Keep monitor commands fast and lightweight</li>
+                <li>Use simple output formats (single values work best)</li>
+                <li>Add appropriate units (%, MB, GB, etc.) to the output</li>
+                <li>Handle errors gracefully - the original name will be shown if the command fails</li>
+              </ul>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-semibold text-slate-800 mb-2">Platform-Specific Examples</h3>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="bg-slate-50 p-4 rounded-lg">
+                <h4 class="font-medium text-slate-700 mb-2">macOS</h4>
+                <div class="space-y-2 text-sm text-slate-600">
+                  <div>
+                    <strong>CPU Usage:</strong>
+                    <code class="block bg-slate-200 p-1 rounded text-xs mt-1">top -l 1 | grep 'CPU usage' | awk '{print $3}' | sed 's/%//'</code>
+                  </div>
+                  <div>
+                    <strong>Memory Usage:</strong>
+                    <code class="block bg-slate-200 p-1 rounded text-xs mt-1">vm_stat | grep 'Pages active' | awk '{print $3}' | sed 's/\.//' | awk '{printf "%.1f", $1/1024/1024}'</code>
+                  </div>
+                  <div>
+                    <strong>Battery Level:</strong>
+                    <code class="block bg-slate-200 p-1 rounded text-xs mt-1">pmset -g batt | grep -o '[0-9]*%' | head -1</code>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="bg-slate-50 p-4 rounded-lg">
+                <h4 class="font-medium text-slate-700 mb-2">Linux</h4>
+                <div class="space-y-2 text-sm text-slate-600">
+                  <div>
+                    <strong>CPU Usage:</strong>
+                    <code class="block bg-slate-200 p-1 rounded text-xs mt-1">top -bn1 | grep "Cpu(s)" | awk '{print $2}' | sed 's/%us,//'</code>
+                  </div>
+                  <div>
+                    <strong>Memory Usage:</strong>
+                    <code class="block bg-slate-200 p-1 rounded text-xs mt-1">free | grep Mem | awk '{printf "%.1f", $3/$2 * 100.0}'</code>
+                  </div>
+                  <div>
+                    <strong>Disk Usage:</strong>
+                    <code class="block bg-slate-200 p-1 rounded text-xs mt-1">df -h / | tail -1 | awk '{print $5}' | sed 's/%//'</code>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
