@@ -1,0 +1,355 @@
+{
+  "name": "Frontend",
+  "description": "Frontend development tools and frameworks",
+  "commands": [
+    {
+      "id": "npm-install",
+      "name": "Install Dependencies npm",
+      "command": "npm install",
+      "hotkey": "Ctrl+Shift+I",
+      "icon": "📦",
+      "description": "Installs all dependencies listed in package.json. npm (Node Package Manager) is the default package manager for Node.js and is used to install and manage JavaScript packages."
+    },
+    {
+      "id": "npm-start",
+      "name": "Start Development Server npm",
+      "command": "npm start",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "▶️",
+      "description": "Starts the development server using the start script defined in package.json. This typically runs the application in development mode with hot reloading enabled."
+    },
+    {
+      "id": "npm-build",
+      "name": "Build Production npm",
+      "command": "npm run build",
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "🏗️",
+      "description": "Creates a production build of the application. This command optimizes and bundles the code for deployment, typically creating a dist or build folder."
+    },
+    {
+      "id": "npm-test",
+      "name": "Run Tests npm",
+      "command": "npm test",
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "🧪",
+      "description": "Runs the test suite using the test script defined in package.json. This executes unit tests, integration tests, and other automated tests."
+    },
+    {
+      "id": "npm-lint",
+      "name": "Run Linter npm",
+      "command": "npm run lint",
+      "hotkey": "Ctrl+Shift+L",
+      "icon": "🔍",
+      "description": "Runs the code linter to check for code quality issues, style violations, and potential errors. Helps maintain consistent code style across the project."
+    },
+    {
+      "id": "yarn-install",
+      "name": "Install Dependencies yarn",
+      "command": "yarn install",
+      "hotkey": "Ctrl+Shift+Y",
+      "icon": "🧶",
+      "description": "Installs all dependencies listed in package.json using Yarn. Yarn is an alternative to npm that offers faster installation and better dependency resolution."
+    },
+    {
+      "id": "yarn-start",
+      "name": "Start Development Server yarn",
+      "command": "yarn start",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "▶️",
+      "description": "Starts the development server using Yarn. This runs the start script defined in package.json with Yarn's package management."
+    },
+    {
+      "id": "yarn-build",
+      "name": "Build Production yarn",
+      "command": "yarn build",
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "🏗️",
+      "description": "Creates a production build using Yarn. This optimizes and bundles the code for deployment, typically creating a dist or build folder."
+    },
+    {
+      "id": "pnpm-install",
+      "name": "Install Dependencies pnpm",
+      "command": "pnpm install",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "📦",
+      "description": "Installs all dependencies using pnpm. pnpm is a fast, disk space efficient package manager that uses hard links and symlinks to save disk space."
+    },
+    {
+      "id": "pnpm-start",
+      "name": "Start Development Server pnpm",
+      "command": "pnpm start",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "▶️",
+      "description": "Starts the development server using pnpm. This runs the start script defined in package.json with pnpm's efficient package management."
+    },
+    {
+      "id": "vite-dev",
+      "name": "Start Vite Dev Server",
+      "command": "npm run dev",
+      "hotkey": "Ctrl+Shift+V",
+      "icon": "⚡",
+      "description": "Starts the Vite development server. Vite is a modern build tool that provides extremely fast hot module replacement (HMR) and optimized builds."
+    },
+    {
+      "id": "vite-build",
+      "name": "Build Vite Production",
+      "command": "npm run build",
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "🏗️",
+      "description": "Creates a production build using Vite. Vite uses Rollup for production builds, providing optimized bundles with tree-shaking and code splitting."
+    },
+    {
+      "id": "vite-preview",
+      "name": "Preview Vite Build",
+      "command": "npm run preview",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "👁️",
+      "description": "Previews the production build locally. This serves the built files to test the production build before deployment."
+    },
+    {
+      "id": "webpack-dev",
+      "name": "Start Webpack Dev Server",
+      "command": "npm run dev",
+      "hotkey": "Ctrl+Shift+W",
+      "icon": "📦",
+      "description": "Starts the Webpack development server. Webpack is a module bundler that transforms and bundles JavaScript modules and other assets."
+    },
+    {
+      "id": "webpack-build",
+      "name": "Build Webpack Production",
+      "command": "npm run build",
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "🏗️",
+      "description": "Creates a production build using Webpack. This generates optimized bundles with minification, tree-shaking, and code splitting."
+    },
+    {
+      "id": "create-react-app",
+      "name": "Create React App",
+      "command": "npx create-react-app [app_name]",
+      "inputs": {
+        "app_name": "my-app"
+      },
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "⚛️",
+      "description": "Creates a new React application using Create React App. This sets up a complete development environment with build tools, testing, and development server."
+    },
+    {
+      "id": "create-vue-app",
+      "name": "Create Vue App",
+      "command": "npm create vue@latest [app_name]",
+      "inputs": {
+        "app_name": "my-vue-app"
+      },
+      "hotkey": "Ctrl+Shift+V",
+      "icon": "💚",
+      "description": "Creates a new Vue.js application using the Vue CLI. This sets up a modern Vue 3 project with Vite, TypeScript support, and development tools."
+    },
+    {
+      "id": "create-next-app",
+      "name": "Create Next.js App",
+      "command": "npx create-next-app@latest [app_name]",
+      "inputs": {
+        "app_name": "my-next-app"
+      },
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "▲",
+      "description": "Creates a new Next.js application. Next.js is a React framework that provides server-side rendering, static site generation, and API routes."
+    },
+    {
+      "id": "create-nuxt-app",
+      "name": "Create Nuxt App",
+      "command": "npx nuxi@latest init [app_name]",
+      "inputs": {
+        "app_name": "my-nuxt-app"
+      },
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "🟢",
+      "description": "Creates a new Nuxt.js application. Nuxt.js is a Vue.js framework that provides server-side rendering, static site generation, and automatic routing."
+    },
+    {
+      "id": "create-angular-app",
+      "name": "Create Angular App",
+      "command": "npx @angular/cli@latest new [app_name]",
+      "inputs": {
+        "app_name": "my-angular-app"
+      },
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "🅰️",
+      "description": "Creates a new Angular application using the Angular CLI. Angular is a platform for building mobile and desktop web applications using TypeScript."
+    },
+    {
+      "id": "create-svelte-app",
+      "name": "Create Svelte App",
+      "command": "npm create svelte@latest [app_name]",
+      "inputs": {
+        "app_name": "my-svelte-app"
+      },
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🎯",
+      "description": "Creates a new Svelte application. Svelte is a modern JavaScript framework that compiles components to highly efficient vanilla JavaScript at build time."
+    },
+    {
+      "id": "storybook-start",
+      "name": "Start Storybook",
+      "command": "npm run storybook",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "📚",
+      "description": "Starts Storybook development server. Storybook is a development environment for UI components that allows you to browse and interact with components in isolation."
+    },
+    {
+      "id": "storybook-build",
+      "name": "Build Storybook",
+      "command": "npm run build-storybook",
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "📚",
+      "description": "Builds Storybook for production deployment. This creates a static version of Storybook that can be deployed to any web server."
+    },
+    {
+      "id": "cypress-open",
+      "name": "Open Cypress",
+      "command": "npx cypress open",
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "🌲",
+      "description": "Opens Cypress Test Runner in interactive mode. Cypress is a JavaScript end-to-end testing framework that runs in the browser."
+    },
+    {
+      "id": "cypress-run",
+      "name": "Run Cypress Tests",
+      "command": "npx cypress run",
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "🏃",
+      "description": "Runs Cypress tests in headless mode. This is useful for continuous integration environments where you need to run tests without a GUI."
+    },
+    {
+      "id": "jest-test",
+      "name": "Run Jest Tests",
+      "command": "npm test",
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "🧪",
+      "description": "Runs Jest test suite. Jest is a JavaScript testing framework that provides a complete testing solution with mocking, coverage, and watch mode."
+    },
+    {
+      "id": "jest-watch",
+      "name": "Run Jest in Watch Mode",
+      "command": "npm run test:watch",
+      "hotkey": "Ctrl+Shift+W",
+      "icon": "👀",
+      "description": "Runs Jest tests in watch mode. This automatically re-runs tests when files change, making it ideal for development workflow."
+    },
+    {
+      "id": "eslint-check",
+      "name": "Run ESLint",
+      "command": "npx eslint .",
+      "hotkey": "Ctrl+Shift+L",
+      "icon": "🔍",
+      "description": "Runs ESLint to check for code quality issues and style violations. ESLint is a static code analysis tool for identifying problematic patterns in JavaScript code."
+    },
+    {
+      "id": "eslint-fix",
+      "name": "Fix ESLint Issues",
+      "command": "npx eslint . --fix",
+      "hotkey": "Ctrl+Shift+F",
+      "icon": "🔧",
+      "description": "Runs ESLint with auto-fix enabled. This automatically fixes many common code style issues and formatting problems."
+    },
+    {
+      "id": "prettier-format",
+      "name": "Format with Prettier",
+      "command": "npx prettier --write .",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "✨",
+      "description": "Formats all files in the project using Prettier. Prettier is an opinionated code formatter that enforces consistent code style."
+    },
+    {
+      "id": "prettier-check",
+      "name": "Check Prettier Format",
+      "command": "npx prettier --check .",
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "✅",
+      "description": "Checks if all files are properly formatted according to Prettier rules. This is useful in CI/CD pipelines to ensure consistent formatting."
+    },
+    {
+      "id": "typescript-check",
+      "name": "Check TypeScript",
+      "command": "npx tsc --noEmit",
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "🔷",
+      "description": "Runs TypeScript compiler to check for type errors without emitting files. This is useful for type checking in development and CI/CD."
+    },
+    {
+      "id": "typescript-build",
+      "name": "Build TypeScript",
+      "command": "npx tsc",
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "🏗️",
+      "description": "Compiles TypeScript files to JavaScript. This generates JavaScript files and declaration files (.d.ts) from TypeScript source code."
+    },
+    {
+      "id": "tailwind-build",
+      "name": "Build Tailwind CSS",
+      "command": "npx tailwindcss -i ./src/input.css -o ./dist/output.css --watch",
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "🎨",
+      "description": "Builds Tailwind CSS with watch mode. Tailwind CSS is a utility-first CSS framework that provides low-level utility classes for building custom designs."
+    },
+    {
+      "id": "sass-compile",
+      "name": "Compile Sass",
+      "command": "npx sass src/styles:dist/styles --watch",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🎨",
+      "description": "Compiles Sass files to CSS with watch mode. Sass is a CSS preprocessor that adds features like variables, nesting, and mixins to CSS."
+    },
+    {
+      "id": "postcss-build",
+      "name": "Build PostCSS",
+      "command": "npx postcss src/styles.css -o dist/styles.css --watch",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "🎨",
+      "description": "Processes CSS with PostCSS and watches for changes. PostCSS is a tool for transforming CSS with JavaScript plugins."
+    },
+    {
+      "id": "babel-build",
+      "name": "Build with Babel",
+      "command": "npx babel src --out-dir dist --watch",
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "🔄",
+      "description": "Transpiles JavaScript with Babel and watches for changes. Babel is a JavaScript compiler that transforms modern JavaScript to compatible versions."
+    },
+    {
+      "id": "rollup-build",
+      "name": "Build with Rollup",
+      "command": "npx rollup -c --watch",
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "📦",
+      "description": "Bundles JavaScript modules with Rollup and watches for changes. Rollup is a module bundler that creates efficient bundles for libraries and applications."
+    },
+    {
+      "id": "parcel-build",
+      "name": "Build with Parcel",
+      "command": "npx parcel build src/index.html",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "📦",
+      "description": "Bundles the application with Parcel. Parcel is a zero-configuration web application bundler that works out of the box."
+    },
+    {
+      "id": "serve-build",
+      "name": "Serve Production Build",
+      "command": "npx serve -s build",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🌐",
+      "description": "Serves the production build locally for testing. This is useful for testing the production build before deployment."
+    },
+    {
+      "id": "lighthouse-audit",
+      "name": "Run Lighthouse Audit",
+      "command": "npx lighthouse [url] --output html --output-path ./lighthouse-report.html",
+      "inputs": {
+        "url": "http://localhost:3000"
+      },
+      "hotkey": "Ctrl+Shift+L",
+      "icon": "🏆",
+      "description": "Runs Lighthouse audit to analyze web app performance, accessibility, best practices, and SEO. Generates an HTML report with detailed recommendations."
+    }
+  ]
+}

@@ -1,0 +1,266 @@
+{
+  "name": "Backend",
+  "description": "Backend development frameworks and server-side tools",
+  "commands": [
+    {
+      "id": "backend-node-init",
+      "name": "Init Project Node.js",
+      "description": "Initializes a new Node.js project with default settings. Creates a package.json file. Requires Node.js and npm to be installed.",
+      "command": "npm init -y",
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "🟢"
+    },
+    {
+      "id": "backend-express-create",
+      "name": "Install Express App",
+      "description": "Installs Express and common middleware (CORS, Helmet, Morgan) for a Node.js backend. Requires Node.js and npm to be installed.",
+      "command": "npm install express cors helmet morgan",
+      "hotkey": "Ctrl+Shift+E",
+      "icon": "🚀"
+    },
+    {
+      "id": "backend-fastify-create",
+      "name": "Install Fastify App",
+      "description": "Installs Fastify, a fast Node.js web framework. Requires Node.js and npm to be installed.",
+      "command": "npm install fastify",
+      "hotkey": "Ctrl+Shift+F",
+      "icon": "⚡"
+    },
+    {
+      "id": "backend-koa-create",
+      "name": "Install Koa App",
+      "description": "Installs Koa and its router for building web applications. Requires Node.js and npm to be installed.",
+      "command": "npm install koa @koa/router",
+      "hotkey": "Ctrl+Shift+K",
+      "icon": "🌊"
+    },
+    {
+      "id": "backend-nest-create",
+      "name": "Create App NestJS",
+      "description": "Installs NestJS CLI globally and creates a new NestJS project. Requires Node.js, npm, and NestJS CLI. Install CLI: npm install -g @nestjs/cli",
+      "command": "npm install -g @nestjs/cli && nest new [app_name]",
+      "inputs": {
+        "app_name": "my-app"
+      },
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "🪺"
+    },
+    {
+      "id": "backend-django-create",
+      "name": "Create Project Django",
+      "description": "Creates a new Django project using django-admin. Requires Python and Django to be installed. Install: pip install django",
+      "command": "django-admin startproject [project_name]",
+      "inputs": {
+        "project_name": "my-app"
+      },
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "🐍"
+    },
+    {
+      "id": "backend-flask-create",
+      "name": "Create App Flask",
+      "description": "Creates a new directory and an empty Flask app file. Requires Python and Flask to be installed. Install: pip install flask",
+      "command": "mkdir [app_name] && cd [app_name] && touch app.py",
+      "inputs": {
+        "app_name": "my-app"
+      },
+      "hotkey": "Ctrl+Shift+F",
+      "icon": "🍶"
+    },
+    {
+      "id": "backend-fastapi-create",
+      "name": "Install FastAPI App",
+      "description": "Installs FastAPI and Uvicorn for building async Python APIs. Requires Python, pip, and FastAPI. Install: pip install fastapi uvicorn",
+      "command": "pip install fastapi uvicorn",
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "⚡"
+    },
+    {
+      "id": "backend-spring-create",
+      "name": "Create App Spring Boot",
+      "description": "Downloads a new Spring Boot project archive with web and data-jpa dependencies. Requires Java and curl to be installed. Unzip the archive to start.",
+      "command": "curl https://start.spring.io/starter.zip -d dependencies=web,data-jpa -d type=maven-project -o [app_name].zip",
+      "inputs": {
+        "app_name": "my-app"
+      },
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🍃"
+    },
+    {
+      "id": "backend-laravel-create",
+      "name": "Create App Laravel",
+      "description": "Creates a new Laravel project using Composer. Requires PHP and Composer to be installed. Install: https://getcomposer.org/download/",
+      "command": "composer create-project laravel/laravel [app_name]",
+      "inputs": {
+        "app_name": "my-app"
+      },
+      "hotkey": "Ctrl+Shift+L",
+      "icon": "🦋"
+    },
+    {
+      "id": "backend-laravel-version",
+      "name": "Create App Laravel Version",
+      "description": "Creates a Laravel project of a specific version using Composer. Requires PHP and Composer to be installed.",
+      "command": "composer create-project laravel/laravel:[version] [app_name]",
+      "inputs": {
+        "version": "9.0",
+        "app_name": "my-laravel-app"
+      },
+      "hotkey": "Ctrl+Shift+V",
+      "icon": "🦋"
+    },
+    {
+      "id": "backend-rails-create",
+      "name": "Create App Rails",
+      "description": "Creates a new Ruby on Rails application. Requires Ruby and Rails to be installed. Install: gem install rails",
+      "command": "rails new [app_name]",
+      "inputs": {
+        "app_name": "my-app"
+      },
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "💎"
+    },
+    {
+      "id": "backend-go-create",
+      "name": "Create App Go",
+      "description": "Creates a new Go module and initializes a project directory. Requires Go to be installed. Install: https://go.dev/doc/install",
+      "command": "mkdir [app_name] && cd [app_name] && go mod init [app_name]",
+      "inputs": {
+        "app_name": "my-app"
+      },
+      "hotkey": "Ctrl+Shift+G",
+      "icon": "🐹"
+    },
+    {
+      "id": "backend-rust-create",
+      "name": "Create App Rust",
+      "description": "Creates a new Rust project using Cargo. Requires Rust and Cargo to be installed. Install: https://www.rust-lang.org/tools/install",
+      "command": "cargo new [app_name]",
+      "inputs": {
+        "app_name": "my-app"
+      },
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "🦀"
+    },
+    {
+      "id": "backend-server-start",
+      "name": "Start Server npm",
+      "description": "Starts the backend server using npm start script. Requires Node.js and npm to be installed.",
+      "command": "npm start",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "▶️"
+    },
+    {
+      "id": "backend-server-dev",
+      "name": "Start Dev Server npm",
+      "description": "Starts the backend development server in watch mode. Requires Node.js and npm to be installed.",
+      "command": "npm run dev",
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "🔄"
+    },
+    {
+      "id": "backend-test",
+      "name": "Run Tests npm",
+      "description": "Runs backend tests using npm. Requires Node.js and npm to be installed.",
+      "command": "npm test",
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "🧪"
+    },
+    {
+      "id": "backend-lint",
+      "name": "Lint Code npm",
+      "description": "Checks backend code for style and programming errors using the linter defined in your project. Requires Node.js, npm, and a linter (like ESLint) to be installed.",
+      "command": "npm run lint",
+      "hotkey": "Ctrl+Shift+L",
+      "icon": "🔍"
+    },
+    {
+      "id": "backend-build",
+      "name": "Build Project npm",
+      "description": "Builds the backend project using npm build script. Requires Node.js and npm to be installed.",
+      "command": "npm run build",
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "📦"
+    },
+    {
+      "id": "backend-migrate",
+      "name": "Run Migrations npm",
+      "description": "Runs database migrations using npm script. Requires a migration tool to be configured in your project.",
+      "command": "npm run migrate",
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "🗄️"
+    },
+    {
+      "id": "backend-seed",
+      "name": "Seed Database npm",
+      "description": "Seeds the database with initial data using npm script. Requires a seed script to be configured in your project.",
+      "command": "npm run seed",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🌱"
+    },
+    {
+      "id": "backend-fastapi-install",
+      "name": "Install FastAPI",
+      "description": "Installs FastAPI and Uvicorn for Python backend development. Requires Python, pip, and FastAPI. Install: pip install fastapi uvicorn",
+      "command": "pip install fastapi uvicorn",
+      "hotkey": "Ctrl+Shift+F",
+      "icon": "⚡"
+    },
+    {
+      "id": "backend-django-rest",
+      "name": "Install Django REST",
+      "description": "Installs Django REST Framework for building RESTful APIs with Django. Requires Python, pip, and Django. Install: pip install djangorestframework",
+      "command": "pip install djangorestframework",
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "🔄"
+    },
+    {
+      "id": "backend-flask-sqlalchemy",
+      "name": "Install Flask SQLAlchemy",
+      "description": "Installs SQLAlchemy extension for Flask to enable ORM support. Requires Python, pip, and Flask. Install: pip install flask-sqlalchemy",
+      "command": "pip install flask-sqlalchemy",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🗄️"
+    },
+    {
+      "id": "backend-flask-cors",
+      "name": "Install Flask CORS",
+      "description": "Installs CORS extension for Flask to handle cross-origin requests. Requires Python, pip, and Flask. Install: pip install flask-cors",
+      "command": "pip install flask-cors",
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "🌐"
+    },
+    {
+      "id": "backend-express-cors",
+      "name": "Install Express CORS",
+      "description": "Installs CORS middleware for Express.js to handle cross-origin requests. Requires Node.js and npm. Install: npm install cors",
+      "command": "npm install cors",
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "🌐"
+    },
+    {
+      "id": "backend-express-helmet",
+      "name": "Install Express Helmet",
+      "description": "Installs Helmet middleware for Express.js to secure HTTP headers. Requires Node.js and npm. Install: npm install helmet",
+      "command": "npm install helmet",
+      "hotkey": "Ctrl+Shift+H",
+      "icon": "🛡️"
+    },
+    {
+      "id": "backend-prisma-init",
+      "name": "Init Prisma ORM",
+      "description": "Initializes Prisma ORM in your project. Requires Node.js, npm, and Prisma CLI. Install: npm install prisma --save-dev",
+      "command": "npx prisma init",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "🗄️"
+    },
+    {
+      "id": "backend-typeorm-install",
+      "name": "Install TypeORM",
+      "description": "Installs TypeORM for TypeScript/JavaScript ORM support. Requires Node.js and npm. Install: npm install typeorm",
+      "command": "npm install typeorm",
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "🗄️"
+    }
+  ]
+}

@@ -1,0 +1,270 @@
+{
+  "name": "Linux Switches",
+  "description": "Commands for switching between Linux distributions and environments",
+  "commands": [
+    {
+      "id": "switch-ubuntu",
+      "name": "Switch to Ubuntu",
+      "command": "sudo update-alternatives --config bash",
+      "hotkey": "Ctrl+Shift+U",
+      "icon": "🐧",
+      "description": "Switches the default shell to Ubuntu's bash configuration. This command allows you to change between different bash installations and configurations available on your system."
+    },
+    {
+      "id": "switch-debian",
+      "name": "Switch to Debian",
+      "command": "sudo update-alternatives --config bash",
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "🐧",
+      "description": "Switches the default shell to Debian's bash configuration. This command allows you to change between different bash installations and configurations available on your system."
+    },
+    {
+      "id": "switch-centos",
+      "name": "Switch to CentOS",
+      "command": "sudo update-alternatives --config bash",
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "🐧",
+      "description": "Switches the default shell to CentOS's bash configuration. This command allows you to change between different bash installations and configurations available on your system."
+    },
+    {
+      "id": "switch-fedora",
+      "name": "Switch to Fedora",
+      "command": "sudo update-alternatives --config bash",
+      "hotkey": "Ctrl+Shift+F",
+      "icon": "🐧",
+      "description": "Switches the default shell to Fedora's bash configuration. This command allows you to change between different bash installations and configurations available on your system."
+    },
+    {
+      "id": "switch-arch",
+      "name": "Switch to Arch Linux",
+      "command": "sudo update-alternatives --config bash",
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "🐧",
+      "description": "Switches the default shell to Arch Linux's bash configuration. This command allows you to change between different bash installations and configurations available on your system."
+    },
+    {
+      "id": "switch-opensuse",
+      "name": "Switch to openSUSE",
+      "command": "sudo update-alternatives --config bash",
+      "hotkey": "Ctrl+Shift+O",
+      "icon": "🐧",
+      "description": "Switches the default shell to openSUSE's bash configuration. This command allows you to change between different bash installations and configurations available on your system."
+    },
+    {
+      "id": "switch-mint",
+      "name": "Switch to Linux Mint",
+      "command": "sudo update-alternatives --config bash",
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "🐧",
+      "description": "Switches the default shell to Linux Mint's bash configuration. This command allows you to change between different bash installations and configurations available on your system."
+    },
+    {
+      "id": "switch-elementary",
+      "name": "Switch to Elementary OS",
+      "command": "sudo update-alternatives --config bash",
+      "hotkey": "Ctrl+Shift+E",
+      "icon": "🐧",
+      "description": "Switches the default shell to Elementary OS's bash configuration. This command allows you to change between different bash installations and configurations available on your system."
+    },
+    {
+      "id": "switch-zsh",
+      "name": "Switch to Zsh",
+      "command": "chsh -s $(which zsh)",
+      "hotkey": "Ctrl+Shift+Z",
+      "icon": "🐚",
+      "description": "Changes the default shell to Zsh. Zsh is a powerful shell that provides advanced features like advanced completion, spelling correction, and extensive customization options."
+    },
+    {
+      "id": "switch-bash",
+      "name": "Switch to Bash",
+      "command": "chsh -s $(which bash)",
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "🐚",
+      "description": "Changes the default shell back to Bash. Bash is the default shell for most Linux distributions and provides a stable, feature-rich command-line environment."
+    },
+    {
+      "id": "switch-fish",
+      "name": "Switch to Fish",
+      "command": "chsh -s $(which fish)",
+      "hotkey": "Ctrl+Shift+F",
+      "icon": "🐠",
+      "description": "Changes the default shell to Fish. Fish is a smart and user-friendly command line shell with features like syntax highlighting, autosuggestions, and web-based configuration."
+    },
+    {
+      "id": "switch-tcsh",
+      "name": "Switch to Tcsh",
+      "command": "chsh -s $(which tcsh)",
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "🐚",
+      "description": "Changes the default shell to Tcsh. Tcsh is an enhanced version of the C shell with features like command-line completion, spelling correction, and job control."
+    },
+    {
+      "id": "switch-ksh",
+      "name": "Switch to Ksh",
+      "command": "chsh -s $(which ksh)",
+      "hotkey": "Ctrl+Shift+K",
+      "icon": "🐚",
+      "description": "Changes the default shell to Ksh (Korn shell). Ksh is a Unix shell that combines features of the Bourne shell and C shell, with additional features like command-line editing."
+    },
+    {
+      "id": "switch-dash",
+      "name": "Switch to Dash",
+      "command": "chsh -s $(which dash)",
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "🐚",
+      "description": "Changes the default shell to Dash. Dash is a POSIX-compliant shell that is smaller and faster than Bash, often used as the default /bin/sh on many Linux distributions."
+    },
+    {
+      "id": "switch-python-env",
+      "name": "Switch Python Environment",
+      "command": "source [env_path]/bin/activate",
+      "inputs": {
+        "env_path": "/path/to/venv"
+      },
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "🐍",
+      "description": "Activates a Python virtual environment. Virtual environments allow you to isolate Python dependencies for different projects, preventing conflicts between package versions."
+    },
+    {
+      "id": "switch-node-version",
+      "name": "Switch Node.js Version",
+      "command": "nvm use [version]",
+      "inputs": {
+        "version": "16.14.0"
+      },
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "🟢",
+      "description": "Switches to a specific Node.js version using NVM (Node Version Manager). This allows you to easily switch between different Node.js versions for different projects."
+    },
+    {
+      "id": "switch-ruby-version",
+      "name": "Switch Ruby Version",
+      "command": "rbenv global [version]",
+      "inputs": {
+        "version": "3.1.2"
+      },
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "💎",
+      "description": "Switches to a specific Ruby version using rbenv. This allows you to manage multiple Ruby versions on the same system and switch between them as needed."
+    },
+    {
+      "id": "switch-php-version",
+      "name": "Switch PHP Version",
+      "command": "sudo update-alternatives --set php /usr/bin/php[version]",
+      "inputs": {
+        "version": "8.1"
+      },
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "🐘",
+      "description": "Switches to a specific PHP version using update-alternatives. This allows you to change the default PHP version used by the system and web servers."
+    },
+    {
+      "id": "switch-java-version",
+      "name": "Switch Java Version",
+      "command": "sudo update-alternatives --config java",
+      "hotkey": "Ctrl+Shift+J",
+      "icon": "☕",
+      "description": "Switches between installed Java versions using update-alternatives. This allows you to change the default Java version used by applications and development tools."
+    },
+    {
+      "id": "switch-gcc-version",
+      "name": "Switch GCC Version",
+      "command": "sudo update-alternatives --config gcc",
+      "hotkey": "Ctrl+Shift+G",
+      "icon": "🔧",
+      "description": "Switches between installed GCC compiler versions using update-alternatives. This allows you to change the default C/C++ compiler used for building software."
+    },
+    {
+      "id": "switch-python-version",
+      "name": "Switch Python Version",
+      "command": "sudo update-alternatives --config python",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "🐍",
+      "description": "Switches between installed Python versions using update-alternatives. This allows you to change the default Python interpreter used by the system and applications."
+    },
+    {
+      "id": "switch-desktop-environment",
+      "name": "Switch Desktop Environment",
+      "command": "sudo systemctl set-default [target]",
+      "inputs": {
+        "target": "graphical.target"
+      },
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "🖥️",
+      "description": "Switches the default desktop environment or display manager. This allows you to change between different desktop environments like GNOME, KDE, XFCE, or LXDE."
+    },
+    {
+      "id": "switch-display-manager",
+      "name": "Switch Display Manager",
+      "command": "sudo systemctl set-default [display_manager]",
+      "inputs": {
+        "display_manager": "gdm"
+      },
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "🖥️",
+      "description": "Switches the default display manager (login screen). This allows you to change between different display managers like GDM, LightDM, SDDM, or XDM."
+    },
+    {
+      "id": "switch-network-manager",
+      "name": "Switch Network Manager",
+      "command": "sudo systemctl enable [network_manager]",
+      "inputs": {
+        "network_manager": "NetworkManager"
+      },
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "🌐",
+      "description": "Switches the default network management service. This allows you to change between different network managers like NetworkManager, systemd-networkd, or Wicd."
+    },
+    {
+      "id": "switch-package-manager",
+      "name": "Switch Package Manager",
+      "command": "sudo update-alternatives --config [package_manager]",
+      "inputs": {
+        "package_manager": "apt"
+      },
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "📦",
+      "description": "Switches between different package managers or package manager frontends. This allows you to change the default package management tool used for installing software."
+    },
+    {
+      "id": "switch-terminal-emulator",
+      "name": "Switch Terminal Emulator",
+      "command": "sudo update-alternatives --config x-terminal-emulator",
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "💻",
+      "description": "Switches the default terminal emulator for the X Window System. This allows you to change between different terminal emulators like GNOME Terminal, Konsole, or xterm."
+    },
+    {
+      "id": "switch-text-editor",
+      "name": "Switch Default Text Editor",
+      "command": "sudo update-alternatives --config editor",
+      "hotkey": "Ctrl+Shift+E",
+      "icon": "📝",
+      "description": "Switches the default text editor used by system commands. This allows you to change between different text editors like nano, vim, emacs, or other editors."
+    },
+    {
+      "id": "switch-browser",
+      "name": "Switch Default Browser",
+      "command": "sudo update-alternatives --config x-www-browser",
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "🌐",
+      "description": "Switches the default web browser for the system. This allows you to change between different browsers like Firefox, Chrome, Chromium, or other web browsers."
+    },
+    {
+      "id": "switch-mail-client",
+      "name": "Switch Default Mail Client",
+      "command": "sudo update-alternatives --config x-www-browser",
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "📧",
+      "description": "Switches the default mail client for the system. This allows you to change between different mail clients like Thunderbird, Evolution, or other email applications."
+    },
+    {
+      "id": "switch-file-manager",
+      "name": "Switch Default File Manager",
+      "command": "sudo update-alternatives --config x-file-manager",
+      "hotkey": "Ctrl+Shift+F",
+      "icon": "📁",
+      "description": "Switches the default file manager for the system. This allows you to change between different file managers like Nautilus, Dolphin, Thunar, or other file management applications."
+    }
+  ]
+}

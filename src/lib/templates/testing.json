@@ -1,0 +1,393 @@
+{
+  "name": "Testing",
+  "description": "Testing tools and frameworks for software quality assurance",
+  "commands": [
+    {
+      "id": "jest-test",
+      "name": "Run Jest Tests",
+      "command": "npm test",
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "🧪",
+      "description": "Runs Jest test suite. Jest is a JavaScript testing framework that provides a complete testing solution with mocking, coverage, and watch mode."
+    },
+    {
+      "id": "jest-watch",
+      "name": "Run Jest in Watch Mode",
+      "command": "npm run test:watch",
+      "hotkey": "Ctrl+Shift+W",
+      "icon": "👀",
+      "description": "Runs Jest tests in watch mode. This automatically re-runs tests when files change, making it ideal for development workflow."
+    },
+    {
+      "id": "jest-coverage",
+      "name": "Run Jest with Coverage",
+      "command": "npm run test:coverage",
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "📊",
+      "description": "Runs Jest tests with coverage reporting. This generates detailed coverage reports showing which code is tested and which isn't."
+    },
+    {
+      "id": "cypress-open",
+      "name": "Open Cypress",
+      "command": "npx cypress open",
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "🌲",
+      "description": "Opens Cypress Test Runner in interactive mode. Cypress is a JavaScript end-to-end testing framework that runs in the browser."
+    },
+    {
+      "id": "cypress-run",
+      "name": "Run Cypress Tests",
+      "command": "npx cypress run",
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "🏃",
+      "description": "Runs Cypress tests in headless mode. This is useful for continuous integration environments where you need to run tests without a GUI."
+    },
+    {
+      "id": "cypress-e2e",
+      "name": "Run Cypress E2E Tests",
+      "command": "npx cypress run --spec \"[spec-pattern]\"",
+      "inputs": {
+        "spec-pattern": "cypress/e2e/**/*.cy.js"
+      },
+      "hotkey": "Ctrl+Shift+E",
+      "icon": "🌐",
+      "description": "Runs Cypress end-to-end tests specifically. This focuses on testing the complete user workflow from start to finish."
+    },
+    {
+      "id": "playwright-install",
+      "name": "Install Playwright",
+      "command": "npx playwright install",
+      "hotkey": "Ctrl+Shift+I",
+      "icon": "🎭",
+      "description": "Installs Playwright browsers and dependencies. Playwright is a cross-browser testing framework that supports multiple browsers."
+    },
+    {
+      "id": "playwright-test",
+      "name": "Run Playwright Tests",
+      "command": "npx playwright test",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "🎭",
+      "description": "Runs Playwright tests. Playwright provides reliable end-to-end testing for modern web applications across multiple browsers."
+    },
+    {
+      "id": "playwright-ui",
+      "name": "Open Playwright UI",
+      "command": "npx playwright test --ui",
+      "hotkey": "Ctrl+Shift+U",
+      "icon": "🎭",
+      "description": "Opens Playwright UI mode for interactive test development and debugging. This provides a visual interface for test execution."
+    },
+    {
+      "id": "selenium-test",
+      "name": "Run Selenium Tests",
+      "command": "python -m pytest tests/",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🔧",
+      "description": "Runs Selenium tests using pytest. Selenium is a web automation framework that allows testing across different browsers."
+    },
+    {
+      "id": "pytest-run",
+      "name": "Run pytest",
+      "command": "pytest",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "🐍",
+      "description": "Runs pytest test suite. pytest is a Python testing framework that makes it easy to write simple and scalable test cases."
+    },
+    {
+      "id": "pytest-watch",
+      "name": "Run pytest in Watch Mode",
+      "command": "pytest-watch",
+      "hotkey": "Ctrl+Shift+W",
+      "icon": "👀",
+      "description": "Runs pytest in watch mode. This automatically re-runs tests when files change, providing immediate feedback during development."
+    },
+    {
+      "id": "pytest-coverage",
+      "name": "Run pytest with Coverage",
+      "command": "pytest --cov=.",
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "📊",
+      "description": "Runs pytest with coverage reporting. This shows which parts of your code are tested and which need more test coverage."
+    },
+    {
+      "id": "mocha-test",
+      "name": "Run Mocha Tests",
+      "command": "npx mocha",
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "☕",
+      "description": "Runs Mocha test suite. Mocha is a flexible JavaScript test framework for Node.js and the browser."
+    },
+    {
+      "id": "mocha-watch",
+      "name": "Run Mocha in Watch Mode",
+      "command": "npx mocha --watch",
+      "hotkey": "Ctrl+Shift+W",
+      "icon": "👀",
+      "description": "Runs Mocha tests in watch mode. This automatically re-runs tests when files change, providing immediate feedback."
+    },
+    {
+      "id": "vitest-run",
+      "name": "Run Vitest",
+      "command": "npx vitest",
+      "hotkey": "Ctrl+Shift+V",
+      "icon": "⚡",
+      "description": "Runs Vitest test suite. Vitest is a fast unit test framework designed for Vite projects with native TypeScript support."
+    },
+    {
+      "id": "vitest-ui",
+      "name": "Open Vitest UI",
+      "command": "npx vitest --ui",
+      "hotkey": "Ctrl+Shift+U",
+      "icon": "⚡",
+      "description": "Opens Vitest UI for interactive test development. This provides a visual interface for running and debugging tests."
+    },
+    {
+      "id": "karma-test",
+      "name": "Run Karma Tests",
+      "command": "npx karma start",
+      "hotkey": "Ctrl+Shift+K",
+      "icon": "⚡",
+      "description": "Runs Karma test runner. Karma is a test runner that allows you to execute JavaScript code in multiple real browsers."
+    },
+    {
+      "id": "jasmine-test",
+      "name": "Run Jasmine Tests",
+      "command": "npx jasmine",
+      "hotkey": "Ctrl+Shift+J",
+      "icon": "🌸",
+      "description": "Runs Jasmine test suite. Jasmine is a behavior-driven development framework for testing JavaScript code."
+    },
+    {
+      "id": "ava-test",
+      "name": "Run AVA Tests",
+      "command": "npx ava",
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "⚡",
+      "description": "Runs AVA test suite. AVA is a test runner for Node.js with a concise API, detailed error output, and parallel execution."
+    },
+    {
+      "id": "tape-test",
+      "name": "Run Tape Tests",
+      "command": "npx tape \"[test-pattern]\"",
+      "inputs": {
+        "test-pattern": "test/**/*.js"
+      },
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "📼",
+      "description": "Runs Tape test suite. Tape is a simple test framework that produces TAP output for Node.js and browsers."
+    },
+    {
+      "id": "chai-test",
+      "name": "Run Chai Tests",
+      "command": "npx mocha --require chai",
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "🍵",
+      "description": "Runs tests with Chai assertion library. Chai is a BDD/TDD assertion library for Node.js and the browser."
+    },
+    {
+      "id": "sinon-test",
+      "name": "Run Sinon Tests",
+      "command": "npx mocha --require sinon",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🎭",
+      "description": "Runs tests with Sinon mocking library. Sinon provides standalone test spies, stubs, and mocks for JavaScript."
+    },
+    {
+      "id": "enzyme-test",
+      "name": "Run Enzyme Tests",
+      "command": "npx jest --setupFilesAfterEnv=./src/setupTests.js",
+      "hotkey": "Ctrl+Shift+E",
+      "icon": "🧬",
+      "description": "Runs tests with Enzyme for React component testing. Enzyme is a JavaScript testing utility for React."
+    },
+    {
+      "id": "testing-library-test",
+      "name": "Run Testing Library Tests",
+      "command": "npx jest --setupFilesAfterEnv=./src/setupTests.js",
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "📚",
+      "description": "Runs tests with React Testing Library. Testing Library provides utilities for testing React components in a way that resembles how users interact with your app."
+    },
+    {
+      "id": "storybook-test",
+      "name": "Run Storybook Tests",
+      "command": "npx storybook test",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "📚",
+      "description": "Runs Storybook tests. Storybook provides a development environment for UI components with testing capabilities."
+    },
+    {
+      "id": "lighthouse-audit",
+      "name": "Run Lighthouse Audit",
+      "command": "npx lighthouse [url] --output html --output-path [output-file]",
+      "inputs": {
+        "url": "http://localhost:3000",
+        "output-file": "./lighthouse-report.html"
+      },
+      "hotkey": "Ctrl+Shift+L",
+      "icon": "🏆",
+      "description": "Runs Lighthouse audit to analyze web app performance, accessibility, best practices, and SEO. Generates an HTML report with detailed recommendations."
+    },
+    {
+      "id": "pa11y-test",
+      "name": "Run Pa11y Accessibility Tests",
+      "command": "npx pa11y [url]",
+      "inputs": {
+        "url": "http://localhost:3000"
+      },
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "♿",
+      "description": "Runs Pa11y accessibility tests. Pa11y is a command-line interface for testing web accessibility using various accessibility standards."
+    },
+    {
+      "id": "axe-core-test",
+      "name": "Run axe-core Tests",
+      "command": "npx axe-core [url]",
+      "inputs": {
+        "url": "http://localhost:3000"
+      },
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "♿",
+      "description": "Runs axe-core accessibility tests. axe-core is a library for automated accessibility testing that works with any modern browser environment."
+    },
+    {
+      "id": "webdriverio-test",
+      "name": "Run WebdriverIO Tests",
+      "command": "npx wdio run [config-file]",
+      "inputs": {
+        "config-file": "wdio.conf.js"
+      },
+      "hotkey": "Ctrl+Shift+W",
+      "icon": "🤖",
+      "description": "Runs WebdriverIO tests. WebdriverIO is a progressive automation framework built for Node.js for testing modern web and mobile applications."
+    },
+    {
+      "id": "puppeteer-test",
+      "name": "Run Puppeteer Tests",
+      "command": "npx jest --testEnvironment node --setupFilesAfterEnv=[setup-file]",
+      "inputs": {
+        "setup-file": "./puppeteer-setup.js"
+      },
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "🎭",
+      "description": "Runs Puppeteer tests. Puppeteer is a Node.js library that provides a high-level API to control Chrome/Chromium over the DevTools Protocol."
+    },
+    {
+      "id": "selenium-webdriver-test",
+      "name": "Run Selenium WebDriver Tests",
+      "command": "python -m pytest [test-dir] --driver [browser]",
+      "inputs": {
+        "test-dir": "tests/",
+        "browser": "chrome"
+      },
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🔧",
+      "description": "Runs Selenium WebDriver tests. Selenium WebDriver is a web automation framework that allows you to execute tests against different browsers."
+    },
+    {
+      "id": "appium-test",
+      "name": "Run Appium Tests",
+      "command": "npx appium",
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "📱",
+      "description": "Runs Appium tests. Appium is an open-source automation tool for testing mobile applications, native apps, and hybrid apps."
+    },
+    {
+      "id": "detox-test",
+      "name": "Run Detox Tests",
+      "command": "npx detox test",
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "📱",
+      "description": "Runs Detox tests. Detox is a gray box end-to-end testing and automation library for mobile apps."
+    },
+    {
+      "id": "cucumber-test",
+      "name": "Run Cucumber Tests",
+      "command": "npx cucumber-js [features-dir]",
+      "inputs": {
+        "features-dir": "features/"
+      },
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "🥒",
+      "description": "Runs Cucumber tests. Cucumber is a tool for behavior-driven development that allows you to write tests in plain language."
+    },
+    {
+      "id": "gauge-test",
+      "name": "Run Gauge Tests",
+      "command": "gauge run [specs-dir]",
+      "inputs": {
+        "specs-dir": "specs/"
+      },
+      "hotkey": "Ctrl+Shift+G",
+      "icon": "📏",
+      "description": "Runs Gauge tests. Gauge is a test automation tool that takes the pain out of writing and maintaining regression tests."
+    },
+    {
+      "id": "robot-framework-test",
+      "name": "Run Robot Framework Tests",
+      "command": "robot [tests-dir]",
+      "inputs": {
+        "tests-dir": "tests/"
+      },
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "🤖",
+      "description": "Runs Robot Framework tests. Robot Framework is a generic test automation framework for acceptance testing and acceptance test-driven development."
+    },
+    {
+      "id": "postman-test",
+      "name": "Run Postman Tests",
+      "command": "newman run [collection-file]",
+      "inputs": {
+        "collection-file": "collection.json"
+      },
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "📮",
+      "description": "Runs Postman tests using Newman. Newman is a command-line collection runner for Postman that allows you to run and test a Postman collection directly from the command line."
+    },
+    {
+      "id": "jmeter-test",
+      "name": "Run JMeter Tests",
+      "command": "jmeter -n -t [test-plan] -l [results-file]",
+      "inputs": {
+        "test-plan": "test-plan.jmx",
+        "results-file": "results.jtl"
+      },
+      "hotkey": "Ctrl+Shift+J",
+      "icon": "📊",
+      "description": "Runs JMeter performance tests. Apache JMeter is an Apache project that can be used as a load testing tool for analyzing and measuring the performance of a variety of services."
+    },
+    {
+      "id": "gatling-test",
+      "name": "Run Gatling Tests",
+      "command": "gatling.sh -s [simulation-name]",
+      "inputs": {
+        "simulation-name": "Simulation"
+      },
+      "hotkey": "Ctrl+Shift+G",
+      "icon": "📈",
+      "description": "Runs Gatling performance tests. Gatling is an open-source load testing framework based on Scala, Akka, and Netty."
+    },
+    {
+      "id": "artillery-test",
+      "name": "Run Artillery Tests",
+      "command": "npx artillery run [config-file]",
+      "inputs": {
+        "config-file": "test.yml"
+      },
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "💥",
+      "description": "Runs Artillery performance tests. Artillery is a modern, powerful, and easy-to-use load testing toolkit."
+    },
+    {
+      "id": "k6-test",
+      "name": "Run k6 Tests",
+      "command": "k6 run [script-file]",
+      "inputs": {
+        "script-file": "script.js"
+      },
+      "hotkey": "Ctrl+Shift+K",
+      "icon": "📊",
+      "description": "Runs k6 performance tests. k6 is a modern load testing tool, built for developer productivity and ease of use."
+    }
+  ]
+}

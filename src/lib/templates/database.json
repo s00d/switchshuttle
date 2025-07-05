@@ -1,0 +1,235 @@
+{
+  "name": "Database",
+  "description": "Database management and operations",
+  "commands": [
+    {
+      "id": "db-postgres-start",
+      "name": "Start Service PostgreSQL",
+      "command": "brew services start postgresql",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "🐘",
+      "description": "Запускает PostgreSQL сервер. PostgreSQL - это мощная объектно-реляционная система управления базами данных с открытым исходным кодом. Поддерживает расширенные типы данных, JSON, полнотекстовый поиск и многое другое."
+    },
+    {
+      "id": "db-postgres-stop",
+      "name": "Stop Service PostgreSQL",
+      "command": "brew services stop postgresql",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "⏹️",
+      "description": "Останавливает PostgreSQL сервер. Используйте эту команду для экономии ресурсов системы, когда база данных не нужна."
+    },
+    {
+      "id": "db-postgres-connect",
+      "name": "Connect Database PostgreSQL",
+      "command": "psql -U [username] -d [database]",
+      "inputs": {
+        "username": "user",
+        "database": "testdb"
+      },
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "🔗",
+      "description": "Подключается к PostgreSQL базе данных через psql. Требует установки PostgreSQL клиента: brew install postgresql. Создайте базу данных командой: createdb your_database_name"
+    },
+    {
+      "id": "db-mysql-start",
+      "name": "Start Service MySQL",
+      "command": "brew services start mysql",
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "🐬",
+      "description": "Запускает MySQL сервер. MySQL - популярная система управления реляционными базами данных, используемая во многих веб-приложениях. Известна своей производительностью и надежностью."
+    },
+    {
+      "id": "db-mysql-stop",
+      "name": "Stop Service MySQL",
+      "command": "brew services stop mysql",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "⏹️",
+      "description": "Останавливает MySQL сервер. Рекомендуется останавливать сервер, когда он не используется, для экономии ресурсов."
+    },
+    {
+      "id": "db-mysql-connect",
+      "name": "Connect Database MySQL",
+      "command": "mysql -u [username] -p [database]",
+      "inputs": {
+        "username": "user",
+        "database": "testdb"
+      },
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "🔗",
+      "description": "Подключается к MySQL базе данных через mysql клиент. Требует установки MySQL клиента: brew install mysql-client. Создайте базу данных командой: mysql -u root -p"
+    },
+    {
+      "id": "db-mongodb-start",
+      "name": "Start Service MongoDB",
+      "command": "brew services start mongodb-community",
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "🍃",
+      "description": "Запускает MongoDB сервер. MongoDB - это документо-ориентированная NoSQL база данных, которая хранит данные в гибких JSON-подобных документах. Отлично подходит для приложений с быстро изменяющимися схемами данных."
+    },
+    {
+      "id": "db-mongodb-stop",
+      "name": "Stop Service MongoDB",
+      "command": "brew services stop mongodb-community",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "⏹️",
+      "description": "Останавливает MongoDB сервер. MongoDB может потреблять значительные ресурсы, поэтому рекомендуется останавливать при неиспользовании."
+    },
+    {
+      "id": "db-mongodb-connect",
+      "name": "Connect Database MongoDB",
+      "command": "mongosh [database]",
+      "inputs": {
+        "database": "testdb"
+      },
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "🔗",
+      "description": "Открывает MongoDB shell для работы с базой данных. Позволяет выполнять запросы к MongoDB: use database_name, show collections, db.collection.find() и другие."
+    },
+    {
+      "id": "db-redis-start",
+      "name": "Start Service Redis",
+      "command": "brew services start redis",
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "🔴",
+      "description": "Запускает Redis сервер. Redis - это быстрая in-memory структура данных, которая может использоваться как база данных, кэш и брокер сообщений. Поддерживает различные структуры данных: строки, хеши, списки, множества."
+    },
+    {
+      "id": "db-redis-stop",
+      "name": "Stop Service Redis",
+      "command": "brew services stop redis",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "⏹️",
+      "description": "Останавливает Redis сервер. Redis потребляет память, поэтому рекомендуется останавливать его при неиспользовании."
+    },
+    {
+      "id": "db-redis-connect",
+      "name": "Connect Database Redis",
+      "command": "redis-cli",
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "🔗",
+      "description": "Открывает Redis CLI для работы с Redis сервером. Позволяет выполнять команды Redis напрямую: SET key value, GET key, DEL key и другие."
+    },
+    {
+      "id": "db-sqlite-create",
+      "name": "Create Database SQLite",
+      "command": "sqlite3 [database_name].db",
+      "inputs": {
+        "database_name": "testdb"
+      },
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "📱",
+      "description": "Создает новую SQLite базу данных. SQLite - это встроенная база данных, которая хранит всю базу данных в одном файле. Не требует установки сервера."
+    },
+    {
+      "id": "db-migrate-run",
+      "name": "Run Migrations npm",
+      "command": "npm run migrate",
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "🔄",
+      "description": "Запускает миграции базы данных через npm скрипт. Миграции позволяют изменять структуру базы данных версионированным способом."
+    },
+    {
+      "id": "db-migrate-rollback",
+      "name": "Rollback Migrations npm",
+      "command": "npm run migrate:rollback",
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "↩️",
+      "description": "Откатывает последние миграции базы данных. Полезно для отмены изменений в структуре базы данных."
+    },
+    {
+      "id": "db-seed-run",
+      "name": "Run Seeders npm",
+      "command": "npm run seed",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🌱",
+      "description": "Запускает сидеры для заполнения базы данных тестовыми данными. Сидеры создают начальные данные для разработки и тестирования."
+    },
+    {
+      "id": "db-backup",
+      "name": "Backup Database PostgreSQL",
+      "command": "pg_dump [database] > backup_[date].sql",
+      "inputs": {
+        "database": "testdb"
+      },
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "💾",
+      "description": "Создает резервную копию PostgreSQL базы данных. Замените 'database' на имя вашей базы данных. Файл будет сохранен в текущей директории с расширением .sql"
+    },
+    {
+      "id": "db-restore",
+      "name": "Restore Database PostgreSQL",
+      "command": "psql [database] < [backup_file]",
+      "inputs": {
+        "database": "testdb",
+        "backup_file": "backup.sql"
+      },
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "📥",
+      "description": "Восстанавливает PostgreSQL базу данных из резервной копии. Замените 'database' и 'backup_file' на соответствующие значения."
+    },
+    {
+      "id": "db-optimize",
+      "name": "Optimize Database PostgreSQL",
+      "command": "VACUUM ANALYZE;",
+      "hotkey": "Ctrl+Shift+O",
+      "icon": "⚡",
+      "description": "Оптимизирует PostgreSQL базу данных. VACUUM освобождает место, а ANALYZE обновляет статистику для оптимизатора запросов."
+    },
+    {
+      "id": "db-monitor",
+      "name": "Monitor Database PostgreSQL",
+      "command": "SELECT * FROM pg_stat_activity;",
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "📊",
+      "description": "Показывает активные подключения к PostgreSQL базе данных. Полезно для мониторинга производительности и отладки проблем с подключениями."
+    },
+    {
+      "id": "db-prisma-push",
+      "name": "Push Schema Prisma",
+      "command": "npx prisma db push",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "🔄",
+      "description": "Применяет схему Prisma к базе данных. Создает или изменяет таблицы в соответствии с определением схемы в schema.prisma файле."
+    },
+    {
+      "id": "db-prisma-studio",
+      "name": "Open Prisma Studio",
+      "command": "npx prisma studio",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🎨",
+      "description": "Открывает Prisma Studio - веб-интерфейс для просмотра и редактирования данных в базе данных. Запускается на http://localhost:5555"
+    },
+    {
+      "id": "db-sequelize-init",
+      "name": "Init Sequelize CLI",
+      "command": "npx sequelize-cli init",
+      "hotkey": "Ctrl+Shift+I",
+      "icon": "🗄️",
+      "description": "Инициализирует Sequelize CLI в проекте. Создает папки config, models, migrations, seeders для работы с базой данных через Sequelize ORM."
+    },
+    {
+      "id": "db-mongoose-install",
+      "name": "Install Mongoose",
+      "command": "npm install mongoose",
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "🍃",
+      "description": "Устанавливает Mongoose - популярную ODM библиотеку для Node.js и MongoDB. Mongoose предоставляет простое API для работы с MongoDB."
+    },
+    {
+      "id": "db-redis-ping",
+      "name": "Ping Redis",
+      "command": "redis-cli ping",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "🏓",
+      "description": "Проверяет подключение к Redis серверу. Команда ping возвращает PONG если сервер работает корректно."
+    },
+    {
+      "id": "db-redis-flush",
+      "name": "Flush Redis",
+      "command": "redis-cli flushall",
+      "hotkey": "Ctrl+Shift+F",
+      "icon": "🗑️",
+      "description": "Очищает все данные из Redis базы данных. Удаляет все ключи и значения. Используйте осторожно - данные будут потеряны безвозвратно."
+    }
+  ]
+}

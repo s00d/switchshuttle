@@ -1,0 +1,211 @@
+{
+  "name": "Cloud",
+  "description": "Cloud infrastructure and deployment tools",
+  "commands": [
+    {
+      "id": "cloud-aws-cli",
+      "name": "Configure AWS CLI",
+      "description": "Opens AWS CLI configuration wizard to set up access keys, region, and output format. Requires AWS CLI to be installed. Install: https://aws.amazon.com/cli/",
+      "command": "aws configure",
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "☁️"
+    },
+    {
+      "id": "cloud-aws-s3",
+      "name": "List Buckets AWS S3",
+      "description": "Lists all S3 buckets in your AWS account. Requires AWS CLI to be installed and configured with valid credentials.",
+      "command": "aws s3 ls",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "📦"
+    },
+    {
+      "id": "cloud-aws-ec2",
+      "name": "List Instances AWS EC2",
+      "description": "Lists all EC2 instances in your AWS account with detailed information. Requires AWS CLI to be installed and configured.",
+      "command": "aws ec2 describe-instances",
+      "hotkey": "Ctrl+Shift+E",
+      "icon": "🖥️"
+    },
+    {
+      "id": "cloud-aws-lambda",
+      "name": "List Functions AWS Lambda",
+      "description": "Lists all Lambda functions in your AWS account. Requires AWS CLI to be installed and configured.",
+      "command": "aws lambda list-functions",
+      "hotkey": "Ctrl+Shift+L",
+      "icon": "⚡"
+    },
+    {
+      "id": "cloud-azure-cli",
+      "name": "Login Azure CLI",
+      "description": "Opens Azure CLI login process to authenticate with your Azure account. Requires Azure CLI to be installed. Install: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli",
+      "command": "az login",
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "☁️"
+    },
+    {
+      "id": "cloud-azure-vm",
+      "name": "List VMs Azure",
+      "description": "Lists all virtual machines in your Azure subscription. Requires Azure CLI to be installed and authenticated.",
+      "command": "az vm list",
+      "hotkey": "Ctrl+Shift+V",
+      "icon": "🖥️"
+    },
+    {
+      "id": "cloud-azure-storage",
+      "name": "List Storage Azure",
+      "description": "Lists all storage accounts in your Azure subscription. Requires Azure CLI to be installed and authenticated.",
+      "command": "az storage account list",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "📦"
+    },
+    {
+      "id": "cloud-gcp-cli",
+      "name": "Configure GCP CLI",
+      "description": "Opens Google Cloud CLI authentication process. Requires Google Cloud SDK to be installed. Install: https://cloud.google.com/sdk/docs/install",
+      "command": "gcloud auth login",
+      "hotkey": "Ctrl+Shift+G",
+      "icon": "☁️"
+    },
+    {
+      "id": "cloud-gcp-compute",
+      "name": "List Instances GCP",
+      "description": "Lists all compute instances in your Google Cloud project. Requires Google Cloud SDK to be installed and authenticated.",
+      "command": "gcloud compute instances list",
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "🖥️"
+    },
+    {
+      "id": "cloud-gcp-storage",
+      "name": "List Buckets GCP",
+      "description": "Lists all Cloud Storage buckets in your Google Cloud project. Requires Google Cloud SDK to be installed and authenticated.",
+      "command": "gsutil ls",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "📦"
+    },
+    {
+      "id": "cloud-terraform-init",
+      "name": "Init Terraform",
+      "description": "Initializes a Terraform working directory and downloads required providers. Requires Terraform to be installed. Install: https://developer.hashicorp.com/terraform/downloads",
+      "command": "terraform init",
+      "hotkey": "Ctrl+Shift+I",
+      "icon": "🏗️"
+    },
+    {
+      "id": "cloud-terraform-plan",
+      "name": "Plan Terraform",
+      "description": "Creates an execution plan for Terraform infrastructure changes. Requires Terraform to be installed and initialized.",
+      "command": "terraform plan",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "📋"
+    },
+    {
+      "id": "cloud-terraform-apply",
+      "name": "Apply Terraform",
+      "description": "Applies Terraform infrastructure changes to create or modify resources. Requires Terraform to be installed and a plan to be available.",
+      "command": "terraform apply",
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "🚀"
+    },
+    {
+      "id": "cloud-terraform-destroy",
+      "name": "Destroy Terraform",
+      "description": "Destroys all resources managed by Terraform. Use with caution as this will delete infrastructure. Requires Terraform to be installed.",
+      "command": "terraform destroy",
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "🗑️"
+    },
+    {
+      "id": "cloud-k8s-pods",
+      "name": "Get Pods Kubernetes",
+      "description": "Lists all pods across all namespaces in your Kubernetes cluster. Requires kubectl to be installed and configured. Install: https://kubernetes.io/docs/tasks/tools/",
+      "command": "kubectl get pods -A",
+      "hotkey": "Ctrl+Shift+K",
+      "icon": "📦"
+    },
+    {
+      "id": "cloud-k8s-services",
+      "name": "Get Services Kubernetes",
+      "description": "Lists all services across all namespaces in your Kubernetes cluster. Requires kubectl to be installed and configured.",
+      "command": "kubectl get services -A",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🌐"
+    },
+    {
+      "id": "cloud-k8s-nodes",
+      "name": "Get Nodes Kubernetes",
+      "description": "Lists all nodes in your Kubernetes cluster. Requires kubectl to be installed and configured.",
+      "command": "kubectl get nodes",
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "🖥️"
+    },
+    {
+      "id": "cloud-docker-images",
+      "name": "List Images Docker",
+      "description": "Lists all Docker images available on your system. Requires Docker to be installed. Install: https://docs.docker.com/get-docker/",
+      "command": "docker images",
+      "hotkey": "Ctrl+Shift+I",
+      "icon": "🐳"
+    },
+    {
+      "id": "cloud-docker-containers",
+      "name": "List Containers Docker",
+      "description": "Lists all Docker containers (running and stopped) on your system. Requires Docker to be installed.",
+      "command": "docker ps -a",
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "📦"
+    },
+    {
+      "id": "cloud-github-repo",
+      "name": "Create Repository GitHub",
+      "description": "Creates a new public GitHub repository using GitHub CLI. Requires GitHub CLI to be installed and authenticated. Install: https://cli.github.com/",
+      "command": "gh repo create [repo_name] --public",
+      "inputs": {
+        "repo_name": "my-repo"
+      },
+      "hotkey": "Ctrl+Shift+G",
+      "icon": "📚"
+    },
+    {
+      "id": "cloud-github-pr",
+      "name": "Create PR GitHub",
+      "description": "Creates a new pull request on GitHub using GitHub CLI. Requires GitHub CLI to be installed and authenticated.",
+      "command": "gh pr create --title \"[title]\"",
+      "inputs": {
+        "title": "Add new feature"
+      },
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "🔀"
+    },
+    {
+      "id": "cloud-aws-sync",
+      "name": "Sync S3 AWS",
+      "description": "Synchronizes local files with an S3 bucket. Uploads files from local directory to S3. Requires AWS CLI to be installed and configured.",
+      "command": "aws s3 sync [local_path] s3://[bucket_name]",
+      "inputs": {
+        "local_path": "./dist",
+        "bucket_name": "my-bucket"
+      },
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🔄"
+    },
+    {
+      "id": "cloud-terraform-validate",
+      "name": "Validate Terraform",
+      "description": "Validates Terraform configuration files for syntax and internal consistency. Requires Terraform to be installed.",
+      "command": "terraform validate",
+      "hotkey": "Ctrl+Shift+V",
+      "icon": "✅"
+    },
+    {
+      "id": "cloud-ansible-playbook",
+      "name": "Run Playbook Ansible",
+      "description": "Executes an Ansible playbook against specified inventory. Requires Ansible to be installed. Install: https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html",
+      "command": "ansible-playbook -i inventory [playbook.yml]",
+      "inputs": {
+        "playbook": "playbook.yml"
+      },
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "📜"
+    }
+  ]
+}

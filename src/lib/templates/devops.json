@@ -1,0 +1,302 @@
+{
+  "name": "DevOps",
+  "description": "DevOps tools and infrastructure management",
+  "commands": [
+    {
+      "id": "docker-build",
+      "name": "Build Docker Image",
+      "command": "docker build -t [image_name] .",
+      "inputs": {
+        "image_name": "myapp"
+      },
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "🐳",
+      "description": "Builds a Docker image from the current directory. Docker is a platform for developing, shipping, and running applications in containers. This command creates an image that can be run consistently across different environments."
+    },
+    {
+      "id": "docker-run",
+      "name": "Run Docker Container",
+      "command": "docker run -d -p [host_port]:[container_port] --name [container_name] [image_name]",
+      "inputs": {
+        "host_port": "3000",
+        "container_port": "3000",
+        "container_name": "myapp-container",
+        "image_name": "myapp"
+      },
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "▶️",
+      "description": "Runs a Docker container in detached mode. The -d flag runs the container in the background, -p maps ports between host and container, and --name assigns a custom name to the container."
+    },
+    {
+      "id": "docker-stop",
+      "name": "Stop Docker Container",
+      "command": "docker stop [container_name]",
+      "inputs": {
+        "container_name": "myapp-container"
+      },
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "⏹️",
+      "description": "Stops a running Docker container gracefully. This sends a SIGTERM signal to the main process in the container, allowing it to shut down properly."
+    },
+    {
+      "id": "docker-ps",
+      "name": "List Docker Containers",
+      "command": "docker ps -a",
+      "hotkey": "Ctrl+Shift+L",
+      "icon": "📋",
+      "description": "Lists all Docker containers (running and stopped). The -a flag shows all containers, including those that are not currently running."
+    },
+    {
+      "id": "docker-logs",
+      "name": "View Docker Logs",
+      "command": "docker logs [container_name]",
+      "inputs": {
+        "container_name": "myapp-container"
+      },
+      "hotkey": "Ctrl+Shift+G",
+      "icon": "📄",
+      "description": "Shows the logs from a Docker container. Useful for debugging and monitoring application output. Add -f flag to follow logs in real-time."
+    },
+    {
+      "id": "docker-compose-up",
+      "name": "Start Docker Compose",
+      "command": "docker-compose up -d",
+      "hotkey": "Ctrl+Shift+U",
+      "icon": "🚀",
+      "description": "Starts all services defined in docker-compose.yml file. Docker Compose allows you to define and run multi-container applications. The -d flag runs in detached mode."
+    },
+    {
+      "id": "docker-compose-down",
+      "name": "Stop Docker Compose",
+      "command": "docker-compose down",
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "🛑",
+      "description": "Stops and removes all containers, networks, and volumes created by docker-compose up. This cleans up the entire application stack."
+    },
+    {
+      "id": "kubectl-get-pods",
+      "name": "List Kubernetes Pods",
+      "command": "kubectl get pods",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "☸️",
+      "description": "Lists all pods in the current Kubernetes namespace. Kubernetes is an open-source container orchestration platform for automating deployment, scaling, and management of containerized applications."
+    },
+    {
+      "id": "kubectl-get-services",
+      "name": "List Kubernetes Services",
+      "command": "kubectl get services",
+      "hotkey": "Ctrl+Shift+V",
+      "icon": "🔗",
+      "description": "Lists all services in the current Kubernetes namespace. Services provide a stable IP address and DNS name for a set of pods, enabling load balancing and service discovery."
+    },
+    {
+      "id": "kubectl-apply",
+      "name": "Apply Kubernetes Config",
+      "command": "kubectl apply -f [config_file]",
+      "inputs": {
+        "config_file": "deployment.yaml"
+      },
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "📝",
+      "description": "Applies a Kubernetes configuration file to create or update resources. This is the declarative way to manage Kubernetes resources using YAML or JSON files."
+    },
+    {
+      "id": "kubectl-delete",
+      "name": "Delete Kubernetes Resource",
+      "command": "kubectl delete -f [config_file]",
+      "inputs": {
+        "config_file": "deployment.yaml"
+      },
+      "hotkey": "Ctrl+Shift+X",
+      "icon": "🗑️",
+      "description": "Deletes Kubernetes resources defined in a configuration file. This removes the resources from the cluster based on the specifications in the file."
+    },
+    {
+      "id": "kubectl-logs",
+      "name": "View Kubernetes Logs",
+      "command": "kubectl logs [pod_name]",
+      "inputs": {
+        "pod_name": "myapp-pod"
+      },
+      "hotkey": "Ctrl+Shift+G",
+      "icon": "📄",
+      "description": "Shows the logs from a Kubernetes pod. Useful for debugging applications running in Kubernetes clusters. Add -f flag to follow logs in real-time."
+    },
+    {
+      "id": "terraform-init",
+      "name": "Initialize Terraform",
+      "command": "terraform init",
+      "hotkey": "Ctrl+Shift+I",
+      "icon": "🏗️",
+      "description": "Initializes a Terraform working directory. Terraform is an infrastructure as code tool that lets you define and provision infrastructure using declarative configuration files."
+    },
+    {
+      "id": "terraform-plan",
+      "name": "Plan Terraform Changes",
+      "command": "terraform plan",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "📋",
+      "description": "Creates an execution plan for Terraform. This shows what Terraform will do when you apply the configuration, without making any actual changes to your infrastructure."
+    },
+    {
+      "id": "terraform-apply",
+      "name": "Apply Terraform Changes",
+      "command": "terraform apply",
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "✅",
+      "description": "Applies the Terraform configuration to create or update infrastructure. This will prompt for confirmation before making changes to your infrastructure."
+    },
+    {
+      "id": "terraform-destroy",
+      "name": "Destroy Terraform Infrastructure",
+      "command": "terraform destroy",
+      "hotkey": "Ctrl+Shift+X",
+      "icon": "💥",
+      "description": "Destroys all resources managed by Terraform. This will permanently delete all infrastructure created by the Terraform configuration. Use with caution!"
+    },
+    {
+      "id": "ansible-playbook",
+      "name": "Run Ansible Playbook",
+      "command": "ansible-playbook [playbook.yml]",
+      "inputs": {
+        "playbook.yml": "deploy.yml"
+      },
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "🔧",
+      "description": "Runs an Ansible playbook. Ansible is an automation tool for configuration management, application deployment, and task automation. Playbooks are written in YAML format."
+    },
+    {
+      "id": "ansible-ping",
+      "name": "Test Ansible Connection",
+      "command": "ansible all -m ping",
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "🏓",
+      "description": "Tests connectivity to all hosts in the Ansible inventory. This is a simple way to verify that Ansible can reach and authenticate with your target servers."
+    },
+    {
+      "id": "jenkins-build",
+      "name": "Trigger Jenkins Build",
+      "command": "curl -X POST [jenkins_url]/job/[job_name]/build",
+      "inputs": {
+        "jenkins_url": "http://localhost:8080",
+        "job_name": "myapp"
+      },
+      "hotkey": "Ctrl+Shift+J",
+      "icon": "🤖",
+      "description": "Triggers a Jenkins build job via REST API. Jenkins is an open-source automation server that helps automate the parts of software development related to building, testing, and deploying."
+    },
+    {
+      "id": "gitlab-ci-run",
+      "name": "Run GitLab CI Pipeline",
+      "command": "gitlab-ci-local",
+      "hotkey": "Ctrl+Shift+G",
+      "icon": "🦊",
+      "description": "Runs GitLab CI pipeline locally for testing. This allows you to test your CI/CD pipeline before pushing to GitLab, helping catch issues early in development."
+    },
+    {
+      "id": "helm-install",
+      "name": "Install Helm Chart",
+      "command": "helm install [release_name] [chart_name]",
+      "inputs": {
+        "release_name": "myapp",
+        "chart_name": "stable/nginx"
+      },
+      "hotkey": "Ctrl+Shift+H",
+      "icon": "⚓",
+      "description": "Installs a Helm chart into a Kubernetes cluster. Helm is a package manager for Kubernetes that simplifies the deployment and management of applications."
+    },
+    {
+      "id": "helm-upgrade",
+      "name": "Upgrade Helm Release",
+      "command": "helm upgrade [release_name] [chart_name]",
+      "inputs": {
+        "release_name": "myapp",
+        "chart_name": "stable/nginx"
+      },
+      "hotkey": "Ctrl+Shift+U",
+      "icon": "⬆️",
+      "description": "Upgrades an existing Helm release to a new version or configuration. This allows you to update applications deployed via Helm without losing data."
+    },
+    {
+      "id": "helm-list",
+      "name": "List Helm Releases",
+      "command": "helm list",
+      "hotkey": "Ctrl+Shift+L",
+      "icon": "📋",
+      "description": "Lists all Helm releases in the current namespace. Shows the name, namespace, revision, status, and chart of each deployed release."
+    },
+    {
+      "id": "prometheus-status",
+      "name": "Check Prometheus Status",
+      "command": "curl [prometheus_url]/api/v1/status/targets",
+      "inputs": {
+        "prometheus_url": "http://localhost:9090"
+      },
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "📊",
+      "description": "Checks the status of Prometheus monitoring targets. Prometheus is an open-source monitoring and alerting toolkit designed for reliability and scalability."
+    },
+    {
+      "id": "grafana-dashboard",
+      "name": "Open Grafana Dashboard",
+      "command": "open [grafana_url]",
+      "inputs": {
+        "grafana_url": "http://localhost:3000"
+      },
+      "hotkey": "Ctrl+Shift+G",
+      "icon": "📈",
+      "description": "Opens Grafana dashboard in the default browser. Grafana is an open-source analytics and monitoring solution for databases, time series metrics, and log analytics."
+    },
+    {
+      "id": "vault-status",
+      "name": "Check Vault Status",
+      "command": "vault status",
+      "hotkey": "Ctrl+Shift+V",
+      "icon": "🔐",
+      "description": "Checks the status of HashiCorp Vault. Vault is a tool for securely accessing secrets, managing sensitive data, and providing encryption as a service."
+    },
+    {
+      "id": "consul-members",
+      "name": "List Consul Members",
+      "command": "consul members",
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "🤝",
+      "description": "Lists all members of the Consul cluster. Consul is a service mesh solution providing service discovery, configuration, and segmentation functionality."
+    },
+    {
+      "id": "nomad-status",
+      "name": "Check Nomad Status",
+      "command": "nomad server members",
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "🚀",
+      "description": "Checks the status of Nomad cluster members. Nomad is a flexible workload orchestrator that can deploy and manage containers, virtual machines, and standalone applications."
+    },
+    {
+      "id": "packer-build",
+      "name": "Build Packer Image",
+      "command": "packer build [template.json]",
+      "inputs": {
+        "template.json": "aws-ami.json"
+      },
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "📦",
+      "description": "Builds a machine image using Packer. Packer is a tool for creating identical machine images for multiple platforms from a single source configuration."
+    },
+    {
+      "id": "vagrant-up",
+      "name": "Start Vagrant VM",
+      "command": "vagrant up",
+      "hotkey": "Ctrl+Shift+U",
+      "icon": "🖥️",
+      "description": "Starts and provisions the Vagrant environment. Vagrant is a tool for building and managing virtual machine environments in a single workflow."
+    },
+    {
+      "id": "vagrant-destroy",
+      "name": "Destroy Vagrant VM",
+      "command": "vagrant destroy -f",
+      "hotkey": "Ctrl+Shift+X",
+      "icon": "💥",
+      "description": "Stops and deletes all traces of the Vagrant machine. The -f flag forces the destruction without confirmation prompts."
+    }
+  ]
+}

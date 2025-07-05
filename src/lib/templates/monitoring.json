@@ -1,0 +1,168 @@
+{
+  "name": "Monitoring",
+  "description": "System monitoring and resource tracking commands",
+  "commands": [
+    {
+      "id": "monitor-cpu-usage",
+      "name": "CPU Usage",
+      "description": "Shows current CPU usage percentage. Uses built-in macOS 'top' command to display real-time CPU statistics. No additional dependencies required.",
+      "command": "top -l 1",
+      "monitor": "top -l 1 | grep \"CPU usage\" | awk -F\"[:,]\" '{print $2+$4 \"%\"}'",
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "🖥️"
+    },
+    {
+      "id": "monitor-memory-usage",
+      "name": "Memory Usage",
+      "description": "Displays current memory usage in GB. Uses 'vm_stat' and 'sysctl' commands to show physical memory statistics. No additional dependencies required.",
+      "command": "vm_stat",
+      "monitor": "echo \"$(top -l 1 -s 0 | awk '/PhysMem/ {used=$2; gsub(/[GM]/,\"\",used); printf \"%.1f\", used}')\" GB / $(sysctl -n hw.memsize | awk '{printf \"%.1f\", $1/1073741824}') GB",
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "💾"
+    },
+    {
+      "id": "monitor-disk-usage",
+      "name": "Disk Usage",
+      "description": "Shows disk usage percentage for the root filesystem. Uses 'df' command to display filesystem disk space usage. No additional dependencies required.",
+      "command": "df -h",
+      "monitor": "df -h / | tail -1 | awk '{print $5}' | sed \"s/%//\"",
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "💿"
+    },
+    {
+      "id": "monitor-battery-level",
+      "name": "Battery Level",
+      "description": "Displays current battery level percentage. Uses 'pmset' command to show power management information. Works on laptops with battery. No additional dependencies required.",
+      "command": "pmset -g batt",
+      "monitor": "pmset -g batt | grep -Eo \"[0-9]+%\" | head -1",
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "🔋"
+    },
+    {
+      "id": "monitor-uptime",
+      "name": "Uptime",
+      "description": "Shows system uptime in hours. Uses 'uptime' command to display how long the system has been running. No additional dependencies required.",
+      "command": "uptime",
+      "monitor": "uptime | awk '{print $3}' | sed 's/,//' | awk -F: '{if(NF==2) print $1/24; else print $1}' | awk '{printf \"%.1fh\", $1}'",
+      "hotkey": "Ctrl+Shift+U",
+      "icon": "⏰"
+    },
+    {
+      "id": "monitor-load-average",
+      "name": "Load Average",
+      "description": "Shows system load average. Uses 'uptime' command to display the average system load over time. No additional dependencies required.",
+      "command": "uptime",
+      "monitor": "uptime | awk '{print $10}' | sed \"s/,//\"",
+      "hotkey": "Ctrl+Shift+L",
+      "icon": "📈"
+    },
+    {
+      "id": "monitor-active-processes",
+      "name": "Active Processes",
+      "description": "Shows the number of active processes. Uses 'ps aux' command to list all running processes and counts them. No additional dependencies required.",
+      "command": "ps aux",
+      "monitor": "ps aux | wc -l",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "🔄"
+    },
+    {
+      "id": "monitor-docker-containers",
+      "name": "Docker Containers",
+      "description": "Shows the number of running Docker containers. Uses 'docker ps' command to list active containers. Requires Docker to be installed and running.",
+      "command": "docker ps",
+      "monitor": "docker ps -q | wc -l",
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "🐳"
+    },
+    {
+      "id": "monitor-git-status",
+      "name": "Git Status",
+      "description": "Shows the number of modified files in current Git repository. Uses 'git status --porcelain' to count uncommitted changes. Requires Git to be installed.",
+      "command": "git status",
+      "monitor": "git status --porcelain | wc -l",
+      "hotkey": "Ctrl+Shift+G",
+      "icon": "📚"
+    },
+    {
+      "id": "monitor-npm-packages",
+      "name": "NPM Packages",
+      "description": "Shows the number of installed NPM packages in current project. Uses 'npm list' to count direct dependencies. Requires Node.js and NPM to be installed.",
+      "command": "npm list --depth=0",
+      "monitor": "npm list --depth=0 | grep \"──\" | wc -l",
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "📦"
+    },
+    {
+      "id": "monitor-node-version",
+      "name": "Node Version",
+      "description": "Shows current Node.js version. Uses 'node --version' command to display the installed Node.js version. Requires Node.js to be installed.",
+      "command": "node --version",
+      "monitor": "node --version",
+      "hotkey": "Ctrl+Shift+V",
+      "icon": "🟢"
+    },
+    {
+      "id": "monitor-python-version",
+      "name": "Python Version",
+      "description": "Shows current Python version. Uses 'python3 --version' command to display the installed Python version. Requires Python 3 to be installed.",
+      "command": "python3 --version",
+      "monitor": "python3 --version | awk \"{print $2}\"",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "🐍"
+    },
+    {
+      "id": "monitor-ruby-version",
+      "name": "Ruby Version",
+      "description": "Shows current Ruby version. Uses 'ruby --version' command to display the installed Ruby version. Requires Ruby to be installed.",
+      "command": "ruby --version",
+      "monitor": "ruby --version | awk \"{print $2}\"",
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "💎"
+    },
+    {
+      "id": "monitor-go-version",
+      "name": "Go Version",
+      "description": "Shows current Go version. Uses 'go version' command to display the installed Go version. Requires Go to be installed.",
+      "command": "go version",
+      "monitor": "go version | awk \"{print $3}\" | sed \"s/go//\"",
+      "hotkey": "Ctrl+Shift+G",
+      "icon": "🐹"
+    },
+    {
+      "id": "monitor-rust-version",
+      "name": "Rust Version",
+      "description": "Shows current Rust version. Uses 'rustc --version' command to display the installed Rust compiler version. Requires Rust to be installed.",
+      "command": "rustc --version",
+      "monitor": "rustc --version | awk \"{print $2}\"",
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "🦀"
+    },
+    {
+      "id": "monitor-docker-version",
+      "name": "Docker Version",
+      "description": "Shows current Docker version. Uses 'docker --version' command to display the installed Docker version. Requires Docker to be installed.",
+      "command": "docker --version",
+      "monitor": "docker --version | awk \"{print $3}\" | sed \"s/,//\"",
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "🐳"
+    },
+    {
+      "id": "monitor-kubectl-version",
+      "name": "Kubectl Version",
+      "description": "Shows the installed version of kubectl (Kubernetes CLI). Uses 'kubectl version --client --short' to display the client version. Requires kubectl to be installed. Install: https://kubernetes.io/docs/tasks/tools/",
+      "command": "kubectl version --client --short",
+      "monitor": "kubectl version --client --short | awk \"{print $3}\"",
+      "hotkey": "Ctrl+Shift+K",
+      "icon": "☸️"
+    },
+    {
+      "id": "monitor-terraform-version",
+      "name": "Terraform Version",
+      "description": "Shows the installed version of Terraform. Uses 'terraform --version' to display the version. Requires Terraform to be installed. Install: https://developer.hashicorp.com/terraform/downloads",
+      "command": "terraform --version",
+      "monitor": "terraform --version | head -1 | awk \"{print $2}\"",
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "🏗️"
+    }
+  ]
+}

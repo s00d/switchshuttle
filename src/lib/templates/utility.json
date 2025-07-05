@@ -1,0 +1,370 @@
+{
+  "name": "Utility",
+  "description": "System utilities and maintenance tools for development and system management",
+  "commands": [
+    {
+      "id": "system-info",
+      "name": "System Information",
+      "command": "system_profiler SPHardwareDataType",
+      "hotkey": "Ctrl+Shift+I",
+      "icon": "💻",
+      "description": "Displays detailed system information including hardware specifications, memory, storage, and system version. Useful for troubleshooting and system documentation."
+    },
+    {
+      "id": "disk-usage",
+      "name": "Disk Usage",
+      "command": "df -h",
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "💾",
+      "description": "Shows disk space usage in human-readable format. Displays total, used, and available space for all mounted filesystems."
+    },
+    {
+      "id": "memory-usage",
+      "name": "Memory Usage",
+      "command": "top -l 1 | head -n 10",
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "🧠",
+      "description": "Displays current memory usage and system load. Shows CPU usage, memory statistics, and top processes by resource consumption."
+    },
+    {
+      "id": "process-list",
+      "name": "Process List",
+      "command": "ps aux | head -20",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "📋",
+      "description": "Lists running processes with detailed information including CPU, memory usage, and command details. Useful for monitoring system activity."
+    },
+    {
+      "id": "kill-process",
+      "name": "Kill Process",
+      "command": "kill -9 [pid]",
+      "inputs": {
+        "pid": "1234"
+      },
+      "hotkey": "Ctrl+Shift+K",
+      "icon": "💀",
+      "description": "Forcefully terminates a process by its PID. Use with caution as this can cause data loss if the process is writing files."
+    },
+    {
+      "id": "network-status",
+      "name": "Network Status",
+      "command": "ifconfig | grep -E \"inet |status:\"",
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "🌐",
+      "description": "Shows network interface status and IP addresses. Displays active network connections and their configurations."
+    },
+    {
+      "id": "ping-test",
+      "name": "Ping Test",
+      "command": "ping -c [count] [host]",
+      "inputs": {
+        "count": "5",
+        "host": "google.com"
+      },
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "🏓",
+      "description": "Tests network connectivity to a specified host. Shows response times and packet loss statistics for network troubleshooting."
+    },
+    {
+      "id": "port-scan",
+      "name": "Port Scan",
+      "command": "nmap -p [ports] [host]",
+      "inputs": {
+        "ports": "80,443,8080",
+        "host": "localhost"
+      },
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🔍",
+      "description": "Scans specified ports on a host to check which services are running. Useful for security auditing and service discovery."
+    },
+    {
+      "id": "file-search",
+      "name": "Find Files",
+      "command": "find [path] -name \"[pattern]\" -type f",
+      "inputs": {
+        "path": ".",
+        "pattern": "*.js"
+      },
+      "hotkey": "Ctrl+Shift+F",
+      "icon": "🔍",
+      "description": "Searches for files matching a pattern in the current directory and subdirectories. Supports wildcards and file type filtering."
+    },
+    {
+      "id": "grep-search",
+      "name": "Search in Files",
+      "command": "grep -r \"[pattern]\" [path]",
+      "inputs": {
+        "pattern": "function",
+        "path": "."
+      },
+      "hotkey": "Ctrl+Shift+G",
+      "icon": "🔎",
+      "description": "Searches for text patterns in files recursively. Useful for finding specific code, functions, or text across a codebase."
+    },
+    {
+      "id": "file-size",
+      "name": "File Size",
+      "command": "ls -lh [file]",
+      "inputs": {
+        "file": "package.json"
+      },
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "📏",
+      "description": "Shows file size and details in human-readable format. Displays permissions, owner, size, and modification date."
+    },
+    {
+      "id": "compress-file",
+      "name": "Compress File",
+      "command": "tar -czf [archive-name].tar.gz [source-path]",
+      "inputs": {
+        "archive-name": "backup",
+        "source-path": "data"
+      },
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "🗜️",
+      "description": "Creates a compressed archive of files or directories. Uses gzip compression to reduce file size for storage or transfer."
+    },
+    {
+      "id": "extract-archive",
+      "name": "Extract Archive",
+      "command": "tar -xzf [archive-name].tar.gz",
+      "inputs": {
+        "archive-name": "backup"
+      },
+      "hotkey": "Ctrl+Shift+E",
+      "icon": "📦",
+      "description": "Extracts files from a compressed archive. Supports various archive formats including tar.gz, zip, and rar files."
+    },
+    {
+      "id": "sync-files",
+      "name": "Sync Files",
+      "command": "rsync -av [source-path]/ [destination-path]/",
+      "inputs": {
+        "source-path": "/path/to/source",
+        "destination-path": "/path/to/destination"
+      },
+      "hotkey": "Ctrl+Shift+Y",
+      "icon": "🔄",
+      "description": "Synchronizes files between directories efficiently. Only copies changed files and preserves permissions and timestamps."
+    },
+    {
+      "id": "backup-dir",
+      "name": "Backup Directory",
+      "command": "cp -r [source-path] [backup-path]",
+      "inputs": {
+        "source-path": "project",
+        "backup-path": "project_backup"
+      },
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "💾",
+      "description": "Creates a complete backup copy of a directory. Preserves all files, subdirectories, and permissions."
+    },
+    {
+      "id": "clean-temp",
+      "name": "Clean Temp Files",
+      "command": "rm -rf /tmp/*",
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "🧹",
+      "description": "Removes temporary files from the system temp directory. Frees up disk space and cleans system cache files."
+    },
+    {
+      "id": "monitor-logs",
+      "name": "Monitor Logs",
+      "command": "tail -f [log-file]",
+      "inputs": {
+        "log-file": "/var/log/system.log"
+      },
+      "hotkey": "Ctrl+Shift+L",
+      "icon": "📋",
+      "description": "Monitors log files in real-time. Shows new log entries as they are written, useful for debugging and system monitoring."
+    },
+    {
+      "id": "system-uptime",
+      "name": "System Uptime",
+      "command": "uptime",
+      "hotkey": "Ctrl+Shift+U",
+      "icon": "⏰",
+      "description": "Shows system uptime and load averages. Displays how long the system has been running and current system load."
+    },
+    {
+      "id": "cpu-info",
+      "name": "CPU Information",
+      "command": "sysctl -n machdep.cpu.brand_string",
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "⚡",
+      "description": "Displays detailed CPU information including model, cores, and specifications. Useful for system diagnostics and performance analysis."
+    },
+    {
+      "id": "battery-status",
+      "name": "Battery Status",
+      "command": "pmset -g batt",
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "🔋",
+      "description": "Shows battery status and health information. Displays charge level, time remaining, and battery condition."
+    },
+    {
+      "id": "wifi-info",
+      "name": "WiFi Information",
+      "command": "networksetup -getinfo Wi-Fi",
+      "hotkey": "Ctrl+Shift+W",
+      "icon": "📶",
+      "description": "Displays WiFi network information including IP address, subnet mask, router address, and DNS servers."
+    },
+    {
+      "id": "bluetooth-status",
+      "name": "Bluetooth Status",
+      "command": "system_profiler SPBluetoothDataType",
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "🔵",
+      "description": "Shows Bluetooth device information and connection status. Lists paired devices and their current state."
+    },
+    {
+      "id": "audio-devices",
+      "name": "Audio Devices",
+      "command": "system_profiler SPAudioDataType",
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "🎵",
+      "description": "Lists audio input and output devices. Shows device names, capabilities, and current status."
+    },
+    {
+      "id": "usb-devices",
+      "name": "USB Devices",
+      "command": "system_profiler SPUSBDataType",
+      "hotkey": "Ctrl+Shift+U",
+      "icon": "🔌",
+      "description": "Lists all connected USB devices. Shows device names, manufacturers, and connection status."
+    },
+    {
+      "id": "firewall-status",
+      "name": "Firewall Status",
+      "command": "sudo pfctl -s info",
+      "hotkey": "Ctrl+Shift+F",
+      "icon": "🛡️",
+      "description": "Shows firewall status and rules. Displays active firewall configuration and security settings."
+    },
+    {
+      "id": "dns-flush",
+      "name": "Flush DNS Cache",
+      "command": "sudo dscacheutil -flushcache",
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "🔄",
+      "description": "Clears the DNS cache to resolve network connectivity issues. Forces the system to fetch fresh DNS records."
+    },
+    {
+      "id": "repair-permissions",
+      "name": "Repair Permissions",
+      "command": "sudo chown -R $(whoami) [directory-path]",
+      "inputs": {
+        "directory-path": "/usr/local"
+      },
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "🔧",
+      "description": "Repairs file permissions for a directory. Fixes ownership issues that can cause permission errors."
+    },
+    {
+      "id": "disk-repair",
+      "name": "Repair Disk",
+      "command": "diskutil verifyDisk [disk-name]",
+      "inputs": {
+        "disk-name": "disk0"
+      },
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "🔧",
+      "description": "Verifies disk integrity and repairs filesystem errors. Checks for corruption and attempts to fix issues."
+    },
+    {
+      "id": "reset-launchpad",
+      "name": "Reset Launchpad",
+      "command": "defaults write com.apple.dock ResetLaunchPad -bool true && killall Dock",
+      "hotkey": "Ctrl+Shift+L",
+      "icon": "🚀",
+      "description": "Resets the Launchpad to default settings. Clears app organization and returns to factory layout."
+    },
+    {
+      "id": "clear-cache",
+      "name": "Clear System Cache",
+      "command": "sudo rm -rf /Library/Caches/* ~/Library/Caches/*",
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "🧹",
+      "description": "Clears system and user caches to free up disk space and resolve performance issues."
+    },
+    {
+      "id": "update-software",
+      "name": "Check for Updates",
+      "command": "softwareupdate -l",
+      "hotkey": "Ctrl+Shift+U",
+      "icon": "🔄",
+      "description": "Checks for available system software updates. Lists pending updates that can be installed."
+    },
+    {
+      "id": "install-updates",
+      "name": "Install Updates",
+      "command": "sudo softwareupdate -i -a",
+      "hotkey": "Ctrl+Shift+I",
+      "icon": "⬇️",
+      "description": "Installs all available system software updates. Requires administrator privileges and may require restart."
+    },
+    {
+      "id": "restart-services",
+      "name": "Restart Services",
+      "command": "sudo launchctl unload /System/Library/LaunchDaemons/[service-name].plist && sudo launchctl load /System/Library/LaunchDaemons/[service-name].plist",
+      "inputs": {
+        "service-name": "com.apple.apsd"
+      },
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "🔄",
+      "description": "Restarts a system service by unloading and reloading its launch daemon. Useful for troubleshooting service issues."
+    },
+    {
+      "id": "monitor-activity",
+      "name": "Monitor Activity",
+      "command": "top -o cpu",
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "📊",
+      "description": "Opens real-time system activity monitor. Shows CPU usage, memory consumption, and process details in an interactive interface."
+    },
+    {
+      "id": "network-speed",
+      "name": "Network Speed Test",
+      "command": "curl -o /dev/null -s -w \"Download: %{speed_download} bytes/sec\\n\" [test-url]",
+      "inputs": {
+        "test-url": "https://httpbin.org/bytes/100000"
+      },
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🚀",
+      "description": "Tests network download speed by downloading a test file. Measures bandwidth and connection performance."
+    },
+    {
+      "id": "check-ports",
+      "name": "Check Open Ports",
+      "command": "lsof -i -P | grep LISTEN",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "🔍",
+      "description": "Lists all open network ports and the processes using them. Useful for identifying which services are running."
+    },
+    {
+      "id": "system-log",
+      "name": "View System Log",
+      "command": "log show --predicate 'process == \"kernel\"' --last 1h",
+      "hotkey": "Ctrl+Shift+L",
+      "icon": "📋",
+      "description": "Shows system log entries from the last hour. Displays kernel messages and system events for troubleshooting."
+    },
+    {
+      "id": "user-accounts",
+      "name": "List User Accounts",
+      "command": "dscl . -list /Users",
+      "hotkey": "Ctrl+Shift+U",
+      "icon": "👥",
+      "description": "Lists all user accounts on the system. Shows usernames and account information."
+    },
+    {
+      "id": "disk-space-detail",
+      "name": "Detailed Disk Space",
+      "command": "du -sh * | sort -hr",
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "💾",
+      "description": "Shows disk usage for all items in current directory, sorted by size. Helps identify large files and directories."
+    }
+  ]
+}

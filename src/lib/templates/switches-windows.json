@@ -1,0 +1,193 @@
+{
+  "name": "Switches (Windows)",
+  "description": "Toggle switches for Windows system states and configurations",
+  "commands": [
+    {
+      "id": "switch-wifi-windows",
+      "name": "WiFi Toggle",
+      "command": "netsh interface set interface \"Wi-Fi\" admin=disable",
+      "switch": "netsh interface show interface \"Wi-Fi\" | findstr \"enabled\" >nul && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+W",
+      "icon": "📶",
+      "description": "Toggles WiFi adapter on and off using netsh command. This allows you to quickly enable or disable wireless networking on your Windows system."
+    },
+    {
+      "id": "switch-bluetooth-windows",
+      "name": "Bluetooth Toggle",
+      "command": "powershell -Command \"Get-PnpDevice -Class Bluetooth | Enable-PnpDevice\"",
+      "switch": "powershell -Command \"Get-PnpDevice -Class Bluetooth | Where-Object {$_.Status -eq \"OK\"} | Measure-Object | Select-Object -ExpandProperty Count\" | findstr \"0\" >nul && echo \"false\" || echo \"true\"",
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "🔵",
+      "description": "Toggles Bluetooth adapter on and off using PowerShell. This allows you to quickly enable or disable Bluetooth connectivity on your Windows system."
+    },
+    {
+      "id": "switch-dark-mode-windows",
+      "name": "Dark Mode Toggle",
+      "command": "powershell -Command \"Set-ItemProperty -Path \\\"HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize\\\" -Name \\\"AppsUseLightTheme\\\" -Value 0\"",
+      "switch": "powershell -Command \"Get-ItemProperty -Path \\\"HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize\\\" -Name \\\"AppsUseLightTheme\\\" | Select-Object -ExpandProperty AppsUseLightTheme\" | findstr \"0\" >nul && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "🌙",
+      "description": "Toggles between light and dark mode appearance using PowerShell. This changes the system-wide appearance to either light or dark theme."
+    },
+    {
+      "id": "switch-sound-windows",
+      "name": "Sound Toggle",
+      "command": "powershell -Command \"$obj = New-Object -ComObject WScript.Shell; $obj.SendKeys([char]173)\"",
+      "switch": "powershell -Command \"Get-AudioDevice -Playback | Where-Object {$_.Muted -eq $true} | Measure-Object | Select-Object -ExpandProperty Count\" | findstr \"0\" >nul && echo \"false\" || echo \"true\"",
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "🔊",
+      "description": "Toggles system audio mute on and off using PowerShell. This allows you to quickly mute or unmute all system sounds and audio output."
+    },
+    {
+      "id": "switch-caps-lock-windows",
+      "name": "Caps Lock Toggle",
+      "command": "powershell -Command \"$obj = New-Object -ComObject WScript.Shell; $obj.SendKeys([char]20)\"",
+      "switch": "powershell -Command \"[Console]::CapsLock\" | findstr \"True\" >nul && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "🔒",
+      "description": "Toggles Caps Lock on and off programmatically using PowerShell. This allows you to control the Caps Lock state through automation."
+    },
+    {
+      "id": "switch-num-lock-windows",
+      "name": "Num Lock Toggle",
+      "command": "powershell -Command \"$obj = New-Object -ComObject WScript.Shell; $obj.SendKeys([char]144)\"",
+      "switch": "powershell -Command \"[Console]::NumberLock\" | findstr \"True\" >nul && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "🔢",
+      "description": "Toggles Num Lock on and off programmatically using PowerShell. This allows you to control the Num Lock state through automation."
+    },
+    {
+      "id": "switch-docker-windows",
+      "name": "Docker Toggle",
+      "command": "start \"\" \"C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe\"",
+      "switch": "tasklist /FI \"IMAGENAME eq Docker Desktop.exe\" 2>NUL | find /I /N \"Docker Desktop.exe\">NUL && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "🐳",
+      "description": "Toggles Docker Desktop on and off. This starts or stops the Docker application for container management on Windows."
+    },
+    {
+      "id": "switch-mysql-windows",
+      "name": "MySQL Toggle",
+      "command": "net start mysql",
+      "switch": "sc query mysql | findstr \"RUNNING\" >nul && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "🐬",
+      "description": "Toggles MySQL database service on and off using net command. This starts or stops the MySQL server on Windows."
+    },
+    {
+      "id": "switch-postgres-windows",
+      "name": "PostgreSQL Toggle",
+      "command": "net start postgresql",
+      "switch": "sc query postgresql | findstr \"RUNNING\" >nul && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "🐘",
+      "description": "Toggles PostgreSQL database service on and off using net command. This starts or stops the PostgreSQL server on Windows."
+    },
+    {
+      "id": "switch-redis-windows",
+      "name": "Redis Toggle",
+      "command": "net start redis",
+      "switch": "sc query redis | findstr \"RUNNING\" >nul && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "🔴",
+      "description": "Toggles Redis service on and off using net command. This starts or stops the Redis in-memory database on Windows."
+    },
+    {
+      "id": "switch-nginx-windows",
+      "name": "Nginx Toggle",
+      "command": "net start nginx",
+      "switch": "sc query nginx | findstr \"RUNNING\" >nul && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "🌐",
+      "description": "Toggles Nginx web server on and off using net command. This starts or stops the Nginx web server on Windows."
+    },
+    {
+      "id": "switch-apache-windows",
+      "name": "Apache Toggle",
+      "command": "net start apache",
+      "switch": "sc query apache | findstr \"RUNNING\" >nul && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "🦅",
+      "description": "Toggles Apache web server on and off using net command. This starts or stops the Apache web server on Windows."
+    },
+    {
+      "id": "switch-firewall-windows",
+      "name": "Firewall Toggle",
+      "command": "netsh advfirewall set allprofiles state on",
+      "switch": "netsh advfirewall show allprofiles state | findstr \"ON\" >nul && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+F",
+      "icon": "🛡️",
+      "description": "Toggles Windows Firewall on and off using netsh command. This enables or disables the built-in firewall for system security."
+    },
+    {
+      "id": "switch-vpn-windows",
+      "name": "VPN Toggle",
+      "command": "rasdial \"[vpn_name]\"",
+      "switch": "rasdial | findstr \"[vpn_name]\" >nul && echo \"true\" || echo \"false\"",
+      "inputs": {
+        "vpn_name": "MyVPN"
+      },
+      "hotkey": "Ctrl+Shift+V",
+      "icon": "🔒",
+      "description": "Toggles VPN connection on and off using rasdial command. This connects or disconnects from a configured VPN service."
+    },
+    {
+      "id": "switch-hotspot-windows",
+      "name": "Hotspot Toggle",
+      "command": "netsh wlan set hostednetwork mode=allow ssid=\"[hotspot_name]\" key=\"[password]\"",
+      "switch": "netsh wlan show hostednetwork | findstr \"Started\" >nul && echo \"true\" || echo \"false\"",
+      "inputs": {
+        "hotspot_name": "MyHotspot",
+        "password": "password123"
+      },
+      "hotkey": "Ctrl+Shift+H",
+      "icon": "📱",
+      "description": "Toggles Personal Hotspot on and off using netsh command. This enables or disables internet sharing on Windows."
+    },
+    {
+      "id": "switch-autohide-taskbar-windows",
+      "name": "Taskbar Autohide Toggle",
+      "command": "powershell -Command \"Set-ItemProperty -Path \\\"HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StuckRects3\\\" -Name \\\"Settings\\\" -Value (Get-ItemProperty -Path \\\"HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StuckRects3\\\" -Name \\\"Settings\\\").Settings -bxor 0x02\"",
+      "switch": "powershell -Command \"Get-ItemProperty -Path \\\"HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StuckRects3\\\" -Name \\\"Settings\\\" | Select-Object -ExpandProperty Settings\" | findstr \"0x02\" >nul && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "📱",
+      "description": "Toggles Taskbar autohide feature on and off using PowerShell. This makes the taskbar automatically hide when not in use."
+    },
+    {
+      "id": "switch-night-light-windows",
+      "name": "Night Light Toggle",
+      "command": "powershell -Command \"Set-ItemProperty -Path \\\"HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CloudStore\\Store\\Cache\\DefaultAccount\\$$windows.data.bluelightreduction.bluelightreductionstate\\$$windows.data.bluelightreduction.bluelightreductionstate\\\" -Name \\\"Data\\\" -Value (Get-ItemProperty -Path \\\"HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CloudStore\\Store\\Cache\\DefaultAccount\\$$windows.data.bluelightreduction.bluelightreductionstate\\$$windows.data.bluelightreduction.bluelightreductionstate\\\" -Name \\\"Data\\\").Data -bxor 0x01\"",
+      "switch": "powershell -Command \"Get-ItemProperty -Path \\\"HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CloudStore\\Store\\Cache\\DefaultAccount\\$$windows.data.bluelightreduction.bluelightreductionstate\\$$windows.data.bluelightreduction.bluelightreductionstate\\\" -Name \\\"Data\\\" | Select-Object -ExpandProperty Data\" | findstr \"0x01\" >nul && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "🌅",
+      "description": "Toggles Night Light feature on and off using PowerShell. This reduces blue light emission during evening hours."
+    },
+    {
+      "id": "switch-cortana-windows",
+      "name": "Cortana Toggle",
+      "command": "powershell -Command \"Get-AppxPackage -Name Microsoft.Windows.Cortana | Set-AppxPackage -DisableDevelopmentMode\"",
+      "switch": "powershell -Command \"Get-AppxPackage -Name Microsoft.Windows.Cortana | Where-Object {$_.IsDisabled -eq $false} | Measure-Object | Select-Object -ExpandProperty Count\" | findstr \"0\" >nul && echo \"false\" || echo \"true\"",
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "🎤",
+      "description": "Toggles Cortana voice assistant on and off using PowerShell. This enables or disables the Cortana feature on Windows."
+    },
+    {
+      "id": "switch-windows-update-windows",
+      "name": "Windows Update Toggle",
+      "command": "powershell -Command \"Set-Service -Name wuauserv -StartupType Manual\"",
+      "switch": "powershell -Command \"Get-Service -Name wuauserv | Select-Object -ExpandProperty StartType\" | findstr \"Manual\" >nul && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+U",
+      "icon": "🔄",
+      "description": "Toggles Windows Update service on and off using PowerShell. This enables or disables automatic system updates."
+    },
+    {
+      "id": "switch-defender-windows",
+      "name": "Windows Defender Toggle",
+      "command": "powershell -Command \"Set-MpPreference -DisableRealtimeMonitoring $false\"",
+      "switch": "powershell -Command \"Get-MpPreference | Select-Object -ExpandProperty DisableRealtimeMonitoring\" | findstr \"False\" >nul && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "🛡️",
+      "description": "Toggles Windows Defender real-time protection on and off using PowerShell. This enables or disables the antivirus protection."
+    }
+  ]
+}

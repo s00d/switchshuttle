@@ -1,0 +1,341 @@
+{
+  "name": "Security",
+  "description": "Security tools and vulnerability assessment",
+  "commands": [
+    {
+      "id": "npm-audit",
+      "name": "Audit npm Dependencies",
+      "command": "npm audit",
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "🔍",
+      "description": "Runs a security audit on npm dependencies to identify known vulnerabilities. This command checks your package.json against the npm security database and reports any security issues found in your dependencies."
+    },
+    {
+      "id": "npm-audit-fix",
+      "name": "Fix npm Vulnerabilities",
+      "command": "npm audit fix",
+      "hotkey": "Ctrl+Shift+F",
+      "icon": "🔧",
+      "description": "Automatically fixes security vulnerabilities in npm dependencies where possible. This updates packages to secure versions and can resolve many common security issues automatically."
+    },
+    {
+      "id": "yarn-audit",
+      "name": "Audit yarn Dependencies",
+      "command": "yarn audit",
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "🔍",
+      "description": "Runs a security audit on yarn dependencies to identify known vulnerabilities. This checks your package.json against the yarn security database and reports security issues."
+    },
+    {
+      "id": "yarn-audit-fix",
+      "name": "Fix yarn Vulnerabilities",
+      "command": "yarn audit --fix",
+      "hotkey": "Ctrl+Shift+F",
+      "icon": "🔧",
+      "description": "Automatically fixes security vulnerabilities in yarn dependencies where possible. This updates packages to secure versions and resolves common security issues."
+    },
+    {
+      "id": "pnpm-audit",
+      "name": "Audit pnpm Dependencies",
+      "command": "pnpm audit",
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "🔍",
+      "description": "Runs a security audit on pnpm dependencies to identify known vulnerabilities. This checks your package.json against the pnpm security database and reports security issues."
+    },
+    {
+      "id": "pnpm-audit-fix",
+      "name": "Fix pnpm Vulnerabilities",
+      "command": "pnpm audit --fix",
+      "hotkey": "Ctrl+Shift+F",
+      "icon": "🔧",
+      "description": "Automatically fixes security vulnerabilities in pnpm dependencies where possible. This updates packages to secure versions and resolves common security issues."
+    },
+    {
+      "id": "snyk-test",
+      "name": "Test with Snyk",
+      "command": "npx snyk test",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🛡️",
+      "description": "Runs Snyk security testing on your project. Snyk is a security platform that helps find and fix vulnerabilities in dependencies, containers, and infrastructure as code."
+    },
+    {
+      "id": "snyk-monitor",
+      "name": "Monitor with Snyk",
+      "command": "npx snyk monitor",
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "📊",
+      "description": "Monitors your project with Snyk for ongoing security vulnerabilities. This creates a snapshot of your dependencies and continuously monitors for new security issues."
+    },
+    {
+      "id": "snyk-container",
+      "name": "Test Docker Container",
+      "command": "npx snyk container test [image_name]",
+      "inputs": {
+        "image_name": "myapp:latest"
+      },
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "🐳",
+      "description": "Tests a Docker container for security vulnerabilities using Snyk. This scans the container image for known vulnerabilities in the base image and installed packages."
+    },
+    {
+      "id": "safety-check",
+      "name": "Check Python Dependencies",
+      "command": "safety check",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "🐍",
+      "description": "Checks Python dependencies for known security vulnerabilities using Safety. Safety is a security tool that checks your installed packages against a database of known vulnerabilities."
+    },
+    {
+      "id": "bandit-scan",
+      "name": "Scan Python Code",
+      "command": "bandit -r .",
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "🔍",
+      "description": "Scans Python code for common security issues using Bandit. Bandit is a security linter that finds common security issues in Python code, such as hardcoded passwords and SQL injection."
+    },
+    {
+      "id": "semgrep-scan",
+      "name": "Scan with Semgrep",
+      "command": "semgrep --config=auto .",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🔍",
+      "description": "Scans code for security issues using Semgrep. Semgrep is a static analysis tool that finds bugs and security issues in your code using pattern matching and semantic analysis."
+    },
+    {
+      "id": "gitleaks-scan",
+      "name": "Scan for Secrets",
+      "command": "gitleaks detect --source .",
+      "hotkey": "Ctrl+Shift+G",
+      "icon": "🔐",
+      "description": "Scans for secrets and sensitive information in your codebase using Gitleaks. This tool detects hardcoded passwords, API keys, tokens, and other sensitive data that shouldn't be in version control."
+    },
+    {
+      "id": "trufflehog-scan",
+      "name": "Scan with TruffleHog",
+      "command": "trufflehog --only-verified .",
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "🐷",
+      "description": "Scans for secrets and sensitive information using TruffleHog. This tool searches through git history and current code for accidentally committed secrets like API keys and passwords."
+    },
+    {
+      "id": "nuclei-scan",
+      "name": "Scan with Nuclei",
+      "command": "nuclei -u [target_url]",
+      "inputs": {
+        "target_url": "https://example.com"
+      },
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "🎯",
+      "description": "Scans web applications for vulnerabilities using Nuclei. Nuclei is a fast vulnerability scanner that uses templates to detect security issues in web applications and infrastructure."
+    },
+    {
+      "id": "zap-baseline",
+      "name": "Run OWASP ZAP Baseline",
+      "command": "zap-baseline.py -t [target_url]",
+      "inputs": {
+        "target_url": "https://example.com"
+      },
+      "hotkey": "Ctrl+Shift+Z",
+      "icon": "🕷️",
+      "description": "Runs OWASP ZAP baseline scan on a web application. ZAP (Zed Attack Proxy) is a web application security scanner that helps find vulnerabilities in web applications."
+    },
+    {
+      "id": "nmap-scan",
+      "name": "Network Port Scan",
+      "command": "nmap -sV [target_ip]",
+      "inputs": {
+        "target_ip": "192.168.1.1"
+      },
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "🌐",
+      "description": "Scans network ports and services using Nmap. Nmap is a network discovery and security auditing tool that can identify open ports, services, and potential vulnerabilities."
+    },
+    {
+      "id": "nmap-vuln-scan",
+      "name": "Vulnerability Scan",
+      "command": "nmap --script vuln [target_ip]",
+      "inputs": {
+        "target_ip": "192.168.1.1"
+      },
+      "hotkey": "Ctrl+Shift+V",
+      "icon": "🔍",
+      "description": "Runs a vulnerability scan using Nmap scripts. This uses Nmap's built-in vulnerability detection scripts to identify common security issues on target systems."
+    },
+    {
+      "id": "sslyze-scan",
+      "name": "SSL/TLS Security Scan",
+      "command": "sslyze [target_host]",
+      "inputs": {
+        "target_host": "example.com"
+      },
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🔒",
+      "description": "Scans SSL/TLS configuration for security issues using SSLyze. This tool checks for weak ciphers, outdated protocols, and other SSL/TLS security problems."
+    },
+    {
+      "id": "testssl-scan",
+      "name": "Test SSL Configuration",
+      "command": "testssl.sh [target_host]",
+      "inputs": {
+        "target_host": "example.com"
+      },
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "🔒",
+      "description": "Tests SSL/TLS configuration using testssl.sh. This comprehensive tool checks for various SSL/TLS security issues including certificate problems, weak ciphers, and protocol support."
+    },
+    {
+      "id": "dirb-scan",
+      "name": "Directory Brute Force",
+      "command": "dirb [target_url]",
+      "inputs": {
+        "target_url": "https://example.com"
+      },
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "📁",
+      "description": "Scans for hidden directories and files using Dirb. This tool performs directory brute forcing to discover hidden web content that might reveal sensitive information."
+    },
+    {
+      "id": "gobuster-scan",
+      "name": "Scan with Gobuster",
+      "command": "gobuster dir -u [target_url] -w /usr/share/wordlists/dirb/common.txt",
+      "inputs": {
+        "target_url": "https://example.com"
+      },
+      "hotkey": "Ctrl+Shift+G",
+      "icon": "🔍",
+      "description": "Scans for directories and files using Gobuster. Gobuster is a fast directory/file enumeration tool that can discover hidden web content and potential security issues."
+    },
+    {
+      "id": "nikto-scan",
+      "name": "Web Server Scan",
+      "command": "nikto -h [target_url]",
+      "inputs": {
+        "target_url": "https://example.com"
+      },
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "🌐",
+      "description": "Scans web servers for vulnerabilities using Nikto. Nikto is a web server scanner that checks for dangerous files, outdated software, and other security issues."
+    },
+    {
+      "id": "sqlmap-scan",
+      "name": "SQL Injection Test",
+      "command": "sqlmap -u [target_url]",
+      "inputs": {
+        "target_url": "https://example.com/page?id=1"
+      },
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "💉",
+      "description": "Tests for SQL injection vulnerabilities using SQLMap. SQLMap is an automated SQL injection and database takeover tool that can detect and exploit SQL injection vulnerabilities."
+    },
+    {
+      "id": "hydra-brute",
+      "name": "Password Brute Force",
+      "command": "hydra -l [username] -P [wordlist] [target_host] [service]",
+      "inputs": {
+        "username": "admin",
+        "wordlist": "/usr/share/wordlists/rockyou.txt",
+        "target_host": "192.168.1.1",
+        "service": "ssh"
+      },
+      "hotkey": "Ctrl+Shift+H",
+      "icon": "🔑",
+      "description": "Performs password brute force attacks using Hydra. Hydra is a parallelized login cracker that supports numerous protocols and can test multiple passwords against various services."
+    },
+    {
+      "id": "john-crack",
+      "name": "Password Cracking",
+      "command": "john [hash_file]",
+      "inputs": {
+        "hash_file": "hashes.txt"
+      },
+      "hotkey": "Ctrl+Shift+J",
+      "icon": "🔓",
+      "description": "Cracks password hashes using John the Ripper. John is a fast password cracker that can crack various types of password hashes using dictionary attacks and brute force methods."
+    },
+    {
+      "id": "hashcat-crack",
+      "name": "GPU Password Cracking",
+      "command": "hashcat -m [hash_type] -a 0 [hash_file] [wordlist]",
+      "inputs": {
+        "hash_type": "0",
+        "hash_file": "hashes.txt",
+        "wordlist": "/usr/share/wordlists/rockyou.txt"
+      },
+      "hotkey": "Ctrl+Shift+H",
+      "icon": "⚡",
+      "description": "Cracks password hashes using Hashcat with GPU acceleration. Hashcat is a fast password recovery tool that can utilize GPU power for faster password cracking."
+    },
+    {
+      "id": "metasploit-search",
+      "name": "Search Metasploit Modules",
+      "command": "msfconsole -q -x 'search [exploit_name]'",
+      "inputs": {
+        "exploit_name": "apache"
+      },
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "🔧",
+      "description": "Searches for Metasploit modules. Metasploit is a penetration testing framework that provides exploits, payloads, and auxiliary modules for security testing."
+    },
+    {
+      "id": "wireshark-capture",
+      "name": "Capture Network Traffic",
+      "command": "wireshark -i [interface] -k",
+      "inputs": {
+        "interface": "eth0"
+      },
+      "hotkey": "Ctrl+Shift+W",
+      "icon": "📡",
+      "description": "Captures and analyzes network traffic using Wireshark. Wireshark is a network protocol analyzer that can capture and display network packets for security analysis."
+    },
+    {
+      "id": "tcpdump-capture",
+      "name": "Command Line Packet Capture",
+      "command": "tcpdump -i [interface] -w capture.pcap",
+      "inputs": {
+        "interface": "eth0"
+      },
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "📡",
+      "description": "Captures network packets using tcpdump. tcpdump is a command-line packet analyzer that can capture and save network traffic for later analysis."
+    },
+    {
+      "id": "openssl-test",
+      "name": "Test SSL Connection",
+      "command": "openssl s_client -connect [host]:[port]",
+      "inputs": {
+        "host": "example.com",
+        "port": "443"
+      },
+      "hotkey": "Ctrl+Shift+O",
+      "icon": "🔒",
+      "description": "Tests SSL/TLS connection using OpenSSL. This command connects to a server and displays detailed information about the SSL/TLS handshake and certificate."
+    },
+    {
+      "id": "cert-check",
+      "name": "Check Certificate Expiry",
+      "command": "openssl x509 -in [cert_file] -text -noout",
+      "inputs": {
+        "cert_file": "certificate.crt"
+      },
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "📜",
+      "description": "Examines SSL certificate details using OpenSSL. This command displays comprehensive information about an SSL certificate including validity dates, issuer, and subject."
+    },
+    {
+      "id": "firewall-status",
+      "name": "Check Firewall Status",
+      "command": "ufw status",
+      "hotkey": "Ctrl+Shift+F",
+      "icon": "🔥",
+      "description": "Checks the status of UFW (Uncomplicated Firewall). UFW is a user-friendly interface for managing iptables firewall rules on Ubuntu and other Linux distributions."
+    },
+    {
+      "id": "fail2ban-status",
+      "name": "Check Fail2Ban Status",
+      "command": "fail2ban-client status",
+      "hotkey": "Ctrl+Shift+F",
+      "icon": "🚫",
+      "description": "Checks the status of Fail2Ban. Fail2Ban is an intrusion prevention software that protects servers from brute force attacks by monitoring log files and blocking suspicious IP addresses."
+    }
+  ]
+}

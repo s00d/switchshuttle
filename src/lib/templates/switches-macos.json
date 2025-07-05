@@ -1,0 +1,279 @@
+{
+  "name": "macOS Switches",
+  "description": "Toggle switches for macOS system states and configurations",
+  "commands": [
+    {
+      "id": "switch-wifi-macos",
+      "name": "WiFi Toggle",
+      "command": "networksetup -setairportpower en0 off",
+      "switch": "networksetup -getairportpower en0 | grep -q \"On\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+W",
+      "icon": "📶",
+      "description": "Toggles WiFi on and off using the networksetup command. This allows you to quickly enable or disable wireless networking on your Mac."
+    },
+    {
+      "id": "switch-bluetooth-macos",
+      "name": "Bluetooth Toggle",
+      "command": "sudo pkill bluetoothd",
+      "switch": "system_profiler SPBluetoothDataType | grep -q \"State: On\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "🔵",
+      "description": "Toggles Bluetooth on and off by restarting the Bluetooth daemon. This allows you to quickly enable or disable Bluetooth connectivity."
+    },
+    {
+      "id": "switch-dark-mode-macos",
+      "name": "Dark Mode Toggle",
+      "command": "osascript -e 'tell application \"System Events\" to tell appearance preferences to set dark mode to true'",
+      "switch": "osascript -e 'tell application \"System Events\" to tell appearance preferences to get dark mode' | grep -q \"true\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "🌙",
+      "description": "Toggles between light and dark mode appearance. This changes the system-wide appearance to either light or dark theme."
+    },
+    {
+      "id": "switch-sound-macos",
+      "name": "Sound Toggle",
+      "command": "osascript -e 'set volume output muted true'",
+      "switch": "osascript -e 'output muted of (get volume settings)' | grep -q \"true\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "🔊",
+      "description": "Toggles system audio mute on and off. This allows you to quickly mute or unmute all system sounds and audio output."
+    },
+    {
+      "id": "switch-caps-lock-macos",
+      "name": "Caps Lock Toggle",
+      "command": "osascript -e 'tell application \"System Events\" to key code 57'",
+      "switch": "osascript -e 'tell application \"System Events\" to tell (process 1 where it is frontmost) to get value of attribute \"AXCapsLock\"' | grep -q \"true\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "🔒",
+      "description": "Toggles Caps Lock on and off programmatically. This allows you to control the Caps Lock state through automation."
+    },
+    {
+      "id": "switch-num-lock-macos",
+      "name": "Num Lock Toggle",
+      "command": "osascript -e 'tell application \"System Events\" to key code 71'",
+      "switch": "osascript -e 'tell application \"System Events\" to tell (process 1 where it is frontmost) to get value of attribute \"AXNumLock\"' | grep -q \"true\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "🔢",
+      "description": "Toggles Num Lock on and off programmatically. This allows you to control the Num Lock state through automation."
+    },
+    {
+      "id": "switch-docker-macos",
+      "name": "Docker Toggle",
+      "command": "open -a Docker",
+      "switch": "pgrep -f Docker.app | grep -q . && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "🐳",
+      "description": "Toggles Docker Desktop on and off. This starts or stops the Docker application for container management."
+    },
+    {
+      "id": "switch-mysql-macos",
+      "name": "MySQL Toggle",
+      "command": "brew services start mysql",
+      "switch": "brew services list | grep mysql | grep -q \"started\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "🐬",
+      "description": "Toggles MySQL database service on and off using Homebrew services. This starts or stops the MySQL server."
+    },
+    {
+      "id": "switch-postgres-macos",
+      "name": "PostgreSQL Toggle",
+      "command": "brew services start postgresql",
+      "switch": "brew services list | grep postgresql | grep -q \"started\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "🐘",
+      "description": "Toggles PostgreSQL database service on and off using Homebrew services. This starts or stops the PostgreSQL server."
+    },
+    {
+      "id": "switch-redis-macos",
+      "name": "Redis Toggle",
+      "command": "brew services start redis",
+      "switch": "brew services list | grep redis | grep -q \"started\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "🔴",
+      "description": "Toggles Redis service on and off using Homebrew services. This starts or stops the Redis in-memory database."
+    },
+    {
+      "id": "switch-nginx-macos",
+      "name": "Nginx Toggle",
+      "command": "brew services start nginx",
+      "switch": "brew services list | grep nginx | grep -q \"started\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "🌐",
+      "description": "Toggles Nginx web server on and off using Homebrew services. This starts or stops the Nginx web server."
+    },
+    {
+      "id": "switch-apache-macos",
+      "name": "Apache Toggle",
+      "command": "sudo apachectl start",
+      "switch": "sudo apachectl status | grep -q \"running\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "🦅",
+      "description": "Toggles Apache web server on and off using the built-in apachectl command. This starts or stops the Apache web server."
+    },
+    {
+      "id": "switch-firewall-macos",
+      "name": "Firewall Toggle",
+      "command": "sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on",
+      "switch": "sudo /usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate | grep -q \"Firewall is enabled\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+F",
+      "icon": "🛡️",
+      "description": "Toggles macOS built-in firewall on and off. This enables or disables the application firewall for system security."
+    },
+    {
+      "id": "switch-vpn-macos",
+      "name": "VPN Toggle",
+      "command": "scutil --nc start [vpn_name]",
+      "switch": "scutil --nc status [vpn_name] | grep -q \"Connected\" && echo \"true\" || echo \"false\"",
+      "inputs": {
+        "vpn_name": "MyVPN"
+      },
+      "hotkey": "Ctrl+Shift+V",
+      "icon": "🔒",
+      "description": "Toggles VPN connection on and off using scutil command. This connects or disconnects from a configured VPN service."
+    },
+    {
+      "id": "switch-hotspot-macos",
+      "name": "Hotspot Toggle",
+      "command": "sudo ifconfig en0 down && sudo ifconfig en0 up",
+      "switch": "ifconfig en0 | grep -q \"UP\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+H",
+      "icon": "📱",
+      "description": "Toggles Personal Hotspot on and off by restarting the network interface. This enables or disables internet sharing."
+    },
+    {
+      "id": "switch-autohide-dock-macos",
+      "name": "Dock Autohide Toggle",
+      "command": "defaults write com.apple.dock autohide -bool true",
+      "switch": "defaults read com.apple.dock autohide | grep -q \"1\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "📱",
+      "description": "Toggles Dock autohide feature on and off. This makes the Dock automatically hide when not in use."
+    },
+    {
+      "id": "switch-night-shift-macos",
+      "name": "Night Shift Toggle",
+      "command": "defaults write com.apple.dock night-mode -bool true",
+      "switch": "defaults read com.apple.dock night-mode | grep -q \"1\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "🌅",
+      "description": "Toggles Night Shift feature on and off. This reduces blue light emission during evening hours."
+    },
+    {
+      "id": "switch-screensaver-macos",
+      "name": "Screensaver Toggle",
+      "command": "defaults write com.apple.screensaver idleTime 0",
+      "switch": "defaults read com.apple.screensaver idleTime | grep -q \"0\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🖥️",
+      "description": "Toggles screensaver on and off by setting idle time. This enables or disables the screensaver activation."
+    },
+    {
+      "id": "switch-sleep-macos",
+      "name": "Sleep Toggle",
+      "command": "pmset sleepnow",
+      "switch": "pmset -g | grep -q \"sleep\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+U",
+      "icon": "💤",
+      "description": "Toggles system sleep mode. This puts the Mac into sleep mode or wakes it up from sleep."
+    },
+    {
+      "id": "switch-hibernate-macos",
+      "name": "Hibernate Toggle",
+      "command": "sudo pmset -a hibernatemode 3",
+      "switch": "pmset -g | grep -q \"hibernatemode 3\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+H",
+      "icon": "🐻",
+      "description": "Toggles hibernate mode on and off. This enables or disables the system hibernation feature."
+    },
+    {
+      "id": "switch-updates-macos",
+      "name": "Updates Toggle",
+      "command": "sudo softwareupdate --schedule off",
+      "switch": "sudo softwareupdate --schedule | grep -q \"Automatic check is off\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+U",
+      "icon": "🔄",
+      "description": "Toggles automatic software updates on and off. This enables or disables automatic system updates."
+    },
+    {
+      "id": "switch-filevault-macos",
+      "name": "FileVault Toggle",
+      "command": "sudo fdesetup enable",
+      "switch": "fdesetup status | grep -q \"FileVault is On\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+F",
+      "icon": "🔐",
+      "description": "Toggles FileVault disk encryption on and off. This enables or disables full disk encryption for security."
+    },
+    {
+      "id": "switch-gatekeeper-macos",
+      "name": "Gatekeeper Toggle",
+      "command": "sudo spctl --master-disable",
+      "switch": "spctl --status | grep -q \"disabled\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+G",
+      "icon": "🚪",
+      "description": "Toggles Gatekeeper security feature on and off. This enables or disables the application security system."
+    },
+    {
+      "id": "switch-sip-macos",
+      "name": "SIP Toggle",
+      "command": "csrutil disable",
+      "switch": "csrutil status | grep -q \"disabled\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🛡️",
+      "description": "Toggles System Integrity Protection on and off. This enables or disables the system security feature."
+    },
+    {
+      "id": "switch-trim-macos",
+      "name": "TRIM Toggle",
+      "command": "sudo trimforce enable",
+      "switch": "system_profiler SPStorageDataType | grep -q \"TRIM Support: Yes\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "💾",
+      "description": "Toggles TRIM support for SSDs on and off. This enables or disables TRIM for better SSD performance."
+    },
+    {
+      "id": "switch-spotlight-macos",
+      "name": "Spotlight Toggle",
+      "command": "sudo mdutil -a -i off",
+      "switch": "mdutil -a -s | grep -q \"Indexing enabled\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🔍",
+      "description": "Toggles Spotlight indexing on and off. This enables or disables the system search indexing feature."
+    },
+    {
+      "id": "switch-time-machine-macos",
+      "name": "Time Machine Toggle",
+      "command": "sudo tmutil disable",
+      "switch": "tmutil status | grep -q \"Running = 0\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "⏰",
+      "description": "Toggles Time Machine backup service on and off. This enables or disables automatic system backups."
+    },
+    {
+      "id": "switch-airdrop-macos",
+      "name": "AirDrop Toggle",
+      "command": "defaults write com.apple.NetworkBrowser BrowseAllInterfaces -bool true",
+      "switch": "defaults read com.apple.NetworkBrowser BrowseAllInterfaces | grep -q \"1\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "📤",
+      "description": "Toggles AirDrop functionality on and off. This enables or disables the file sharing feature between Apple devices."
+    },
+    {
+      "id": "switch-handoff-macos",
+      "name": "Handoff Toggle",
+      "command": "defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true",
+      "switch": "defaults read com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking | grep -q \"1\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+H",
+      "icon": "🤝",
+      "description": "Toggles Handoff feature on and off. This enables or disables continuity between Apple devices."
+    },
+    {
+      "id": "switch-siri-macos",
+      "name": "Siri Toggle",
+      "command": "defaults write com.apple.assistant.support \"Assistant Enabled\" -bool true",
+      "switch": "defaults read com.apple.assistant.support \"Assistant Enabled\" | grep -q \"1\" && echo \"true\" || echo \"false\"",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🎤",
+      "description": "Toggles Siri voice assistant on and off. This enables or disables the Siri feature on macOS."
+    }
+  ]
+}

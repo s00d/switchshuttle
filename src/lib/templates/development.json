@@ -1,0 +1,355 @@
+{
+  "name": "Development",
+  "description": "General software development tools and workflows",
+  "commands": [
+    {
+      "id": "dev-setup-project",
+      "name": "Init Project npm",
+      "description": "Creates a new Node.js project with npm initialization. Creates a directory with the specified name and initializes it as an npm package. Requires Node.js and npm to be installed.",
+      "command": "mkdir [project_name] && cd [project_name] && npm init -y",
+      "inputs": {
+        "project_name": "my-app"
+      },
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "🚀"
+    },
+    {
+      "id": "dev-install-deps",
+      "name": "Install Dependencies npm",
+      "description": "Installs a specific npm package. Adds the specified package to your project dependencies. Requires Node.js and npm to be installed.",
+      "command": "npm install [package_name]",
+      "inputs": {
+        "package_name": "lodash"
+      },
+      "hotkey": "Ctrl+Shift+I",
+      "icon": "📦"
+    },
+    {
+      "id": "dev-run-script",
+      "name": "Run Script npm",
+      "description": "Runs a specific npm script defined in package.json. Executes the script with the specified name. Requires Node.js and npm to be installed.",
+      "command": "npm run [script_name]",
+      "inputs": {
+        "script_name": "run"
+      },
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "▶️"
+    },
+    {
+      "id": "dev-build",
+      "name": "Build Project npm",
+      "description": "Builds the project using npm build script. Compiles and prepares the project for production. Requires Node.js and npm to be installed.",
+      "command": "npm run build",
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "📦"
+    },
+    {
+      "id": "dev-test",
+      "name": "Run Tests npm",
+      "description": "Runs all tests defined in your project using npm. Useful for verifying code correctness. Requires Node.js and npm to be installed.",
+      "command": "npm test",
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "🧪"
+    },
+    {
+      "id": "dev-lint",
+      "name": "Lint Code npm",
+      "description": "Checks your code for style and programming errors using the linter defined in your project. Requires Node.js, npm, and a linter (like ESLint) to be installed.",
+      "command": "npm run lint",
+      "hotkey": "Ctrl+Shift+L",
+      "icon": "🔍"
+    },
+    {
+      "id": "dev-format",
+      "name": "Format Code npm",
+      "description": "Automatically formats your code using the formatter defined in your project (e.g., Prettier). Requires Node.js, npm, and a formatter to be installed.",
+      "command": "npm run format",
+      "hotkey": "Ctrl+Shift+F",
+      "icon": "✨"
+    },
+    {
+      "id": "dev-watch",
+      "name": "Watch Mode npm",
+      "description": "Starts the development server in watch mode, automatically rebuilding on file changes. Requires Node.js and npm to be installed.",
+      "command": "npm run dev",
+      "hotkey": "Ctrl+Shift+W",
+      "icon": "👁️"
+    },
+    {
+      "id": "dev-debug",
+      "name": "Debug Mode npm",
+      "description": "Runs the project in debug mode for troubleshooting and step-by-step execution. Requires Node.js and npm to be installed.",
+      "command": "npm run debug",
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "🐛"
+    },
+    {
+      "id": "dev-clean",
+      "name": "Clean Install npm",
+      "description": "Removes node_modules and lock file, then reinstalls all dependencies. Useful for fixing dependency issues. Requires Node.js and npm to be installed.",
+      "command": "rm -rf node_modules package-lock.json && npm install",
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "🧹"
+    },
+    {
+      "id": "dev-update",
+      "name": "Update Dependencies npm",
+      "description": "Updates all project dependencies to their latest versions using npm. Requires Node.js and npm to be installed.",
+      "command": "npm update",
+      "hotkey": "Ctrl+Shift+U",
+      "icon": "🔄"
+    },
+    {
+      "id": "dev-audit",
+      "name": "Audit Security npm",
+      "description": "Performs a security audit of your project's dependencies using npm. Requires Node.js and npm to be installed.",
+      "command": "npm audit",
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "🔍"
+    },
+    {
+      "id": "dev-outdated",
+      "name": "Check Outdated npm",
+      "description": "Checks for outdated npm packages in your project. Requires Node.js and npm to be installed.",
+      "command": "npm outdated",
+      "hotkey": "Ctrl+Shift+O",
+      "icon": "📋"
+    },
+    {
+      "id": "dev-publish",
+      "name": "Publish Package npm",
+      "description": "Publishes your npm package to the npm registry. Requires Node.js and npm to be installed, and you must be logged in to npm.",
+      "command": "npm publish",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "📤"
+    },
+    {
+      "id": "dev-version",
+      "name": "Bump Version npm",
+      "description": "Increments the version number of your npm package. Useful for release management. Requires Node.js and npm to be installed.",
+      "command": "npm version [version_type]",
+      "inputs": {
+        "version_type": "patch"
+      },
+      "hotkey": "Ctrl+Shift+V",
+      "icon": "🏷️"
+    },
+    {
+      "id": "dev-git-init",
+      "name": "Init Repository git",
+      "description": "Initializes a new Git repository, adds all files, and creates the first commit. Requires Git to be installed.",
+      "command": "git init && git add . && git commit -m \"Initial commit\"",
+      "hotkey": "Ctrl+Shift+G",
+      "icon": "📚"
+    },
+    {
+      "id": "dev-readme",
+      "name": "Create README file",
+      "description": "Creates a README.md file in your project. Useful for adding project documentation.",
+      "command": "touch README.md",
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "📖"
+    },
+    {
+      "id": "dev-license",
+      "name": "Create LICENSE file",
+      "description": "Creates a LICENSE file in your project. Useful for specifying the license of your code.",
+      "command": "touch LICENSE",
+      "hotkey": "Ctrl+Shift+L",
+      "icon": "📄"
+    },
+    {
+      "id": "dev-gitignore",
+      "name": "Create .gitignore file",
+      "description": "Creates a .gitignore file in your project. Useful for specifying files and folders to be ignored by Git.",
+      "command": "touch .gitignore",
+      "hotkey": "Ctrl+Shift+I",
+      "icon": "🚫"
+    },
+    {
+      "id": "dev-env",
+      "name": "Create .env files",
+      "description": "Creates .env and .env.example files for environment variables. Useful for managing configuration in different environments.",
+      "command": "touch .env.example && touch .env",
+      "hotkey": "Ctrl+Shift+E",
+      "icon": "🌍"
+    },
+    {
+      "id": "dev-tauri-create",
+      "name": "Create App Tauri",
+      "description": "Creates a new Tauri application using cargo. Requires Rust and Tauri CLI to be installed. Install: https://tauri.app/v1/guides/getting-started/prerequisites/",
+      "command": "cargo create-tauri-app [app_name]",
+      "inputs": {
+        "app_name": "my-tauri-app"
+      },
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "⚡"
+    },
+    {
+      "id": "dev-tauri-dev",
+      "name": "Dev Mode Tauri",
+      "description": "Runs the Tauri application in development mode. Requires Rust and Tauri CLI to be installed.",
+      "command": "cargo tauri dev",
+      "hotkey": "Ctrl+Shift+D",
+      "icon": "🔄"
+    },
+    {
+      "id": "dev-tauri-autostart",
+      "name": "Add Autostart Tauri",
+      "description": "Adds autostart functionality to your Tauri app. Requires Rust and Tauri CLI to be installed.",
+      "command": "cargo tauri add autostart",
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "🚀"
+    },
+    {
+      "id": "dev-tauri-build",
+      "name": "Build App Tauri",
+      "description": "Builds the Tauri application for production. Requires Rust and Tauri CLI to be installed.",
+      "command": "cargo tauri build",
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "📦"
+    },
+    {
+      "id": "dev-git-clone",
+      "name": "Clone Repository Git",
+      "description": "Clones a remote Git repository to your local machine. Requires Git to be installed.",
+      "command": "git clone [repository_url]",
+      "inputs": {
+        "repository_url": "https://github.com/user/repo.git"
+      },
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "📥"
+    },
+    {
+      "id": "dev-git-pull",
+      "name": "Pull Changes Git",
+      "description": "Pulls the latest changes from the main branch of the remote repository. Requires Git to be installed.",
+      "command": "git pull origin main",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "⬇️"
+    },
+    {
+      "id": "dev-git-push",
+      "name": "Push Changes Git",
+      "description": "Pushes your local commits to the main branch of the remote repository. Requires Git to be installed.",
+      "command": "git push origin main",
+      "hotkey": "Ctrl+Shift+U",
+      "icon": "⬆️"
+    },
+    {
+      "id": "dev-git-branch",
+      "name": "Create Branch Git",
+      "description": "Creates a new branch in your Git repository. Requires Git to be installed.",
+      "command": "git checkout -b [branch_name]",
+      "inputs": {
+        "branch_name": "feature/new-feature"
+      },
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "🌿"
+    },
+    {
+      "id": "dev-git-merge",
+      "name": "Merge Branch Git",
+      "description": "Merges the specified branch into the current branch in your Git repository. Requires Git to be installed.",
+      "command": "git merge [branch_name]",
+      "inputs": {
+        "branch_name": "feature/new-feature"
+      },
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "🔀"
+    },
+    {
+      "id": "dev-yarn-install",
+      "name": "Install Dependencies Yarn",
+      "description": "Installs all dependencies using Yarn. Requires Node.js and Yarn to be installed.",
+      "command": "yarn install",
+      "hotkey": "Ctrl+Shift+Y",
+      "icon": "📦"
+    },
+    {
+      "id": "dev-yarn-add",
+      "name": "Add Package Yarn",
+      "description": "Adds a package to your project dependencies using Yarn. Requires Node.js and Yarn to be installed.",
+      "command": "yarn add [package_name]",
+      "inputs": {
+        "package_name": "lodash"
+      },
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "➕"
+    },
+    {
+      "id": "dev-pnpm-install",
+      "name": "Install Dependencies pnpm",
+      "description": "Installs all dependencies using pnpm. Requires Node.js and pnpm to be installed.",
+      "command": "pnpm install",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "📦"
+    },
+    {
+      "id": "dev-bun-install",
+      "name": "Install Dependencies Bun",
+      "description": "Installs all dependencies using Bun. Requires Bun to be installed. Install: https://bun.sh/docs/install",
+      "command": "bun install",
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "📦"
+    },
+    {
+      "id": "dev-docker-compose",
+      "name": "Compose Up Docker",
+      "description": "Starts all services defined in docker-compose.yml in detached mode. Requires Docker and Docker Compose to be installed.",
+      "command": "docker-compose up -d",
+      "hotkey": "Ctrl+Shift+U",
+      "icon": "🐳"
+    },
+    {
+      "id": "dev-docker-run",
+      "name": "Run Container Docker",
+      "description": "Runs a Docker container in detached mode with the specified name and image. Requires Docker to be installed.",
+      "command": "docker run -d --name [container_name] [image_name]",
+      "inputs": {
+        "container_name": "my-container",
+        "image_name": "nginx"
+      },
+      "hotkey": "Ctrl+Shift+R",
+      "icon": "▶️"
+    },
+    {
+      "id": "dev-docker-exec",
+      "name": "Exec Container Docker",
+      "description": "Executes a shell inside a running Docker container. Requires Docker to be installed.",
+      "command": "docker exec -it [container_name] /bin/bash",
+      "inputs": {
+        "container_name": "my-container"
+      },
+      "hotkey": "Ctrl+Shift+E",
+      "icon": "🔧"
+    },
+    {
+      "id": "dev-npx-run",
+      "name": "Run Package npx",
+      "description": "Runs a package using npx without installing it globally. Requires Node.js and npm to be installed.",
+      "command": "npx [package_name]",
+      "inputs": {
+        "package_name": "create-react-app"
+      },
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "⚡"
+    },
+    {
+      "id": "dev-npm-audit-fix",
+      "name": "Fix Security npm",
+      "description": "Automatically fixes security vulnerabilities in your npm dependencies. Requires Node.js and npm to be installed.",
+      "command": "npm audit fix",
+      "hotkey": "Ctrl+Shift+F",
+      "icon": "🔧"
+    },
+    {
+      "id": "dev-npm-outdated",
+      "name": "Check Outdated npm",
+      "description": "Checks for outdated npm packages in your project. Requires Node.js and npm to be installed.",
+      "command": "npm outdated",
+      "hotkey": "Ctrl+Shift+O",
+      "icon": "📋"
+    }
+  ]
+}
