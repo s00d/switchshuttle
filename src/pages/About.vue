@@ -3,14 +3,6 @@
     
     <main class="container mx-auto px-4 py-6">
       <div class="max-w-4xl mx-auto space-y-6">
-        <!-- Header -->
-        <div class="flex items-center justify-between">
-          <div>
-            <h1 class="text-2xl font-bold text-slate-900">About</h1>
-            <p class="text-slate-600 mt-1">Learn more about SwitchShuttle</p>
-          </div>
-        </div>
-
         <!-- App Info -->
         <Card>
           <div class="text-center space-y-6">
