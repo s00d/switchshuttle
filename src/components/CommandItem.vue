@@ -55,12 +55,25 @@
       'grid gap-6',
       commandType === 'submenu' ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'
     ]">
-      <Input
-        v-model="command.name"
-        label="Name"
-        placeholder="Command name"
-        required
-      />
+      <div class="flex items-end gap-3">
+        <div class="w-16">
+          <Input
+            v-model="commandIcon"
+            label="Icon"
+            placeholder="emoji"
+            size="sm"
+            @input="handleIconChange"
+          />
+        </div>
+        <div class="flex-1">
+          <Input
+            v-model="command.name"
+            label="Name"
+            placeholder="Command name"
+            required
+          />
+        </div>
+      </div>
       
       <HotkeyInput
         v-if="commandType !== 'submenu'"
@@ -322,6 +335,83 @@
       </div>
     </div>
 
+    <!-- Monitor Command -->
+    <div v-if="commandType === 'monitor'" class="space-y-6">
+      <Input
+        v-model="command.command"
+        label="Monitor Command"
+        placeholder="Command to execute for monitoring (e.g., top -l 1 | grep 'CPU usage')"
+        type="textarea"
+        rows="3"
+      />
+      
+      <Input
+        v-model="command.monitor"
+        label="Monitor Display Command"
+        placeholder="Command to get display value (e.g., echo 'CPU: 45%')"
+        type="textarea"
+        rows="3"
+      />
+      
+      <!-- Divider -->
+      <div class="border-t-2 border-slate-200/70 my-8 -mx-6"></div>
+      
+      <!-- Inputs Section -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <label class="block text-sm font-semibold text-slate-700">Inputs</label>
+          <Button @click="handleAddInput" variant="ghost" size="sm" class="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Add Field
+          </Button>
+        </div>
+        
+        <div v-if="command.inputs && Object.keys(command.inputs).length > 0" class="space-y-2">
+          <!-- Table Headers -->
+          <div class="flex items-center gap-2 py-1 px-1 rounded-lg">
+            <div class="flex-1">
+              <span class="text-xs font-semibold text-slate-700 uppercase tracking-wide">Key</span>
+            </div>
+            <div class="flex-1">
+              <span class="text-xs font-semibold text-slate-700 uppercase tracking-wide">Default Value</span>
+            </div>
+            <div class="w-8"></div>
+          </div>
+          <!-- Table Rows -->
+          <div
+            v-for="(_, key) in command.inputs"
+            :key="key"
+            class="flex items-center gap-2 py-1"
+          >
+            <div class="flex-1">
+              <Input
+                :model-value="isRootLevel && inputKeys[index] ? inputKeys[index][key] : key"
+                placeholder="Key"
+                size="sm"
+                input-class="border border-slate-300 bg-white rounded px-2 py-1 focus:border-blue-400 focus:ring-0"
+                @input="handleInputKeyChange(key, $event)"
+              />
+            </div>
+            <div class="flex-1">
+              <Input
+                v-model="command.inputs[key]"
+                placeholder="Default value"
+                size="sm"
+                input-class="border border-slate-300 bg-white rounded px-2 py-1 focus:border-blue-400 focus:ring-0"
+              />
+            </div>
+            <Button @click="handleRemoveInput(key)" variant="danger" size="sm" class="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0 w-8">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Submenu -->
     <div v-if="commandType === 'submenu'" class="space-y-4">
       <div class="space-y-4">
@@ -421,8 +511,13 @@ const commandType = ref<string>('single');
 const initializeCommandType = () => {
   const cmd = props.command;
   
+  // Проверяем наличие monitor (только если это не null и не пустая строка)
+  if (cmd.monitor !== undefined && cmd.monitor !== null && cmd.monitor !== '') {
+    commandType.value = 'monitor';
+    return;
+  }
   // Проверяем наличие switch (только если это не null и не пустая строка)
-  if (cmd.switch !== undefined && cmd.switch !== null && cmd.switch !== '') {
+  else if (cmd.switch !== undefined && cmd.switch !== null && cmd.switch !== '') {
     commandType.value = 'switch';
     return;
   }
@@ -461,6 +556,30 @@ const handleCommandTypeChange = (type: string) => {
 // Computed properties for determining logic
 const isRootLevel = computed(() => props.level === 0);
 // const isSubmenuLevel = computed(() => props.level > 0);
+
+// Computed property for icon handling
+const commandIcon = computed({
+  get: () => props.command.icon || '',
+  set: (value: string) => {
+    if (value.trim() === '') {
+      props.command.icon = null;
+    } else {
+      props.command.icon = value;
+    }
+    emit('update:command', props.command);
+  }
+});
+
+// Method for handling icon changes
+const handleIconChange = (event: Event) => {
+  const value = (event.target as HTMLInputElement).value;
+  if (value.trim() === '') {
+    props.command.icon = null;
+  } else {
+    props.command.icon = value;
+  }
+  emit('update:command', props.command);
+};
 
 // Functions for handling inputs
 const handleAddInput = () => {
@@ -541,11 +660,13 @@ const updateSubmenuCommandType = (type: string) => {
       cmd.commands = null;
       cmd.inputs = null;
       cmd.switch = undefined;
+      cmd.monitor = undefined;
       // Не очищаем command, так как это основное поле для single команды
     } else if (type === 'multiple') {
       cmd.command = undefined;
       cmd.submenu = null;
       cmd.switch = undefined;
+      cmd.monitor = undefined;
       cmd.commands = cmd.commands || [];
       cmd.inputs = cmd.inputs || {};
     } else if (type === 'submenu') {
@@ -553,13 +674,22 @@ const updateSubmenuCommandType = (type: string) => {
       cmd.commands = null;
       cmd.inputs = null;
       cmd.switch = undefined;
+      cmd.monitor = undefined;
       cmd.submenu = cmd.submenu || [];
     } else if (type === 'switch') {
       cmd.submenu = null;
       cmd.commands = null;
       cmd.inputs = cmd.inputs || {};
       cmd.switch = cmd.switch || '';
+      cmd.monitor = undefined;
       // Не очищаем command, так как это поле для toggle команды
+    } else if (type === 'monitor') {
+      cmd.submenu = null;
+      cmd.commands = null;
+      cmd.inputs = cmd.inputs || {};
+      cmd.monitor = cmd.monitor || '';
+      cmd.switch = undefined;
+      // Не очищаем command, так как это поле для команды мониторинга
     }
     emit('update:command', props.command);
   }
