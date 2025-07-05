@@ -139,6 +139,8 @@ pub fn execute_command_with_inputs(
         submenu: command.submenu.clone(),
         hotkey: command.hotkey.clone(),
         switch: switch_cmd,
+        monitor: command.monitor.clone(),
+        icon: command.icon.clone(),
     };
 
     // Проверяем, является ли это switch командой
