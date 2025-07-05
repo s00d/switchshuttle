@@ -2,8 +2,8 @@ use include_dir::{include_dir, Dir};
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
-use tauri::{AppHandle, Emitter, Manager, Wry};
-use tauri::menu::{IconMenuItem, IconMenuItemBuilder};
+use tauri::{AppHandle, Emitter, Manager, Wry, WebviewWindowBuilder};
+use tauri::menu::{IconMenuItem, IconMenuItemBuilder, CheckMenuItem};
 use tauri::image::Image;
 use tauri::path::BaseDirectory;
 
@@ -272,33 +272,55 @@ pub fn open_folder_in_default_explorer(path: &PathBuf) {
 
 pub fn create_window(
     app: &AppHandle,
+    window_id: &str,
     title: &str,
     route: &str,
     width: f64,
     height: f64,
     center: bool,
-) -> tauri::Window {
-    let window = app.get_window("main").unwrap();
-    window
-        .show()
-        .unwrap_or_else(|e| println!("Failed to show window: {:?}", e));
-    window
+) -> Result<(), String> {
+    // Используем отдельное окно
+    if let Some(existing_window) = app.get_webview_window(window_id) {
+        // Если окно уже существует, просто показываем его и устанавливаем фокус
+        existing_window.show().unwrap_or_else(|e| println!("Failed to show existing window: {:?}", e));
+        existing_window.set_focus().unwrap_or_else(|e| println!("Failed to focus existing window: {:?}", e));
+        existing_window.emit("navigate", (route, title)).unwrap();
+        return Ok(());
+    }
+
+    // Создаем новое окно
+    let window = WebviewWindowBuilder::new(app, window_id, tauri::WebviewUrl::App(route.into()))
+        .title(title)
+        .inner_size(width, height)
+        .resizable(true)
         .center()
-        .unwrap_or_else(|e| println!("Failed to center window: {:?}", e));
-    window.set_focus().expect("Failed to set focus on window");
+        .build()
+        .map_err(|e| format!("Failed to create window: {}", e))?;
+
+    // Устанавливаем иконку если возможно
+    if let Ok(icon_path) = app.path().resolve("icons/icon.png", BaseDirectory::Resource) {
+        if let Ok(image) = Image::from_path(icon_path) {
+            if let Err(e) = window.set_icon(image) {
+                println!("Failed to set window icon: {:?}", e);
+            }
+        }
+    }
+
+    if let Err(e) = window.set_focus() {
+        println!("Failed to set window focus: {:?}", e);
+    }
 
     window.emit("navigate", (route, title)).unwrap();
-    window
-        .set_size(tauri::Size::Logical(tauri::LogicalSize { width, height }))
-        .unwrap();
+
     if center {
         if let Err(e) = window.center() {
             println!("Failed to center window: {:?}", e);
         }
     }
 
-    window
+    Ok(())
 }
+
 
 #[cfg(debug_assertions)]
 pub fn change_devtools(app: &AppHandle) {
@@ -313,12 +335,13 @@ pub fn change_devtools(app: &AppHandle) {
 #[cfg(not(debug_assertions))]
 pub fn change_devtools(_app: &AppHandle) {}
 
-/// Создает пункт меню с иконкой
+/// Создает пункт меню с иконкой и опциональной горячей клавишей
 pub fn create_menu_item(
     app: &AppHandle<Wry>,
     id: &str,
     text: &str,
     icon_name: &str,
+    hotkey: Option<String>,
 ) -> IconMenuItem<Wry> {
     let mut builder = IconMenuItemBuilder::with_id(id, text);
     
@@ -327,27 +350,33 @@ pub fn create_menu_item(
         if let Ok(image) = Image::from_path(icon_path) {
             builder = builder.icon(image);
         }
+    }
+    
+    // Добавляем горячую клавишу если указана
+    if let Some(hotkey) = hotkey {
+        builder = builder.accelerator(&hotkey);
     }
     
     builder.build(app).unwrap()
 }
 
-/// Создает пункт меню с иконкой и горячей клавишей
-pub fn create_menu_item_with_hotkey(
+/// Создает чекбокс пункт меню с опциональной горячей клавишей
+pub fn create_check_menu_item(
     app: &AppHandle<Wry>,
     id: &str,
     text: &str,
-    icon_name: &str,
-    hotkey: &str,
-) -> IconMenuItem<Wry> {
-    let mut builder = IconMenuItemBuilder::with_id(id, text);
+    checked: bool,
+    hotkey: Option<String>,
+) -> CheckMenuItem<Wry> {
+    let hotkey_ref = hotkey.as_ref().map(|s| s.as_str());
     
-    // Пытаемся загрузить иконку, но не падаем если её нет
-    if let Ok(icon_path) = app.path().resolve(&format!("icons/{}.png", icon_name), BaseDirectory::Resource) {
-        if let Ok(image) = Image::from_path(icon_path) {
-            builder = builder.icon(image);
-        }
-    }
-    
-    builder.accelerator(hotkey).build(app).unwrap()
+    CheckMenuItem::with_id(
+        app.app_handle(),
+        id,
+        text,
+        true, // enabled
+        checked,
+        hotkey_ref,
+    )
+    .unwrap()
 }
