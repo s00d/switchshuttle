@@ -152,6 +152,7 @@
 <li><strong>💻 Command Line Interface</strong> - Execute commands directly from terminal with CLI</li>
 <li><strong>⚙️ Configuration Management</strong> - Enable/disable configurations without deleting them</li>
 <li><strong>🔄 Switch Commands</strong> - Toggle system features with background execution</li>
+<li><strong>📊 Monitor Commands</strong> - Real-time system resource monitoring with visual indicators</li>
 </ul>
 <h2 id="quick-start" class="heading-2">🚀 Quick Start</h2><h3 id="download-amp-install" class="heading-3">Download &amp; Install</h3><h4 id="option-1-homebrew-macos-recommended" class="heading-4">Option 1: Homebrew (macOS - Recommended)</h4><pre class="code-block"><code class="language-bash"># Install via Homebrew
 brew tap s00d/switchshuttle
@@ -330,6 +331,43 @@ switch-shuttle --search "database"</code></pre><h3 id="cli-features" class="head
 <li><strong>Visual Feedback</strong> - Shows enabled/disabled status in menu</li>
 <li><strong>Cross-Platform</strong> - Works on macOS, Windows, and Linux</li>
 </ul>
+<h4 id="monitor-commands" class="heading-4">📊 Monitor Commands</h4><p>Monitor system resources and services with real-time information:</p>
+<pre class="code-block"><code class="language-json">{
+  "name": "📊 System Monitoring",
+  "submenu": [
+    {
+      "name": "💾 Memory Usage",
+      "command": "top -l 1 | head -n 10",
+      "monitor": "memory",
+      "icon": "🧠"
+    },
+    {
+      "name": "💻 CPU Load",
+      "command": "top -l 1 | grep 'CPU usage'",
+      "monitor": "cpu",
+      "icon": "⚡"
+    },
+    {
+      "name": "💾 Disk Space",
+      "command": "df -h | grep '/dev/'",
+      "monitor": "disk",
+      "icon": "💾"
+    },
+    {
+      "name": "🌐 Network Status",
+      "command": "ifconfig | grep -E 'inet |status:'",
+      "monitor": "network",
+      "icon": "🌐"
+    }
+  ]
+}</code></pre><p><strong>Monitor Command Features:</strong></p>
+<ul>
+<li><strong>Menu Integration</strong> - Add monitoring buttons to system tray menu</li>
+<li><strong>Command Execution</strong> - Execute monitoring commands when menu opens</li>
+<li><strong>Data Display</strong> - Show command output directly in menu interface</li>
+<li><strong>Visual Indicators</strong> - Icons and status indicators in menu</li>
+<li><strong>Cross-Platform</strong> - Works on macOS, Windows, and Linux</li>
+</ul>
 <h2 id="configuration-reference" class="heading-2">⚙️ Configuration Reference</h2><h3 id="main-configuration" class="heading-3">Main Configuration</h3><table>
 <thead>
 <tr>
@@ -492,6 +530,18 @@ switch-shuttle --search "database"</code></pre><h3 id="cli-features" class="head
 <td>String</td>
 <td>❌</td>
 <td>Command to check current status (for toggle commands)</td>
+</tr>
+<tr>
+<td><code>monitor</code></td>
+<td>String</td>
+<td>❌</td>
+<td>Monitor type for real-time resource tracking</td>
+</tr>
+<tr>
+<td><code>icon</code></td>
+<td>String</td>
+<td>❌</td>
+<td>Emoji icon for visual identification</td>
 </tr>
 </tbody></table>
 <h3 id="configuration-management" class="heading-3">Configuration Management</h3><h4 id="enabledisable-configurations" class="heading-4">Enable/Disable Configurations</h4><p>You can enable or disable individual configuration files to control which commands are available in the system tray menu. This is useful for:</p>

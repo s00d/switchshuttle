@@ -44,6 +44,7 @@ SwitchShuttle ist eine leistungsstarke plattformübergreifende System-Tray-Anwen
 - **💻 Kommandozeilen-Interface** - Führen Sie Befehle direkt aus dem Terminal mit CLI aus
 - **⚙️ Konfigurationsverwaltung** - Aktivieren/Deaktivieren von Konfigurationen ohne Löschung
 - **🔄 Schalter-Befehle** - Systemfunktionen mit Hintergrundausführung umschalten
+- **📊 Überwachungsbefehle** - Echtzeit-Überwachung von Systemressourcen mit visuellen Indikatoren
 
 ## 🚀 Schnellstart
 
@@ -217,6 +218,49 @@ Systemfunktionen mit Hintergrundausführung umschalten:
 - **Visuelles Feedback** - Zeigt aktiviert/deaktiviert Status im Menü
 - **Plattformübergreifend** - Funktioniert auf macOS, Windows und Linux
 
+#### 📊 Überwachungsbefehle
+
+Überwachung von Systemressourcen und Diensten mit Echtzeit-Informationen:
+
+```json
+{
+  "name": "📊 Systemüberwachung",
+  "submenu": [
+    {
+      "name": "💾 Speichernutzung",
+      "command": "top -l 1 | head -n 10",
+      "monitor": "memory",
+      "icon": "🧠"
+    },
+    {
+      "name": "💻 CPU-Auslastung",
+      "command": "top -l 1 | grep 'CPU usage'",
+      "monitor": "cpu",
+      "icon": "⚡"
+    },
+    {
+      "name": "💾 Festplattenspeicher",
+      "command": "df -h | grep '/dev/'",
+      "monitor": "disk",
+      "icon": "💾"
+    },
+    {
+      "name": "🌐 Netzwerkstatus",
+      "command": "ifconfig | grep -E 'inet |status:'",
+      "monitor": "network",
+      "icon": "🌐"
+    }
+  ]
+}
+```
+
+**Überwachungsbefehle Funktionen:**
+- **Menüintegration** - Hinzufügen von Überwachungsbuttons zum System-Tray-Menü
+- **Befehlsausführung** - Ausführung von Überwachungsbefehlen beim Öffnen des Menüs
+- **Datenanzeige** - Anzeige der Befehlsausgabe direkt in der Menüoberfläche
+- **Visuelle Indikatoren** - Icons und Statusindikatoren im Menü
+- **Plattformübergreifend** - Funktioniert auf macOS, Windows und Linux
+
 ## ⚙️ Konfigurationsreferenz
 
 ### Hauptkonfiguration
@@ -260,6 +304,8 @@ Systemfunktionen mit Hintergrundausführung umschalten:
 | `inputs` | Object | ❌ | Dynamische Eingabefelder |
 | `hotkey` | String | ❌ | Globaler Hotkey |
 | `switch` | String | ❌ | Befehl zum Überprüfen des aktuellen Status (für Schalter-Befehle) |
+| `monitor` | String | ❌ | Überwachungstyp für Echtzeit-Ressourcenverfolgung |
+| `icon` | String | ❌ | Emoji-Icon zur visuellen Identifikation |
 
 ### Konfigurationsverwaltung
 

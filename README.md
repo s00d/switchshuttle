@@ -43,6 +43,7 @@ SwitchShuttle is a powerful cross-platform system tray application that revoluti
 - **💻 Command Line Interface** - Execute commands directly from terminal with CLI
 - **⚙️ Configuration Management** - Enable/disable configurations without deleting them
 - **🔄 Switch Commands** - Toggle system features with background execution
+- **📊 Monitor Commands** - Real-time system resource monitoring with visual indicators
 
 ## 🚀 Quick Start
 
@@ -313,6 +314,49 @@ Toggle system features with background execution:
 - **Visual Feedback** - Shows enabled/disabled status in menu
 - **Cross-Platform** - Works on macOS, Windows, and Linux
 
+#### 📊 Monitor Commands
+
+Monitor system resources and services with real-time information:
+
+```json
+{
+  "name": "📊 System Monitoring",
+  "submenu": [
+    {
+      "name": "💾 Memory Usage",
+      "command": "top -l 1 | head -n 10",
+      "monitor": "memory",
+      "icon": "🧠"
+    },
+    {
+      "name": "💻 CPU Load",
+      "command": "top -l 1 | grep 'CPU usage'",
+      "monitor": "cpu",
+      "icon": "⚡"
+    },
+    {
+      "name": "💾 Disk Space",
+      "command": "df -h | grep '/dev/'",
+      "monitor": "disk",
+      "icon": "💾"
+    },
+    {
+      "name": "🌐 Network Status",
+      "command": "ifconfig | grep -E 'inet |status:'",
+      "monitor": "network",
+      "icon": "🌐"
+    }
+  ]
+}
+```
+
+**Monitor Command Features:**
+- **Menu Integration** - Add monitoring buttons to system tray menu
+- **Command Execution** - Execute monitoring commands when menu opens
+- **Data Display** - Show command output directly in menu interface
+- **Visual Indicators** - Icons and status indicators in menu
+- **Cross-Platform** - Works on macOS, Windows, and Linux
+
 ## ⚙️ Configuration Reference
 
 ### Main Configuration
@@ -356,6 +400,8 @@ Toggle system features with background execution:
 | `inputs` | Object | ❌ | Dynamic input fields |
 | `hotkey` | String | ❌ | Global hotkey shortcut |
 | `switch` | String | ❌ | Command to check current status (for toggle commands) |
+| `monitor` | String | ❌ | Monitor type for real-time resource tracking |
+| `icon` | String | ❌ | Emoji icon for visual identification |
 
 ### Configuration Management
 

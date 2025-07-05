@@ -44,6 +44,7 @@ SwitchShuttle 是一个强大的跨平台系统托盘应用程序，它彻底改
 - **💻 命令行界面** - 直接从终端执行命令的 CLI
 - **⚙️ 配置管理** - 启用/禁用配置而无需删除
 - **🔄 开关命令** - 通过后台执行切换系统功能
+- **📊 监控命令** - 实时系统资源监控，带视觉指示器
 
 ## 🚀 快速开始
 
@@ -217,6 +218,49 @@ SwitchShuttle 使用 JSON 配置文件，存储在：
 - **视觉反馈** - 在菜单中显示启用/禁用状态
 - **跨平台** - 在 macOS、Windows 和 Linux 上工作
 
+#### 📊 监控命令
+
+监控系统资源和服务，提供实时信息：
+
+```json
+{
+  "name": "📊 系统监控",
+  "submenu": [
+    {
+      "name": "💾 内存使用",
+      "command": "top -l 1 | head -n 10",
+      "monitor": "memory",
+      "icon": "🧠"
+    },
+    {
+      "name": "💻 CPU 负载",
+      "command": "top -l 1 | grep 'CPU usage'",
+      "monitor": "cpu",
+      "icon": "⚡"
+    },
+    {
+      "name": "💾 磁盘空间",
+      "command": "df -h | grep '/dev/'",
+      "monitor": "disk",
+      "icon": "💾"
+    },
+    {
+      "name": "🌐 网络状态",
+      "command": "ifconfig | grep -E 'inet |status:'",
+      "monitor": "network",
+      "icon": "🌐"
+    }
+  ]
+}
+```
+
+**监控命令功能：**
+- **菜单集成** - 在系统托盘菜单中添加监控按钮
+- **命令执行** - 打开菜单时执行监控命令
+- **数据显示** - 直接在菜单界面中显示命令输出
+- **视觉指示器** - 菜单中的图标和状态指示器
+- **跨平台** - 在 macOS、Windows 和 Linux 上运行
+
 ## ⚙️ 配置参考
 
 ### 主配置
@@ -260,6 +304,8 @@ SwitchShuttle 使用 JSON 配置文件，存储在：
 | `inputs` | Object | ❌ | 动态输入字段 |
 | `hotkey` | String | ❌ | 全局热键 |
 | `switch` | String | ❌ | 检查当前状态的命令（用于开关命令） |
+| `monitor` | String | ❌ | 实时资源跟踪的监控类型 |
+| `icon` | String | ❌ | 用于视觉识别的表情符号图标 |
 
 ### 配置管理
 

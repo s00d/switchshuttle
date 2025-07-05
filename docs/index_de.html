@@ -148,6 +148,7 @@
 <li><strong>💻 Kommandozeilen-Interface</strong> - Führen Sie Befehle direkt aus dem Terminal mit CLI aus</li>
 <li><strong>⚙️ Konfigurationsverwaltung</strong> - Aktivieren/Deaktivieren von Konfigurationen ohne Löschung</li>
 <li><strong>🔄 Schalter-Befehle</strong> - Systemfunktionen mit Hintergrundausführung umschalten</li>
+<li><strong>📊 Überwachungsbefehle</strong> - Echtzeit-Überwachung von Systemressourcen mit visuellen Indikatoren</li>
 </ul>
 <h2 id="schnellstart" class="heading-2">🚀 Schnellstart</h2><h3 id="download-amp-installation" class="heading-3">Download &amp; Installation</h3><h4 id="option-1-homebrew-macos-empfohlen" class="heading-4">Option 1: Homebrew (macOS - Empfohlen)</h4><pre class="code-block"><code class="language-bash"># Installation über Homebrew
 brew tap s00d/switchshuttle
@@ -271,6 +272,43 @@ brew install --cask switchshuttle</code></pre><h4 id="option-2-manueller-downloa
 <li><strong>Hintergrundausführung</strong> - Befehle werden leise ausgeführt ohne Terminal zu öffnen</li>
 <li><strong>Statusprüfung</strong> - Erkennt automatisch den aktuellen Zustand</li>
 <li><strong>Visuelles Feedback</strong> - Zeigt aktiviert/deaktiviert Status im Menü</li>
+<li><strong>Plattformübergreifend</strong> - Funktioniert auf macOS, Windows und Linux</li>
+</ul>
+<h4 id="ueberwachungsbefehle" class="heading-4">📊 Überwachungsbefehle</h4><p>Überwachung von Systemressourcen und Diensten mit Echtzeit-Informationen:</p>
+<pre class="code-block"><code class="language-json">{
+  "name": "📊 Systemüberwachung",
+  "submenu": [
+    {
+      "name": "💾 Speichernutzung",
+      "command": "top -l 1 | head -n 10",
+      "monitor": "memory",
+      "icon": "🧠"
+    },
+    {
+      "name": "💻 CPU-Auslastung",
+      "command": "top -l 1 | grep 'CPU usage'",
+      "monitor": "cpu",
+      "icon": "⚡"
+    },
+    {
+      "name": "💾 Festplattenspeicher",
+      "command": "df -h | grep '/dev/'",
+      "monitor": "disk",
+      "icon": "💾"
+    },
+    {
+      "name": "🌐 Netzwerkstatus",
+      "command": "ifconfig | grep -E 'inet |status:'",
+      "monitor": "network",
+      "icon": "🌐"
+    }
+  ]
+}</code></pre><p><strong>Überwachungsbefehle Funktionen:</strong></p>
+<ul>
+<li><strong>Menüintegration</strong> - Hinzufügen von Überwachungsbuttons zum System-Tray-Menü</li>
+<li><strong>Befehlsausführung</strong> - Ausführung von Überwachungsbefehlen beim Öffnen des Menüs</li>
+<li><strong>Datenanzeige</strong> - Anzeige der Befehlsausgabe direkt in der Menüoberfläche</li>
+<li><strong>Visuelle Indikatoren</strong> - Icons und Statusindikatoren im Menü</li>
 <li><strong>Plattformübergreifend</strong> - Funktioniert auf macOS, Windows und Linux</li>
 </ul>
 <h2 id="konfigurationsreferenz" class="heading-2">⚙️ Konfigurationsreferenz</h2><h3 id="hauptkonfiguration" class="heading-3">Hauptkonfiguration</h3><table>
@@ -435,6 +473,18 @@ brew install --cask switchshuttle</code></pre><h4 id="option-2-manueller-downloa
 <td>String</td>
 <td>❌</td>
 <td>Befehl zum Überprüfen des aktuellen Status (für Schalter-Befehle)</td>
+</tr>
+<tr>
+<td><code>monitor</code></td>
+<td>String</td>
+<td>❌</td>
+<td>Überwachungstyp für Echtzeit-Ressourcenverfolgung</td>
+</tr>
+<tr>
+<td><code>icon</code></td>
+<td>String</td>
+<td>❌</td>
+<td>Emoji-Icon zur visuellen Identifikation</td>
 </tr>
 </tbody></table>
 <h3 id="konfigurationsverwaltung" class="heading-3">Konfigurationsverwaltung</h3><h4 id="konfigurationen-aktivierendeaktivieren" class="heading-4">Konfigurationen aktivieren/deaktivieren</h4><p>Sie können einzelne Konfigurationsdateien aktivieren oder deaktivieren, um zu steuern, welche Befehle im System-Tray-Menü verfügbar sind. Dies ist nützlich für:</p>

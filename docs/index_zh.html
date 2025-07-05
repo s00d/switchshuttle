@@ -103,6 +103,7 @@
 <li><strong>💻 命令行界面</strong> - 直接从终端执行命令的 CLI</li>
 <li><strong>⚙️ 配置管理</strong> - 启用/禁用配置而无需删除</li>
 <li><strong>🔄 开关命令</strong> - 通过后台执行切换系统功能</li>
+<li><strong>📊 监控命令</strong> - 实时系统资源监控，带视觉指示器</li>
 </ul>
 <h2 id="kaishi" class="heading-2">🚀 快速开始</h2><h3 id="xiaanzhuang" class="heading-3">下载和安装</h3><h4 id="1-homebrew-macos" class="heading-4">选项 1: Homebrew (macOS - 推荐)</h4><pre class="code-block"><code class="language-bash"># 通过 Homebrew 安装
 brew tap s00d/switchshuttle
@@ -227,6 +228,43 @@ brew install --cask switchshuttle</code></pre><h4 id="2-xia" class="heading-4">�
 <li><strong>状态检查</strong> - 自动检测当前状态</li>
 <li><strong>视觉反馈</strong> - 在菜单中显示启用/禁用状态</li>
 <li><strong>跨平台</strong> - 在 macOS、Windows 和 Linux 上工作</li>
+</ul>
+<h4 id="" class="heading-4">📊 监控命令</h4><p>监控系统资源和服务，提供实时信息：</p>
+<pre class="code-block"><code class="language-json">{
+  "name": "📊 系统监控",
+  "submenu": [
+    {
+      "name": "💾 内存使用",
+      "command": "top -l 1 | head -n 10",
+      "monitor": "memory",
+      "icon": "🧠"
+    },
+    {
+      "name": "💻 CPU 负载",
+      "command": "top -l 1 | grep 'CPU usage'",
+      "monitor": "cpu",
+      "icon": "⚡"
+    },
+    {
+      "name": "💾 磁盘空间",
+      "command": "df -h | grep '/dev/'",
+      "monitor": "disk",
+      "icon": "💾"
+    },
+    {
+      "name": "🌐 网络状态",
+      "command": "ifconfig | grep -E 'inet |status:'",
+      "monitor": "network",
+      "icon": "🌐"
+    }
+  ]
+}</code></pre><p><strong>监控命令功能：</strong></p>
+<ul>
+<li><strong>菜单集成</strong> - 在系统托盘菜单中添加监控按钮</li>
+<li><strong>命令执行</strong> - 打开菜单时执行监控命令</li>
+<li><strong>数据显示</strong> - 直接在菜单界面中显示命令输出</li>
+<li><strong>视觉指示器</strong> - 菜单中的图标和状态指示器</li>
+<li><strong>跨平台</strong> - 在 macOS、Windows 和 Linux 上运行</li>
 </ul>
 <h2 id="zhi" class="heading-2">⚙️ 配置参考</h2><h3 id="zhi" class="heading-3">主配置</h3><table>
 <thead>
@@ -390,6 +428,18 @@ brew install --cask switchshuttle</code></pre><h4 id="2-xia" class="heading-4">�
 <td>String</td>
 <td>❌</td>
 <td>检查当前状态的命令（用于开关命令）</td>
+</tr>
+<tr>
+<td><code>monitor</code></td>
+<td>String</td>
+<td>❌</td>
+<td>实时资源跟踪的监控类型</td>
+</tr>
+<tr>
+<td><code>icon</code></td>
+<td>String</td>
+<td>❌</td>
+<td>用于视觉识别的表情符号图标</td>
 </tr>
 </tbody></table>
 <h3 id="zhi" class="heading-3">配置管理</h3><h4 id="yongyongzhi" class="heading-4">启用/禁用配置</h4><p>您可以启用或禁用单个配置文件来控制系统托盘菜单中可用的命令。这对于以下情况很有用：</p>

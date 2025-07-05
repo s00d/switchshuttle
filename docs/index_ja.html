@@ -103,6 +103,7 @@
 <li><strong>💻 コマンドラインインターフェース</strong> - CLIでターミナルから直接コマンドを実行</li>
 <li><strong>⚙️ 設定管理</strong> - 削除せずに設定を有効/無効にする</li>
 <li><strong>🔄 スイッチコマンド</strong> - バックグラウンド実行でシステム機能を切り替え</li>
+<li><strong>📊 モニターコマンド</strong> - 視覚的インジケーター付きのリアルタイムシステムリソース監視</li>
 </ul>
 <h2 id="" class="heading-2">🚀 クイックスタート</h2><h3 id="to" class="heading-3">ダウンロードとインストール</h3><h4 id="1-homebrew-macos" class="heading-4">オプション1: Homebrew (macOS - 推奨)</h4><pre class="code-block"><code class="language-bash"># Homebrew経由でインストール
 brew tap s00d/switchshuttle
@@ -226,6 +227,43 @@ brew install --cask switchshuttle</code></pre><h4 id="2" class="heading-4">オ�
 <li><strong>バックグラウンド実行</strong> - ターミナルを開かずにコマンドが静かに実行される</li>
 <li><strong>ステータスチェック</strong> - 現在の状態を自動的に検出</li>
 <li><strong>視覚的フィードバック</strong> - メニューで有効/無効の状態を表示</li>
+<li><strong>クロスプラットフォーム</strong> - macOS、Windows、Linuxで動作</li>
+</ul>
+<h4 id="" class="heading-4">📊 モニターコマンド</h4><p>リアルタイム情報でシステムリソースとサービスを監視：</p>
+<pre class="code-block"><code class="language-json">{
+  "name": "📊 システム監視",
+  "submenu": [
+    {
+      "name": "💾 メモリ使用量",
+      "command": "top -l 1 | head -n 10",
+      "monitor": "memory",
+      "icon": "🧠"
+    },
+    {
+      "name": "💻 CPU負荷",
+      "command": "top -l 1 | grep 'CPU usage'",
+      "monitor": "cpu",
+      "icon": "⚡"
+    },
+    {
+      "name": "💾 ディスク容量",
+      "command": "df -h | grep '/dev/'",
+      "monitor": "disk",
+      "icon": "💾"
+    },
+    {
+      "name": "🌐 ネットワークステータス",
+      "command": "ifconfig | grep -E 'inet |status:'",
+      "monitor": "network",
+      "icon": "🌐"
+    }
+  ]
+}</code></pre><p><strong>モニターコマンド機能：</strong></p>
+<ul>
+<li><strong>メニュー統合</strong> - システムトレイメニューに監視ボタンを追加</li>
+<li><strong>コマンド実行</strong> - メニューを開くときに監視コマンドを実行</li>
+<li><strong>データ表示</strong> - メニューインターフェースでコマンド出力を直接表示</li>
+<li><strong>視覚的インジケーター</strong> - メニュー内のアイコンとステータスインジケーター</li>
 <li><strong>クロスプラットフォーム</strong> - macOS、Windows、Linuxで動作</li>
 </ul>
 <h2 id="" class="heading-2">⚙️ 設定リファレンス</h2><h3 id="" class="heading-3">メイン設定</h3><table>
@@ -390,6 +428,18 @@ brew install --cask switchshuttle</code></pre><h4 id="2" class="heading-4">オ�
 <td>String</td>
 <td>❌</td>
 <td>現在の状態をチェックするコマンド（スイッチコマンド用）</td>
+</tr>
+<tr>
+<td><code>monitor</code></td>
+<td>String</td>
+<td>❌</td>
+<td>リアルタイムリソース追跡の監視タイプ</td>
+</tr>
+<tr>
+<td><code>icon</code></td>
+<td>String</td>
+<td>❌</td>
+<td>視覚的識別のための絵文字アイコン</td>
 </tr>
 </tbody></table>
 <h3 id="" class="heading-3">設定管理</h3><h4 id="no" class="heading-4">設定の有効/無効</h4><p>個別の設定ファイルを有効または無効にして、システムトレイメニューで利用可能なコマンドを制御できます。これは以下に役立ちます：</p>
