@@ -14,7 +14,7 @@
   ],
   "releaseCommitMessageFormat": "chore(release): 📦 {{currentTag}}",
   "issuePrefixes": ["#"],
-  "commitUrlFormat": "https://github.com/your-username/switchshuttle/commit/{{hash}}",
-  "compareUrlFormat": "https://github.com/your-username/switchshuttle/compare/{{previousTag}}...{{currentTag}}",
-  "issueUrlFormat": "https://github.com/your-username/switchshuttle/issues/{{id}}"
+  "commitUrlFormat": "https://github.com/s00d/switchshuttle/commit/{{hash}}",
+  "compareUrlFormat": "https://github.com/s00d/switchshuttle/compare/{{previousTag}}...{{currentTag}}",
+  "issueUrlFormat": "https://github.com/s00d/switchshuttle/issues/{{id}}"
 } 
