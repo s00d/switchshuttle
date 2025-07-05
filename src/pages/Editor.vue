@@ -315,24 +315,28 @@ const validateAndSave = async () => {
   if (!currentConfig.value) return;
   
   saving.value = true;
-  try {
-    // Используем универсальную команду для сохранения/обновления
-    const originalTitle = editingConfig.value ? originalFileName.value : null;
-    
-    await invoke('save_or_update_configuration', { 
-      config: currentConfig.value,
-      originalTitle: originalTitle
-    });
-    
-    closeEditor();
-    // Refresh configurations list after saving
-    await loadConfigurations();
-  } catch (error) {
-    console.error('Error saving configuration:', error);
-    alert('Failed to save configuration');
-  } finally {
-    saving.value = false;
-  }
+  
+  // Ждем обновления DOM чтобы показался лоадер
+  setTimeout(async() => {
+    try {
+      // Используем универсальную команду для сохранения/обновления
+      const originalTitle = editingConfig.value ? originalFileName.value : null;
+      
+      await invoke('save_or_update_configuration', { 
+        config: currentConfig.value,
+        originalTitle: originalTitle
+      });
+      
+      closeEditor();
+      // Refresh configurations list after saving
+      await loadConfigurations();
+    } catch (error) {
+      console.error('Error saving configuration:', error);
+      alert('Failed to save configuration');
+    } finally {
+      saving.value = false;
+    }  
+  }, 500);
 };
 
 const closeEditor = () => {
