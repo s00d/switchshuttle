@@ -99,6 +99,12 @@ impl ConsoleInstance {
     pub fn execute_command(&mut self, command: &str) -> Result<String, String> {
         println!("[Console] Executing command: {}", command);
         
+        // Проверяем, что команда не пустая
+        if command.trim().is_empty() {
+            println!("[Console] Empty command provided, returning empty string");
+            return Ok("".to_string());
+        }
+        
         if let Some(ref mut stdin) = self.stdin {
             // Отправляем команду в консоль
             println!("[Console] Sending command to stdin...");
@@ -199,6 +205,12 @@ pub fn init_console() -> Result<(), String> {
 /// Выполняет команду в постоянном инстансе консоли
 pub fn execute_command_silent(command: &str) -> Result<String, String> {
     println!("[Console] execute_command_silent called with: {}", command);
+    
+    // Проверяем, что команда не пустая
+    if command.trim().is_empty() {
+        println!("[Console] Empty command provided, returning empty string");
+        return Ok("".to_string());
+    }
     
     // Получаем или создаем инстанс консоли
     let mut console_guard = CONSOLE_INSTANCE.lock().unwrap();
