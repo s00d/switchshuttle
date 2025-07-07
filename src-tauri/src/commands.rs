@@ -363,7 +363,7 @@ pub fn delete_configuration(
             .map_err(|e| format!("Failed to reload configurations: {}", e))?;
         
         // Обновляем меню в трее
-        update_system_tray_menu(&app, &config_manager)
+        update_tray_menu_from_commands(&app, &config_manager)
     } else {
         Err(format!("Configuration file not found: {}", file_name))
     }
@@ -454,7 +454,7 @@ pub fn save_or_update_configuration(
         .map_err(|e| format!("Failed to reload configurations: {}", e))?;
     
     // Обновляем меню в трее
-    update_system_tray_menu(&app, &config_manager)
+    update_tray_menu_from_commands(&app, &config_manager)
 }
 
 fn generate_unique_title(config_dir: &std::path::Path, base_title: &str) -> String {
@@ -523,7 +523,7 @@ pub fn save_configuration_by_id(
         .map_err(|e| format!("Failed to reload configurations: {}", e))?;
     
     // Обновляем меню в трее
-    update_system_tray_menu(&app, &config_manager)
+    update_tray_menu_from_commands(&app, &config_manager)
 }
 
 #[tauri::command]
@@ -652,7 +652,7 @@ pub fn load_config(path: String) -> Result<Config, String> {
 }
 
 // Функция для обновления меню в трее
-fn update_system_tray_menu(app: &tauri::AppHandle, config_manager: &ConfigManager) -> Result<(), String> {
+fn update_tray_menu_from_commands(app: &tauri::AppHandle, config_manager: &ConfigManager) -> Result<(), String> {
     use crate::menu::{create_system_tray_menu};
     use tauri_plugin_autostart::{ManagerExt};
     
@@ -683,5 +683,5 @@ pub fn refresh_configurations(
         .map_err(|e| format!("Failed to reload configurations: {}", e))?;
     
     // Обновляем меню в трее
-    update_system_tray_menu(&app, &config_manager)
+    update_tray_menu_from_commands(&app, &config_manager)
 }
