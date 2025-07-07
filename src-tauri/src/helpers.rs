@@ -8,6 +8,7 @@ use tauri::image::Image;
 use tauri::path::BaseDirectory;
 use tauri_plugin_notification::NotificationExt;
 use crate::config::CommandConfig;
+use crate::console::execute_command_silent;
 
 static SCRIPTS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/scripts");
 
@@ -164,51 +165,7 @@ pub fn execute_command(
     }
 }
 
-pub fn execute_command_silent(
-    command: &str,
-) -> Result<String, String> {
-    if cfg!(target_os = "macos") {
-        // На macOS используем sh для выполнения команды
-        let output = Command::new("sh")
-            .arg("-c")
-            .arg(command)
-            .output()
-            .map_err(|e| format!("Failed to execute command: {}", e))?;
 
-        if output.status.success() {
-            Ok(String::from_utf8_lossy(&output.stdout).to_string())
-        } else {
-            Err(String::from_utf8_lossy(&output.stderr).to_string())
-        }
-    } else if cfg!(target_os = "windows") {
-        // На Windows используем cmd для выполнения команды
-        let output = Command::new("cmd")
-            .args(&["/C", command])
-            .output()
-            .map_err(|e| format!("Failed to execute command: {}", e))?;
-
-        if output.status.success() {
-            Ok(String::from_utf8_lossy(&output.stdout).to_string())
-        } else {
-            Err(String::from_utf8_lossy(&output.stderr).to_string())
-        }
-    } else if cfg!(target_os = "linux") {
-        // На Linux используем sh для выполнения команды
-        let output = Command::new("sh")
-            .arg("-c")
-            .arg(command)
-            .output()
-            .map_err(|e| format!("Failed to execute command: {}", e))?;
-
-        if output.status.success() {
-            Ok(String::from_utf8_lossy(&output.stdout).to_string())
-        } else {
-            Err(String::from_utf8_lossy(&output.stderr).to_string())
-        }
-    } else {
-        Err("Unsupported operating system".to_string())
-    }
-}
 
 pub fn open_in_default_editor(path: &PathBuf) {
     #[cfg(target_os = "macos")]
@@ -422,3 +379,5 @@ pub fn is_switch_enabled(switch_command: &str, app: Option<&AppHandle<Wry>>) -> 
         }
     }
 }
+
+
