@@ -89,7 +89,7 @@ pub fn run() {
 
             // Добавляем обработчики событий мыши для управления таймерами
             tray.on_tray_icon_event(move |_tray, event| {
-                use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
+                use tauri::tray::{MouseButton, MouseButtonState, TrayIconEvent};
                 match event {
                     TrayIconEvent::Enter { .. } => {
                         eprintln!("[Tray] Mouse entered tray icon - resuming timers");
