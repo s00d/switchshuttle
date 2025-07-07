@@ -8,7 +8,7 @@ use tauri::{State};
 use tauri_plugin_notification::NotificationExt;
 
 use crate::config::{CommandConfig, Config, ConfigManager};
-use crate::helpers;
+use crate::{console};
 use crate::helpers::{execute_command, get_config_path, open_in_default_editor, open_folder_in_default_explorer};
 
 #[derive(Deserialize)]
@@ -147,7 +147,7 @@ pub fn execute_command_with_inputs(
     if command.switch.is_some() {
         // Для switch команд используем execute_command_silent
         if let Some(toggle_command) = &updated_command.command {
-            match helpers::execute_command_silent(toggle_command) {
+            match console::execute_command_silent(toggle_command) {
                 Ok(_) => {
                     println!("Switch command executed successfully");
                     // Показываем уведомление об успешном выполнении
@@ -653,7 +653,7 @@ pub fn load_config(path: String) -> Result<Config, String> {
 
 // Функция для обновления меню в трее
 fn update_system_tray_menu(app: &tauri::AppHandle, config_manager: &ConfigManager) -> Result<(), String> {
-    use crate::menu::create_system_tray_menu;
+    use crate::menu::{create_system_tray_menu};
     use tauri_plugin_autostart::{ManagerExt};
     
     // Получаем состояние автозапуска
