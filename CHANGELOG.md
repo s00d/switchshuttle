@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.0](https://github.com/s00d/switchshuttle/compare/v1.8.0...v1.9.0) (2025-07-05)
+
+### ✨ Features
+* **menu:** implement comprehensive system menu structure with monitoring support
+* **monitoring:** add real-time monitoring capabilities with background timer management
+* **tray:** add mouse event handlers for intelligent timer management (pause/resume on hover)
+* **console:** implement persistent console instance for improved command execution
+* **menu:** enhance menu item creation with individual timer management
+* **monitoring:** add new monitoring templates and enhance existing ones
+
+### 🔧 Chores
+* **deps:** add lazy_static dependency for global state management
+
+### ♻️ Code Refactoring
+* **menu:** simplify menu creation and update logic with structured approach
+* **commands:** rename update_system_tray_menu to update_tray_menu_from_commands for clarity
+* **helpers:** remove redundant execute_command_silent function
+* **commands:** replace helpers with console for command execution
+* **console:** add ConsoleInstance for managing interactive console sessions
+* **menu:** enhance menu item creation with console command execution
+
+### 🐛 Bug Fixes
+* **menu:** fix background timer cleanup when menu items are removed
+* **monitoring:** implement proper timer lifecycle management with stop flags
+* **menu:** resolve timer conflicts during menu updates
+
+### ⚡ Performance
+* **tray:** optimize monitoring timers with pause/resume functionality on mouse events
+* **menu:** implement efficient timer management to prevent resource leaks
+
 ## [1.8.0](https://github.com/s00d/switchshuttle/compare/v1.7.0...v1.8.0) (2025-07-05)
 
 ### ✨ Features
