@@ -8,6 +8,7 @@ version = "0.0.0"
 dependencies = [
  "dirs 6.0.0",
  "include_dir",
+ "lazy_static",
  "log",
  "once_cell",
  "openssl",
