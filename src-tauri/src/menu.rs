@@ -1,5 +1,5 @@
 use crate::config::{CommandConfig, ConfigManager};
-use crate::helpers;
+use crate::{console, helpers};
 use crate::helpers::{
     change_devtools, create_window, get_config_path, open_folder_in_default_explorer,
     open_in_default_editor, create_menu_item, create_check_menu_item
@@ -25,7 +25,7 @@ fn create_sub_menu(app: &AppHandle<Wry>, submenu_items: &Vec<CommandConfig>, nam
             let sub_submenu = create_sub_menu(app, sub_items, &item.name, item.icon.clone());
             submenu_builder = submenu_builder.item(&sub_submenu);
         } else {
-        let id = item.id.clone().unwrap_or(item.name.clone());
+            let id = item.id.clone().unwrap_or(item.name.clone());
 
             if item.switch.is_some() {
                 // Это переключатель - получаем состояние
@@ -43,7 +43,7 @@ fn create_sub_menu(app: &AppHandle<Wry>, submenu_items: &Vec<CommandConfig>, nam
                 // Это команда мониторинга - получаем данные
                 let mut display_name = item.name.clone();
                 if let Some(monitor_command) = &item.monitor {
-                    match helpers::execute_command_silent(monitor_command) {
+                    match console::execute_command_silent(monitor_command) {
                         Ok(output) => {
                             let result = output.trim();
                             display_name = format!("{}: {}", item.name, result);
@@ -53,7 +53,8 @@ fn create_sub_menu(app: &AppHandle<Wry>, submenu_items: &Vec<CommandConfig>, nam
                         }
                     }
                 }
-                submenu_builder = submenu_builder.item(&create_menu_item(app, &id, &display_name, "terminal", item.hotkey.clone(), item.icon.as_deref()));
+                let menu_item = create_menu_item(app, &id, &display_name, "terminal", item.hotkey.clone(), item.icon.as_deref());
+                submenu_builder = submenu_builder.item(&menu_item);
             } else {
                 // Обычная команда
                 submenu_builder = submenu_builder.item(&create_menu_item(app, &id, &item.name, "terminal", item.hotkey.clone(), item.icon.as_deref()));
@@ -111,10 +112,12 @@ pub fn create_system_tray_menu(
                     // Это команда мониторинга - получаем данные
                     let mut display_name = command.name.clone();
                     if let Some(monitor_command) = &command.monitor {
-                        match helpers::execute_command_silent(monitor_command) {
+                        match console::execute_command_silent(monitor_command) {
                             Ok(output) => {
                                 let result = output.trim();
-                                display_name = format!("{}: {}", command.name, result);
+                                if !result.is_empty() {
+                                    display_name = format!("{}: {}", command.name, result);
+                                }
                             }
                             Err(_) => {
                                 // В случае ошибки оставляем оригинальное название
@@ -233,13 +236,11 @@ pub fn handle_system_tray_event(
             config_manager.load_configs(Some(&app))
                 .expect("Failed to reload configs");
             
-            // Обновляем меню в трее
-            let new_system_tray_menu = create_system_tray_menu(
-                app, 
-                app.autolaunch().is_enabled().unwrap_or(false), 
-                &config_manager
-            );
-            app.set_menu(new_system_tray_menu).unwrap();
+            // Создаем новое меню с обновленными данными
+            let new_menu = create_system_tray_menu(app, app.autolaunch().is_enabled().unwrap_or(false), &config_manager);
+            if let Some(tray) = app.tray_by_id("switch-shuttle-tray") {
+                tray.set_menu(Some(new_menu)).unwrap();
+            }
         }
         "edit_config" => open_in_default_editor(&config_path),
         "open_config_folder" => {
@@ -258,9 +259,10 @@ pub fn handle_system_tray_event(
             } else {
                 autostart_manager.enable().unwrap();
             }
-            let new_system_tray_menu =
-                create_system_tray_menu(app, !enabled, &config_manager.lock().unwrap());
-            app.set_menu(new_system_tray_menu).unwrap();
+            let new_menu = create_system_tray_menu(app, app.autolaunch().is_enabled().unwrap_or(false), &config_manager.lock().unwrap());
+            if let Some(tray) = app.tray_by_id("switch-shuttle-tray") {
+                tray.set_menu(Some(new_menu)).unwrap();
+            }
         }
         "homepage" => {
             let homepage_url = "https://github.com/s00d/SwitchShuttle";
@@ -307,7 +309,7 @@ pub fn handle_system_tray_event(
                             } else {
                                 // Выполняем команду переключения через execute_command_silent
                                 if let Some(toggle_command) = &command.command {
-                                    match helpers::execute_command_silent(toggle_command) {
+                                    match console::execute_command_silent(toggle_command) {
                                         Ok(_) => {
                                             // Показываем уведомление об успешном выполнении
                                             if let Ok(_) = app.notification().builder()
@@ -317,12 +319,10 @@ pub fn handle_system_tray_event(
                                                 // Уведомление отправлено
                                             }
                                             // Обновляем меню после выполнения команды
-                                            let new_system_tray_menu = create_system_tray_menu(
-                                                app, 
-                                                app.autolaunch().is_enabled().unwrap_or(false), 
-                                                &config_manager
-                                            );
-                                            app.set_menu(new_system_tray_menu).unwrap();
+                                            let new_menu = create_system_tray_menu(app, app.autolaunch().is_enabled().unwrap_or(false), &config_manager);
+                                            if let Some(tray) = app.tray_by_id("switch-shuttle-tray") {
+                                                tray.set_menu(Some(new_menu)).unwrap();
+                                            }
                                         }
                                         Err(e) => {
                                             eprintln!("Failed to execute switch command: {}", e);
