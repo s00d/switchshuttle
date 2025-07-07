@@ -262,6 +262,12 @@ impl Submenu {
         self
     }
 
+    /// Добавляет элемент в подменю
+    pub fn add_item(mut self, item: MenuItem) -> Self {
+        self.items.push(item);
+        self
+    }
+
     /// Добавляет несколько элементов в подменю
     // pub fn add_items(mut self, items: Vec<MenuItem>) -> Self {
     //     self.items.extend(items);
@@ -347,15 +353,14 @@ impl SystemMenu {
                 
                 if menu_item.has_submenu() {
                     // Если у элемента есть подменю, создаем Submenu
-                    let submenu = Submenu::new(command.name.clone())
+                    let mut submenu = Submenu::new(command.name.clone())
                         .with_icon(command.icon.clone().unwrap_or_else(|| "📁".to_string()));
                     
                     // Добавляем элементы подменю
                     if let Some(submenu_items) = &command.submenu {
                         for sub_command in submenu_items {
-                            let _sub_menu_item = MenuItem::from_command_config(sub_command);
-                            // Здесь нужно добавить sub_menu_item в submenu
-                            // Но у нас нет метода add_item в Submenu, поэтому создадим временное решение
+                            let sub_menu_item = MenuItem::from_command_config(sub_command);
+                            submenu = submenu.add_item(sub_menu_item);
                         }
                     }
                     
