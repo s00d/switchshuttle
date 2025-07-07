@@ -1,74 +1,19 @@
-use crate::config::{CommandConfig, ConfigManager};
+use crate::config::ConfigManager;
+use crate::menu_structure::SystemMenu;
 use crate::{console, helpers};
 use crate::helpers::{
     change_devtools, create_window, get_config_path, open_folder_in_default_explorer,
     open_in_default_editor, create_menu_item, create_check_menu_item
 };
 use std::sync::{Arc, Mutex};
-use tauri::menu::{
-    CheckMenuItem, IconMenuItem, MenuBuilder, Submenu, SubmenuBuilder,
-};
 use tauri::{AppHandle, Wry};
 use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_opener::OpenerExt;
 use tauri_plugin_notification::NotificationExt;
 
-fn create_sub_menu(app: &AppHandle<Wry>, submenu_items: &Vec<CommandConfig>, name: &str, icon: Option<String>) -> Submenu<Wry> {
-    let name_with_icon = if let Some(icon_symbol) = icon {
-        format!("{} {}", icon_symbol, name)
-    } else {
-        format!("📁 {}", name)
-    };
-    let mut submenu_builder = SubmenuBuilder::new(app, &name_with_icon);
-    for item in submenu_items {
-        if let Some(sub_items) = &item.submenu {
-            let sub_submenu = create_sub_menu(app, sub_items, &item.name, item.icon.clone());
-            submenu_builder = submenu_builder.item(&sub_submenu);
-        } else {
-            let id = item.id.clone().unwrap_or(item.name.clone());
-
-            if item.switch.is_some() {
-                // Это переключатель - получаем состояние
-                let is_enabled = helpers::is_switch_enabled(&id, Some(app));
-                let menu_item = create_check_menu_item(
-                    app,
-                    &id,
-                    &item.name,
-                    is_enabled,
-                    item.hotkey.clone(),
-                    item.icon.as_deref(),
-                );
-                submenu_builder = submenu_builder.item(&menu_item);
-            } else if item.monitor.is_some() {
-                // Это команда мониторинга - получаем данные
-                let mut display_name = item.name.clone();
-                if let Some(monitor_command) = &item.monitor {
-                    match console::execute_command_silent(monitor_command) {
-                        Ok(output) => {
-                            let result = output.trim();
-                            display_name = format!("{}: {}", item.name, result);
-                        }
-                        Err(_) => {
-                            // В случае ошибки оставляем оригинальное название
-                        }
-                    }
-                }
-                let menu_item = create_menu_item(app, &id, &display_name, "terminal", item.hotkey.clone(), item.icon.as_deref());
-                submenu_builder = submenu_builder.item(&menu_item);
-            } else {
-                // Обычная команда
-                submenu_builder = submenu_builder.item(&create_menu_item(app, &id, &item.name, "terminal", item.hotkey.clone(), item.icon.as_deref()));
-            }
-        }
-    }
-    submenu_builder.build().unwrap()
-}
-
-enum MenuItemOrSubmenu {
-    // MenuItem(MenuItem<Wry>),
-    Submenu(Submenu<Wry>),
-    IconItem(IconMenuItem<Wry>),
-    CheckItem(CheckMenuItem<Wry>),
+// Глобальное состояние для хранения текущей структуры меню
+lazy_static::lazy_static! {
+    static ref CURRENT_MENU: Arc<Mutex<Option<SystemMenu>>> = Arc::new(Mutex::new(None));
 }
 
 pub fn create_system_tray_menu(
@@ -76,84 +21,35 @@ pub fn create_system_tray_menu(
     autostart: bool,
     config_manager: &ConfigManager,
 ) -> tauri::menu::Menu<Wry> {
-    let mut tray_menu_builder = MenuBuilder::new(app);
+    // Останавливаем таймеры в текущем меню, если оно существует
+    if let Some(mut current_menu) = CURRENT_MENU.lock().unwrap().take() {
+        current_menu.stop_all_monitor_timers();
+    }
+    
+    // Создаем структуру меню из конфигураций
+    let mut system_menu = SystemMenu::from_configs_with_states(&config_manager.configs, Some(app));
+    
+    // Создаем Tauri меню из структуры (это сохранит tauri_icon_item)
+    let tray_menu = system_menu.create_tauri_menu(app);
 
-    let mut menu_items = Vec::new();
+    // Теперь запускаем индивидуальные таймеры для элементов с мониторингом
+    system_menu.start_all_monitor_timers();
+    
+    // Сохраняем новую структуру меню
+    *CURRENT_MENU.lock().unwrap() = Some(system_menu);
 
-    for config in &config_manager.configs {
-        // Пропускаем отключенные конфигурации
-        if let Some(enabled) = config.enabled {
-            if !enabled {
-                continue;
-            }
-        }
-        
-        for command in &config.commands {
-            if let Some(submenu_items) = &command.submenu {
-                let submenu = create_sub_menu(app, &submenu_items.clone(), &command.name, command.icon.clone());
-                menu_items.push(MenuItemOrSubmenu::Submenu(submenu));
-            } else {
-                let id = command.id.clone().unwrap_or(command.name.clone());
-                
-                // Проверяем, является ли это переключателем
-                if command.switch.is_some() {
-                    // Это переключатель - получаем состояние
-                    let is_enabled = helpers::is_switch_enabled(&id, Some(app));
-                    let menu_item = create_check_menu_item(
-                        app,
-                        &id,
-                        &command.name,
-                        is_enabled,
-                        command.hotkey.clone(),
-                        command.icon.as_deref(),
-                    );
-                    menu_items.push(MenuItemOrSubmenu::CheckItem(menu_item));
-                } else if command.monitor.is_some() {
-                    // Это команда мониторинга - получаем данные
-                    let mut display_name = command.name.clone();
-                    if let Some(monitor_command) = &command.monitor {
-                        match console::execute_command_silent(monitor_command) {
-                            Ok(output) => {
-                                let result = output.trim();
-                                if !result.is_empty() {
-                                    display_name = format!("{}: {}", command.name, result);
-                                }
-                            }
-                            Err(_) => {
-                                // В случае ошибки оставляем оригинальное название
-                            }
-                        }
-                    }
-                    let menu_item = create_menu_item(app, &id, &display_name, "terminal", command.hotkey.clone(), command.icon.as_deref());
-                    menu_items.push(MenuItemOrSubmenu::IconItem(menu_item));
-                } else {
-                    let menu_item = create_menu_item(app, &id, &command.name, "terminal", command.hotkey.clone(), command.icon.as_deref());
-                    menu_items.push(MenuItemOrSubmenu::IconItem(menu_item));
-                }
-            }
-        }
+    // Создаем новый MenuBuilder для добавления системных элементов
+    let mut tray_menu_builder = tauri::menu::MenuBuilder::new(app);
+    
+    // Добавляем элементы из структуры меню
+    for item in tray_menu.items().unwrap() {
+        tray_menu_builder = tray_menu_builder.item(&item);
     }
 
-    for item in menu_items {
-        match item {
-            // MenuItemOrSubmenu::MenuItem(menu_item) => {
-            //     tray_menu_builder = tray_menu_builder.item(&menu_item);
-            // }
-            MenuItemOrSubmenu::Submenu(submenu) => {
-                tray_menu_builder = tray_menu_builder.item(&submenu);
-            }
-            MenuItemOrSubmenu::IconItem(submenu) => {
-                tray_menu_builder = tray_menu_builder.item(&submenu);
-            }
-            MenuItemOrSubmenu::CheckItem(check_item) => {
-                tray_menu_builder = tray_menu_builder.item(&check_item);
-            }
-        }
-    }
-
+    // Добавляем системные элементы меню
     tray_menu_builder = tray_menu_builder.separator();
 
-    let mut edit_config_submenu = SubmenuBuilder::new(app, "🚀 Edit Config");
+    let mut edit_config_submenu = tauri::menu::SubmenuBuilder::new(app, "🚀 Edit Config");
 
     for path in &config_manager.config_paths {
         let file_name = path.file_name().unwrap().to_string_lossy().to_string();
@@ -236,11 +132,8 @@ pub fn handle_system_tray_event(
             config_manager.load_configs(Some(&app))
                 .expect("Failed to reload configs");
             
-            // Создаем новое меню с обновленными данными
-            let new_menu = create_system_tray_menu(app, app.autolaunch().is_enabled().unwrap_or(false), &config_manager);
-            if let Some(tray) = app.tray_by_id("switch-shuttle-tray") {
-                tray.set_menu(Some(new_menu)).unwrap();
-            }
+            // Обновляем меню в трее
+            update_system_tray_menu(app, &config_manager);
         }
         "edit_config" => open_in_default_editor(&config_path),
         "open_config_folder" => {
@@ -259,10 +152,7 @@ pub fn handle_system_tray_event(
             } else {
                 autostart_manager.enable().unwrap();
             }
-            let new_menu = create_system_tray_menu(app, app.autolaunch().is_enabled().unwrap_or(false), &config_manager.lock().unwrap());
-            if let Some(tray) = app.tray_by_id("switch-shuttle-tray") {
-                tray.set_menu(Some(new_menu)).unwrap();
-            }
+            update_system_tray_menu(app, &config_manager.lock().unwrap());
         }
         "homepage" => {
             let homepage_url = "https://github.com/s00d/SwitchShuttle";
@@ -319,10 +209,7 @@ pub fn handle_system_tray_event(
                                                 // Уведомление отправлено
                                             }
                                             // Обновляем меню после выполнения команды
-                                            let new_menu = create_system_tray_menu(app, app.autolaunch().is_enabled().unwrap_or(false), &config_manager);
-                                            if let Some(tray) = app.tray_by_id("switch-shuttle-tray") {
-                                                tray.set_menu(Some(new_menu)).unwrap();
-                                            }
+                                            update_system_tray_menu(app, &config_manager);
                                         }
                                         Err(e) => {
                                             eprintln!("Failed to execute switch command: {}", e);
@@ -371,3 +258,33 @@ pub fn handle_system_tray_event(
         }
     }
 }
+
+/// Обновляет меню в трее с правильной обработкой таймеров
+pub fn update_system_tray_menu(
+    app: &AppHandle<Wry>,
+    config_manager: &ConfigManager,
+) {
+    // Создаем новое меню
+    let new_menu = create_system_tray_menu(app, app.autolaunch().is_enabled().unwrap_or(false), config_manager);
+    
+    // Обновляем меню в трее
+    if let Some(tray) = app.tray_by_id("switch-shuttle-tray") {
+        if let Err(e) = tray.set_menu(Some(new_menu)) {
+            eprintln!("Failed to update tray menu: {}", e);
+        }
+    }
+}
+
+/// Возобновляет таймеры мониторинга
+pub fn resume_monitor_timers() {
+    eprintln!("[Monitor] Resuming monitor timers");
+    *crate::menu_structure::TRAY_ACTIVE.lock().unwrap() = true;
+}
+
+/// Приостанавливает таймеры мониторинга
+pub fn pause_monitor_timers() {
+    eprintln!("[Monitor] Pausing monitor timers");
+    *crate::menu_structure::TRAY_ACTIVE.lock().unwrap() = false;
+}
+
+
