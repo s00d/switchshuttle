@@ -5,10 +5,10 @@
     {
       "id": "monitor-cpu-usage",
       "name": "CPU Usage",
-      "description": "Shows current CPU usage percentage. Uses built-in macOS 'top' command to display real-time CPU statistics. No additional dependencies required.",
-      "command": "top -l 1",
-      "monitor": "top -l 1 | grep \"CPU usage\" | awk -F\"[:,]\" '{print $2+$4 \"%\"}'",
-      "hotkey": "Ctrl+Shift+C",
+      "description": "Estimates total CPU usage as percentage of performance cores using 'ps' and 'system_profiler'. No external dependencies.",
+      "command": "ps -A -o %cpu",
+      "monitor": "ps -A -o %cpu | awk -v cores=$(system_profiler SPHardwareDataType | awk -F'[()]' '/Total Number of Cores:/ {match($2, /[0-9]+ performance/); print substr($2, RSTART, RLENGTH-12)}') '{s+=$1} END {printf \"%.1f%%\\n\", s/cores}'",
+      "hotkey": "Ctrl+Shift+P",
       "icon": "🖥️"
     },
     {
@@ -16,7 +16,7 @@
       "name": "Memory Usage",
       "description": "Displays current memory usage in GB. Uses 'vm_stat' and 'sysctl' commands to show physical memory statistics. No additional dependencies required.",
       "command": "vm_stat",
-      "monitor": "echo \"$(top -l 1 -s 0 | awk '/PhysMem/ {used=$2; gsub(/[GM]/,\"\",used); printf \"%.1f\", used}')\" GB / $(sysctl -n hw.memsize | awk '{printf \"%.1f\", $1/1073741824}') GB",
+      "monitor": "echo \"$(vm_stat | awk '/Pages active/ {a=$3} /Pages inactive/ {i=$3} /Pages speculative/ {s=$3} /Pages wired down/ {w=$4} END {printf \"%.1f\", (a+i+s+w)*4096/1073741824}') GB / $(sysctl -n hw.memsize | awk '{printf \"%.1f\", $1/1073741824}') GB\"",
       "hotkey": "Ctrl+Shift+M",
       "icon": "💾"
     },
@@ -163,6 +163,159 @@
       "monitor": "terraform --version | head -1 | awk \"{print $2}\"",
       "hotkey": "Ctrl+Shift+T",
       "icon": "🏗️"
+    },
+    {
+      "id": "monitor-network-connections",
+      "name": "Network Connections",
+      "description": "Показывает количество активных сетевых соединений. Использует 'netstat' для подсчёта установленных TCP соединений.",
+      "command": "netstat -an",
+      "monitor": "netstat -an | grep ESTABLISHED | wc -l",
+      "hotkey": "Ctrl+Shift+N",
+      "icon": "🌐"
+    },
+    {
+      "id": "monitor-open-ports",
+      "name": "Open Ports",
+      "description": "Показывает количество открытых портов. Использует 'lsof' для подсчёта.",
+      "command": "lsof -i -P -n",
+      "monitor": "lsof -i -P -n | grep LISTEN | wc -l",
+      "hotkey": "Ctrl+Shift+O",
+      "icon": "🔌"
+    },
+    {
+      "id": "monitor-temperature",
+      "name": "CPU Temperature (Intel Mac)",
+      "description": "Показывает температуру процессора (требуется утилита 'osx-cpu-temp').",
+      "command": "/usr/local/bin/osx-cpu-temp",
+      "monitor": "/usr/local/bin/osx-cpu-temp | awk '{print $1}'",
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "🌡️"
+    },
+    {
+      "id": "monitor-top-process",
+      "name": "Top CPU Process",
+      "description": "Показывает процесс, который использует больше всего CPU. Использует 'ps' и 'head'.",
+      "command": "ps aux | sort -nrk 3,3 | head -2",
+      "monitor": "ps aux | sort -nrk 3,3 | head -2 | tail -1 | awk '{print $11}'",
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "🔥"
+    },
+    {
+      "id": "monitor-free-space",
+      "name": "Free Disk Space",
+      "description": "Показывает свободное место на диске в ГБ. Использует 'df'.",
+      "command": "df -h /",
+      "monitor": "df -h / | awk 'NR==2 {print $4}'",
+      "hotkey": "Ctrl+Shift+F",
+      "icon": "🗄️"
+    },
+    {
+      "id": "monitor-internet-speed",
+      "name": "Internet Speed (speedtest-cli)",
+      "description": "Показывает скорость интернета (требуется 'speedtest-cli').",
+      "command": "speedtest-cli --simple",
+      "monitor": "speedtest-cli --simple | grep 'Download' | awk '{print $2, $3}'",
+      "hotkey": "Ctrl+Shift+S",
+      "icon": "🚀"
+    },
+    {
+      "id": "monitor-network-bandwidth",
+      "name": "Network Bandwidth Usage",
+      "description": "Shows current network bandwidth usage (bytes in/out per second). Uses 'netstat' and 'awk'. No additional dependencies required.",
+      "command": "netstat -ib",
+      "monitor": "netstat -ib | awk 'NR>1 {in+=$7; out+=$10} END {print \"In: \" in/1024/1024 \" MB, Out: \" out/1024/1024 \" MB\"}'",
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "📡"
+    },
+    {
+      "id": "monitor-top-memory-process",
+      "name": "Top Memory Process",
+      "description": "Shows the process using the most memory. Uses 'ps' and 'head'. No additional dependencies required.",
+      "command": "ps aux | sort -nrk 4,4 | head -2",
+      "monitor": "ps aux | sort -nrk 4,4 | head -2 | tail -1 | awk '{print $11}'",
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "🧠"
+    },
+    {
+      "id": "monitor-system-temperature",
+      "name": "System Temperature (sensors)",
+      "description": "Shows system temperature using 'sensors' (Linux, requires lm-sensors).",
+      "command": "sensors",
+      "monitor": "sensors | grep -m 1 'Package id 0:' | awk '{print $4}'",
+      "hotkey": "Ctrl+Shift+T",
+      "icon": "🌡️"
+    },
+    {
+      "id": "monitor-ping-google",
+      "name": "Ping Google",
+      "description": "Shows average ping to google.com. Uses 'ping' command. No additional dependencies required.",
+      "command": "ping -c 4 google.com",
+      "monitor": "ping -c 4 google.com | tail -1 | awk -F '/' '{print $5 \" ms\"}'",
+      "hotkey": "Ctrl+Shift+P",
+      "icon": "🏓"
+    },
+    {
+      "id": "monitor-logged-in-users",
+      "name": "Logged-in Users",
+      "description": "Shows the number of users currently logged in. Uses 'who' command. No additional dependencies required.",
+      "command": "who",
+      "monitor": "who | wc -l",
+      "hotkey": "Ctrl+Shift+U",
+      "icon": "👥"
+    },
+    {
+      "id": "monitor-swap-usage",
+      "name": "Swap Usage",
+      "description": "Shows current swap usage. Uses 'sysctl' and 'vm_stat' (macOS) or 'free' (Linux). No additional dependencies required.",
+      "command": "vm_stat; sysctl vm.swapusage",
+      "monitor": "sysctl vm.swapusage | awk '{print $7}'",
+      "hotkey": "Ctrl+Shift+W",
+      "icon": "💾"
+    },
+    {
+      "id": "monitor-file-descriptors",
+      "name": "File Descriptor Usage",
+      "description": "Shows the number of open file descriptors. Uses 'lsof'. No additional dependencies required.",
+      "command": "lsof | wc -l",
+      "monitor": "lsof | wc -l",
+      "hotkey": "Ctrl+Shift+F",
+      "icon": "📂"
+    },
+    {
+      "id": "monitor-bluetooth-battery-system-profiler",
+      "name": "Bluetooth Device Battery (system_profiler)",
+      "description": "Shows battery level of connected Bluetooth devices using 'system_profiler' (macOS only).",
+      "command": "system_profiler SPBluetoothDataType",
+      "monitor": "system_profiler SPBluetoothDataType | grep -i 'Battery Level'",
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "🔋"
+    },
+    {
+      "id": "monitor-bluetooth-battery-ioreg",
+      "name": "Bluetooth Device Battery (ioreg)",
+      "description": "Shows battery level and product name of connected Bluetooth devices using 'ioreg' (macOS only).",
+      "command": "ioreg -c AppleDeviceManagementHIDEventService",
+      "monitor": "ioreg -c AppleDeviceManagementHIDEventService | grep -E 'BatteryPercent|Product'",
+      "hotkey": "Ctrl+Shift+L",
+      "icon": "🦷"
+    },
+    {
+      "id": "monitor-bluetooth-battery-magic-mouse",
+      "name": "Magic Mouse Battery (macOS)",
+      "description": "Shows battery percent for Magic Mouse (macOS only).",
+      "command": "ioreg -c AppleDeviceManagementHIDEventService",
+      "monitor": "ioreg -c AppleDeviceManagementHIDEventService | awk '/\"Product\" =/ {prod=$3; for(i=4;i<=NF;i++) prod=prod\" \"$i} /\"BatteryPercent\" =/ {gsub(/\"/, \"\", prod); if (prod ~ /Magic Mouse/) print $3 \"%\"}'",
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "🖱️"
+    },
+    {
+      "id": "monitor-bluetooth-battery-airpods",
+      "name": "AirPods Battery (macOS)",
+      "description": "Shows battery percent for AirPods (macOS only).",
+      "command": "ioreg -c AppleDeviceManagementHIDEventService",
+      "monitor": "ioreg -c AppleDeviceManagementHIDEventService | awk '/\"Product\" =/ {prod=$3; for(i=4;i<=NF;i++) prod=prod\" \"$i} /\"BatteryPercent\" =/ {gsub(/\"/, \"\", prod); if (prod ~ /AirPods/) print $3 \"%\"}'",
+      "hotkey": "Ctrl+Shift+A",
+      "icon": "🎧"
     }
   ]
 }
