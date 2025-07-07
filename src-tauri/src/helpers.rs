@@ -31,17 +31,33 @@ pub fn execute_command(
     println!("Initializing commands_to_execute...");
 
     if let Some(command) = &command_config.command {
-        println!("Adding single command: {}", command);
-        commands_to_execute.push(command.clone());
+        if !command.trim().is_empty() {
+            println!("Adding single command: {}", command);
+            commands_to_execute.push(command.clone());
+        } else {
+            println!("Skipping empty single command");
+        }
     }
 
     if let Some(commands) = &command_config.commands {
         println!("Adding multiple commands: {:?}", commands);
-        commands_to_execute.extend(commands.clone());
+        for cmd in commands {
+            if !cmd.trim().is_empty() {
+                commands_to_execute.push(cmd.clone());
+            } else {
+                println!("Skipping empty command in multiple commands");
+            }
+        }
     }
 
     // Дебаг: Печать списка команд
     println!("Commands to execute: {:?}", commands_to_execute);
+
+    // Проверяем, что есть команды для выполнения
+    if commands_to_execute.is_empty() {
+        println!("No commands to execute, skipping");
+        return;
+    }
 
     let terminal = terminal.to_lowercase();
     let launch_in = launch_in.to_lowercase();
