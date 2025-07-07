@@ -2,6 +2,7 @@
 mod commands;
 mod cli;
 mod config;
+mod console;
 mod helpers;
 mod menu;
 
@@ -14,6 +15,7 @@ use crate::commands::{
 };
 use crate::menu::{create_system_tray_menu, handle_system_tray_event};
 use crate::cli::handle_cli_commands;
+use crate::console::{init_console};
 use config::ConfigManager;
 use std::sync::{Arc, Mutex};
 use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
@@ -51,6 +53,11 @@ pub fn run() {
                 app.set_activation_policy(tauri::ActivationPolicy::Accessory);
             }
 
+            // Инициализируем постоянный инстанс консоли
+            if let Err(e) = init_console() {
+                eprintln!("Failed to initialize console: {}", e);
+            }
+
             // Handle CLI commands
             let config_manager_clone = config_manager.clone();
             
@@ -73,10 +80,47 @@ pub fn run() {
                 create_system_tray_menu(app.handle(), enabled, &config_manager.lock().unwrap());
 
             let tray = app.tray_by_id("switch-shuttle-tray").unwrap();
+            let config_manager_clone = config_manager.clone();
 
             tray.on_menu_event(move |app, event| {
-                handle_system_tray_event(app, event, config_manager.clone())
+                handle_system_tray_event(app, event, config_manager_clone.clone())
             });
+
+            let config_manager_for_event = config_manager.clone();
+            let app_handle = app.handle().clone();
+            tray.on_tray_icon_event(move |tray, event| {
+                use tauri::tray::{ TrayIconEvent};
+
+                match event {
+                    TrayIconEvent::Enter {
+                        // button: MouseButton::Left,
+                        // button_state: MouseButtonState::Down,
+                        ..
+                    } => {
+                        // Обновляем меню при наведении мыши
+                        let mut config_manager = config_manager_for_event.lock().unwrap();
+                        let app = tray.app_handle();
+
+                        // Перезагружаем конфигурации
+                        if let Err(e) = config_manager.load_configs(Some(&app)) {
+                            eprintln!("Failed to reload configs: {}", e);
+                        }
+
+                        let new_menu = create_system_tray_menu(
+                            &app_handle,
+                            app_handle.autolaunch().is_enabled().unwrap_or(false),
+                            &config_manager
+                        );
+
+                        // Устанавливаем новое меню
+                        if let Err(e) = tray.set_menu(Some(new_menu)) {
+                            eprintln!("Failed to update tray menu: {}", e);
+                        }
+                    }
+                    _ => {}
+                }
+            });
+
             tray.set_menu(Some(system_tray_menu)).unwrap();
 
             Ok(())
