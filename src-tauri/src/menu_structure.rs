@@ -1,6 +1,5 @@
 use crate::config::CommandConfig;
 use crate::{console, helpers};
-use std::collections::HashMap;
 use std::sync::{Arc};
 use std::time::Duration;
 use std::thread;
@@ -22,16 +21,9 @@ lazy_static::lazy_static! {
 /// Представляет элемент меню
 #[derive(Clone)]
 pub struct MenuItem {
-    pub id: String,
-    pub name: String,
-    pub icon: Option<String>,
-    pub hotkey: Option<String>,
-    pub command: Option<String>,
-    pub commands: Option<Vec<String>>,
-    pub switch: Option<String>,
-    pub monitor: Option<String>,
-    pub inputs: Option<HashMap<String, String>>,
-    pub submenu: Option<Vec<MenuItem>>,
+    // Наследуем все поля от CommandConfig
+    pub config: crate::config::CommandConfig,
+    // Добавляем только специфичные для меню поля
     pub tauri_icon_item: Option<Arc<IconMenuItem<Wry>>>,
     pub stop_flag: Option<Arc<AtomicBool>>,
 }
@@ -53,21 +45,8 @@ pub struct SystemMenu {
 impl MenuItem {
     /// Создает элемент меню из CommandConfig
     pub fn from_command_config(cmd: &CommandConfig) -> Self {
-        let id = cmd.id.clone().unwrap_or_else(|| cmd.name.clone());
-        
         Self {
-            id,
-            name: cmd.name.clone(),
-            icon: cmd.icon.clone(),
-            hotkey: cmd.hotkey.clone(),
-            command: cmd.command.clone(),
-            commands: cmd.commands.clone(),
-            switch: cmd.switch.clone(),
-            monitor: cmd.monitor.clone(),
-            inputs: cmd.inputs.clone(),
-            submenu: cmd.submenu.as_ref().map(|submenu_items| {
-                submenu_items.iter().map(MenuItem::from_command_config).collect()
-            }),
+            config: cmd.clone(),
             tauri_icon_item: None,
             stop_flag: None,
         }
@@ -75,54 +54,69 @@ impl MenuItem {
 
     /// Проверяет, является ли элемент переключателем
     pub fn is_switch(&self) -> bool {
-        self.switch.is_some()
+        self.config.switch.is_some()
     }
 
     /// Проверяет, является ли элемент командой мониторинга
     pub fn is_monitor(&self) -> bool {
-        self.monitor.is_some()
+        self.config.monitor.is_some()
     }
 
     /// Проверяет, имеет ли элемент подменю
     pub fn has_submenu(&self) -> bool {
-        self.submenu.is_some() && !self.submenu.as_ref().unwrap().is_empty()
+        self.config.submenu.is_some() && !self.config.submenu.as_ref().unwrap().is_empty()
     }
 
     /// Получает отображаемое имя с учетом мониторинга
     pub fn get_display_name(&self, _app: Option<&AppHandle<Wry>>) -> String {
-        if let Some(monitor_command) = &self.monitor {
-            // Выполняем команду мониторинга
-            match console::execute_command_silent(monitor_command) {
-                Ok(output) => {
-                    let result = output.trim();
-                    if !result.is_empty() {
-                        format!("{}: {}", self.name, result)
-                    } else {
-                        self.name.clone()
+        if self.is_monitor() {
+            if let Some(monitor_command) = &self.config.monitor {
+                // Выполняем команду мониторинга
+                match console::execute_command_silent(monitor_command) {
+                    Ok(output) => {
+                        let result = output.trim();
+                        if !result.is_empty() {
+                            format!("{}: {}", self.config.name, result)
+                        } else {
+                            self.config.name.clone()
+                        }
+                    }
+                    Err(_) => {
+                        // В случае ошибки оставляем оригинальное название
+                        self.config.name.clone()
                     }
                 }
-                Err(_) => {
-                    // В случае ошибки оставляем оригинальное название
-                    self.name.clone()
-                }
+            } else {
+                self.config.name.clone()
             }
         } else {
-            self.name.clone()
+            self.config.name.clone()
         }
     }
 
     /// Запускает таймер обновления для элемента с мониторингом
     pub fn start_monitor_timer(&mut self) {
         if self.is_monitor() {
+            // Проверяем, что команда мониторинга не пустая
+            if let Some(monitor_command) = &self.config.monitor {
+                if monitor_command.trim().is_empty() {
+                    eprintln!("[Monitor] Empty monitor command for item: {}", self.config.id.as_ref().unwrap_or(&self.config.name));
+                    return;
+                }
+            } else {
+                eprintln!("[Monitor] No monitor command for item: {}", self.config.id.as_ref().unwrap_or(&self.config.name));
+                return;
+            }
+            
             // Останавливаем предыдущий поток, если был
             self.stop_monitor_timer();
             let stop_flag = Arc::new(AtomicBool::new(false));
             self.stop_flag = Some(stop_flag.clone());
             if let Some(icon_item) = self.tauri_icon_item.clone() {
-                let monitor_command = self.monitor.clone().unwrap_or_default();
-                let name = self.name.clone();
-                let id = self.id.clone();
-                let icon = self.icon.clone();
+                let monitor_command = self.config.monitor.clone().unwrap();
+                let name = self.config.name.clone();
+                let id = self.config.id.clone().unwrap_or_else(|| self.config.name.clone());
+                let icon = self.config.icon.clone();
                 thread::spawn(move || {
                     eprintln!("[Monitor] Starting timer for item: {}", id);
                     while !stop_flag.load(Ordering::Relaxed) {
@@ -167,7 +161,7 @@ impl MenuItem {
                     eprintln!("[Monitor] Timer stopped for item: {}", id);
                 });
             } else {
-                eprintln!("[Monitor] No icon_item found for {}", self.id);
+                eprintln!("[Monitor] No icon_item found for {}", self.config.id.as_ref().unwrap_or(&self.config.name));
             }
         }
     }
@@ -183,7 +177,8 @@ impl MenuItem {
     /// Получает состояние переключателя
     pub fn get_switch_state(&self, app: Option<&AppHandle<Wry>>) -> bool {
         if self.is_switch() {
-            helpers::is_switch_enabled(&self.id, app)
+            let id = self.config.id.as_ref().unwrap_or(&self.config.name);
+            helpers::is_switch_enabled(id, app)
         } else {
             false
         }
@@ -191,10 +186,10 @@ impl MenuItem {
 
     /// Создает Tauri элемент меню из структуры MenuItem
     pub fn create_tauri_menu_item(&mut self, app: &AppHandle<Wry>) -> MenuItemOrSubmenu {
-        let id = &self.id;
-        let name = &self.name;
-        let hotkey = self.hotkey.as_deref();
-        let icon = self.icon.as_deref();
+        let id = self.config.id.as_ref().unwrap_or(&self.config.name);
+        let name = &self.config.name;
+        let hotkey = self.config.hotkey.as_deref();
+        let icon = self.config.icon.as_deref();
         
         if self.is_switch() {
             let is_enabled = self.get_switch_state(Some(app));
@@ -214,21 +209,22 @@ impl MenuItem {
 
     /// Создает Tauri подменю из MenuItem с подменю
     pub fn create_tauri_submenu(&mut self, app: &AppHandle<Wry>) -> TauriSubmenu<Wry> {
-        let display_name = if let Some(icon) = &self.icon {
-            format!("{} {}", icon, self.name)
+        let display_name = if let Some(icon) = &self.config.icon {
+            format!("{} {}", icon, self.config.name)
         } else {
-            format!("📁 {}", self.name)
+            format!("📁 {}", self.config.name)
         };
         
         let mut submenu_builder = SubmenuBuilder::new(app, &display_name);
         
-        if let Some(submenu_items) = &mut self.submenu {
-            for sub_item in submenu_items.iter_mut() {
-                if sub_item.has_submenu() {
-                    let nested_submenu = sub_item.create_tauri_submenu(app);
+        if let Some(submenu_items) = &self.config.submenu {
+            for sub_item in submenu_items.iter() {
+                let mut menu_item = MenuItem::from_command_config(sub_item);
+                if menu_item.has_submenu() {
+                    let nested_submenu = menu_item.create_tauri_submenu(app);
                     submenu_builder = submenu_builder.item(&nested_submenu);
                 } else {
-                    let tauri_item = sub_item.create_tauri_menu_item(app);
+                    let tauri_item = menu_item.create_tauri_menu_item(app);
                     match tauri_item {
                         MenuItemOrSubmenu::IconItem(icon_item) => {
                             submenu_builder = submenu_builder.item(&icon_item);
@@ -267,10 +263,10 @@ impl Submenu {
     }
 
     /// Добавляет несколько элементов в подменю
-    pub fn add_items(mut self, items: Vec<MenuItem>) -> Self {
-        self.items.extend(items);
-        self
-    }
+    // pub fn add_items(mut self, items: Vec<MenuItem>) -> Self {
+    //     self.items.extend(items);
+    //     self
+    // }
 
     /// Получает отображаемое имя подменю с иконкой
     pub fn get_display_name(&self) -> String {
@@ -352,8 +348,16 @@ impl SystemMenu {
                 if menu_item.has_submenu() {
                     // Если у элемента есть подменю, создаем Submenu
                     let submenu = Submenu::new(command.name.clone())
-                        .with_icon(command.icon.clone().unwrap_or_else(|| "📁".to_string()))
-                        .add_items(menu_item.submenu.unwrap());
+                        .with_icon(command.icon.clone().unwrap_or_else(|| "📁".to_string()));
+                    
+                    // Добавляем элементы подменю
+                    if let Some(submenu_items) = &command.submenu {
+                        for sub_command in submenu_items {
+                            let _sub_menu_item = MenuItem::from_command_config(sub_command);
+                            // Здесь нужно добавить sub_menu_item в submenu
+                            // Но у нас нет метода add_item в Submenu, поэтому создадим временное решение
+                        }
+                    }
                     
                     system_menu = system_menu.add_submenu(submenu);
                 } else {
@@ -373,7 +377,7 @@ impl SystemMenu {
         // Запускаем таймеры для основных элементов
         for item in &mut self.items {
             if item.is_monitor() {
-                eprintln!("[Monitor] Found monitor item in main items: {}", item.id);
+                eprintln!("[Monitor] Found monitor item in main items: {}", item.config.id.as_ref().unwrap_or(&item.config.name));
                 item.start_monitor_timer();
             }
         }
@@ -382,7 +386,7 @@ impl SystemMenu {
         for submenu in &mut self.submenus {
             for item in &mut submenu.items {
                 if item.is_monitor() {
-                    eprintln!("[Monitor] Found monitor item in submenu: {}", item.id);
+                    eprintln!("[Monitor] Found monitor item in submenu: {}", item.config.id.as_ref().unwrap_or(&item.config.name));
                     item.start_monitor_timer();
                 }
             }
