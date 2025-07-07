@@ -5,6 +5,7 @@ mod config;
 mod console;
 mod helpers;
 mod menu;
+mod menu_structure;
 
 use crate::commands::{
     about_message, check_for_updates, create_new_config, execute, execute_command_with_inputs,
@@ -86,38 +87,30 @@ pub fn run() {
                 handle_system_tray_event(app, event, config_manager_clone.clone())
             });
 
-            let config_manager_for_event = config_manager.clone();
-            let app_handle = app.handle().clone();
-            tray.on_tray_icon_event(move |tray, event| {
-                use tauri::tray::{ TrayIconEvent};
-
+            // Добавляем обработчики событий мыши для управления таймерами
+            tray.on_tray_icon_event(move |_tray, event| {
+                use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
                 match event {
-                    TrayIconEvent::Enter {
-                        // button: MouseButton::Left,
-                        // button_state: MouseButtonState::Down,
+                    TrayIconEvent::Enter { .. } => {
+                        eprintln!("[Tray] Mouse entered tray icon - resuming timers");
+                        crate::menu::resume_monitor_timers();
+                    }
+                    TrayIconEvent::Leave { .. } => {
+                        eprintln!("[Tray] Mouse left tray icon - pausing timers");
+                        crate::menu::pause_monitor_timers();
+                    }
+                    TrayIconEvent::Click {
+                        button: MouseButton::Left,
+                        button_state: MouseButtonState::Up,
                         ..
                     } => {
-                        // Обновляем меню при наведении мыши
-                        let mut config_manager = config_manager_for_event.lock().unwrap();
-                        let app = tray.app_handle();
-
-                        // Перезагружаем конфигурации
-                        if let Err(e) = config_manager.load_configs(Some(&app)) {
-                            eprintln!("Failed to reload configs: {}", e);
-                        }
-
-                        let new_menu = create_system_tray_menu(
-                            &app_handle,
-                            app_handle.autolaunch().is_enabled().unwrap_or(false),
-                            &config_manager
-                        );
-
-                        // Устанавливаем новое меню
-                        if let Err(e) = tray.set_menu(Some(new_menu)) {
-                            eprintln!("Failed to update tray menu: {}", e);
-                        }
+                        eprintln!("[Tray] Mouse click left tray icon - pausing timers");
+                        // in this example, let's show and focus the main window when the tray is clicked
+                        crate::menu::resume_monitor_timers();
                     }
-                    _ => {}
+                    _ => {
+                        // Игнорируем другие события
+                    }
                 }
             });
 
