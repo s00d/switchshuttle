@@ -94,7 +94,6 @@ pub fn get_version(app: tauri::AppHandle) -> String {
 #[tauri::command]
 pub fn execute(
     state: State<'_, Arc<Mutex<ConfigManager>>>,
-    settings_state: State<'_, Arc<Mutex<AppSettings>>>,
     command: String,
 ) -> Result<String, String> {
     println!("Executing command: {}", command);
@@ -110,8 +109,6 @@ pub fn execute(
                 &config.theme,
                 &config.title,
             );
-            // Воспроизводим звук уведомления
-            settings_state.lock().unwrap().play_notification_sound().ok();
             Ok("Ok".to_string())
         }
         None => Err(format!("Command '{}' not found", command)),
@@ -186,8 +183,6 @@ pub fn execute_command_with_inputs(
                         "SwitchShuttle Success",
                         &format!("Switch command '{}' executed successfully", command.name)
                     ).ok();
-                    // Воспроизводим звук уведомления
-                    settings_state.lock().unwrap().play_notification_sound().ok();
                 }
                 Err(e) => {
                     eprintln!("Failed to execute switch command: {}", e);
@@ -210,8 +205,6 @@ pub fn execute_command_with_inputs(
             &config.title,
         );
     }
-    // Воспроизводим звук уведомления
-    settings_state.lock().unwrap().play_notification_sound().ok();
     Ok("Ok".to_string())
 }
 
@@ -730,18 +723,7 @@ pub fn save_settings(
     settings.apply(&app).map_err(|e| format!("Failed to apply settings: {}", e))?;
     // Обновляем state
     *state.lock().unwrap() = settings;
-    // Воспроизводим звук
-    state.lock().unwrap().play_notification_sound().ok();
     Ok(())
-}
-
-#[tauri::command]
-pub fn play_notification_sound(
-    state: State<'_, Arc<Mutex<AppSettings>>>
-) -> Result<(), String> {
-    let settings = state.lock().unwrap();
-    settings.play_notification_sound()
-        .map_err(|e| format!("Failed to play notification sound: {}", e))
 }
 
 #[derive(Debug, Deserialize)]
