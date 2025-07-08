@@ -158,11 +158,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { invoke } from '@tauri-apps/api/core';
+import { ref, onMounted, inject } from 'vue';
 import Card from '../components/Card.vue';
 import Button from '../components/Button.vue';
 import { open } from '@tauri-apps/plugin-shell';
+import type { TauriInjectionKey } from '../lib/tauri-commands-plugin';
+
+// Получаем доступ к командам через плагин
+const tauri = inject('tauri') as TauriInjectionKey['tauri'];
 
 const version = ref('Loading...');
 
@@ -172,7 +175,7 @@ const openLink = (url: string) => {
 
 const loadVersion = async () => {
   try {
-    version.value = await invoke('get_version');
+    version.value = await tauri.get_version();
   } catch (error) {
     console.error('Failed to load version:', error);
     version.value = 'Unknown';
