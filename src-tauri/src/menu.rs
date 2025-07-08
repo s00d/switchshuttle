@@ -96,10 +96,10 @@ pub fn create_system_tray_menu(
         tray_menu_builder = tray_menu_builder.separator();
     }
 
+    tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "settings", "Settings", "config",  None, None));
     tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "about", "About", "info",  None, None));
     tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "help", "Help", "help",  None, None));
     tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "homepage", "Homepage", "site",  None, None));
-    tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "check_updates", "Check for Updates", "update",  None, None));
 
     tray_menu_builder = tray_menu_builder.separator();
     tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "quit", "Quit SwitchShuttle", "exit",  None, None));
@@ -115,6 +115,11 @@ pub fn handle_system_tray_event(
     let config_path = get_config_path();
 
     match event.id().0.as_str() {
+        "settings" => {
+            if let Err(e) = create_window(&app, "settings", "SwitchShuttle - Settings", "/settings", 900.0, 700.0, true) {
+                eprintln!("Failed to create settings window: {}", e);
+            }
+        }
         "about" => {
             if let Err(e) = create_window(&app, "about", "SwitchShuttle - About", "/about", 800.0, 600.0, true) {
                 eprintln!("Failed to create about window: {}", e);
@@ -159,11 +164,6 @@ pub fn handle_system_tray_event(
             let opener = app.opener();
             opener.open_url(homepage_url, None::<&str>).unwrap();
         }
-        "check_updates" => {
-            if let Err(e) = create_window(&app, "check_updates", "SwitchShuttle - Update", "/update", 800.0, 600.0, true) {
-                eprintln!("Failed to create check_updates window: {}", e);
-            }
-        }
         "open_devtools" => {
             if cfg!(debug_assertions) {
                 change_devtools(app);
@@ -199,6 +199,7 @@ pub fn handle_system_tray_event(
                             } else {
                                 // Выполняем команду переключения через execute_command_silent
                                 if let Some(toggle_command) = &command.command {
+                                    println!("[Monitor] spawn: toggle_command = '{}'", toggle_command);
                                     match console::execute_command_silent(toggle_command) {
                                         Ok(_) => {
                                             // Показываем уведомление об успешном выполнении
