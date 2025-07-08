@@ -9,49 +9,14 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import { getCurrentWindow, cursorPosition } from '@tauri-apps/api/window';
-import { useRouter } from 'vue-router';
-import { listen, emit } from '@tauri-apps/api/event';
 import { invoke } from '@tauri-apps/api/core';
 import { MenuItem } from "@tauri-apps/api/menu/menuItem";
 import { Menu } from "@tauri-apps/api/menu/menu";
 import { Submenu } from "@tauri-apps/api/menu/submenu";
-import {
-  isPermissionGranted,
-  requestPermission,
-  sendNotification
-} from '@tauri-apps/plugin-notification';
+import SwitchShuttleCommands from './lib/tauri-commands';
 import { register, unregister } from "@tauri-apps/plugin-global-shortcut";
 import { PhysicalPosition } from "@tauri-apps/api/dpi";
 import type { Command } from './types';
-
-const router = useRouter();
-
-listen('navigate', async (event: any) => {
-  try {
-    await router.push(event.payload[0]);
-    emit('navigation_complete', { route: event.payload[0] });
-    const window = getCurrentWindow();
-    await window.center();
-    await window.setFocus();
-    await window.setAlwaysOnTop(true);
-    await window.setShadow(true);
-  } catch (error) {
-    console.error('Navigation error:', error);
-  }
-}).catch((error) => {
-  console.error('Failed to listen for navigate event:', error);
-});
-
-async function noti(title: string, body: string) {
-  let permissionGranted = await isPermissionGranted();
-  if (!permissionGranted) {
-    const permission = await requestPermission();
-    permissionGranted = permission === 'granted';
-  }
-  if (permissionGranted) {
-    sendNotification({ title, body });
-  }
-}
 
 async function createMenuItem(item: Command): Promise<MenuItem | Submenu> {
   if (item.submenu) {
@@ -79,9 +44,7 @@ async function showContextMenu(hotkey: string) {
     await menu.popup(new PhysicalPosition(pos.x, pos.y));
   } else {
     console.error(`No menu items found for hotkey: ${hotkey}`);
-    if (import.meta.env.PROD) {
-      noti('Error', `No menu items found for hotkey: ${hotkey}`);
-    }
+    SwitchShuttleCommands.show_notification('Error', `No menu items found for hotkey: ${hotkey}`, 'error');
     await getCurrentWindow().hide();
   }
 }
@@ -91,9 +54,7 @@ async function registerGlobalHotkeys(commands: Command[], uniqueHotkeys: Set<str
     if (command.hotkey) {
       if (uniqueHotkeys.has(command.hotkey)) {
         console.error(`Hotkey ${command.hotkey} is already registered for command ${command.name}.`);
-        if (import.meta.env.PROD) {
-          noti('Warning', `Hotkey ${command.hotkey} is already registered for command ${command.name}.`);
-        }
+        SwitchShuttleCommands.show_notification('Warning', `Hotkey ${command.hotkey} is already registered for command ${command.name}.`, 'warning');
         await getCurrentWindow().hide();
       } else {
         uniqueHotkeys.add(command.hotkey);
@@ -104,7 +65,7 @@ async function registerGlobalHotkeys(commands: Command[], uniqueHotkeys: Set<str
           }
         }).catch(async (error) => {
           console.error(`Failed to register hotkey ${command.hotkey} for command ${command.name}:`, error);
-          noti('Error', `Failed to register hotkey ${command.hotkey} for command ${command.name}: ${error}`);
+          SwitchShuttleCommands.show_notification('Error', `Failed to register hotkey ${command.hotkey} for command ${command.name}: ${error}`, 'error');
           await getCurrentWindow().hide();
         });
       }
@@ -124,9 +85,7 @@ onMounted(async () => {
   for (const [hotkey] of Object.entries(menuData)) {
     if (uniqueHotkeys.has(hotkey)) {
       console.error(`Hotkey ${hotkey} is already registered.`);
-      if (import.meta.env.PROD) {
-        noti('Warning', `Hotkey ${hotkey} is already registered.`);
-      }
+      SwitchShuttleCommands.show_notification('Warning', `Hotkey ${hotkey} is already registered.`, 'warning');
       await getCurrentWindow().hide();
     } else {
       uniqueHotkeys.add(hotkey);
@@ -137,9 +96,7 @@ onMounted(async () => {
         }
       }).catch(async (error) => {
         console.error(`Failed to register hotkey ${hotkey}:`, error);
-        if (import.meta.env.PROD) {
-          noti('Warning', `Failed to register hotkey ${hotkey}: ${error}`);
-        }
+        SwitchShuttleCommands.show_notification('Warning', `Failed to register hotkey ${hotkey}: ${error}`, 'warning');
         await getCurrentWindow().hide();
       });
     }
@@ -149,8 +106,6 @@ onMounted(async () => {
     await registerGlobalHotkeys(items, uniqueHotkeys);
   }
 
-  if (!await isPermissionGranted()) {
-    await requestPermission();
-  }
+
 });
 </script>
