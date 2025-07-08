@@ -6,13 +6,14 @@ mod console;
 mod helpers;
 mod menu;
 mod menu_structure;
+mod settings;
 
 use crate::commands::{
     about_message, check_for_updates, create_new_config, execute, execute_command_with_inputs,
     fetch_input_data, get_menu_data, get_version, get_configurations, delete_configuration,
     save_or_update_configuration, get_config_files, load_config, save_configuration_by_id,
     create_new_configuration, duplicate_configuration, validate_configuration, get_unique_config_title,
-    open_configuration, refresh_configurations, open_config_folder
+    open_configuration, refresh_configurations, open_config_folder, get_settings_schema, get_settings, save_settings, play_notification_sound, show_notification
 };
 use crate::menu::{create_system_tray_menu, handle_system_tray_event};
 use crate::cli::handle_cli_commands;
@@ -21,6 +22,7 @@ use config::ConfigManager;
 use std::sync::{Arc, Mutex};
 use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
 use tauri_plugin_cli::CliExt;
+use crate::settings::AppSettings;
 
 pub fn run() {
     let config_manager = Arc::new(Mutex::new(ConfigManager::new()));
@@ -30,6 +32,15 @@ pub fn run() {
             .load_configs(None)
             .expect("Failed to load configs");
     }
+
+    // Загружаем настройки в состояние
+    let settings = match AppSettings::load() {
+        Ok(settings) => Arc::new(Mutex::new(settings)),
+        Err(e) => {
+            eprintln!("Failed to load settings: {}", e);
+            Arc::new(Mutex::new(AppSettings::default()))
+        }
+    };
 
     let app = tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
@@ -48,6 +59,7 @@ pub fn run() {
             None,
         ))
         .manage(config_manager.clone())
+        .manage(settings.clone())
         .setup(move |app| {
             #[cfg(target_os = "macos")]
             {
@@ -57,6 +69,13 @@ pub fn run() {
             // Инициализируем постоянный инстанс консоли
             if let Err(e) = init_console() {
                 eprintln!("Failed to initialize console: {}", e);
+            }
+
+            // Загружаем и применяем настройки при запуске
+            if let Ok(settings) = AppSettings::load() {
+                if let Err(e) = settings.apply(&app.handle()) {
+                    eprintln!("Failed to apply settings: {}", e);
+                }
             }
 
             // Handle CLI commands
@@ -139,7 +158,12 @@ pub fn run() {
             about_message,
             fetch_input_data,
             refresh_configurations,
-            open_config_folder
+            open_config_folder,
+            get_settings_schema,
+            get_settings,
+            save_settings,
+            play_notification_sound,
+            show_notification
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application");
