@@ -4,6 +4,7 @@ use std::sync::{Arc, Mutex};
 use lazy_static::lazy_static;
 use std::println;
 use std::time::Duration;
+#[cfg(not(target_os = "windows"))]
 use timeout_readwrite::TimeoutReadExt;
 
 /// Структура для управления постоянным инстансом консоли
@@ -120,22 +121,43 @@ impl ConsoleInstance {
                     // Читаем только одну строку результата с таймаутом
                     line.clear();
                     
-                    // Читаем одну строку с таймаутом в 3 секунды
-                    let timeout_reader = stdout.with_timeout(Duration::from_secs(3));
-                    let mut buf_reader = BufReader::new(timeout_reader);
+                    // Читаем одну строку результата
+                    #[cfg(not(target_os = "windows"))]
+                    {
+                        let timeout_reader = stdout.with_timeout(Duration::from_secs(3));
+                        let mut buf_reader = BufReader::new(timeout_reader);
+                        
+                        match buf_reader.read_line(&mut line) {
+                            Ok(0) => {
+                                println!("[Console] EOF reached - no output");
+                            }
+                            Ok(_) => {
+                                output.push_str(&line);
+                                println!("[Console] Result: {:?}", line.trim());
+                            }
+                            Err(e) => {
+                                if e.kind() == ErrorKind::TimedOut {
+                                    println!("[Console] Timeout reading output after 3 seconds");
+                                } else {
+                                    println!("[Console] Error reading line: {}", e);
+                                }
+                            }
+                        }
+                    }
                     
-                    match buf_reader.read_line(&mut line) {
-                        Ok(0) => {
-                            println!("[Console] EOF reached - no output");
-                        }
-                        Ok(_) => {
-                            output.push_str(&line);
-                            println!("[Console] Result: {:?}", line.trim());
-                        }
-                        Err(e) => {
-                            if e.kind() == ErrorKind::TimedOut {
-                                println!("[Console] Timeout reading output after 3 seconds");
-                            } else {
+                    #[cfg(target_os = "windows")]
+                    {
+                        let mut buf_reader = BufReader::new(stdout);
+                        
+                        match buf_reader.read_line(&mut line) {
+                            Ok(0) => {
+                                println!("[Console] EOF reached - no output");
+                            }
+                            Ok(_) => {
+                                output.push_str(&line);
+                                println!("[Console] Result: {:?}", line.trim());
+                            }
+                            Err(e) => {
                                 println!("[Console] Error reading line: {}", e);
                             }
                         }
