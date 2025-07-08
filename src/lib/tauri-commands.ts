@@ -392,18 +392,6 @@ export class SwitchShuttleCommands {
   }
 
   /**
-   * @description Воспроизводит звук уведомления
-   * @returns {Promise<void>} Promise, который разрешается при успешном воспроизведении
-   */
-  static async play_notification_sound(): Promise<void> {
-    try {
-      await invoke<void>('play_notification_sound');
-    } catch (error) {
-      throw new Error(`Failed to play notification sound: ${error}`);
-    }
-  }
-
-  /**
    * @description Показывает уведомление указанного типа
    * @param {string} title - Заголовок уведомления
    * @param {string} body - Текст уведомления
