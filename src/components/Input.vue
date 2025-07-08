@@ -33,6 +33,8 @@
         :value="modelValue"
         :placeholder="placeholder"
         :disabled="disabled"
+          :min="min"
+          :max="max"
         :class="[
           'w-full border border-slate-300 text-sm transition-all duration-200',
           'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
@@ -71,6 +73,8 @@ interface Props {
   size?: 'sm' | 'md' | 'lg';
   options?: Option[];
   inputClass?: string;
+  min?: number;
+  max?: number;
 }
 
 withDefaults(defineProps<Props>(), {
