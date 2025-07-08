@@ -2,7 +2,7 @@ use include_dir::{include_dir, Dir};
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
-use tauri::{AppHandle, Emitter, Manager, Wry, WebviewWindowBuilder};
+use tauri::{AppHandle, Manager, Wry, WebviewWindowBuilder};
 use tauri::menu::{IconMenuItem, IconMenuItemBuilder, CheckMenuItem};
 use tauri::image::Image;
 use tauri::path::BaseDirectory;
@@ -257,7 +257,6 @@ pub fn create_window(
         // Если окно уже существует, просто показываем его и устанавливаем фокус
         existing_window.show().unwrap_or_else(|e| println!("Failed to show existing window: {:?}", e));
         existing_window.set_focus().unwrap_or_else(|e| println!("Failed to focus existing window: {:?}", e));
-        existing_window.emit("navigate", (route, title)).unwrap();
         return Ok(());
     }
 
@@ -282,8 +281,6 @@ pub fn create_window(
     if let Err(e) = window.set_focus() {
         println!("Failed to set window focus: {:?}", e);
     }
-
-    window.emit("navigate", (route, title)).unwrap();
 
     if center {
         if let Err(e) = window.center() {
@@ -373,6 +370,7 @@ pub fn create_check_menu_item(
 
 /// Проверяет состояние переключателя, выполняя команду
 pub fn is_switch_enabled(switch_command: &str, app: Option<&AppHandle<Wry>>) -> bool {
+    println!("[Helpers] is_switch_enabled called with: '{}'", switch_command);
     // Выполняем команду переключателя в фоне и получаем результат
     match execute_command_silent(switch_command) {
         Ok(output) => {
