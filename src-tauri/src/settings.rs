@@ -238,13 +238,6 @@ impl AppSettings {
                             "default": 3000
                         },
                         {
-                            "id": "notifications.sound_enabled",
-                            "type": "boolean",
-                            "label": "Sound notifications",
-                            "description": "Play sound for notifications",
-                            "default": false
-                        },
-                        {
                             "id": "notifications.success_notifications",
                             "type": "boolean",
                             "label": "Success notifications",
