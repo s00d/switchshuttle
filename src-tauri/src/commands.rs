@@ -5,11 +5,12 @@ use serde_json::json;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use tauri::{State};
-use tauri_plugin_notification::NotificationExt;
+
 
 use crate::config::{CommandConfig, Config, ConfigManager};
 use crate::{console};
 use crate::helpers::{execute_command, get_config_path, open_in_default_editor, open_folder_in_default_explorer};
+use crate::settings::AppSettings;
 
 #[derive(Deserialize)]
 struct GitHubRelease {
@@ -81,7 +82,7 @@ pub fn check_for_updates(app: tauri::AppHandle) -> Result<(String, String), Stri
         );
         Ok((update_message, latest_release.html_url))
     } else {
-        Err("You are using the latest version.".to_string())
+        Ok(("You are using the latest version.".to_string(), "".to_string()))
     }
 }
 
@@ -91,8 +92,36 @@ pub fn get_version(app: tauri::AppHandle) -> String {
 }
 
 #[tauri::command]
+pub fn execute(
+    state: State<'_, Arc<Mutex<ConfigManager>>>,
+    settings_state: State<'_, Arc<Mutex<AppSettings>>>,
+    command: String,
+) -> Result<String, String> {
+    println!("Executing command: {}", command);
+
+    let config_manager = state.lock().unwrap();
+
+    match config_manager.find_command_by_id(&command) {
+        Some((command, config)) => {
+            execute_command(
+                command,
+                &config.terminal,
+                &config.launch_in,
+                &config.theme,
+                &config.title,
+            );
+            // Воспроизводим звук уведомления
+            settings_state.lock().unwrap().play_notification_sound().ok();
+            Ok("Ok".to_string())
+        }
+        None => Err(format!("Command '{}' not found", command)),
+    }
+}
+
+#[tauri::command]
 pub fn execute_command_with_inputs(
     state: State<'_, Arc<Mutex<ConfigManager>>>,
+    settings_state: State<'_, Arc<Mutex<AppSettings>>>,
     inputs: HashMap<String, String>,
     command: String,
     app: tauri::AppHandle,
@@ -147,26 +176,27 @@ pub fn execute_command_with_inputs(
     if command.switch.is_some() {
         // Для switch команд используем execute_command_silent
         if let Some(toggle_command) = &updated_command.command {
+            println!("[Monitor] switch: toggle_command = '{}'", toggle_command);
             match console::execute_command_silent(toggle_command) {
                 Ok(_) => {
                     println!("Switch command executed successfully");
                     // Показываем уведомление об успешном выполнении
-                    if let Ok(_) = app.notification().builder()
-                        .title("SwitchShuttle Success")
-                        .body(&format!("Switch command '{}' executed successfully", command.name))
-                        .show() {
-                        // Уведомление отправлено
-                    }
+                    settings_state.lock().unwrap().show_success_notification(
+                        &app,
+                        "SwitchShuttle Success",
+                        &format!("Switch command '{}' executed successfully", command.name)
+                    ).ok();
+                    // Воспроизводим звук уведомления
+                    settings_state.lock().unwrap().play_notification_sound().ok();
                 }
                 Err(e) => {
                     eprintln!("Failed to execute switch command: {}", e);
                     // Показываем уведомление об ошибке
-                    if let Ok(_) = app.notification().builder()
-                        .title("SwitchShuttle Error")
-                        .body(&format!("Failed to execute switch command: {}", e))
-                        .show() {
-                        // Уведомление отправлено
-                    }
+                    settings_state.lock().unwrap().show_error_notification(
+                        &app,
+                        "SwitchShuttle Error",
+                        &format!("Failed to execute switch command: {}", e)
+                    ).ok();
                 }
             }
         }
@@ -180,6 +210,8 @@ pub fn execute_command_with_inputs(
             &config.title,
         );
     }
+    // Воспроизводим звук уведомления
+    settings_state.lock().unwrap().play_notification_sound().ok();
     Ok("Ok".to_string())
 }
 
@@ -237,30 +269,6 @@ pub fn get_menu_data(state: State<'_, Arc<Mutex<ConfigManager>>>) -> Result<Stri
     }
 
     Ok(serde_json::to_string(&grouped_items).unwrap())
-}
-
-#[tauri::command]
-pub fn execute(
-    state: State<'_, Arc<Mutex<ConfigManager>>>,
-    command: String,
-) -> Result<String, String> {
-    println!("Executing command: {}", command);
-
-    let config_manager = state.lock().unwrap();
-
-    match config_manager.find_command_by_id(&command) {
-        Some((command, config)) => {
-            execute_command(
-                command,
-                &config.terminal,
-                &config.launch_in,
-                &config.theme,
-                &config.title,
-            );
-            Ok("Ok".to_string())
-        }
-        None => Err(format!("Command '{}' not found", command)),
-    }
 }
 
 #[tauri::command]
@@ -392,6 +400,8 @@ pub fn save_or_update_configuration(
     let config_path = get_config_path();
     let config_dir = config_path.parent().unwrap().to_path_buf();
     
+    println!("[Save] original_title: {:?}, config.title: {}", original_title, config.title);
+    
     // Для обновления: проверяем что старый файл существует
     if let Some(ref original_title) = original_title {
         let original_config_file = config_dir.join(format!("{}.json", original_title));
@@ -400,24 +410,33 @@ pub fn save_or_update_configuration(
         }
     }
     
-    // Сохраняем исходное название для возможной очистки
-    let original_config_title = config.title.clone();
-    
     // Очищаем ID перед сохранением
     config.clear_ids();
     
     // Определяем нужно ли переименование
     let title_changed = original_title.as_ref().map_or(false, |orig| config.title != *orig);
     
-    if title_changed || original_title.is_none() {
-        // Генерируем уникальное имя файла и сразу обновляем title для синхронизации
-        let unique_title = generate_unique_title(&config_dir, &config.title);
+    println!("[Save] title_changed: {}, original_title.is_some(): {}", title_changed, original_title.is_some());
+    
+    if original_title.is_some() && !title_changed {
+        // Заголовок не изменился при обновлении - сохраняем в тот же файл
+        let original_title = original_title.unwrap(); // Safe unwrap, так как мы знаем что original_title.is_some()
+        let config_file = config_dir.join(format!("{}.json", original_title));
+        println!("[Save] Saving to existing file: {}", config_file.display());
+        config.save(&config_file)
+            .map_err(|e| format!("Failed to save configuration: {}", e))?;
+    } else {
+        // Это новая конфигурация или изменилось название - генерируем уникальное имя
+        let unique_title = generate_unique_title(&config_dir, &config.title, original_title.as_deref());
+        println!("[Save] Generated unique title: {}", unique_title);
         config.title = unique_title.clone();
         
         let new_config_file = config_dir.join(format!("{}.json", unique_title));
+        println!("[Save] Saving to new file: {}", new_config_file.display());
         
         // Если новый файл уже существует, удаляем его
         if new_config_file.exists() {
+            println!("[Save] Removing existing file: {}", new_config_file.display());
             std::fs::remove_file(&new_config_file)
                 .map_err(|e| format!("Failed to remove existing file: {}", e))?;
         }
@@ -426,26 +445,15 @@ pub fn save_or_update_configuration(
         config.save(&new_config_file)
             .map_err(|e| format!("Failed to save configuration: {}", e))?;
         
-        // Удаляем старый файл если это обновление или если это новая конфигурация с измененным именем
+        // Удаляем старый файл если это обновление с измененным именем
         if let Some(original_title) = original_title {
             let original_config_file = config_dir.join(format!("{}.json", original_title));
-            std::fs::remove_file(&original_config_file)
-                .map_err(|e| format!("Failed to remove old configuration file: {}", e))?;
-        } else if original_config_title != unique_title {
-            // Для новых конфигураций: удаляем файл с исходным именем если он существует
-            let original_file = config_dir.join(format!("{}.json", original_config_title));
-            if original_file.exists() {
-                if let Err(e) = std::fs::remove_file(&original_file) {
-                    eprintln!("Warning: Could not remove duplicate file {}: {}", original_file.display(), e);
-                }
+            if original_config_file.exists() {
+                println!("[Save] Removing old file: {}", original_config_file.display());
+                std::fs::remove_file(&original_config_file)
+                    .map_err(|e| format!("Failed to remove old configuration file: {}", e))?;
             }
         }
-    } else {
-        // Заголовок не изменился при обновлении - сохраняем в тот же файл
-        let original_title = original_title.unwrap(); // Safe unwrap, так как мы знаем что title_changed = false
-        let config_file = config_dir.join(format!("{}.json", original_title));
-        config.save(&config_file)
-            .map_err(|e| format!("Failed to save configuration: {}", e))?;
     }
     
     // Перезагружаем конфигурации в ConfigManager
@@ -457,9 +465,11 @@ pub fn save_or_update_configuration(
     update_tray_menu_from_commands(&app, &config_manager)
 }
 
-fn generate_unique_title(config_dir: &std::path::Path, base_title: &str) -> String {
+fn generate_unique_title(config_dir: &std::path::Path, base_title: &str, original_title: Option<&str>) -> String {
     let mut counter = 1;
     let mut title = base_title.trim().to_string();
+    
+    println!("[Generate] base_title: '{}', original_title: {:?}", base_title, original_title);
     
     // Если заголовок пустой, используем базовый
     if title.is_empty() {
@@ -467,7 +477,7 @@ fn generate_unique_title(config_dir: &std::path::Path, base_title: &str) -> Stri
     }
     
     // Сохраняем исходный title для генерации вариантов
-    let original_title = title.clone();
+    let original_title_name = title.clone();
     
     // Защита от бесконечного цикла (максимум 10000 попыток)
     const MAX_ATTEMPTS: usize = 10000;
@@ -475,13 +485,25 @@ fn generate_unique_title(config_dir: &std::path::Path, base_title: &str) -> Stri
     
     // Проверяем, существует ли файл с таким именем
     while config_dir.join(format!("{}.json", title)).exists() {
+        println!("[Generate] File exists: {}.json", title);
+        
+        // Если это тот же файл (original_title совпадает с текущим title), 
+        // то возвращаем текущее название без изменений
+        if let Some(orig_title) = original_title {
+            if title == orig_title {
+                println!("[Generate] Same file, returning: {}", title);
+                return title;
+            }
+        }
+        
         counter += 1;
-        title = format!("{} ({})", original_title, counter);
+        title = format!("{} ({})", original_title_name, counter);
+        println!("[Generate] Trying: {}", title);
         
         attempts += 1;
         if attempts >= MAX_ATTEMPTS {
             // В крайне редком случае, если не можем найти уникальное имя
-            title = format!("{}-{}", original_title, std::time::SystemTime::now()
+            title = format!("{}-{}", original_title_name, std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
                 .as_millis());
@@ -489,6 +511,7 @@ fn generate_unique_title(config_dir: &std::path::Path, base_title: &str) -> Stri
         }
     }
     
+    println!("[Generate] Final title: {}", title);
     title
 }
 
@@ -497,7 +520,7 @@ pub fn get_unique_config_title(base_title: String) -> Result<String, String> {
     let config_path = get_config_path();
     let config_dir = config_path.parent().unwrap().to_path_buf();
     
-    Ok(generate_unique_title(&config_dir, &base_title))
+    Ok(generate_unique_title(&config_dir, &base_title, None))
 }
 
 #[tauri::command]
@@ -684,4 +707,94 @@ pub fn refresh_configurations(
     
     // Обновляем меню в трее
     update_tray_menu_from_commands(&app, &config_manager)
+}
+
+#[tauri::command]
+pub fn get_settings_schema() -> Result<serde_json::Value, String> {
+    Ok(AppSettings::get_settings_schema())
+}
+
+#[tauri::command]
+pub fn get_settings() -> Result<AppSettings, String> {
+    AppSettings::load()
+        .map_err(|e| format!("Failed to load settings: {}", e))
+}
+
+#[tauri::command]
+pub fn save_settings(
+    settings: AppSettings,
+    app: tauri::AppHandle,
+    state: State<'_, Arc<Mutex<AppSettings>>>
+) -> Result<(), String> {
+    settings.save().map_err(|e| format!("Failed to save settings: {}", e))?;
+    settings.apply(&app).map_err(|e| format!("Failed to apply settings: {}", e))?;
+    // Обновляем state
+    *state.lock().unwrap() = settings;
+    // Воспроизводим звук
+    state.lock().unwrap().play_notification_sound().ok();
+    Ok(())
+}
+
+#[tauri::command]
+pub fn play_notification_sound(
+    state: State<'_, Arc<Mutex<AppSettings>>>
+) -> Result<(), String> {
+    let settings = state.lock().unwrap();
+    settings.play_notification_sound()
+        .map_err(|e| format!("Failed to play notification sound: {}", e))
+}
+
+#[derive(Debug, Deserialize)]
+pub enum NotificationType {
+    #[serde(rename = "default")]
+    Default,
+    #[serde(rename = "success")]
+    Success,
+    #[serde(rename = "error")]
+    Error,
+    #[serde(rename = "info")]
+    Info,
+    #[serde(rename = "warning")]
+    Warning,
+}
+
+#[tauri::command]
+pub fn show_notification(
+    state: State<'_, Arc<Mutex<AppSettings>>>,
+    app: tauri::AppHandle,
+    title: String,
+    body: String,
+    notification_type: NotificationType,
+) -> Result<(), String> {
+    println!("[Commands] show_notification called: title='{}', body='{}', type='{:?}'", title, body, notification_type);
+    
+    let settings = state.lock().unwrap();
+    
+    match notification_type {
+        NotificationType::Default => {
+            println!("[Commands] Showing default notification");
+            settings.show_notification(&app, &title, &body)
+                .map_err(|e| format!("Failed to show notification: {}", e))
+        }
+        NotificationType::Success => {
+            println!("[Commands] Showing success notification");
+            settings.show_success_notification(&app, &title, &body)
+                .map_err(|e| format!("Failed to show success notification: {}", e))
+        }
+        NotificationType::Error => {
+            println!("[Commands] Showing error notification");
+            settings.show_error_notification(&app, &title, &body)
+                .map_err(|e| format!("Failed to show error notification: {}", e))
+        }
+        NotificationType::Info => {
+            println!("[Commands] Showing info notification");
+            settings.show_info_notification(&app, &title, &body)
+                .map_err(|e| format!("Failed to show info notification: {}", e))
+        }
+        NotificationType::Warning => {
+            println!("[Commands] Showing warning notification");
+            settings.show_warning_notification(&app, &title, &body)
+                .map_err(|e| format!("Failed to show warning notification: {}", e))
+        }
+    }
 }
