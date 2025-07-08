@@ -80,6 +80,13 @@ impl ConfigManager {
             for path in paths {
                 match Config::load(&path) {
                     Ok(mut config) => {
+                        // Устанавливаем title равным имени файла (без расширения)
+                        if let Some(file_name) = path.file_stem() {
+                            if let Some(name) = file_name.to_str() {
+                                config.title = name.to_string();
+                            }
+                        }
+                        
                         // Устанавливаем значение по умолчанию для enabled, если оно не задано
                         if config.enabled.is_none() {
                             config.enabled = Some(true);
