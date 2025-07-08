@@ -225,14 +225,18 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted } from 'vue';
-import { invoke } from '@tauri-apps/api/core';
+import { ref, computed, onMounted, inject } from 'vue';
 import Card from '../components/Card.vue';
 import Button from '../components/Button.vue';
 import Modal from '../components/Modal.vue';
 import ConfigEditor from '../components/ConfigEditor.vue';
+import type { TauriInjectionKey } from '../lib/tauri-commands-plugin';
 
+import type { Config as TauriConfig } from '../lib/tauri-commands';
 import type { Config, Command } from '../types';
+
+// Получаем доступ к командам через плагин
+const tauri = inject('tauri') as TauriInjectionKey['tauri'];
 
 const configurations = ref<Config[]>([]);
 const searchQuery = ref('');
@@ -273,9 +277,10 @@ const filteredConfigurations = computed(() => {
 const loadConfigurations = async () => {
   loading.value = true;
   try {
-    configurations.value = await invoke('get_configurations');
+    configurations.value = await tauri.get_configurations();
   } catch (error) {
     console.error('Failed to load configurations:', error);
+    await tauri.show_error_notification('Error Loading Configurations', 'Failed to load configurations list');
     configurations.value = [];
   } finally {
     loading.value = false;
@@ -284,30 +289,35 @@ const loadConfigurations = async () => {
 
 const createNewConfig = async () => {
   try {
-    currentConfig.value = await invoke('create_new_configuration');
+    currentConfig.value = await tauri.create_new_configuration();
     editingConfig.value = null;
     showEditor.value = true;
+    await tauri.show_success_notification('Configuration Created', 'New configuration created successfully');
   } catch (error) {
     console.error('Failed to create new configuration:', error);
-    alert(`Error creating: ${error}`);
+    await tauri.show_error_notification('Error Creating Configuration', `Failed to create new configuration: ${error}`);
   }
 };
 
 const editConfig = (config: Config) => {
   currentConfig.value = { ...config };
   editingConfig.value = config;
+  // Извлекаем оригинальное название, убрав все (2), (3) и т.д.
+  const originalTitle = config.title;
   originalFileName.value = config.title;
+  console.log('originalTitle', originalTitle, config);
   showEditor.value = true;
 };
 
 const duplicateConfig = async (config: Config) => {
   try {
-    currentConfig.value = await invoke('duplicate_configuration', { config });
+    currentConfig.value = await tauri.duplicate_configuration(config as TauriConfig);
     editingConfig.value = null;
     showEditor.value = true;
+    await tauri.show_success_notification('Configuration Duplicated', 'Configuration duplicated successfully');
   } catch (error) {
     console.error('Failed to duplicate configuration:', error);
-    alert(`Error duplicating: ${error}`);
+    await tauri.show_error_notification('Error Duplicating Configuration', `Failed to duplicate configuration: ${error}`);
   }
 };
 
@@ -319,20 +329,22 @@ const validateAndSave = async () => {
   // Ждем обновления DOM чтобы показался лоадер
   setTimeout(async() => {
     try {
-      // Используем универсальную команду для сохранения/обновления
-      const originalTitle = editingConfig.value ? originalFileName.value : null;
+      // Определяем оригинальное название файла
+      // Если originalFileName не пустой - это редактирование существующей конфигурации
+      // Если пустой - это новая или дублированная конфигурация
+      const originalTitle = originalFileName.value || undefined;
       
-      await invoke('save_or_update_configuration', { 
-        config: currentConfig.value,
-        originalTitle: originalTitle
-      });
+      await tauri.save_or_update_configuration(currentConfig.value as TauriConfig, originalTitle || undefined);
       
       closeEditor();
       // Refresh configurations list after saving
       await loadConfigurations();
+      
+      const message = editingConfig.value ? 'Configuration updated successfully' : 'Configuration saved successfully';
+      await tauri.show_success_notification('Configuration Saved', message);
     } catch (error) {
       console.error('Error saving configuration:', error);
-      alert('Failed to save configuration');
+      await tauri.show_error_notification('Error Saving Configuration', 'Failed to save configuration');
     } finally {
       saving.value = false;
     }  
@@ -348,10 +360,11 @@ const closeEditor = () => {
 
 const openConfig = async (config: Config) => {
   try {
-    await invoke('open_configuration', { id: config.title });
+    await tauri.open_configuration(config.title);
+    await tauri.show_success_notification('Configuration Opened', 'Configuration opened in default editor');
   } catch (error) {
     console.error('Failed to open configuration:', error);
-    alert(`Error opening configuration: ${error}`);
+    await tauri.show_error_notification('Error Opening Configuration', `Failed to open configuration: ${error}`);
   }
 };
 
@@ -370,13 +383,14 @@ const confirmDelete = async () => {
   
   deleting.value = true;
   try {
-    await invoke('delete_configuration', { id: configToDelete.value.title });
+    await tauri.delete_configuration(configToDelete.value.title);
     // Refresh configurations list after deletion
     await loadConfigurations();
     closeDeleteConfirm();
+    await tauri.show_success_notification('Configuration Deleted', 'Configuration deleted successfully');
   } catch (error) {
     console.error('Failed to delete configuration:', error);
-    alert(`Error deleting: ${error}`);
+    await tauri.show_error_notification('Error Deleting Configuration', `Failed to delete configuration: ${error}`);
   } finally {
     deleting.value = false;
   }
@@ -385,11 +399,15 @@ const confirmDelete = async () => {
 
 const openConfigFolder = async () => {
   try {
-    await invoke('open_config_folder');
+    await tauri.open_config_folder();
+    await tauri.show_success_notification('Config Folder Opened', 'Configuration folder opened in file explorer');
   } catch (error) {
     console.error('Failed to open config folder:', error);
+    await tauri.show_error_notification('Error Opening Config Folder', `Failed to open configuration folder: ${error}`);
   }
 };
+
+
 
 
 
