@@ -167,7 +167,7 @@ const error = ref('');
 const settingsSchema = ref<SettingsSchema | null>(null);
 const settings = ref<AppSettings | null>(null);
 const originalSettings = ref<AppSettings | null>(null);
-const saveTimeout = ref<NodeJS.Timeout | null>(null);
+const saveTimeout = ref<any | null>(null);
 const lastSaved = ref(false);
 
 // Update variables
