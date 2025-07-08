@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.10.0](https://github.com/s00d/switchshuttle/compare/v1.9.0...v1.10.0) (2025-07-05)
+
+### ✨ Features
+* **icons:** add SettingsIcon component for user settings
+* **router:** replace update route with settings route
+* **app:** replace notification logic with SwitchShuttleCommands
+* **settings:** add settings page for configuring application options
+* **inputs:** improve form handling and error management
+* **editor:** integrate Tauri commands for configuration management
+* **about:** inject Tauri commands plugin for version retrieval
+* **tauri-commands:** add Vue plugin for global access to Tauri commands
+* **tauri-commands:** add initial implementation of Tauri command handlers
+* **components:** add Toggle component for boolean state management
+* **input:** add min and max props for input validation
+* **components:** replace configuration toggle with Toggle component
+* **settings:** add application settings management for notifications and auto-start
+* **menu_structure:** add debug logging for switch and monitor checks
+* **menu:** add settings option to the tray menu
+* **settings:** add settings management to application initialization
+* **console:** add timeout handling for console output reading
+* **config:** set title based on filename without extension
+* **commands:** add execute command with notification sound support
+
+### 🔧 Chores
+* **deps:** update Tauri plugins and dependencies in Cargo.toml
+* **version:** update version to 1.10.0 and add type-check script
+
+### ♻️ Code Refactoring
+* **update:** remove outdated update page component
+* **helpers:** remove redundant window navigation emit call
+
+### 🐛 Bug Fixes
+* **console:** fix timeout handling for blocking read operations
+* **menu_structure:** fix monitor command execution logic
+* **switch:** fix switch command execution using proper command field
+
 ## [1.9.0](https://github.com/s00d/switchshuttle/compare/v1.8.0...v1.9.0) (2025-07-05)
 
 ### ✨ Features
