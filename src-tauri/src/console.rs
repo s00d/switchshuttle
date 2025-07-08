@@ -1,14 +1,16 @@
 use std::process::{Command, Stdio};
-use std::io::{Write, BufRead, BufReader};
+use std::io::{Write, BufRead, BufReader, ErrorKind};
 use std::sync::{Arc, Mutex};
 use lazy_static::lazy_static;
 use std::println;
+use std::time::Duration;
+use timeout_readwrite::TimeoutReadExt;
 
 /// Структура для управления постоянным инстансом консоли
 pub struct ConsoleInstance {
     process: Option<std::process::Child>,
     stdin: Option<std::process::ChildStdin>,
-    reader: Option<BufReader<std::process::ChildStdout>>,
+    stdout: Option<std::process::ChildStdout>,
 }
 
 impl ConsoleInstance {
@@ -29,12 +31,11 @@ impl ConsoleInstance {
             let stdout = child.stdout.take();
             
             if let Some(stdout) = stdout {
-                let reader = BufReader::new(stdout);
                 println!("[Console] Bash console created successfully");
                 Ok(ConsoleInstance {
                     process: Some(child),
                     stdin,
-                    reader: Some(reader),
+                    stdout: Some(stdout),
                 })
             } else {
                 println!("[Console] Failed to get stdout from bash");
@@ -54,12 +55,11 @@ impl ConsoleInstance {
             let stdout = child.stdout.take();
             
             if let Some(stdout) = stdout {
-                let reader = BufReader::new(stdout);
                 println!("[Console] CMD console created successfully");
                 Ok(ConsoleInstance {
                     process: Some(child),
                     stdin,
-                    reader: Some(reader),
+                    stdout: Some(stdout),
                 })
             } else {
                 println!("[Console] Failed to get stdout from cmd");
@@ -79,12 +79,11 @@ impl ConsoleInstance {
             let stdout = child.stdout.take();
             
             if let Some(stdout) = stdout {
-                let reader = BufReader::new(stdout);
                 println!("[Console] Bash console created successfully");
                 Ok(ConsoleInstance {
                     process: Some(child),
                     stdin,
-                    reader: Some(reader),
+                    stdout: Some(stdout),
                 })
             } else {
                 println!("[Console] Failed to get stdout from bash");
@@ -107,29 +106,38 @@ impl ConsoleInstance {
         
         if let Some(ref mut stdin) = self.stdin {
             // Отправляем команду в консоль
-            println!("[Console] Sending command to stdin...");
+            println!("[Console] Sending command to stdin... {}", command);
             writeln!(stdin, "{}", command)
                 .map_err(|e| format!("Failed to write command: {}", e))?;
             
                             // Читаем результат до появления промпта
-                if let Some(ref mut reader) = self.reader {
+                if let Some(ref mut stdout) = self.stdout {
                     let mut output = String::new();
                     let mut line = String::new();
                     
                     println!("[Console] Reading output...");
                     
-                    // Читаем только одну строку результата
+                    // Читаем только одну строку результата с таймаутом
                     line.clear();
-                    match reader.read_line(&mut line) {
+                    
+                    // Читаем одну строку с таймаутом в 3 секунды
+                    let timeout_reader = stdout.with_timeout(Duration::from_secs(3));
+                    let mut buf_reader = BufReader::new(timeout_reader);
+                    
+                    match buf_reader.read_line(&mut line) {
                         Ok(0) => {
-                            println!("[Console] EOF reached");
+                            println!("[Console] EOF reached - no output");
                         }
                         Ok(_) => {
                             output.push_str(&line);
                             println!("[Console] Result: {:?}", line.trim());
                         }
                         Err(e) => {
-                            println!("[Console] Error reading line: {}", e);
+                            if e.kind() == ErrorKind::TimedOut {
+                                println!("[Console] Timeout reading output after 3 seconds");
+                            } else {
+                                println!("[Console] Error reading line: {}", e);
+                            }
                         }
                     }
                 
@@ -145,7 +153,7 @@ impl ConsoleInstance {
                 println!("[Console] Command completed. Result: {:?}", result);
                 Ok(result)
             } else {
-                println!("[Console] No reader available");
+                println!("[Console] No stdout available");
                 Ok("".to_string())
             }
         } else {
@@ -204,11 +212,18 @@ pub fn init_console() -> Result<(), String> {
 
 /// Выполняет команду в постоянном инстансе консоли
 pub fn execute_command_silent(command: &str) -> Result<String, String> {
-    println!("[Console] execute_command_silent called with: {}", command);
+    println!("[Console] execute_command_silent called with: '{}'", command);
+    println!("[Console] Stack trace: {:?}", std::backtrace::Backtrace::capture());
     
     // Проверяем, что команда не пустая
     if command.trim().is_empty() {
         println!("[Console] Empty command provided, returning empty string");
+        return Ok("".to_string());
+    }
+    
+    // Проверяем, не является ли команда ID
+    if command.starts_with("cmd_") {
+        println!("[Console] WARNING: Command looks like an ID: '{}'", command);
         return Ok("".to_string());
     }
     
