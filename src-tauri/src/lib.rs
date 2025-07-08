@@ -13,7 +13,7 @@ use crate::commands::{
     fetch_input_data, get_menu_data, get_version, get_configurations, delete_configuration,
     save_or_update_configuration, get_config_files, load_config, save_configuration_by_id,
     create_new_configuration, duplicate_configuration, validate_configuration, get_unique_config_title,
-    open_configuration, refresh_configurations, open_config_folder, get_settings_schema, get_settings, save_settings, play_notification_sound, show_notification
+    open_configuration, refresh_configurations, open_config_folder, get_settings_schema, get_settings, save_settings, show_notification
 };
 use crate::menu::{create_system_tray_menu, handle_system_tray_event};
 use crate::cli::handle_cli_commands;
@@ -162,7 +162,6 @@ pub fn run() {
             get_settings_schema,
             get_settings,
             save_settings,
-            play_notification_sound,
             show_notification
         ])
         .build(tauri::generate_context!())
