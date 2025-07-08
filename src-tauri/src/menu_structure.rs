@@ -1,4 +1,4 @@
-use crate::config::CommandConfig;
+use crate::config::{CommandConfig};
 use crate::{console, helpers};
 use std::sync::{Arc};
 use std::time::Duration;
@@ -54,12 +54,22 @@ impl MenuItem {
 
     /// Проверяет, является ли элемент переключателем
     pub fn is_switch(&self) -> bool {
-        self.config.switch.is_some()
+        let is_switch = self.config.switch.is_some();
+        if is_switch {
+            println!("[Switch] is_switch: {} has switch = '{:?}'", self.config.name, self.config.switch);
+        }
+        println!("[Switch] is_switch called for: {} = {}", self.config.name, is_switch);
+        is_switch
     }
 
     /// Проверяет, является ли элемент командой мониторинга
     pub fn is_monitor(&self) -> bool {
-        self.config.monitor.is_some()
+        let is_monitor = self.config.monitor.is_some();
+        if is_monitor {
+            println!("[Monitor] is_monitor: {} has monitor = '{:?}'", self.config.name, self.config.monitor);
+        }
+        println!("[Monitor] is_monitor called for: {} = {}", self.config.name, is_monitor);
+        is_monitor
     }
 
     /// Проверяет, имеет ли элемент подменю
@@ -69,8 +79,11 @@ impl MenuItem {
 
     /// Получает отображаемое имя с учетом мониторинга
     pub fn get_display_name(&self, _app: Option<&AppHandle<Wry>>) -> String {
+        println!("[Monitor] get_display_name called for: {}", self.config.name);
         if self.is_monitor() {
             if let Some(monitor_command) = &self.config.monitor {
+                println!("[Monitor] get_display_name: monitor_command = '{}'", monitor_command);
+                
                 // Выполняем команду мониторинга
                 match console::execute_command_silent(monitor_command) {
                     Ok(output) => {
@@ -96,6 +109,7 @@ impl MenuItem {
 
     /// Запускает таймер обновления для элемента с мониторингом
     pub fn start_monitor_timer(&mut self) {
+        println!("[Monitor] start_monitor_timer called for: {}", self.config.name);
         if self.is_monitor() {
             // Проверяем, что команда мониторинга не пустая
             if let Some(monitor_command) = &self.config.monitor {
@@ -112,11 +126,18 @@ impl MenuItem {
             self.stop_monitor_timer();
             let stop_flag = Arc::new(AtomicBool::new(false));
             self.stop_flag = Some(stop_flag.clone());
-            if let Some(icon_item) = self.tauri_icon_item.clone() {
-                let monitor_command = self.config.monitor.clone().unwrap();
+                        if let Some(icon_item) = self.tauri_icon_item.clone() {
+                let monitor_id = self.config.monitor.clone().unwrap();
+                println!("[Monitor] start_monitor_timer: monitor_id = '{}'", monitor_id);
                 let name = self.config.name.clone();
                 let id = self.config.id.clone().unwrap_or_else(|| self.config.name.clone());
                 let icon = self.config.icon.clone();
+                
+                // Используем monitor_id как команду для выполнения
+                let monitor_command = monitor_id.clone();
+                
+                println!("[Monitor] Resolved monitor_command: '{}'", monitor_command);
+                
                 thread::spawn(move || {
                     eprintln!("[Monitor] Starting timer for item: {}", id);
                     while !stop_flag.load(Ordering::Relaxed) {
@@ -124,8 +145,9 @@ impl MenuItem {
                         let tray_active = TRAY_ACTIVE.lock().unwrap();
                         if *tray_active {
                             drop(tray_active); // Освобождаем блокировку
-                            
-                            let new_text = match crate::console::execute_command_silent(&monitor_command) {
+
+                            println!("[Monitor] spawn: monitor_command = '{}'", monitor_command);
+                            let new_text = match console::execute_command_silent(&monitor_command) {
                                 Ok(output) => {
                                     let result = output.trim();
                                     if !result.is_empty() {
@@ -177,8 +199,13 @@ impl MenuItem {
     /// Получает состояние переключателя
     pub fn get_switch_state(&self, app: Option<&AppHandle<Wry>>) -> bool {
         if self.is_switch() {
-            let id = self.config.id.as_ref().unwrap_or(&self.config.name);
-            helpers::is_switch_enabled(id, app)
+            if let Some(switch_command) = &self.config.switch {
+                println!("[Switch] get_switch_state: switch_command = '{}'", switch_command);
+                helpers::is_switch_enabled(switch_command, app)
+            } else {
+                println!("[Switch] No switch command found for: {}", self.config.name);
+                false
+            }
         } else {
             false
         }
@@ -377,6 +404,7 @@ impl SystemMenu {
 
     /// Запускает таймеры для всех элементов с мониторингом
     pub fn start_all_monitor_timers(&mut self) {
+        println!("[Monitor] start_all_monitor_timers called");
         eprintln!("[Monitor] Starting timers for all monitor items");
         
         // Запускаем таймеры для основных элементов
