@@ -4,7 +4,7 @@
       <!-- Form Card -->
       <div class="bg-white rounded-xl shadow-sm border border-slate-200/60 backdrop-blur-sm">
         <form id="inputForm" class="p-4 space-y-3" @submit.prevent="submitForm">
-          <div v-for="(value, key) in inputs" :key="key" class="flex items-center">
+          <div v-for="(_, key) in inputs" :key="key" class="flex items-center">
             <label :for="key" class="text-sm font-medium text-slate-700 bg-slate-50 border border-r-0 border-slate-200 px-3 py-2 rounded-l-lg">
               {{ key }}
             </label>
@@ -13,7 +13,7 @@
                 v-model="inputs[key]"
                 :id="key"
                 :name="key"
-                :placeholder="`Enter ${key.toLowerCase()}`"
+                :placeholder="`Enter ${String(key).toLowerCase()}`"
                 class="w-full px-3 py-2 bg-white border-l-0 border border-slate-200 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-slate-300 focus:outline-none"
                 @keydown.enter="submitForm"
               />
@@ -67,31 +67,35 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue';
-import { invoke } from '@tauri-apps/api/core';
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted, watch, nextTick, inject } from 'vue';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { useRouter, useRoute } from 'vue-router';
 import Button from '../components/Button.vue';
+import type { TauriInjectionKey } from '../lib/tauri-commands-plugin';
 
 const router = useRouter();
 const route = useRoute();
+
+// Получаем доступ к командам через плагин
+const tauri = inject('tauri') as TauriInjectionKey['tauri'];
 
 const command = ref('');
 const inputs = ref({});
 const errorMessage = ref('');
 
-function submitForm() {
-  invoke('execute_command_with_inputs', { inputs: inputs.value, command: command.value }).then(() => {
+async function submitForm() {
+  try {
+    await tauri.execute_command_with_inputs(inputs.value, command.value);
     onClose();
-  }).catch((error) => {
-    errorMessage.value = error;
-  });
+  } catch (error) {
+    errorMessage.value = error as string;
+  }
 }
 
-function handleKeydown(event) {
+function handleKeydown(event: KeyboardEvent) {
   // Submit form on Enter key (but not when typing in input fields)
-  if (event.key === 'Enter' && event.target.tagName !== 'INPUT') {
+  if (event.key === 'Enter' && (event.target as HTMLElement).tagName !== 'INPUT') {
     event.preventDefault();
     submitForm();
   }
@@ -102,13 +106,13 @@ function handleKeydown(event) {
   }
 }
 
-function fetchInputData() {
-  // Implement your logic to fetch input data using the ID
-  invoke('fetch_input_data', { command: command.value }).then((data) => {
-    inputs.value = JSON.parse(data);
-  }).catch((error) => {
-    errorMessage.value = error;
-  });
+async function fetchInputData() {
+  try {
+    const data = await tauri.fetch_input_data(command.value);
+    inputs.value = data;
+  } catch (error) {
+    errorMessage.value = error as string;
+  }
 }
 
 function onClose() {
@@ -134,7 +138,7 @@ onMounted(() => {
     return;
   }
   
-  command.value = route.params.id; // Get the ID from the route parameters
+  command.value = route.params.id as string; // Get the ID from the route parameters
   fetchInputData(); // Fetch the input data using the ID
   
   // Add global keyboard listener
