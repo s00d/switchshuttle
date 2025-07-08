@@ -3,7 +3,6 @@ use std::fs;
 use std::path::PathBuf;
 use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_notification::{NotificationExt, PermissionState};
-use rodio::{OutputStream, Sink, buffer::SamplesBuffer};
 use serde_json::Value;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -21,7 +20,6 @@ pub struct GeneralSettings {
 pub struct NotificationSettings {
     pub show_notifications: bool,
     pub notification_duration: u32,
-    pub sound_enabled: bool,
     pub success_notifications: bool,
     pub error_notifications: bool,
     pub info_notifications: bool,
@@ -37,7 +35,6 @@ impl Default for AppSettings {
             notifications: NotificationSettings {
                 show_notifications: true,
                 notification_duration: 3000,
-                sound_enabled: false,
                 success_notifications: true,
                 error_notifications: true,
                 info_notifications: true,
@@ -94,45 +91,11 @@ impl AppSettings {
         
         // Применяем настройки языка
         // (можно добавить логику для смены языка интерфейса)
-
-        if let Err(e) = self.play_notification_sound() {
-            // Показываем уведомление об ошибке вместо вывода в консоль
-            let _ = self.show_error_notification(app, "Ошибка звука", &format!("Не удалось воспроизвести звук уведомления: {}", e));
-        }
         
         Ok(())
     }
 
-    pub fn play_notification_sound(&self) -> Result<(), Box<dyn std::error::Error>> {
-        if !self.notifications.sound_enabled {
-            return Ok(());
-        }
 
-        // Простой звуковой сигнал (синусоида 440Hz)
-        let sample_rate = 44100;
-        let duration = self.notifications.notification_duration as f32 / 1000.0; // конвертируем из миллисекунд в секунды
-        let frequency = 440.0; // A4 note
-        
-        let num_samples = (sample_rate as f32 * duration) as usize;
-        let mut samples = Vec::with_capacity(num_samples);
-        
-        for i in 0..num_samples {
-            let t = i as f32 / sample_rate as f32;
-            let amplitude = 0.3;
-            let sample = (2.0 * std::f32::consts::PI * frequency * t).sin() * amplitude;
-            samples.push(sample);
-        }
-
-        // Воспроизводим звук
-        let (_stream, stream_handle) = OutputStream::try_default()?;
-        let sink = Sink::try_new(&stream_handle)?;
-        
-        let buffer = SamplesBuffer::new(1, sample_rate, samples);
-        sink.append(buffer);
-        sink.sleep_until_end();
-
-        Ok(())
-    }
 
     pub fn show_notification(&self, app: &tauri::AppHandle, title: &str, body: &str) -> Result<(), Box<dyn std::error::Error>> {
         self.show_notification_with_icon(app, title, body, None)
