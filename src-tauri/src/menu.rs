@@ -1,15 +1,16 @@
 use crate::config::ConfigManager;
-use crate::menu_structure::SystemMenu;
-use crate::{console, helpers};
+use crate::console;
+use crate::execute::execute_command;
 use crate::helpers::{
-    change_devtools, create_window, get_config_path, open_folder_in_default_explorer,
-    open_in_default_editor, create_menu_item, create_check_menu_item
+    change_devtools, create_check_menu_item, create_menu_item, create_window, get_config_path,
+    open_folder_in_default_explorer, open_in_default_editor,
 };
+use crate::menu_structure::SystemMenu;
 use std::sync::{Arc, Mutex};
 use tauri::{AppHandle, Wry};
 use tauri_plugin_autostart::ManagerExt;
-use tauri_plugin_opener::OpenerExt;
 use tauri_plugin_notification::NotificationExt;
+use tauri_plugin_opener::OpenerExt;
 
 // Глобальное состояние для хранения текущей структуры меню
 lazy_static::lazy_static! {
@@ -25,22 +26,22 @@ pub fn create_system_tray_menu(
     if let Some(mut current_menu) = CURRENT_MENU.lock().unwrap().take() {
         current_menu.stop_all_monitor_timers();
     }
-    
+
     // Создаем структуру меню из конфигураций
     let mut system_menu = SystemMenu::from_configs_with_states(&config_manager.configs, Some(app));
-    
+
     // Создаем Tauri меню из структуры (это сохранит tauri_icon_item)
     let tray_menu = system_menu.create_tauri_menu(app);
 
     // Теперь запускаем индивидуальные таймеры для элементов с мониторингом
     system_menu.start_all_monitor_timers();
-    
+
     // Сохраняем новую структуру меню
     *CURRENT_MENU.lock().unwrap() = Some(system_menu);
 
     // Создаем новый MenuBuilder для добавления системных элементов
     let mut tray_menu_builder = tauri::menu::MenuBuilder::new(app);
-    
+
     // Добавляем элементы из структуры меню
     for item in tray_menu.items().unwrap() {
         tray_menu_builder = tray_menu_builder.item(&item);
@@ -53,56 +54,92 @@ pub fn create_system_tray_menu(
 
     for path in &config_manager.config_paths {
         let file_name = path.file_name().unwrap().to_string_lossy().to_string();
-        edit_config_submenu = edit_config_submenu.item(
-            &create_menu_item(app, &format!("edit_{}", file_name), &file_name, "edit",  None, None)
-        );
+        edit_config_submenu = edit_config_submenu.item(&create_menu_item(
+            app,
+            &format!("edit_{}", file_name),
+            &file_name,
+            "edit",
+            None,
+            None,
+        ));
     }
 
     edit_config_submenu = edit_config_submenu.separator();
-    edit_config_submenu = edit_config_submenu.item(
-        &create_menu_item(app, "open_config_folder", "Show Config Folder", "folder",  None, None)
-    );
-    edit_config_submenu = edit_config_submenu.item(
-        &create_menu_item(app, "open_config_editor", "Open Visual Editor", "visual",  None, None)
-    );
+    edit_config_submenu = edit_config_submenu.item(&create_menu_item(
+        app,
+        "open_config_folder",
+        "Show Config Folder",
+        "folder",
+        None,
+        None,
+    ));
+    edit_config_submenu = edit_config_submenu.item(&create_menu_item(
+        app,
+        "open_config_editor",
+        "Open Visual Editor",
+        "visual",
+        None,
+        None,
+    ));
 
     edit_config_submenu = edit_config_submenu.separator();
-    edit_config_submenu = edit_config_submenu.item(
-        &create_menu_item(app, "refresh_configurations", "Refresh Configurations", "refresh_settings",  None, None)
-    );
+    edit_config_submenu = edit_config_submenu.item(&create_menu_item(
+        app,
+        "refresh_configurations",
+        "Refresh Configurations",
+        "refresh_settings",
+        None,
+        None,
+    ));
 
     tray_menu_builder = tray_menu_builder.item(&edit_config_submenu.build().unwrap());
 
     tray_menu_builder = tray_menu_builder.separator();
 
-    tray_menu_builder = tray_menu_builder.item(
-        &create_check_menu_item(
-            app,
-            "toggle_launch_at_login",
-            "Launch at Login",
-            autostart,
-            None,
-            None,
-        ),
-    );
+    tray_menu_builder = tray_menu_builder.item(&create_check_menu_item(
+        app,
+        "toggle_launch_at_login",
+        "Launch at Login",
+        autostart,
+        None,
+        None,
+    ));
 
     tray_menu_builder = tray_menu_builder.separator();
 
     if cfg!(debug_assertions) {
-        tray_menu_builder = tray_menu_builder.item(
-            &create_menu_item(app, "open_devtools", "Open DevTools", "devtools",  None, None)
-        );
+        tray_menu_builder = tray_menu_builder.item(&create_menu_item(
+            app,
+            "open_devtools",
+            "Open DevTools",
+            "devtools",
+            None,
+            None,
+        ));
 
         tray_menu_builder = tray_menu_builder.separator();
     }
 
-    tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "settings", "Settings", "config",  None, None));
-    tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "about", "About", "info",  None, None));
-    tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "help", "Help", "help",  None, None));
-    tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "homepage", "Homepage", "site",  None, None));
+    tray_menu_builder = tray_menu_builder.item(&create_menu_item(
+        app, "settings", "Settings", "config", None, None,
+    ));
+    tray_menu_builder =
+        tray_menu_builder.item(&create_menu_item(app, "about", "About", "info", None, None));
+    tray_menu_builder =
+        tray_menu_builder.item(&create_menu_item(app, "help", "Help", "help", None, None));
+    tray_menu_builder = tray_menu_builder.item(&create_menu_item(
+        app, "homepage", "Homepage", "site", None, None,
+    ));
 
     tray_menu_builder = tray_menu_builder.separator();
-    tray_menu_builder = tray_menu_builder.item(&create_menu_item(app, "quit", "Quit SwitchShuttle", "exit",  None, None));
+    tray_menu_builder = tray_menu_builder.item(&create_menu_item(
+        app,
+        "quit",
+        "Quit SwitchShuttle",
+        "exit",
+        None,
+        None,
+    ));
 
     tray_menu_builder.build().unwrap()
 }
@@ -116,17 +153,41 @@ pub fn handle_system_tray_event(
 
     match event.id().0.as_str() {
         "settings" => {
-            if let Err(e) = create_window(&app, "settings", "SwitchShuttle - Settings", "/settings", 900.0, 700.0, true) {
+            if let Err(e) = create_window(
+                &app,
+                "settings",
+                "SwitchShuttle - Settings",
+                "/settings",
+                900.0,
+                700.0,
+                true,
+            ) {
                 eprintln!("Failed to create settings window: {}", e);
             }
         }
         "about" => {
-            if let Err(e) = create_window(&app, "about", "SwitchShuttle - About", "/about", 800.0, 600.0, true) {
+            if let Err(e) = create_window(
+                &app,
+                "about",
+                "SwitchShuttle - About",
+                "/about",
+                800.0,
+                600.0,
+                true,
+            ) {
                 eprintln!("Failed to create about window: {}", e);
             }
         }
         "help" => {
-            if let Err(e) = create_window(&app, "help", "SwitchShuttle - Help", "/help", 1000.0, 800.0, true) {
+            if let Err(e) = create_window(
+                &app,
+                "help",
+                "SwitchShuttle - Help",
+                "/help",
+                1000.0,
+                800.0,
+                true,
+            ) {
                 eprintln!("Failed to create help window: {}", e);
             }
         }
@@ -134,9 +195,10 @@ pub fn handle_system_tray_event(
         "refresh_configurations" => {
             // Перезагружаем конфигурации и обновляем меню
             let mut config_manager = config_manager.lock().unwrap();
-            config_manager.load_configs(Some(&app))
+            config_manager
+                .load_configs(Some(&app))
                 .expect("Failed to reload configs");
-            
+
             // Обновляем меню в трее
             update_system_tray_menu(app, &config_manager);
         }
@@ -145,7 +207,15 @@ pub fn handle_system_tray_event(
             open_folder_in_default_explorer(&config_path.parent().unwrap().to_path_buf())
         }
         "open_config_editor" => {
-            if let Err(e) = create_window(&app, "main", "SwitchShuttle - Config Editor", "/editor", 800.0, 600.0, true) {
+            if let Err(e) = create_window(
+                &app,
+                "main",
+                "SwitchShuttle - Config Editor",
+                "/editor",
+                800.0,
+                600.0,
+                true,
+            ) {
                 eprintln!("Failed to create config editor window: {}", e);
             }
         }
@@ -180,10 +250,13 @@ pub fn handle_system_tray_event(
                     Some((command, config)) => {
                         // Проверяем, является ли это командой мониторинга
                         if command.switch.is_some() {
-                            let should_show_inputs = command.inputs.as_ref()
+                            let should_show_inputs = command
+                                .inputs
+                                .as_ref()
                                 .map(|inputs| !inputs.is_empty())
-                                .unwrap_or(false) && command.id.is_some();
-                            
+                                .unwrap_or(false)
+                                && command.id.is_some();
+
                             if should_show_inputs {
                                 if let Err(e) = create_window(
                                     &app,
@@ -199,14 +272,23 @@ pub fn handle_system_tray_event(
                             } else {
                                 // Выполняем команду переключения через execute_command_silent
                                 if let Some(toggle_command) = &command.command {
-                                    println!("[Monitor] spawn: toggle_command = '{}'", toggle_command);
+                                    println!(
+                                        "[Monitor] spawn: toggle_command = '{}'",
+                                        toggle_command
+                                    );
                                     match console::execute_command_silent(toggle_command) {
                                         Ok(_) => {
                                             // Показываем уведомление об успешном выполнении
-                                            if let Ok(_) = app.notification().builder()
+                                            if let Ok(_) = app
+                                                .notification()
+                                                .builder()
                                                 .title("SwitchShuttle Success")
-                                                .body(&format!("Switch '{}' executed successfully", command.name))
-                                                .show() {
+                                                .body(&format!(
+                                                    "Switch '{}' executed successfully",
+                                                    command.name
+                                                ))
+                                                .show()
+                                            {
                                                 // Уведомление отправлено
                                             }
                                             // Обновляем меню после выполнения команды
@@ -215,10 +297,16 @@ pub fn handle_system_tray_event(
                                         Err(e) => {
                                             eprintln!("Failed to execute switch command: {}", e);
                                             // Показываем уведомление об ошибке
-                                            if let Ok(_) = app.notification().builder()
+                                            if let Ok(_) = app
+                                                .notification()
+                                                .builder()
                                                 .title("SwitchShuttle Error")
-                                                .body(&format!("Failed to execute switch '{}': {}", command.name, e))
-                                                .show() {
+                                                .body(&format!(
+                                                    "Failed to execute switch '{}': {}",
+                                                    command.name, e
+                                                ))
+                                                .show()
+                                            {
                                                 // Уведомление отправлено
                                             }
                                         }
@@ -226,10 +314,13 @@ pub fn handle_system_tray_event(
                                 }
                             }
                         } else {
-                            let should_show_inputs = command.inputs.as_ref()
+                            let should_show_inputs = command
+                                .inputs
+                                .as_ref()
                                 .map(|inputs| !inputs.is_empty())
-                                .unwrap_or(false) && command.id.is_some();
-                            
+                                .unwrap_or(false)
+                                && command.id.is_some();
+
                             if should_show_inputs {
                                 if let Err(e) = create_window(
                                     &app,
@@ -243,7 +334,7 @@ pub fn handle_system_tray_event(
                                     eprintln!("Failed to create inputs window: {}", e);
                                 }
                             } else {
-                                helpers::execute_command(
+                                execute_command(
                                     command,
                                     &config.terminal,
                                     &config.launch_in,
@@ -261,13 +352,14 @@ pub fn handle_system_tray_event(
 }
 
 /// Обновляет меню в трее с правильной обработкой таймеров
-pub fn update_system_tray_menu(
-    app: &AppHandle<Wry>,
-    config_manager: &ConfigManager,
-) {
+pub fn update_system_tray_menu(app: &AppHandle<Wry>, config_manager: &ConfigManager) {
     // Создаем новое меню
-    let new_menu = create_system_tray_menu(app, app.autolaunch().is_enabled().unwrap_or(false), config_manager);
-    
+    let new_menu = create_system_tray_menu(
+        app,
+        app.autolaunch().is_enabled().unwrap_or(false),
+        config_manager,
+    );
+
     // Обновляем меню в трее
     if let Some(tray) = app.tray_by_id("switch-shuttle-tray") {
         if let Err(e) = tray.set_menu(Some(new_menu)) {
@@ -287,5 +379,3 @@ pub fn pause_monitor_timers() {
     eprintln!("[Monitor] Pausing monitor timers");
     *crate::menu_structure::TRAY_ACTIVE.lock().unwrap() = false;
 }
-
-
