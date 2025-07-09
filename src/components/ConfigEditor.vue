@@ -73,6 +73,7 @@ import CustomSelect from './CustomSelect.vue';
 import Toggle from './Toggle.vue';
 
 import { Command, Config } from '../types';
+import { getTerminalOptions, launchOptions } from '../lib/terminals';
 
 const props = defineProps<{
   config: Config;
@@ -86,17 +87,5 @@ if (config.value.enabled === undefined) {
   config.value.enabled = true;
 }
 
-const terminalOptions = [
-  { value: 'iterm', label: 'iTerm2', icon: '🖥️' },
-  { value: 'terminal', label: 'Terminal.app', icon: '💻' },
-  { value: 'alacritty', label: 'Alacritty', icon: '⚡' },
-  { value: 'hyper', label: 'Hyper', icon: '🚀' },
-  { value: 'warp', label: 'Warp', icon: '⚡' }
-];
-
-const launchOptions = [
-  { value: 'current', label: 'Current Window', icon: '🪟' },
-  { value: 'tab', label: 'New Tab', icon: '📑' },
-  { value: 'window', label: 'New Window', icon: '🪟' }
-];
+const terminalOptions = getTerminalOptions();
 </script>
