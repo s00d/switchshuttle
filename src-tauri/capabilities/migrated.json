@@ -3,7 +3,12 @@
   "description": "permissions that were migrated from v1",
   "local": true,
   "windows": [
-    "main", "about", "help", "check_updates", "inputs"
+    "main",
+    "about",
+    "help",
+    "check_updates",
+    "inputs",
+    "settings"
   ],
   "permissions": [
     "core:default",
@@ -72,6 +77,7 @@
     "global-shortcut:allow-register",
     "updater:default",
     "process:default",
-    "opener:default"
+    "opener:default",
+    "os:default"
   ]
 }
