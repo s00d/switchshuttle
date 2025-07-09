@@ -86,12 +86,12 @@ impl ConfigManager {
                                 config.title = name.to_string();
                             }
                         }
-                        
+
                         // Устанавливаем значение по умолчанию для enabled, если оно не задано
                         if config.enabled.is_none() {
                             config.enabled = Some(true);
                         }
-                        
+
                         config.assign_ids(&self.counter);
                         self.config_paths.push(path);
                         self.configs.push(config);
@@ -136,19 +136,13 @@ impl ConfigManager {
                     continue;
                 }
             }
-            
+
             if let Some(command) = config.find_command_by_id(id) {
                 return Some((command, config));
             }
         }
         None
     }
-
-
-
-
-
-
 }
 
 impl Config {
@@ -200,7 +194,7 @@ impl Config {
             "Homebrew",
             "New tab",
             Some("Ctrl+Shift+M".to_string()),
-            vec![            CommandConfig {
+            vec![CommandConfig {
                 id: None,
                 name: "Command".to_string(),
                 command: None,
