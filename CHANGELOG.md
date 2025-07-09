@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.11.0](https://github.com/s00d/switchshuttle/compare/v1.10.0...v1.11.0) (2025-01-27)
+
+### ✨ Features
+* **terminals:** add RustRover IDE support for macOS, Windows, and Linux
+* **scripts:** add AppleScript automation for RustRover terminal integration
+* **execute:** implement RustRover command execution across all platforms
+* **terminals:** add terminal options by platform with OS detection
+* **scripts:** add AppleScript automation for Visual Studio Code
+* **capabilities:** add 'settings' and 'os:default' permissions
+* **console:** implement asynchronous command execution with threads
+* **execute:** implement execute command functionality
+
+### 🔧 Chores
+* **deps:** update Tauri OS plugin to version 2.3.0
+
+### ♻️ Code Refactoring
+* **settings:** clean up code and improve formatting
+* **menu_structure:** reorganize imports and enhance logging statements
+* **menu:** reorganize imports and improve code formatting
+* **lib:** reorganize module imports and structure
+* **config:** remove unnecessary whitespace and clean up formatting
+* **commands:** improve code formatting and readability
+* **cli:** replace helper function with direct command execution
+* **helpers:** clean up and reorganize code structure
+
+### 🐛 Bug Fixes
+* **modal:** adjust maximum height of modal component
+
 ## [1.10.0](https://github.com/s00d/switchshuttle/compare/v1.9.0...v1.10.0) (2025-07-05)
 
 ### ✨ Features
