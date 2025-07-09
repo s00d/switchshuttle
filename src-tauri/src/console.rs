@@ -1,195 +1,281 @@
-use std::process::{Command, Stdio};
-use std::io::{Write, BufRead, BufReader, ErrorKind};
-use std::sync::{Arc, Mutex};
 use lazy_static::lazy_static;
-use std::println;
+use std::io::{BufRead, BufReader, Write};
+use std::process::{Command, Stdio};
+use std::sync::{Arc, Mutex};
+use std::thread::{self, JoinHandle};
 use std::time::Duration;
-#[cfg(not(target_os = "windows"))]
-use timeout_readwrite::TimeoutReadExt;
+use tauri::{AppHandle, Wry};
+use tauri_plugin_notification::NotificationExt;
 
-/// Структура для управления постоянным инстансом консоли
+// Глобальный инстанс консоли
+lazy_static! {
+    static ref CONSOLE_INSTANCE: Arc<Mutex<Option<ConsoleInstance>>> = Arc::new(Mutex::new(None));
+}
+
 pub struct ConsoleInstance {
     process: Option<std::process::Child>,
-    stdin: Option<std::process::ChildStdin>,
-    stdout: Option<std::process::ChildStdout>,
+    stdin_sender: Option<std::sync::mpsc::Sender<String>>, // Канал для отправки команд
+    response: Arc<Mutex<Option<String>>>,                  // Переменная для хранения ответа
+    stdout_thread: Option<JoinHandle<()>>,
+    stderr_thread: Option<JoinHandle<()>>, // Отдельный поток для stderr
+    stdin_thread: Option<JoinHandle<()>>,
 }
 
 impl ConsoleInstance {
     pub fn new() -> Result<Self, String> {
         println!("[Console] Creating new console instance...");
-        
-        if cfg!(target_os = "macos") {
-            println!("[Console] Spawning bash on macOS...");
-            let mut child = Command::new("/bin/bash")
-                .arg("-i")
-                .stdin(Stdio::piped())
-                .stdout(Stdio::piped())
-                .stderr(Stdio::piped())
-                .spawn()
-                .map_err(|e| format!("Failed to spawn bash: {}", e))?;
 
-            let stdin = child.stdin.take();
-            let stdout = child.stdout.take();
-            
-            if let Some(stdout) = stdout {
-                println!("[Console] Bash console created successfully");
-                Ok(ConsoleInstance {
-                    process: Some(child),
-                    stdin,
-                    stdout: Some(stdout),
-                })
-            } else {
-                println!("[Console] Failed to get stdout from bash");
-                Err("Failed to get stdout".to_string())
-            }
+        let (stdin_tx, stdin_rx) = std::sync::mpsc::channel();
+        let response = Arc::new(Mutex::new(None));
+
+        let (stdout_thread, stderr_thread, stdin_thread, process) =
+            Self::spawn_process(stdin_rx, response.clone())?;
+
+        Ok(ConsoleInstance {
+            process,
+            stdin_sender: Some(stdin_tx),
+            response,
+            stdout_thread,
+            stderr_thread,
+            stdin_thread,
+        })
+    }
+
+    fn spawn_process(
+        stdin_rx: std::sync::mpsc::Receiver<String>,
+        response: Arc<Mutex<Option<String>>>,
+    ) -> Result<
+        (
+            Option<JoinHandle<()>>,
+            Option<JoinHandle<()>>,
+            Option<JoinHandle<()>>,
+            Option<std::process::Child>,
+        ),
+        String,
+    > {
+        let (command, args) = if cfg!(target_os = "macos") {
+            ("/bin/bash".to_string(), vec![]) // Убираем -i для неинтерактивного режима
         } else if cfg!(target_os = "windows") {
-            println!("[Console] Spawning cmd on Windows...");
-            let mut child = Command::new("cmd")
-                .arg("/K")
-                .stdin(Stdio::piped())
-                .stdout(Stdio::piped())
-                .stderr(Stdio::piped())
-                .spawn()
-                .map_err(|e| format!("Failed to spawn cmd: {}", e))?;
-
-            let stdin = child.stdin.take();
-            let stdout = child.stdout.take();
-            
-            if let Some(stdout) = stdout {
-                println!("[Console] CMD console created successfully");
-                Ok(ConsoleInstance {
-                    process: Some(child),
-                    stdin,
-                    stdout: Some(stdout),
-                })
-            } else {
-                println!("[Console] Failed to get stdout from cmd");
-                Err("Failed to get stdout".to_string())
-            }
+            ("cmd".to_string(), vec!["/K".to_string()])
         } else if cfg!(target_os = "linux") {
-            println!("[Console] Spawning bash on Linux...");
-            let mut child = Command::new("/bin/bash")
-                .arg("-i")
-                .stdin(Stdio::piped())
-                .stdout(Stdio::piped())
-                .stderr(Stdio::piped())
-                .spawn()
-                .map_err(|e| format!("Failed to spawn bash: {}", e))?;
-
-            let stdin = child.stdin.take();
-            let stdout = child.stdout.take();
-            
-            if let Some(stdout) = stdout {
-                println!("[Console] Bash console created successfully");
-                Ok(ConsoleInstance {
-                    process: Some(child),
-                    stdin,
-                    stdout: Some(stdout),
-                })
-            } else {
-                println!("[Console] Failed to get stdout from bash");
-                Err("Failed to get stdout".to_string())
-            }
+            ("/bin/bash".to_string(), vec![]) // Убираем -i для неинтерактивного режима
         } else {
-            println!("[Console] Unsupported operating system");
-            Err("Unsupported operating system".to_string())
+            return Err("Unsupported operating system".to_string());
+        };
+
+        let mut child = Command::new(&command)
+            .args(&args)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .map_err(|e| format!("Failed to spawn {}: {}", command, e))?;
+
+        let stdin = child.stdin.take();
+        let stdout = child.stdout.take();
+        let stderr = child.stderr.take();
+
+        if let (Some(stdin), Some(stdout), Some(stderr)) = (stdin, stdout, stderr) {
+            // Поток для записи команд в stdin
+            let stdin_thread = thread::spawn(move || {
+                let mut stdin_writer = stdin;
+                println!("[Console] Stdin thread started");
+
+                while let Ok(command) = stdin_rx.recv() {
+                    println!("[Console] Stdin thread received command: {:?}", command);
+                    if command == "exit" {
+                        println!("[Console] Stdin thread received exit command");
+                        break;
+                    }
+                    if let Err(e) = writeln!(stdin_writer, "{}", command) {
+                        println!("[Console] Error writing to stdin: {}", e);
+                        break;
+                    }
+                    println!("[Console] Stdin thread wrote command to process");
+                }
+                println!("[Console] Stdin thread finished");
+            });
+
+            // Клонируем response для потоков
+            let response_stdout = response.clone();
+            let response_stderr = response.clone();
+
+            // Поток для чтения stdout
+            let stdout_thread = thread::spawn(move || {
+                let mut stdout_reader = BufReader::new(stdout);
+                println!("[Console] Stdout thread started");
+                loop {
+                    // Читаем из stdout
+                    let mut line = String::new();
+                    match stdout_reader.read_line(&mut line) {
+                        Ok(0) => {
+                            // EOF - поток закрыт
+                            println!("[Console] Stdout EOF reached");
+                            break;
+                        }
+                        Ok(_) => {
+                            if !line.trim().is_empty() {
+                                println!("[Console] Got stdout: {:?}", line.trim());
+                                *response_stdout.lock().unwrap() = Some(line.trim().to_string());
+                            }
+                        }
+                        Err(e) => {
+                            println!("[Console] Error reading stdout: {}", e);
+                            break;
+                        }
+                    }
+
+                    // Небольшая пауза
+                    std::thread::sleep(Duration::from_millis(10));
+                }
+                println!("[Console] Stdout thread finished");
+            });
+
+            // Поток для чтения stderr
+            let stderr_thread = thread::spawn(move || {
+                let mut stderr_reader = BufReader::new(stderr);
+                println!("[Console] Stderr thread started");
+
+                loop {
+                    // Читаем из stderr
+                    let mut err_line = String::new();
+                    match stderr_reader.read_line(&mut err_line) {
+                        Ok(0) => {
+                            // EOF - поток закрыт
+                            println!("[Console] Stderr EOF reached");
+                            break;
+                        }
+                        Ok(_) => {
+                            if !err_line.trim().is_empty() {
+                                // Фильтруем эхо команды и промпт bash
+                                let trimmed = err_line.trim();
+                                if !trimmed.contains("bash-")
+                                    && !trimmed.contains("$")
+                                    && !trimmed.contains("PS1")
+                                {
+                                    println!("[Console] Got stderr: {:?}", trimmed);
+                                    *response_stderr.lock().unwrap() =
+                                        Some(format!("stderr: {}", trimmed));
+                                } else {
+                                    println!(
+                                        "[Console] Filtered stderr (echo/prompt): {:?}",
+                                        trimmed
+                                    );
+                                }
+                            }
+                        }
+                        Err(e) => {
+                            println!("[Console] Error reading stderr: {}", e);
+                            break;
+                        }
+                    }
+
+                    // Небольшая пауза
+                    std::thread::sleep(Duration::from_millis(10));
+                }
+                println!("[Console] Stderr thread finished");
+            });
+
+            Ok((
+                Some(stdout_thread),
+                Some(stderr_thread),
+                Some(stdin_thread),
+                Some(child),
+            ))
+        } else {
+            Err("Failed to get stdin/stdout/stderr".to_string())
         }
     }
 
     pub fn execute_command(&mut self, command: &str) -> Result<String, String> {
         println!("[Console] Executing command: {}", command);
-        
-        // Проверяем, что команда не пустая
         if command.trim().is_empty() {
-            println!("[Console] Empty command provided, returning empty string");
             return Ok("".to_string());
         }
-        
-        if let Some(ref mut stdin) = self.stdin {
-            // Отправляем команду в консоль
-            println!("[Console] Sending command to stdin... {}", command);
-            writeln!(stdin, "{}", command)
-                .map_err(|e| format!("Failed to write command: {}", e))?;
-            
-                            // Читаем результат до появления промпта
-                if let Some(ref mut stdout) = self.stdout {
-                    let mut output = String::new();
-                    let mut line = String::new();
-                    
-                    println!("[Console] Reading output...");
-                    
-                    // Читаем только одну строку результата с таймаутом
-                    line.clear();
-                    
-                    // Читаем одну строку результата
-                    #[cfg(not(target_os = "windows"))]
-                    {
-                        let timeout_reader = stdout.with_timeout(Duration::from_secs(3));
-                        let mut buf_reader = BufReader::new(timeout_reader);
-                        
-                        match buf_reader.read_line(&mut line) {
-                            Ok(0) => {
-                                println!("[Console] EOF reached - no output");
-                            }
-                            Ok(_) => {
-                                output.push_str(&line);
-                                println!("[Console] Result: {:?}", line.trim());
-                            }
-                            Err(e) => {
-                                if e.kind() == ErrorKind::TimedOut {
-                                    println!("[Console] Timeout reading output after 3 seconds");
-                                } else {
-                                    println!("[Console] Error reading line: {}", e);
-                                }
-                            }
-                        }
-                    }
-                    
-                    #[cfg(target_os = "windows")]
-                    {
-                        let mut buf_reader = BufReader::new(stdout);
-                        
-                        match buf_reader.read_line(&mut line) {
-                            Ok(0) => {
-                                println!("[Console] EOF reached - no output");
-                            }
-                            Ok(_) => {
-                                output.push_str(&line);
-                                println!("[Console] Result: {:?}", line.trim());
-                            }
-                            Err(e) => {
-                                println!("[Console] Error reading line: {}", e);
-                            }
-                        }
-                    }
-                
-                // Очищаем остальной вывод до промпта с таймаутом
-                println!("[Console] Clearing remaining output...");
-                
-                // Просто ждем немного и не читаем больше - результат уже получен
-                std::thread::sleep(std::time::Duration::from_millis(100));
-                println!("[Console] Clearing skipped - result already obtained");
-                
-                // Обрабатываем результат (только одна строка)
-                let result = output.trim().to_string();
-                println!("[Console] Command completed. Result: {:?}", result);
-                Ok(result)
-            } else {
-                println!("[Console] No stdout available");
-                Ok("".to_string())
+
+        // Проверяем состояние процесса
+        if let Some(ref mut process) = self.process {
+            match process.try_wait() {
+                Ok(Some(exit_status)) => {
+                    println!(
+                        "[Console] ERROR: Process has exited with status: {:?}",
+                        exit_status
+                    );
+                    return Err("Process has exited".to_string());
+                }
+                Ok(None) => {
+                    println!("[Console] Process is still running");
+                }
+                Err(e) => {
+                    println!("[Console] ERROR: Failed to check process status: {}", e);
+                    return Err("Failed to check process status".to_string());
+                }
             }
         } else {
-            println!("[Console] No stdin available");
-            Err("No stdin available".to_string())
+            println!("[Console] ERROR: No process available");
+            return Err("No process available".to_string());
         }
+
+        // Проверяем состояние потоков
+        if let Some(ref _stdin_sender) = self.stdin_sender {
+            println!("[Console] Stdin sender is available");
+        } else {
+            println!("[Console] ERROR: No stdin sender available");
+            return Err("No stdin sender available".to_string());
+        }
+
+        // Очищаем старый ответ
+        *self.response.lock().unwrap() = None;
+        println!("[Console] Cleared old response");
+
+        // Отправляем команду в stdin поток
+        if let Some(ref stdin_sender) = self.stdin_sender {
+            match stdin_sender.send(command.to_string()) {
+                Ok(_) => println!("[Console] Command sent to stdin thread successfully"),
+                Err(e) => {
+                    println!("[Console] ERROR: Failed to send command: {}", e);
+                    return Err(format!("Failed to send command: {}", e));
+                }
+            }
+        } else {
+            return Err("No stdin sender available".to_string());
+        }
+
+        // Ждем ответ с таймаутом 3 секунды
+        let timeout = Duration::from_secs(3);
+        let start = std::time::Instant::now();
+        println!("[Console] Starting to wait for response...");
+
+        while start.elapsed() < timeout {
+            let response_guard = self.response.lock().unwrap();
+            if let Some(response) = response_guard.as_ref() {
+                println!("[Console] Got response: {:?}", response);
+                return Ok(response.clone());
+            }
+            drop(response_guard); // Освобождаем блокировку
+
+            std::thread::sleep(Duration::from_millis(100));
+        }
+
+        println!("[Console] ERROR: Timeout - no response received in 3 seconds");
+        Err("Timeout: no response received in 3 seconds".to_string())
     }
 
     pub fn close(&mut self) {
-        if let Some(ref mut stdin) = self.stdin {
-            let _ = writeln!(stdin, "exit");
+        if let Some(ref stdin_sender) = self.stdin_sender {
+            let _ = stdin_sender.send("exit".to_string());
         }
         if let Some(ref mut process) = self.process {
             let _ = process.kill();
+        }
+        if let Some(thread) = self.stdout_thread.take() {
+            let _ = thread.join();
+        }
+        if let Some(thread) = self.stderr_thread.take() {
+            let _ = thread.join();
+        }
+        if let Some(thread) = self.stdin_thread.take() {
+            let _ = thread.join();
         }
     }
 }
@@ -198,11 +284,6 @@ impl Drop for ConsoleInstance {
     fn drop(&mut self) {
         self.close();
     }
-}
-
-// Глобальный инстанс консоли
-lazy_static! {
-    static ref CONSOLE_INSTANCE: Arc<Mutex<Option<ConsoleInstance>>> = Arc::new(Mutex::new(None));
 }
 
 /// Инициализирует постоянный инстанс консоли
@@ -219,39 +300,24 @@ pub fn init_console() -> Result<(), String> {
     Ok(())
 }
 
-/// Закрывает постоянный инстанс консоли
-// pub fn close_console() {
-//     println!("[Console] Closing console instance...");
-//     let mut console_guard = CONSOLE_INSTANCE.lock().unwrap();
-//     if let Some(ref mut console) = *console_guard {
-//         console.close();
-//         println!("[Console] Console instance closed");
-//     } else {
-//         println!("[Console] No console instance to close");
-//     }
-//     *console_guard = None;
-// }
-
 /// Выполняет команду в постоянном инстансе консоли
 pub fn execute_command_silent(command: &str) -> Result<String, String> {
-    println!("[Console] execute_command_silent called with: '{}'", command);
-    println!("[Console] Stack trace: {:?}", std::backtrace::Backtrace::capture());
-    
-    // Проверяем, что команда не пустая
+    println!(
+        "[Console] execute_command_silent called with: '{}'",
+        command
+    );
+
     if command.trim().is_empty() {
-        println!("[Console] Empty command provided, returning empty string");
         return Ok("".to_string());
     }
-    
-    // Проверяем, не является ли команда ID
+
     if command.starts_with("cmd_") {
         println!("[Console] WARNING: Command looks like an ID: '{}'", command);
         return Ok("".to_string());
     }
-    
-    // Получаем или создаем инстанс консоли
+
     let mut console_guard = CONSOLE_INSTANCE.lock().unwrap();
-    
+
     if console_guard.is_none() {
         println!("[Console] No console instance found, creating new one...");
         *console_guard = Some(ConsoleInstance::new()?);
@@ -259,9 +325,8 @@ pub fn execute_command_silent(command: &str) -> Result<String, String> {
     } else {
         println!("[Console] Using existing console instance");
     }
-    
+
     if let Some(ref mut console) = *console_guard {
-        // Выполняем команду в постоянном инстансе консоли
         println!("[Console] Executing command in console instance");
         let result = console.execute_command(command);
         println!("[Console] Command execution completed");
@@ -270,4 +335,36 @@ pub fn execute_command_silent(command: &str) -> Result<String, String> {
         println!("[Console] Failed to create console instance");
         Err("Failed to create console instance".to_string())
     }
-} 
+}
+
+/// Проверяет состояние переключателя, выполняя команду
+pub fn is_switch_enabled(switch_command: &str, app: Option<&AppHandle<Wry>>) -> bool {
+    println!(
+        "[Helpers] is_switch_enabled called with: '{}'",
+        switch_command
+    );
+    // Выполняем команду переключателя в фоне и получаем результат
+    match execute_command_silent(switch_command) {
+        Ok(output) => {
+            // Проверяем результат - если команда вернула "true" или непустую строку, считаем включенным
+            let output = output.trim().to_lowercase();
+            output == "true" || output == "1" || output == "enabled" || output == "on"
+        }
+        Err(e) => {
+            eprintln!("Failed to check switch status: {}", e);
+            // Показываем уведомление об ошибке, если app доступен
+            if let Some(app_handle) = app {
+                if let Ok(_) = app_handle
+                    .notification()
+                    .builder()
+                    .title("SwitchShuttle Error")
+                    .body(&format!("Failed to check switch status: {}", e))
+                    .show()
+                {
+                    // Уведомление отправлено
+                }
+            }
+            false
+        }
+    }
+}
