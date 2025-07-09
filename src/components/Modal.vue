@@ -10,7 +10,7 @@
         
         <!-- Modal -->
         <div 
-          class="relative bg-white border border-slate-300 shadow-xl w-full max-w-6xl max-h-[calc(95vh-5rem)] overflow-hidden flex flex-col"
+          class="relative bg-white border border-slate-300 shadow-xl w-full max-w-6xl max-h-[calc(95vh-1rem)] overflow-hidden flex flex-col"
           @click.stop
         >
           <!-- Header -->
