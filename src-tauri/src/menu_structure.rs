@@ -1,17 +1,17 @@
-use crate::config::{CommandConfig};
-use crate::{console, helpers};
-use std::sync::{Arc};
-use std::time::Duration;
+use crate::config::CommandConfig;
+use crate::console;
+use std::sync::atomic::AtomicBool;
+use std::sync::atomic::Ordering;
+use std::sync::Arc;
+use std::sync::Mutex;
 use std::thread;
-use tauri::{AppHandle, Wry};
+use std::time::Duration;
 use tauri::menu::{
     CheckMenuItem, IconMenuItem, MenuBuilder, Submenu as TauriSubmenu, SubmenuBuilder,
 };
-use std::sync::atomic::AtomicBool;
-use std::sync::atomic::Ordering;
-use std::sync::Mutex;
+use tauri::{AppHandle, Wry};
 
-use crate::helpers::{create_menu_item, create_check_menu_item};
+use crate::helpers::{create_check_menu_item, create_menu_item};
 
 // Глобальная переменная для отслеживания активности трея
 lazy_static::lazy_static! {
@@ -56,9 +56,15 @@ impl MenuItem {
     pub fn is_switch(&self) -> bool {
         let is_switch = self.config.switch.is_some();
         if is_switch {
-            println!("[Switch] is_switch: {} has switch = '{:?}'", self.config.name, self.config.switch);
+            println!(
+                "[Switch] is_switch: {} has switch = '{:?}'",
+                self.config.name, self.config.switch
+            );
         }
-        println!("[Switch] is_switch called for: {} = {}", self.config.name, is_switch);
+        println!(
+            "[Switch] is_switch called for: {} = {}",
+            self.config.name, is_switch
+        );
         is_switch
     }
 
@@ -66,9 +72,15 @@ impl MenuItem {
     pub fn is_monitor(&self) -> bool {
         let is_monitor = self.config.monitor.is_some();
         if is_monitor {
-            println!("[Monitor] is_monitor: {} has monitor = '{:?}'", self.config.name, self.config.monitor);
+            println!(
+                "[Monitor] is_monitor: {} has monitor = '{:?}'",
+                self.config.name, self.config.monitor
+            );
         }
-        println!("[Monitor] is_monitor called for: {} = {}", self.config.name, is_monitor);
+        println!(
+            "[Monitor] is_monitor called for: {} = {}",
+            self.config.name, is_monitor
+        );
         is_monitor
     }
 
@@ -79,11 +91,17 @@ impl MenuItem {
 
     /// Получает отображаемое имя с учетом мониторинга
     pub fn get_display_name(&self, _app: Option<&AppHandle<Wry>>) -> String {
-        println!("[Monitor] get_display_name called for: {}", self.config.name);
+        println!(
+            "[Monitor] get_display_name called for: {}",
+            self.config.name
+        );
         if self.is_monitor() {
             if let Some(monitor_command) = &self.config.monitor {
-                println!("[Monitor] get_display_name: monitor_command = '{}'", monitor_command);
-                
+                println!(
+                    "[Monitor] get_display_name: monitor_command = '{}'",
+                    monitor_command
+                );
+
                 // Выполняем команду мониторинга
                 match console::execute_command_silent(monitor_command) {
                     Ok(output) => {
@@ -109,35 +127,52 @@ impl MenuItem {
 
     /// Запускает таймер обновления для элемента с мониторингом
     pub fn start_monitor_timer(&mut self) {
-        println!("[Monitor] start_monitor_timer called for: {}", self.config.name);
+        println!(
+            "[Monitor] start_monitor_timer called for: {}",
+            self.config.name
+        );
         if self.is_monitor() {
             // Проверяем, что команда мониторинга не пустая
             if let Some(monitor_command) = &self.config.monitor {
                 if monitor_command.trim().is_empty() {
-                    eprintln!("[Monitor] Empty monitor command for item: {}", self.config.id.as_ref().unwrap_or(&self.config.name));
+                    eprintln!(
+                        "[Monitor] Empty monitor command for item: {}",
+                        self.config.id.as_ref().unwrap_or(&self.config.name)
+                    );
                     return;
                 }
             } else {
-                eprintln!("[Monitor] No monitor command for item: {}", self.config.id.as_ref().unwrap_or(&self.config.name));
+                eprintln!(
+                    "[Monitor] No monitor command for item: {}",
+                    self.config.id.as_ref().unwrap_or(&self.config.name)
+                );
                 return;
             }
-            
+
             // Останавливаем предыдущий поток, если был
             self.stop_monitor_timer();
             let stop_flag = Arc::new(AtomicBool::new(false));
             self.stop_flag = Some(stop_flag.clone());
-                        if let Some(icon_item) = self.tauri_icon_item.clone() {
+            if let Some(icon_item) = self.tauri_icon_item.clone() {
                 let monitor_id = self.config.monitor.clone().unwrap();
-                println!("[Monitor] start_monitor_timer: monitor_id = '{}'", monitor_id);
+                println!(
+                    "[Monitor] start_monitor_timer: monitor_id = '{}'",
+                    monitor_id
+                );
                 let name = self.config.name.clone();
-                let id = self.config.id.clone().unwrap_or_else(|| self.config.name.clone());
+                let id = self
+                    .config
+                    .id
+                    .clone()
+                    .unwrap_or_else(|| self.config.name.clone());
                 let icon = self.config.icon.clone();
-                
+                let hotkey = self.config.hotkey.clone();
+
                 // Используем monitor_id как команду для выполнения
                 let monitor_command = monitor_id.clone();
-                
+
                 println!("[Monitor] Resolved monitor_command: '{}'", monitor_command);
-                
+
                 thread::spawn(move || {
                     eprintln!("[Monitor] Starting timer for item: {}", id);
                     while !stop_flag.load(Ordering::Relaxed) {
@@ -159,13 +194,27 @@ impl MenuItem {
                                 Err(_) => name.clone(),
                             };
                             eprintln!("[Monitor] Updating text for {}: {}", id, new_text);
-                            
+
+                            if let Err(e) = icon_item.set_accelerator(hotkey.clone()) {
+                                eprintln!("[Monitor] Failed to set accelerator for {}: {}", id, e);
+                            } else {
+                                eprintln!("[Monitor] Successfully updated accelerator for {}", id);
+                            }
+
                             // Обновляем текст с сохранением иконки
                             if let Some(icon_str) = &icon {
-                                if let Err(e) = icon_item.set_text(&format!("{} {}", icon_str, new_text)) {
-                                    eprintln!("[Monitor] Failed to set text with icon for {}: {}", id, e);
+                                if let Err(e) =
+                                    icon_item.set_text(&format!("{} {}", icon_str, new_text))
+                                {
+                                    eprintln!(
+                                        "[Monitor] Failed to set text with icon for {}: {}",
+                                        id, e
+                                    );
                                 } else {
-                                    eprintln!("[Monitor] Successfully updated text with icon for {}", id);
+                                    eprintln!(
+                                        "[Monitor] Successfully updated text with icon for {}",
+                                        id
+                                    );
                                 }
                             } else {
                                 if let Err(e) = icon_item.set_text(&new_text) {
@@ -183,7 +232,10 @@ impl MenuItem {
                     eprintln!("[Monitor] Timer stopped for item: {}", id);
                 });
             } else {
-                eprintln!("[Monitor] No icon_item found for {}", self.config.id.as_ref().unwrap_or(&self.config.name));
+                eprintln!(
+                    "[Monitor] No icon_item found for {}",
+                    self.config.id.as_ref().unwrap_or(&self.config.name)
+                );
             }
         }
     }
@@ -200,8 +252,11 @@ impl MenuItem {
     pub fn get_switch_state(&self, app: Option<&AppHandle<Wry>>) -> bool {
         if self.is_switch() {
             if let Some(switch_command) = &self.config.switch {
-                println!("[Switch] get_switch_state: switch_command = '{}'", switch_command);
-                helpers::is_switch_enabled(switch_command, app)
+                println!(
+                    "[Switch] get_switch_state: switch_command = '{}'",
+                    switch_command
+                );
+                console::is_switch_enabled(switch_command, app)
             } else {
                 println!("[Switch] No switch command found for: {}", self.config.name);
                 false
@@ -217,20 +272,43 @@ impl MenuItem {
         let name = &self.config.name;
         let hotkey = self.config.hotkey.as_deref();
         let icon = self.config.icon.as_deref();
-        
+
         if self.is_switch() {
             let is_enabled = self.get_switch_state(Some(app));
-            MenuItemOrSubmenu::CheckItem(create_check_menu_item(app, id, name, is_enabled, hotkey.map(|s| s.to_string()), icon))
+            MenuItemOrSubmenu::CheckItem(create_check_menu_item(
+                app,
+                id,
+                name,
+                is_enabled,
+                hotkey.map(|s| s.to_string()),
+                icon,
+            ))
         } else if self.is_monitor() {
             eprintln!("[Monitor] Creating menu item for monitor: {}", id);
             let display_name = self.get_display_name(Some(app));
-            let icon_item = create_menu_item(app, id, &display_name, "terminal", hotkey.map(|s| s.to_string()), icon);
+            let icon_item = create_menu_item(
+                app,
+                id,
+                &display_name,
+                "terminal",
+                hotkey.map(|s| s.to_string()),
+                icon,
+            );
             let arc_icon_item = Arc::new(icon_item);
             self.tauri_icon_item = Some(arc_icon_item.clone());
             eprintln!("[Monitor] Saved icon_item for: {}", id);
-            MenuItemOrSubmenu::IconItem(Arc::try_unwrap(arc_icon_item).unwrap_or_else(|arc| (*arc).clone()))
+            MenuItemOrSubmenu::IconItem(
+                Arc::try_unwrap(arc_icon_item).unwrap_or_else(|arc| (*arc).clone()),
+            )
         } else {
-            MenuItemOrSubmenu::IconItem(create_menu_item(app, id, name, "terminal", hotkey.map(|s| s.to_string()), icon))
+            MenuItemOrSubmenu::IconItem(create_menu_item(
+                app,
+                id,
+                name,
+                "terminal",
+                hotkey.map(|s| s.to_string()),
+                icon,
+            ))
         }
     }
 
@@ -241,9 +319,9 @@ impl MenuItem {
         } else {
             format!("📁 {}", self.config.name)
         };
-        
+
         let mut submenu_builder = SubmenuBuilder::new(app, &display_name);
-        
+
         if let Some(submenu_items) = &self.config.submenu {
             for sub_item in submenu_items.iter() {
                 let mut menu_item = MenuItem::from_command_config(sub_item);
@@ -266,11 +344,9 @@ impl MenuItem {
                 }
             }
         }
-        
+
         submenu_builder.build().unwrap()
     }
-
-
 }
 
 impl Submenu {
@@ -314,7 +390,7 @@ impl Submenu {
     pub fn create_tauri_submenu(&mut self, app: &AppHandle<Wry>) -> TauriSubmenu<Wry> {
         let display_name = self.get_display_name();
         let mut submenu_builder = SubmenuBuilder::new(app, &display_name);
-        
+
         for item in self.items.iter_mut() {
             if item.has_submenu() {
                 // Рекурсивно создаем вложенное подменю
@@ -335,7 +411,7 @@ impl Submenu {
                 }
             }
         }
-        
+
         submenu_builder.build().unwrap()
     }
 }
@@ -361,10 +437,11 @@ impl SystemMenu {
         self
     }
 
-
-
     /// Создает SystemMenu из ConfigManager с обновлением состояний
-    pub fn from_configs_with_states(configs: &[crate::config::Config], _app: Option<&AppHandle<Wry>>) -> Self {
+    pub fn from_configs_with_states(
+        configs: &[crate::config::Config],
+        _app: Option<&AppHandle<Wry>>,
+    ) -> Self {
         let mut system_menu = SystemMenu::new();
 
         for config in configs {
@@ -377,12 +454,12 @@ impl SystemMenu {
 
             for command in &config.commands {
                 let menu_item = MenuItem::from_command_config(command);
-                
+
                 if menu_item.has_submenu() {
                     // Если у элемента есть подменю, создаем Submenu
                     let mut submenu = Submenu::new(command.name.clone())
                         .with_icon(command.icon.clone().unwrap_or_else(|| "📁".to_string()));
-                    
+
                     // Добавляем элементы подменю
                     if let Some(submenu_items) = &command.submenu {
                         for sub_command in submenu_items {
@@ -390,7 +467,7 @@ impl SystemMenu {
                             submenu = submenu.add_item(sub_menu_item);
                         }
                     }
-                    
+
                     system_menu = system_menu.add_submenu(submenu);
                 } else {
                     // Иначе добавляем как обычный элемент
@@ -406,39 +483,45 @@ impl SystemMenu {
     pub fn start_all_monitor_timers(&mut self) {
         println!("[Monitor] start_all_monitor_timers called");
         eprintln!("[Monitor] Starting timers for all monitor items");
-        
+
         // Запускаем таймеры для основных элементов
         for item in &mut self.items {
             if item.is_monitor() {
-                eprintln!("[Monitor] Found monitor item in main items: {}", item.config.id.as_ref().unwrap_or(&item.config.name));
+                eprintln!(
+                    "[Monitor] Found monitor item in main items: {}",
+                    item.config.id.as_ref().unwrap_or(&item.config.name)
+                );
                 item.start_monitor_timer();
             }
         }
-        
+
         // Запускаем таймеры для элементов в подменю
         for submenu in &mut self.submenus {
             for item in &mut submenu.items {
                 if item.is_monitor() {
-                    eprintln!("[Monitor] Found monitor item in submenu: {}", item.config.id.as_ref().unwrap_or(&item.config.name));
+                    eprintln!(
+                        "[Monitor] Found monitor item in submenu: {}",
+                        item.config.id.as_ref().unwrap_or(&item.config.name)
+                    );
                     item.start_monitor_timer();
                 }
             }
         }
-        
+
         eprintln!("[Monitor] Finished starting timers");
     }
 
     /// Останавливает все таймеры мониторинга
     pub fn stop_all_monitor_timers(&mut self) {
         eprintln!("[Monitor] Stopping all monitor timers");
-        
+
         // Останавливаем таймеры для основных элементов
         for item in &mut self.items {
             if item.is_monitor() {
                 item.stop_monitor_timer();
             }
         }
-        
+
         // Останавливаем таймеры для элементов в подменю
         for submenu in &mut self.submenus {
             for item in &mut submenu.items {
@@ -447,11 +530,9 @@ impl SystemMenu {
                 }
             }
         }
-        
+
         eprintln!("[Monitor] Finished stopping timers");
     }
-
-
 
     /// Создает Tauri меню из SystemMenu
     pub fn create_tauri_menu(&mut self, app: &AppHandle<Wry>) -> tauri::menu::Menu<Wry> {
