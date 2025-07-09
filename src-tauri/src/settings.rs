@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use std::fs;
 use std::path::PathBuf;
 use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_notification::{NotificationExt, PermissionState};
-use serde_json::Value;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AppSettings {
@@ -29,9 +29,7 @@ pub struct NotificationSettings {
 impl Default for AppSettings {
     fn default() -> Self {
         AppSettings {
-            general: GeneralSettings {
-                auto_start: false,
-            },
+            general: GeneralSettings { auto_start: false },
             notifications: NotificationSettings {
                 show_notifications: true,
                 notification_duration: 3000,
@@ -47,7 +45,7 @@ impl Default for AppSettings {
 impl AppSettings {
     pub fn load() -> Result<Self, Box<dyn std::error::Error>> {
         let settings_path = get_settings_path();
-        
+
         if settings_path.exists() {
             let content = fs::read_to_string(&settings_path)?;
             let mut value: Value = serde_json::from_str(&content)?;
@@ -76,7 +74,7 @@ impl AppSettings {
         let autostart_manager = app.autolaunch();
         let current_autostart = autostart_manager.is_enabled().unwrap_or(false);
         let new_autostart = self.general.auto_start;
-        
+
         if current_autostart != new_autostart {
             if new_autostart {
                 autostart_manager.enable()?;
@@ -85,25 +83,36 @@ impl AppSettings {
             }
         }
 
-        
         // Применяем настройки уведомлений
         // (эти настройки будут использоваться в других частях приложения)
-        
+
         // Применяем настройки языка
         // (можно добавить логику для смены языка интерфейса)
-        
+
         Ok(())
     }
 
-
-
-    pub fn show_notification(&self, app: &tauri::AppHandle, title: &str, body: &str) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn show_notification(
+        &self,
+        app: &tauri::AppHandle,
+        title: &str,
+        body: &str,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         self.show_notification_with_icon(app, title, body, None)
     }
 
-    fn show_notification_with_icon(&self, app: &tauri::AppHandle, title: &str, body: &str, icon: Option<&str>) -> Result<(), Box<dyn std::error::Error>> {
-        println!("[Settings] Attempting to show notification: title='{}', body='{}', icon='{:?}'", title, body, icon);
-        
+    fn show_notification_with_icon(
+        &self,
+        app: &tauri::AppHandle,
+        title: &str,
+        body: &str,
+        icon: Option<&str>,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        println!(
+            "[Settings] Attempting to show notification: title='{}', body='{}', icon='{:?}'",
+            title, body, icon
+        );
+
         if !self.notifications.show_notifications {
             println!("[Settings] Notifications are disabled in settings");
             return Ok(());
@@ -112,7 +121,7 @@ impl AppSettings {
         // Проверяем права на уведомления
         let permission_state = app.notification().permission_state();
         println!("[Settings] Permission state: {:?}", permission_state);
-        
+
         match permission_state {
             Ok(state) if state == PermissionState::Granted => {
                 println!("[Settings] Permission granted, proceeding with notification");
@@ -123,22 +132,27 @@ impl AppSettings {
                 if let Err(e) = app.notification().request_permission() {
                     println!("[Settings] Failed to request permission: {}", e);
                     // Показываем уведомление об ошибке вместо вывода в консоль
-                    let _ = self.show_error_notification(app, "Ошибка разрешений", &format!("Не удалось запросить разрешение на уведомления: {}", e));
+                    let _ = self.show_error_notification(
+                        app,
+                        "Ошибка разрешений",
+                        &format!("Не удалось запросить разрешение на уведомления: {}", e),
+                    );
                 }
                 return Ok(());
             }
         }
 
-        let mut builder = app.notification().builder()
-            .title(title)
-            .body(body);
+        let mut builder = app.notification().builder().title(title).body(body);
 
         if let Some(icon) = icon {
             builder = builder.icon(icon);
         }
 
-        println!("[Settings] Building notification with title='{}', body='{}'", title, body);
-        
+        println!(
+            "[Settings] Building notification with title='{}', body='{}'",
+            title, body
+        );
+
         match builder.show() {
             Ok(_) => {
                 println!("[Settings] Notification shown successfully");
@@ -151,9 +165,17 @@ impl AppSettings {
         }
     }
 
-    pub fn show_success_notification(&self, app: &tauri::AppHandle, title: &str, body: &str) -> Result<(), Box<dyn std::error::Error>> {
-        println!("[Settings] show_success_notification called: title='{}', body='{}'", title, body);
-        
+    pub fn show_success_notification(
+        &self,
+        app: &tauri::AppHandle,
+        title: &str,
+        body: &str,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        println!(
+            "[Settings] show_success_notification called: title='{}', body='{}'",
+            title, body
+        );
+
         if !self.notifications.success_notifications {
             println!("[Settings] Success notifications are disabled in settings");
             return Ok(());
@@ -163,9 +185,17 @@ impl AppSettings {
         self.show_notification_with_icon(app, title, body, Some("✅"))
     }
 
-    pub fn show_error_notification(&self, app: &tauri::AppHandle, title: &str, body: &str) -> Result<(), Box<dyn std::error::Error>> {
-        println!("[Settings] show_error_notification called: title='{}', body='{}'", title, body);
-        
+    pub fn show_error_notification(
+        &self,
+        app: &tauri::AppHandle,
+        title: &str,
+        body: &str,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        println!(
+            "[Settings] show_error_notification called: title='{}', body='{}'",
+            title, body
+        );
+
         if !self.notifications.error_notifications {
             println!("[Settings] Error notifications are disabled in settings");
             return Ok(());
@@ -175,9 +205,17 @@ impl AppSettings {
         self.show_notification_with_icon(app, title, body, Some("❌"))
     }
 
-    pub fn show_info_notification(&self, app: &tauri::AppHandle, title: &str, body: &str) -> Result<(), Box<dyn std::error::Error>> {
-        println!("[Settings] show_info_notification called: title='{}', body='{}'", title, body);
-        
+    pub fn show_info_notification(
+        &self,
+        app: &tauri::AppHandle,
+        title: &str,
+        body: &str,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        println!(
+            "[Settings] show_info_notification called: title='{}', body='{}'",
+            title, body
+        );
+
         if !self.notifications.info_notifications {
             println!("[Settings] Info notifications are disabled in settings");
             return Ok(());
@@ -187,9 +225,17 @@ impl AppSettings {
         self.show_notification_with_icon(app, title, body, Some("ℹ️"))
     }
 
-    pub fn show_warning_notification(&self, app: &tauri::AppHandle, title: &str, body: &str) -> Result<(), Box<dyn std::error::Error>> {
-        println!("[Settings] show_warning_notification called: title='{}', body='{}'", title, body);
-        
+    pub fn show_warning_notification(
+        &self,
+        app: &tauri::AppHandle,
+        title: &str,
+        body: &str,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        println!(
+            "[Settings] show_warning_notification called: title='{}', body='{}'",
+            title, body
+        );
+
         if !self.notifications.warning_notifications {
             println!("[Settings] Warning notifications are disabled in settings");
             return Ok(());
@@ -286,7 +332,9 @@ fn merge_defaults(current: &mut Value, default: &Value) {
             for (k, v) in def_map {
                 match cur_map.get_mut(k) {
                     Some(cur_v) => merge_defaults(cur_v, v),
-                    None => { cur_map.insert(k.clone(), v.clone()); },
+                    None => {
+                        cur_map.insert(k.clone(), v.clone());
+                    }
                 }
             }
         }
@@ -305,4 +353,4 @@ fn remove_extra_fields(current: &mut Value, default: &Value) {
             }
         }
     }
-} 
+}
