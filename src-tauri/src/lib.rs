@@ -1,28 +1,30 @@
+mod cli;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 mod commands;
-mod cli;
 mod config;
 mod console;
+mod execute;
 mod helpers;
 mod menu;
 mod menu_structure;
 mod settings;
 
-use crate::commands::{
-    about_message, check_for_updates, create_new_config, execute, execute_command_with_inputs,
-    fetch_input_data, get_menu_data, get_version, get_configurations, delete_configuration,
-    save_or_update_configuration, get_config_files, load_config, save_configuration_by_id,
-    create_new_configuration, duplicate_configuration, validate_configuration, get_unique_config_title,
-    open_configuration, refresh_configurations, open_config_folder, get_settings_schema, get_settings, save_settings, show_notification
-};
-use crate::menu::{create_system_tray_menu, handle_system_tray_event};
 use crate::cli::handle_cli_commands;
-use crate::console::{init_console};
+use crate::commands::{
+    about_message, check_for_updates, create_new_config, create_new_configuration,
+    delete_configuration, duplicate_configuration, execute, execute_command_with_inputs,
+    fetch_input_data, get_config_files, get_configurations, get_menu_data, get_settings,
+    get_settings_schema, get_unique_config_title, get_version, load_config, open_config_folder,
+    open_configuration, refresh_configurations, save_configuration_by_id,
+    save_or_update_configuration, save_settings, show_notification, validate_configuration,
+};
+use crate::console::init_console;
+use crate::menu::{create_system_tray_menu, handle_system_tray_event};
+use crate::settings::AppSettings;
 use config::ConfigManager;
 use std::sync::{Arc, Mutex};
 use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
 use tauri_plugin_cli::CliExt;
-use crate::settings::AppSettings;
 
 pub fn run() {
     let config_manager = Arc::new(Mutex::new(ConfigManager::new()));
@@ -43,6 +45,7 @@ pub fn run() {
     };
 
     let app = tauri::Builder::default()
+        .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
@@ -80,7 +83,7 @@ pub fn run() {
 
             // Handle CLI commands
             let config_manager_clone = config_manager.clone();
-            
+
             match app.cli().matches() {
                 Ok(matches) => {
                     // Handle CLI commands and exit if any were processed
