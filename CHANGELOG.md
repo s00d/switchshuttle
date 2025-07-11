@@ -2,6 +2,41 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.12.0](https://github.com/s00d/switchshuttle/compare/v1.11.0...v1.12.0) (2025-01-27)
+
+### ✨ Features
+* **hotkeys:** implement global hotkey management and execution
+* **hotkeys:** implement hotkey management with conflict detection
+* **menu:** add command execution by ID with input handling
+* **menu_structure:** refactor tray activity tracking and command execution
+* **console:** implement console connection pooling
+* **execute:** refactor command execution system
+* **commands:** refactor command handling and management
+* **feat(IconSelector):** add icon selector component with dropdown functionality
+* **feat(components):** replace SVG icons with Vue components in CommandsTable
+* **feat(components):** replace SVG icons with new components in CommandItem
+* **feat(icons):** add new SVG icons for Add, Lightning, Chevron, Trash, and X
+* **feat(editor):** add terminal options and loading states to ConfigEditor
+* **feat(tauri-commands):** add terminal configuration and retrieval methods
+* **feat(config-editor):** update terminal options handling in component
+* **feat(terminals):** remove obsolete terminal options and functions
+* **feat(development):** update Tauri commands list with new terminal command
+
+### 🔧 Chores
+* **deps:** update tokio version and add features
+* **chore(deps):** update tokio version and add features
+
+### ♻️ Code Refactoring
+* **app:** remove unused hotkey and context menu handling code
+* **refactor(app):** remove unused hotkey and context menu handling code
+* **refactor(terminals):** remove obsolete terminal options and functions
+* **feat(scripts):** replace old iTerm scripts with updated versions
+* **helpers:** add debug logging for menu item creation
+
+### 🐛 Bug Fixes
+* **hotkeys:** fix global hotkey registration and execution
+* **menu:** fix command execution with proper timer management
+
 ## [1.11.0](https://github.com/s00d/switchshuttle/compare/v1.10.0...v1.11.0) (2025-01-27)
 
 ### ✨ Features
