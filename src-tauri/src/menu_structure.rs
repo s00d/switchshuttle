@@ -1,5 +1,6 @@
 use crate::config::CommandConfig;
 use crate::console;
+use once_cell::sync::Lazy;
 use std::sync::atomic::AtomicBool;
 use std::sync::atomic::Ordering;
 use std::sync::Arc;
@@ -14,9 +15,8 @@ use tauri::{AppHandle, Wry};
 use crate::helpers::{create_check_menu_item, create_menu_item};
 
 // Глобальная переменная для отслеживания активности трея
-lazy_static::lazy_static! {
-    pub static ref TRAY_ACTIVE: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
-}
+pub static TRAY_ACTIVE: Lazy<Arc<Mutex<bool>>> = 
+    Lazy::new(|| Arc::new(Mutex::new(false)));
 
 /// Представляет элемент меню
 #[derive(Clone)]
@@ -37,6 +37,7 @@ pub struct Submenu {
 }
 
 /// Представляет полное меню системы
+#[derive(Clone)]
 pub struct SystemMenu {
     pub items: Vec<MenuItem>,
     pub submenus: Vec<Submenu>,
@@ -103,7 +104,7 @@ impl MenuItem {
                 );
 
                 // Выполняем команду мониторинга
-                match console::execute_command_silent(monitor_command) {
+                match console::ConsoleInstance::execute_command_silent(monitor_command) {
                     Ok(output) => {
                         let result = output.trim();
                         if !result.is_empty() {
@@ -177,55 +178,57 @@ impl MenuItem {
                     eprintln!("[Monitor] Starting timer for item: {}", id);
                     while !stop_flag.load(Ordering::Relaxed) {
                         // Проверяем активность трея
-                        let tray_active = TRAY_ACTIVE.lock().unwrap();
-                        if *tray_active {
-                            drop(tray_active); // Освобождаем блокировку
+                        if let Ok(tray_active) = TRAY_ACTIVE.lock() {
+                            if *tray_active {
+                                drop(tray_active); // Освобождаем блокировку
 
-                            println!("[Monitor] spawn: monitor_command = '{}'", monitor_command);
-                            let new_text = match console::execute_command_silent(&monitor_command) {
-                                Ok(output) => {
-                                    let result = output.trim();
-                                    if !result.is_empty() {
-                                        format!("{}: {}", name, result)
+                                println!("[Monitor] spawn: monitor_command = '{}'", monitor_command);
+                                // Используем пул соединений для выполнения команды
+                                let new_text = match console::ConsoleInstance::execute_command_via_pool(&id, &monitor_command) {
+                                    Ok(output) => {
+                                        let result = output.trim();
+                                        if !result.is_empty() {
+                                            format!("{}: {}", name, result)
+                                        } else {
+                                            name.clone()
+                                        }
+                                    }
+                                    Err(_) => name.clone(),
+                                };
+                                eprintln!("[Monitor] Updating text for {}: {}", id, new_text);
+
+                                if let Err(e) = icon_item.set_accelerator(hotkey.clone()) {
+                                    eprintln!("[Monitor] Failed to set accelerator for {}: {}", id, e);
+                                } else {
+                                    eprintln!("[Monitor] Successfully updated accelerator for {}", id);
+                                }
+
+                                // Обновляем текст с сохранением иконки
+                                if let Some(icon_str) = &icon {
+                                    if let Err(e) =
+                                        icon_item.set_text(&format!("{} {}", icon_str, new_text))
+                                    {
+                                        eprintln!(
+                                            "[Monitor] Failed to set text with icon for {}: {}",
+                                            id, e
+                                        );
                                     } else {
-                                        name.clone()
+                                        eprintln!(
+                                            "[Monitor] Successfully updated text with icon for {}",
+                                            id
+                                        );
+                                    }
+                                } else {
+                                    if let Err(e) = icon_item.set_text(&new_text) {
+                                        eprintln!("[Monitor] Failed to set text for {}: {}", id, e);
+                                    } else {
+                                        eprintln!("[Monitor] Successfully updated text for {}", id);
                                     }
                                 }
-                                Err(_) => name.clone(),
-                            };
-                            eprintln!("[Monitor] Updating text for {}: {}", id, new_text);
-
-                            if let Err(e) = icon_item.set_accelerator(hotkey.clone()) {
-                                eprintln!("[Monitor] Failed to set accelerator for {}: {}", id, e);
                             } else {
-                                eprintln!("[Monitor] Successfully updated accelerator for {}", id);
+                                drop(tray_active); // Освобождаем блокировку
+                                eprintln!("[Monitor] Timer paused for item: {}", id);
                             }
-
-                            // Обновляем текст с сохранением иконки
-                            if let Some(icon_str) = &icon {
-                                if let Err(e) =
-                                    icon_item.set_text(&format!("{} {}", icon_str, new_text))
-                                {
-                                    eprintln!(
-                                        "[Monitor] Failed to set text with icon for {}: {}",
-                                        id, e
-                                    );
-                                } else {
-                                    eprintln!(
-                                        "[Monitor] Successfully updated text with icon for {}",
-                                        id
-                                    );
-                                }
-                            } else {
-                                if let Err(e) = icon_item.set_text(&new_text) {
-                                    eprintln!("[Monitor] Failed to set text for {}: {}", id, e);
-                                } else {
-                                    eprintln!("[Monitor] Successfully updated text for {}", id);
-                                }
-                            }
-                        } else {
-                            drop(tray_active); // Освобождаем блокировку
-                            eprintln!("[Monitor] Timer paused for item: {}", id);
                         }
                         thread::sleep(Duration::from_secs(1));
                     }
@@ -256,7 +259,7 @@ impl MenuItem {
                     "[Switch] get_switch_state: switch_command = '{}'",
                     switch_command
                 );
-                console::is_switch_enabled(switch_command, app)
+                console::ConsoleInstance::is_switch_enabled(switch_command, app)
             } else {
                 println!("[Switch] No switch command found for: {}", self.config.name);
                 false
@@ -272,6 +275,9 @@ impl MenuItem {
         let name = &self.config.name;
         let hotkey = self.config.hotkey.as_deref();
         let icon = self.config.icon.as_deref();
+        
+        println!("[Menu Structure] Creating tauri menu item with ID: '{}', name: '{}'", id, name);
+        println!("[Menu Structure] Is switch: {}, is monitor: {}", self.is_switch(), self.is_monitor());
 
         if self.is_switch() {
             let is_enabled = self.get_switch_state(Some(app));
@@ -532,6 +538,16 @@ impl SystemMenu {
         }
 
         eprintln!("[Monitor] Finished stopping timers");
+    }
+
+    /// Периодически очищает неактивные соединения в пуле
+    pub fn cleanup_console_pool_periodically() {
+        thread::spawn(|| {
+            loop {
+                thread::sleep(Duration::from_secs(60)); // Очистка каждую минуту
+                console::ConsoleInstance::cleanup_console_pool();
+            }
+        });
     }
 
     /// Создает Tauri меню из SystemMenu
