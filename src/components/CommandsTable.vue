@@ -5,15 +5,11 @@
       <h3 class="text-lg font-semibold text-slate-900">Commands</h3>
       <div class="flex items-center space-x-2">
         <Button @click="showTemplatesModal" variant="primary" size="sm">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-          </svg>
+          <TemplatesIcon />
           Templates
         </Button>
         <Button @click="addCommand" variant="secondary" size="sm">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
+          <AddIcon />
           Add Command
         </Button>
       </div>
@@ -21,9 +17,7 @@
     
     <div v-if="commands.length === 0" class="text-center py-8">
       <div class="w-16 h-16 bg-slate-100 flex items-center justify-center mx-auto mb-4">
-        <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
+        <LightningIcon />
       </div>
       <p class="text-slate-500 mb-2">No commands added</p>
       <p class="text-sm text-slate-400">Add commands for quick access</p>
@@ -60,15 +54,11 @@
       </div>
       <div class="flex items-center space-x-2">
         <Button @click="showTemplatesModal" variant="primary" size="sm" class="shadow-sm">
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-          </svg>
+          <TemplatesIcon class="mr-2" />
           Templates
         </Button>
         <Button @click="addCommand" variant="secondary" size="sm" class="shadow-sm">
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
+          <AddIcon class="mr-2" />
           Add Command
         </Button>
       </div>
@@ -90,6 +80,9 @@ import { Command } from '../types';
 import Button from './Button.vue';
 import CommandItem from './CommandItem.vue';
 import TemplateCommandsModal from './TemplateCommandsModal.vue';
+import TemplatesIcon from './icons/TemplatesIcon.vue';
+import AddIcon from './icons/AddIcon.vue';
+import LightningIcon from './icons/LightningIcon.vue';
 
 const props = defineProps({
   commands: {
