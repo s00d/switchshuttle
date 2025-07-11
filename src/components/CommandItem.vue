@@ -6,9 +6,7 @@
     <div class="flex items-center justify-between pb-4 border-b border-slate-200 -mx-6 px-6">
       <div class="flex items-center space-x-3">
         <div class="w-8 h-8 bg-blue-100 flex items-center justify-center rounded-lg">
-          <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
+          <LightningSmallIcon />
         </div>
         <h4 class="font-semibold text-slate-900">
           {{ commandType === 'submenu' ? `Submenu ${index + 1}` : `Command ${index + 1}` }}
@@ -22,9 +20,7 @@
           :disabled="index === 0"
           class="text-slate-500 hover:text-slate-700"
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-          </svg>
+          <ChevronUpIcon />
         </Button>
         <Button
           @click="$emit('move', index, 1)"
@@ -33,9 +29,7 @@
           :disabled="index === (parentCommands?.length || 0) - 1"
           class="text-slate-500 hover:text-slate-700"
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-          </svg>
+          <ChevronDownIcon />
         </Button>
         <Button
           @click="$emit('remove', index)"
@@ -43,9 +37,7 @@
           size="sm"
           class="text-red-600 hover:text-red-700 hover:bg-red-50"
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-          </svg>
+          <TrashIcon />
         </Button>
       </div>
     </div>
@@ -55,16 +47,15 @@
       'grid gap-6',
       commandType === 'submenu' ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'
     ]">
-      <div class="flex items-end gap-3">
-        <div class="w-16">
-          <Input
-            v-model="commandIcon"
-            label="Icon"
-            placeholder="emoji"
-            size="sm"
-            @input="handleIconChange"
-          />
-        </div>
+              <div class="flex items-end gap-3">
+          <div class="w-16">
+            <IconSelector
+              v-model="commandIcon"
+              label="Icon"
+              placeholder="emoji"
+              @update:modelValue="handleIconChange"
+            />
+          </div>
         <div class="flex-1">
           <Input
             v-model="command.name"
@@ -112,9 +103,7 @@
         <div class="flex items-center justify-between">
           <label class="block text-sm font-semibold text-slate-700">Inputs</label>
           <Button @click="handleAddInput" variant="ghost" size="sm" class="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
+            <AddIcon />
             Add Field
           </Button>
         </div>
@@ -154,9 +143,7 @@
               />
             </div>
             <Button @click="handleRemoveInput(key)" variant="danger" size="sm" class="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0 w-8">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <XIcon />
             </Button>
           </div>
         </div>
@@ -169,9 +156,7 @@
         <div class="flex items-center justify-between">
           <label class="block text-sm font-semibold text-slate-700">Commands</label>
           <Button @click="handleAddMultipleCommand" variant="ghost" size="sm" class="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
+            <AddIcon />
             Add Command
           </Button>
         </div>
@@ -191,9 +176,7 @@
               />
             </div>
             <Button @click="handleRemoveMultipleCommand(cmdIndex)" variant="danger" size="sm" class="text-red-600 hover:text-red-700 hover:bg-red-50">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <XIcon />
             </Button>
           </div>
         </div>
@@ -207,9 +190,7 @@
         <div class="flex items-center justify-between">
           <label class="block text-sm font-semibold text-slate-700">Inputs</label>
           <Button @click="handleAddInput" variant="ghost" size="sm" class="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
+            <AddIcon />
             Add Field
           </Button>
         </div>
@@ -249,9 +230,7 @@
               />
             </div>
             <Button @click="handleRemoveInput(key)" variant="danger" size="sm" class="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0 w-8">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <XIcon />
             </Button>
           </div>
         </div>
@@ -284,9 +263,7 @@
         <div class="flex items-center justify-between">
           <label class="block text-sm font-semibold text-slate-700">Inputs</label>
           <Button @click="handleAddInput" variant="ghost" size="sm" class="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
+            <AddIcon />
             Add Field
           </Button>
         </div>
@@ -326,9 +303,7 @@
               />
             </div>
             <Button @click="handleRemoveInput(key)" variant="danger" size="sm" class="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0 w-8">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <XIcon />
             </Button>
           </div>
         </div>
@@ -361,9 +336,7 @@
         <div class="flex items-center justify-between">
           <label class="block text-sm font-semibold text-slate-700">Inputs</label>
           <Button @click="handleAddInput" variant="ghost" size="sm" class="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
+            <AddIcon />
             Add Field
           </Button>
         </div>
@@ -403,9 +376,7 @@
               />
             </div>
             <Button @click="handleRemoveInput(key)" variant="danger" size="sm" class="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0 w-8">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <XIcon />
             </Button>
           </div>
         </div>
@@ -418,16 +389,12 @@
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
             <button @click="toggleSubmenu" type="button" class="focus:outline-none">
-              <svg :class="['w-5 h-5 transition-transform', submenuCollapsed ? 'rotate-[-90deg]' : 'rotate-0']" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
+              <ChevronRightIcon :collapsed="submenuCollapsed" />
             </button>
             <label class="block text-sm font-semibold text-slate-700">Submenu</label>
           </div>
           <Button @click="addSubmenuCommand" variant="ghost" size="sm" class="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
+            <AddIcon />
             Add Submenu Command
           </Button>
         </div>
@@ -466,6 +433,14 @@ import Input from './Input.vue';
 import Button from './Button.vue';
 import HotkeyInput from './HotkeyInput.vue';
 import CommandTypeSelector from './CommandTypeSelector.vue';
+import IconSelector from './IconSelector.vue';
+import LightningSmallIcon from './icons/LightningSmallIcon.vue';
+import ChevronUpIcon from './icons/ChevronUpIcon.vue';
+import ChevronDownIcon from './icons/ChevronDownIcon.vue';
+import ChevronRightIcon from './icons/ChevronRightIcon.vue';
+import TrashIcon from './icons/TrashIcon.vue';
+import AddIcon from './icons/AddIcon.vue';
+import XIcon from './icons/XIcon.vue';
 
 const props = defineProps({
   command: {
@@ -571,8 +546,7 @@ const commandIcon = computed({
 });
 
 // Method for handling icon changes
-const handleIconChange = (event: Event) => {
-  const value = (event.target as HTMLInputElement).value;
+const handleIconChange = (value: string) => {
   if (value.trim() === '') {
     props.command.icon = null;
   } else {
