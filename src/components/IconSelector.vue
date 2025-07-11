@@ -48,7 +48,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 
-const props = defineProps<{
+defineProps<{
   modelValue: string;
   label?: string;
   placeholder?: string;
