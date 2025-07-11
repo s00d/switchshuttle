@@ -8,7 +8,6 @@ version = "0.0.0"
 dependencies = [
  "dirs 6.0.0",
  "include_dir",
- "lazy_static",
  "log",
  "once_cell",
  "openssl",
@@ -31,6 +30,7 @@ dependencies = [
  "tauri-plugin-shell",
  "tauri-plugin-store",
  "tauri-plugin-updater",
+ "tokio",
  "winreg 0.55.0",
 ]
 
@@ -5295,6 +5295,7 @@ dependencies = [
  "io-uring",
  "libc",
  "mio",
+ "parking_lot",
  "pin-project-lite",
  "signal-hook-registry",
  "slab",
