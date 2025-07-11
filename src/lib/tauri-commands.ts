@@ -34,15 +34,7 @@ export interface GitHubRelease {
   html_url: string;
 }
 
-export interface MenuItem {
-  name: string;
-  disabled: boolean;
-  event: string;
-  id: string;
-  command?: string;
-  hotkey: string;
-  submenu?: MenuItem[];
-}
+
 
 export interface ConfigFile {
   name: string;
@@ -67,6 +59,21 @@ export interface SettingsSchema {
       options?: Array<{ value: string; label: string }>;
     }>;
   }>;
+}
+
+export interface TerminalConfig {
+  name: string;
+  executable: string;
+  current_args: string[];
+  new_tab_args: string[];
+  new_window_args: string[];
+  icon: string;
+}
+
+export interface TerminalOption {
+  value: string;
+  label: string;
+  icon: string;
 }
 
 /**
@@ -129,6 +136,18 @@ export class SwitchShuttleCommands {
   }
 
   /**
+   * @description Получает список доступных терминалов для текущей операционной системы
+   * @returns {Promise<Record<string, TerminalConfig>>} Promise со списком терминалов
+   */
+  static async get_terminals_list(): Promise<Record<string, TerminalConfig>> {
+    try {
+      return await invoke<Record<string, TerminalConfig>>('get_terminals_list');
+    } catch (error) {
+      throw new Error(`Failed to get terminals list: ${error}`);
+    }
+  }
+
+  /**
    * @description Выполняет команду по ID
    * @param {string} command - ID команды для выполнения
    * @returns {Promise<string>} Promise с результатом выполнения
@@ -158,18 +177,7 @@ export class SwitchShuttleCommands {
     }
   }
 
-  /**
-   * @description Получает данные меню для системного трея
-   * @returns {Promise<Record<string, MenuItem[]>>} Promise с данными меню
-   */
-  static async get_menu_data(): Promise<Record<string, MenuItem[]>> {
-    try {
-      const result = await invoke<string>('get_menu_data');
-      return JSON.parse(result);
-    } catch (error) {
-      throw new Error(`Failed to get menu data: ${error}`);
-    }
-  }
+
 
   /**
    * @description Получает данные вводов для команды
@@ -182,18 +190,6 @@ export class SwitchShuttleCommands {
       return JSON.parse(result);
     } catch (error) {
       throw new Error(`Failed to fetch input data: ${error}`);
-    }
-  }
-
-  /**
-   * @description Получает сообщение "О программе"
-   * @returns {Promise<string>} Promise с HTML сообщением
-   */
-  static async about_message(): Promise<string> {
-    try {
-      return await invoke<string>('about_message');
-    } catch (error) {
-      throw new Error(`Failed to get about message: ${error}`);
     }
   }
 
