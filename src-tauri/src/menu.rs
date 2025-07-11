@@ -6,16 +6,142 @@ use crate::helpers::{
     open_folder_in_default_explorer, open_in_default_editor,
 };
 use crate::menu_structure::SystemMenu;
+use once_cell::sync::Lazy;
 use std::sync::{Arc, Mutex};
 use tauri::{AppHandle, Wry};
 use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_notification::NotificationExt;
 use tauri_plugin_opener::OpenerExt;
 
-// Глобальное состояние для хранения текущей структуры меню
-lazy_static::lazy_static! {
-    static ref CURRENT_MENU: Arc<Mutex<Option<SystemMenu>>> = Arc::new(Mutex::new(None));
+/// Выполняет команду по ID через единую точку входа
+pub fn execute_command_by_id(
+    app: &AppHandle<Wry>,
+    command_id: &str,
+    config_manager: &ConfigManager,
+) -> Result<(), String> {
+    println!("[Execute] Looking for command with ID: '{}'", command_id);
+    
+    // Приостанавливаем таймеры мониторинга перед выполнением команды
+    pause_monitor_timers();
+    println!("[Execute] Paused monitor timers before command execution");
+    
+    match config_manager.find_command_by_id(command_id) {
+        Some((command, config)) => {
+            println!("[Execute] Found command: '{}' (ID: {:?})", command.name, command.id);
+            println!("[Execute] Command has switch: {:?}", command.switch);
+            println!("[Execute] Command has inputs: {:?}", command.inputs);
+            
+            // Проверяем, является ли это командой мониторинга
+            if command.switch.is_some() {
+                let should_show_inputs = command
+                    .inputs
+                    .as_ref()
+                    .map(|inputs| !inputs.is_empty())
+                    .unwrap_or(false)
+                    && command.id.is_some();
+
+                if should_show_inputs {
+                    if let Err(e) = create_window(
+                        app,
+                        "inputs",
+                        "SwitchShuttle - Provide Inputs",
+                        &format!("/inputs/{}", command.id.as_ref().unwrap()),
+                        400.0,
+                        300.0,
+                        true,
+                    ) {
+                        return Err(format!("Failed to create inputs window: {}", e));
+                    }
+                } else {
+                    // Выполняем команду переключения через execute_command_silent
+                    if let Some(toggle_command) = &command.command {
+                        println!("[Monitor] spawn: toggle_command = '{}'", toggle_command);
+                        match console::ConsoleInstance::execute_command_silent(toggle_command) {
+                            Ok(_) => {
+                                // Показываем уведомление об успешном выполнении
+                                if let Ok(_) = app
+                                    .notification()
+                                    .builder()
+                                    .title("SwitchShuttle Success")
+                                    .body(&format!("Switch '{}' executed successfully", command.name))
+                                    .show()
+                                {
+                                    // Уведомление отправлено
+                                }
+                                // Обновляем меню после выполнения команды
+                                update_system_tray_menu(app, config_manager);
+                            }
+                            Err(e) => {
+                                eprintln!("Failed to execute switch command: {}", e);
+                                // Показываем уведомление об ошибке
+                                if let Ok(_) = app
+                                    .notification()
+                                    .builder()
+                                    .title("SwitchShuttle Error")
+                                    .body(&format!("Failed to execute switch '{}': {}", command.name, e))
+                                    .show()
+                                {
+                                    // Уведомление отправлено
+                                }
+                                return Err(format!("Failed to execute switch command: {}", e));
+                            }
+                        }
+                    }
+                }
+            } else {
+                let should_show_inputs = command
+                    .inputs
+                    .as_ref()
+                    .map(|inputs| !inputs.is_empty())
+                    .unwrap_or(false)
+                    && command.id.is_some();
+
+                if should_show_inputs {
+                    if let Err(e) = create_window(
+                        app,
+                        "main",
+                        "SwitchShuttle - Provide Inputs",
+                        &format!("/inputs/{}", command.id.as_ref().unwrap()),
+                        400.0,
+                        300.0,
+                        true,
+                    ) {
+                        return Err(format!("Failed to create inputs window: {}", e));
+                    }
+                } else {
+                    execute_command(
+                        command,
+                        &config.terminal,
+                        &config.launch_in,
+                        &config.theme,
+                        &config.title,
+                    );
+                }
+            }
+            
+            Ok(())
+        }
+        None => {
+            println!("[Execute] Command not found for ID: '{}'", command_id);
+            println!("[Execute] Available commands:");
+            for config in &config_manager.configs {
+                for command in &config.commands {
+                    println!("[Execute]   - '{}' (ID: {:?})", command.name, command.id);
+                }
+            }
+            
+            // Возобновляем таймеры мониторинга даже если команда не найдена
+            resume_monitor_timers();
+            println!("[Execute] Resumed monitor timers after command not found");
+            
+            Err(format!("Command not found for ID: '{}'", command_id))
+        }
+    }
 }
+
+// Глобальное состояние для хранения текущей структуры меню
+static CURRENT_MENU: Lazy<Arc<Mutex<Option<SystemMenu>>>> = 
+    Lazy::new(|| Arc::new(Mutex::new(None)));
 
 pub fn create_system_tray_menu(
     app: &AppHandle<Wry>,
@@ -35,6 +161,9 @@ pub fn create_system_tray_menu(
 
     // Теперь запускаем индивидуальные таймеры для элементов с мониторингом
     system_menu.start_all_monitor_timers();
+
+    // Запускаем периодическую очистку пула соединений
+    SystemMenu::cleanup_console_pool_periodically();
 
     // Сохраняем новую структуру меню
     *CURRENT_MENU.lock().unwrap() = Some(system_menu);
@@ -149,10 +278,15 @@ pub fn handle_system_tray_event(
     event: tauri::menu::MenuEvent,
     config_manager: Arc<Mutex<ConfigManager>>,
 ) {
+    let event_id = event.id().0.as_str();
+    println!("[Tray Event] Received menu event with ID: '{}'", event_id);
+    println!("[Tray Event] Event type: {:?}", event);
+    
     let config_path = get_config_path();
 
-    match event.id().0.as_str() {
+    match event_id {
         "settings" => {
+            println!("[Tray Event] Handling settings event");
             if let Err(e) = create_window(
                 &app,
                 "settings",
@@ -240,111 +374,17 @@ pub fn handle_system_tray_event(
             }
         }
         _ => {
-            if event.id().0.starts_with("edit_") {
-                let config_file_name = event.id().0.replacen("edit_", "", 1);
+            println!("[Tray Event] Handling unknown event ID: '{}'", event_id);
+            if event_id.starts_with("edit_") {
+                println!("[Tray Event] Handling edit config event for: {}", event_id);
+                let config_file_name = event_id.replacen("edit_", "", 1);
                 let config_file_path = config_path.parent().unwrap().join(&config_file_name);
                 open_in_default_editor(&config_file_path);
             } else {
+                println!("[Tray Event] Looking for command with ID: '{}'", event_id);
                 let config_manager = config_manager.lock().unwrap();
-                match config_manager.find_command_by_id(event.id().0.as_str()) {
-                    Some((command, config)) => {
-                        // Проверяем, является ли это командой мониторинга
-                        if command.switch.is_some() {
-                            let should_show_inputs = command
-                                .inputs
-                                .as_ref()
-                                .map(|inputs| !inputs.is_empty())
-                                .unwrap_or(false)
-                                && command.id.is_some();
-
-                            if should_show_inputs {
-                                if let Err(e) = create_window(
-                                    &app,
-                                    "inputs",
-                                    "SwitchShuttle - Provide Inputs",
-                                    &format!("/inputs/{}", command.id.as_ref().unwrap()),
-                                    400.0,
-                                    300.0,
-                                    true,
-                                ) {
-                                    eprintln!("Failed to create inputs window: {}", e);
-                                }
-                            } else {
-                                // Выполняем команду переключения через execute_command_silent
-                                if let Some(toggle_command) = &command.command {
-                                    println!(
-                                        "[Monitor] spawn: toggle_command = '{}'",
-                                        toggle_command
-                                    );
-                                    match console::execute_command_silent(toggle_command) {
-                                        Ok(_) => {
-                                            // Показываем уведомление об успешном выполнении
-                                            if let Ok(_) = app
-                                                .notification()
-                                                .builder()
-                                                .title("SwitchShuttle Success")
-                                                .body(&format!(
-                                                    "Switch '{}' executed successfully",
-                                                    command.name
-                                                ))
-                                                .show()
-                                            {
-                                                // Уведомление отправлено
-                                            }
-                                            // Обновляем меню после выполнения команды
-                                            update_system_tray_menu(app, &config_manager);
-                                        }
-                                        Err(e) => {
-                                            eprintln!("Failed to execute switch command: {}", e);
-                                            // Показываем уведомление об ошибке
-                                            if let Ok(_) = app
-                                                .notification()
-                                                .builder()
-                                                .title("SwitchShuttle Error")
-                                                .body(&format!(
-                                                    "Failed to execute switch '{}': {}",
-                                                    command.name, e
-                                                ))
-                                                .show()
-                                            {
-                                                // Уведомление отправлено
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        } else {
-                            let should_show_inputs = command
-                                .inputs
-                                .as_ref()
-                                .map(|inputs| !inputs.is_empty())
-                                .unwrap_or(false)
-                                && command.id.is_some();
-
-                            if should_show_inputs {
-                                if let Err(e) = create_window(
-                                    &app,
-                                    "main",
-                                    "SwitchShuttle - Provide Inputs",
-                                    &format!("/inputs/{}", command.id.as_ref().unwrap()),
-                                    400.0,
-                                    300.0,
-                                    true,
-                                ) {
-                                    eprintln!("Failed to create inputs window: {}", e);
-                                }
-                            } else {
-                                execute_command(
-                                    command,
-                                    &config.terminal,
-                                    &config.launch_in,
-                                    &config.theme,
-                                    &config.title,
-                                );
-                            }
-                        }
-                    }
-                    None => eprintln!("Command '{}' not found", event.id().0),
+                if let Err(e) = execute_command_by_id(&app, event_id, &config_manager) {
+                    eprintln!("[Tray Event] Failed to execute command: {}", e);
                 }
             }
         }
@@ -371,11 +411,15 @@ pub fn update_system_tray_menu(app: &AppHandle<Wry>, config_manager: &ConfigMana
 /// Возобновляет таймеры мониторинга
 pub fn resume_monitor_timers() {
     eprintln!("[Monitor] Resuming monitor timers");
-    *crate::menu_structure::TRAY_ACTIVE.lock().unwrap() = true;
+    if let Ok(mut tray_active) = crate::menu_structure::TRAY_ACTIVE.lock() {
+        *tray_active = true;
+    }
 }
 
 /// Приостанавливает таймеры мониторинга
 pub fn pause_monitor_timers() {
     eprintln!("[Monitor] Pausing monitor timers");
-    *crate::menu_structure::TRAY_ACTIVE.lock().unwrap() = false;
+    if let Ok(mut tray_active) = crate::menu_structure::TRAY_ACTIVE.lock() {
+        *tray_active = false;
+    }
 }
