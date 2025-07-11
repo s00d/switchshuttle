@@ -176,6 +176,8 @@ pub fn create_menu_item(
     hotkey: Option<String>,
     icon: Option<&str>,
 ) -> IconMenuItem<Wry> {
+    println!("[Menu Item] Creating menu item with ID: '{}', text: '{}'", id, text);
+    
     let display_text = if let Some(icon_symbol) = icon {
         format!("{} {}", icon_symbol, text)
     } else {
@@ -214,6 +216,8 @@ pub fn create_check_menu_item(
     hotkey: Option<String>,
     icon: Option<&str>,
 ) -> CheckMenuItem<Wry> {
+    println!("[Menu Item] Creating check menu item with ID: '{}', text: '{}', checked: {}", id, text, checked);
+    
     let display_text = if let Some(icon_symbol) = icon {
         format!("{} {}", icon_symbol, text)
     } else {
