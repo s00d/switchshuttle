@@ -12,9 +12,10 @@
           <label class="block text-sm font-medium text-slate-700 mb-2">Terminal</label>
           <CustomSelect
             v-model="config.terminal"
-            :options="terminalOptions"
-            placeholder="Select terminal"
+            :options="terminalOptionsArray"
+            placeholder="Loading terminals..."
             required
+            :disabled="loadingTerminals"
           />
         </div>
         
@@ -65,7 +66,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import CommandsTable from './CommandsTable.vue';
 import Input from './Input.vue';
 import HotkeyInput from './HotkeyInput.vue';
@@ -73,11 +74,20 @@ import CustomSelect from './CustomSelect.vue';
 import Toggle from './Toggle.vue';
 
 import { Command, Config } from '../types';
-import { getTerminalOptions, launchOptions } from '../lib/terminals';
+import { TerminalConfig } from '../lib/tauri-commands';
+
+// Опции запуска (одинаковые для всех ОС)
+const launchOptions = [
+  { value: 'current', label: 'Current Window', icon: '📍' },
+  { value: 'new_tab', label: 'New Tab', icon: '📑' },
+  { value: 'new_window', label: 'New Window', icon: '🪟' }
+];
 
 const props = defineProps<{
   config: Config;
   commands: Command[];
+  terminalOptions: Record<string, TerminalConfig>;
+  loadingTerminals: boolean;
 }>();
 
 const config = ref<Config>(props.config);
@@ -87,5 +97,12 @@ if (config.value.enabled === undefined) {
   config.value.enabled = true;
 }
 
-const terminalOptions = getTerminalOptions();
+// Преобразуем Record<string, TerminalConfig> в массив для CustomSelect
+const terminalOptionsArray = computed(() => {
+  return Object.entries(props.terminalOptions).map(([key, config]) => ({
+    value: key,
+    label: config.name,
+    icon: config.icon
+  }));
+});
 </script>
