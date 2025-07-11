@@ -80,6 +80,9 @@ const readmeFiles = {
     'zh': 'README_ZH.md'
 };
 
+// Путь к CHANGELOG файлу
+const changelogFile = 'CHANGELOG.md';
+
 const languageNames = {
     'en': 'English',
     'de': 'Deutsch', 
@@ -188,6 +191,16 @@ const generateMenu = (headers) => {
     return menuItems.join('\n');
 };
 
+// Функция для чтения CHANGELOG.md
+const readChangelog = () => {
+    try {
+        return fs.readFileSync(changelogFile, 'utf8');
+    } catch (err) {
+        console.error(`Ошибка при чтении файла ${changelogFile}:`, err);
+        return '';
+    }
+};
+
 // Функция для генерации HTML для каждого языка
 const generateHtmlForLanguage = (lang, inputPath, outputPath) => {
     fs.readFile(inputPath, 'utf8', (err, data) => {
@@ -213,6 +226,10 @@ const generateHtmlForLanguage = (lang, inputPath, outputPath) => {
             const isActive = code === lang;
             return `<a href="${fileName}" class="nav-link ${isActive ? 'active' : ''}">${languageNames[code]}</a>`;
         }).join('');
+
+        // Читаем CHANGELOG.md
+        const changelogContent = readChangelog();
+        const changelogHtml = marked(changelogContent, { renderer });
 
         // Обертывание в современную структуру HTML
         const fullHtml = `<!DOCTYPE html>
@@ -248,6 +265,7 @@ const generateHtmlForLanguage = (lang, inputPath, outputPath) => {
                         <li><a href="https://github.com/s00d/switchshuttle/" class="nav-link">GitHub</a></li>
                         <li><a href="https://github.com/s00d/switchshuttle/issues" class="nav-link">Issues</a></li>
                         <li><a href="https://github.com/s00d/switchshuttle/releases" class="nav-link">Releases</a></li>
+                        <li><button class="nav-link changelog-btn" id="changelog-btn">Changelog</button></li>
                     </ul>
                 </nav>
                 <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
@@ -288,6 +306,26 @@ const generateHtmlForLanguage = (lang, inputPath, outputPath) => {
                     ${htmlContent}
                 </section>
             </main>
+        </div>
+        
+        <!-- Модалка с CHANGELOG -->
+        <div class="modal-overlay" id="changelog-modal" aria-hidden="true">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">📋 Changelog</h2>
+                    <button class="modal-close" id="changelog-close" aria-label="Close modal">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="changelog-content">
+                        ${changelogHtml}
+                    </div>
+                </div>
+            </div>
         </div>
         
         <!-- Мобильный оверлей -->
@@ -474,6 +512,43 @@ const generateHtmlForLanguage = (lang, inputPath, outputPath) => {
                 item.addEventListener('click', () => {
                     languageMenu.classList.remove('open');
                 });
+            });
+        }
+        
+        // Управление модалкой CHANGELOG
+        const changelogBtn = document.getElementById('changelog-btn');
+        const changelogModal = document.getElementById('changelog-modal');
+        const changelogClose = document.getElementById('changelog-close');
+        
+        if (changelogBtn && changelogModal && changelogClose) {
+            // Открытие модалки
+            changelogBtn.addEventListener('click', () => {
+                changelogModal.setAttribute('aria-hidden', 'false');
+                changelogModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            // Закрытие модалки
+            const closeModal = () => {
+                changelogModal.setAttribute('aria-hidden', 'true');
+                changelogModal.classList.remove('active');
+                document.body.style.overflow = '';
+            };
+            
+            changelogClose.addEventListener('click', closeModal);
+            
+            // Закрытие при клике на оверлей
+            changelogModal.addEventListener('click', (e) => {
+                if (e.target === changelogModal) {
+                    closeModal();
+                }
+            });
+            
+            // Закрытие по Escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && changelogModal.classList.contains('active')) {
+                    closeModal();
+                }
             });
         }
     </script>

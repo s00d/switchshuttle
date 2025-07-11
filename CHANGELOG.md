@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [1.12.0](https://github.com/s00d/switchshuttle/compare/v1.11.0...v1.12.0) (2025-01-27)
+## [1.12.0](https://github.com/s00d/switchshuttle/compare/v1.11.0...v1.12.0) (2025-07-11)
 
 ### ✨ Features
 * **hotkeys:** implement global hotkey management and execution
@@ -37,7 +37,7 @@ All notable changes to this project will be documented in this file. See [standa
 * **hotkeys:** fix global hotkey registration and execution
 * **menu:** fix command execution with proper timer management
 
-## [1.11.0](https://github.com/s00d/switchshuttle/compare/v1.10.0...v1.11.0) (2025-01-27)
+## [1.11.0](https://github.com/s00d/switchshuttle/compare/v1.10.0...v1.11.0) (2025-07-07)
 
 ### ✨ Features
 * **terminals:** add RustRover IDE support for macOS, Windows, and Linux
