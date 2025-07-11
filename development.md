@@ -69,9 +69,9 @@ Configurations are loaded at startup and managed within a `ConfigManager`. The c
 Tauri commands are defined in `commands.rs` and include:
 
 - `create_new_config`: Creates a new configuration file.
-- `about_message`: Returns the application's about message.
 - `check_for_updates`: Checks for updates from the GitHub repository.
 - `get_version`: Returns the current version of the application.
+- `get_terminals_list`: Returns the list of available terminals for the current OS.
 - `execute_command_with_inputs`: Executes a command with provided inputs.
 - `get_menu_data`: Retrieves data for the system tray menu.
 - `execute`: Executes a specified command.
