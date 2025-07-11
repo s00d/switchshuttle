@@ -149,6 +149,8 @@
         <ConfigEditor 
           :config="currentConfig" 
           :commands="currentConfig.commands"
+          :terminal-options="terminalOptions"
+          :loading-terminals="loadingTerminals"
         />
       </div>
       
@@ -231,6 +233,7 @@ import Button from '../components/Button.vue';
 import Modal from '../components/Modal.vue';
 import ConfigEditor from '../components/ConfigEditor.vue';
 import type { TauriInjectionKey } from '../lib/tauri-commands-plugin';
+import { SwitchShuttleCommands, TerminalConfig } from '../lib/tauri-commands';
 
 import type { Config as TauriConfig } from '../lib/tauri-commands';
 import type { Config, Command } from '../types';
@@ -242,6 +245,8 @@ const configurations = ref<Config[]>([]);
 const searchQuery = ref('');
 const loading = ref(false);
 const showEditor = ref(false);
+const terminalOptions = ref<Record<string, TerminalConfig>>({});
+const loadingTerminals = ref(true);
 
 const currentConfig = ref<Config | null>(null);
 const editingConfig = ref<Config | null>(null);
@@ -273,6 +278,17 @@ const filteredConfigurations = computed(() => {
     config.theme.toLowerCase().includes(query)
   );
 });
+
+const loadTerminals = async () => {
+  try {
+    terminalOptions.value = await SwitchShuttleCommands.get_terminals_list();
+  } catch (error) {
+    console.error('[Editor] Failed to load terminals:', error);
+    terminalOptions.value = {};
+  } finally {
+    loadingTerminals.value = false;
+  }
+};
 
 const loadConfigurations = async () => {
   loading.value = true;
@@ -334,7 +350,7 @@ const validateAndSave = async () => {
       // Если пустой - это новая или дублированная конфигурация
       const originalTitle = originalFileName.value || undefined;
       
-      await tauri.save_or_update_configuration(currentConfig.value as TauriConfig, originalTitle || undefined);
+      await tauri.save_or_update_configuration(currentConfig.value as TauriConfig, originalTitle);
       
       closeEditor();
       // Refresh configurations list after saving
@@ -396,7 +412,6 @@ const confirmDelete = async () => {
   }
 };
 
-
 const openConfigFolder = async () => {
   try {
     await tauri.open_config_folder();
@@ -407,12 +422,9 @@ const openConfigFolder = async () => {
   }
 };
 
-
-
-
-
 onMounted(() => {
   loadConfigurations();
+  loadTerminals();
 });
 </script>
 
