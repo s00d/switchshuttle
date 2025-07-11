@@ -5,26 +5,30 @@ mod config;
 mod console;
 mod execute;
 mod helpers;
+mod hotkeys;
 mod menu;
 mod menu_structure;
 mod settings;
 
 use crate::cli::handle_cli_commands;
 use crate::commands::{
-    about_message, check_for_updates, create_new_config, create_new_configuration,
+    check_for_updates, create_new_config, create_new_configuration,
     delete_configuration, duplicate_configuration, execute, execute_command_with_inputs,
-    fetch_input_data, get_config_files, get_configurations, get_menu_data, get_settings,
-    get_settings_schema, get_unique_config_title, get_version, load_config, open_config_folder,
+    fetch_input_data, get_config_files, get_configurations, get_settings,
+    get_settings_schema, get_terminals_list, get_unique_config_title, get_version, load_config, open_config_folder,
     open_configuration, refresh_configurations, save_configuration_by_id,
     save_or_update_configuration, save_settings, show_notification, validate_configuration,
 };
-use crate::console::init_console;
-use crate::menu::{create_system_tray_menu, handle_system_tray_event};
+use crate::console::{ConsolePool};
+use crate::hotkeys::{HotkeyManager};
+use crate::menu::{create_system_tray_menu, handle_system_tray_event, execute_command_by_id};
 use crate::settings::AppSettings;
 use config::ConfigManager;
 use std::sync::{Arc, Mutex};
+use tauri::{Manager};
 use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
 use tauri_plugin_cli::CliExt;
+use tauri_plugin_global_shortcut::ShortcutState;
 
 pub fn run() {
     let config_manager = Arc::new(Mutex::new(ConfigManager::new()));
@@ -44,12 +48,50 @@ pub fn run() {
         }
     };
 
+    // Создаем менеджер хоткеев
+    let hotkey_manager = Arc::new(Mutex::new(HotkeyManager::new()));
+
     let app = tauri::Builder::default()
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
-        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .plugin(tauri_plugin_global_shortcut::Builder::new()
+            .with_handler(move |app, shortcut, event| {
+                println!("[Hotkeys] Global shortcut event: {:?}, state: {:?}", shortcut, event.state());
+                
+                if event.state() == ShortcutState::Released {
+                    // Получаем зарегистрированные хоткеи
+                    let hotkey_manager = app.state::<Arc<Mutex<HotkeyManager>>>();
+                    let config_manager = app.state::<Arc<Mutex<ConfigManager>>>();
+                    let hotkey_manager = hotkey_manager.lock().unwrap();
+                    let config_manager = config_manager.lock().unwrap();
+                    
+                    // Ищем строку хоткея по shortcut
+                    let hotkey_str = hotkey_manager.registered_hotkeys.iter()
+                        .find(|(_, registered_shortcut)| *registered_shortcut == shortcut)
+                        .map(|(key, _)| key.as_str());
+                    
+                    if let Some(hotkey_str) = hotkey_str {
+                        // Ищем команду по хоткею
+                        if let Some((command, _config)) = hotkey_manager.find_command_by_hotkey(hotkey_str, &config_manager.configs) {
+                            if let Some(id) = &command.id {
+                                println!("[Hotkeys] Executing command: {} (id: {})", command.name, id);
+                                
+                                // Выполняем команду напрямую через единую функцию
+                                if let Err(e) = execute_command_by_id(&app, id, &config_manager) {
+                                    eprintln!("[Hotkeys] Failed to execute command: {}", e);
+                                } else {
+                                    println!("[Hotkeys] Successfully executed command: {}", id);
+                                }
+                            } else {
+                                eprintln!("[Hotkeys] Command has no ID: {}", command.name);
+                            }
+                        }
+                    }
+                }
+            })
+            .build())
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_notification::init())
@@ -63,6 +105,7 @@ pub fn run() {
         ))
         .manage(config_manager.clone())
         .manage(settings.clone())
+        .manage(hotkey_manager.clone())
         .setup(move |app| {
             #[cfg(target_os = "macos")]
             {
@@ -70,7 +113,7 @@ pub fn run() {
             }
 
             // Инициализируем постоянный инстанс консоли
-            if let Err(e) = init_console() {
+            if let Err(e) = ConsolePool::init_console() {
                 eprintln!("Failed to initialize console: {}", e);
             }
 
@@ -138,6 +181,23 @@ pub fn run() {
 
             tray.set_menu(Some(system_tray_menu)).unwrap();
 
+            // Инициализируем глобальные хоткеи
+            let hotkey_manager_clone = hotkey_manager.clone();
+            let config_manager_clone = config_manager.clone();
+            let settings_clone = settings.clone();
+            
+            // ПЕРВИЧНАЯ РЕГИСТРАЦИЯ ГЛОБАЛЬНЫХ ХОТКЕЕВ ПРИ ЗАПУСКЕ
+            println!("[Hotkeys] PRIMARY registration of all hotkeys at app startup");
+            {
+                let mut hotkey_manager = hotkey_manager_clone.lock().unwrap();
+                hotkey_manager.set_app_handle(app.handle().clone());
+                // Регистрируем все хоткеи из конфигураций
+                let configs = config_manager_clone.lock().unwrap().configs.clone();
+                if let Err(e) = hotkey_manager.register_all_hotkeys(&configs, &app.handle(), &settings_clone) {
+                    eprintln!("Failed to register hotkeys: {}", e);
+                }
+            }
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -155,10 +215,9 @@ pub fn run() {
             create_new_config,
             check_for_updates,
             get_version,
+            get_terminals_list,
             execute_command_with_inputs,
-            get_menu_data,
             execute,
-            about_message,
             fetch_input_data,
             refresh_configurations,
             open_config_folder,
