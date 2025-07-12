@@ -18,7 +18,7 @@
           <div class="icon-image">ℹ️</div>
           <div class="icon-label">About</div>
         </div>
-        <div class="desktop-icon switchshuttle-icon" @click="showMenuBar" title="SwitchShuttle (Click to show menu bar)">
+        <div class="desktop-icon" @click="showMenuBar" title="SwitchShuttle (Click to show menu bar)">
           <div class="icon-image">
             <img src="/logo.svg" alt="SwitchShuttle" class="desktop-icon-img">
           </div>
