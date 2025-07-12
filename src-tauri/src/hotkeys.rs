@@ -1,9 +1,9 @@
-use crate::config::{Config, CommandConfig};
+use crate::config::{CommandConfig, Config};
+use crate::settings::AppSettings;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use tauri::{AppHandle};
+use tauri::AppHandle;
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut};
-use crate::settings::AppSettings;
 
 /// Структура для хранения информации о конфликте хоткеев
 #[derive(Debug, Clone)]
@@ -20,7 +20,7 @@ pub fn check_hotkey_conflicts(configs: &[Config]) -> Vec<HotkeyConflict> {
     // Собираем все горячие клавиши из всех конфигураций
     for config in configs {
         let config_name = &config.title;
-        
+
         // Проверяем hotkey в командах
         check_commands_hotkeys(&config.commands, config_name, &mut hotkey_map);
     }
@@ -34,10 +34,7 @@ pub fn check_hotkey_conflicts(configs: &[Config]) -> Vec<HotkeyConflict> {
                 commands.push(command_name);
             }
 
-            conflicts.push(HotkeyConflict {
-                hotkey,
-                commands,
-            });
+            conflicts.push(HotkeyConflict { hotkey, commands });
         }
     }
 
@@ -77,7 +74,7 @@ pub fn format_conflict_message(conflicts: &[HotkeyConflict]) -> String {
 
     for (i, conflict) in conflicts.iter().enumerate() {
         message.push_str(&format!("{}. {}: ", i + 1, conflict.hotkey));
-        
+
         // Показываем только первые несколько команд
         let commands_to_show = std::cmp::min(conflict.commands.len(), 3);
         for (j, command) in conflict.commands.iter().take(commands_to_show).enumerate() {
@@ -86,11 +83,14 @@ pub fn format_conflict_message(conflicts: &[HotkeyConflict]) -> String {
             }
             message.push_str(command);
         }
-        
+
         if conflict.commands.len() > commands_to_show {
-            message.push_str(&format!(" (+{} more)", conflict.commands.len() - commands_to_show));
+            message.push_str(&format!(
+                " (+{} more)",
+                conflict.commands.len() - commands_to_show
+            ));
         }
-        
+
         message.push_str("\n");
     }
 
@@ -98,17 +98,18 @@ pub fn format_conflict_message(conflicts: &[HotkeyConflict]) -> String {
     message
 }
 
-
-
 /// Находит команду по хоткею в структуре команд
-pub fn find_command_by_hotkey<'a>(commands: &'a [CommandConfig], hotkey: &str) -> Option<&'a CommandConfig> {
+pub fn find_command_by_hotkey<'a>(
+    commands: &'a [CommandConfig],
+    hotkey: &str,
+) -> Option<&'a CommandConfig> {
     for command in commands {
         if let Some(cmd_hotkey) = &command.hotkey {
             if cmd_hotkey == hotkey {
                 return Some(command);
             }
         }
-        
+
         // Рекурсивно проверяем подменю
         if let Some(submenu) = &command.submenu {
             if let Some(found) = find_command_by_hotkey(submenu, hotkey) {
@@ -140,21 +141,32 @@ impl HotkeyManager {
     }
 
     /// Регистрирует хоткей для команды
-    pub fn register_command_hotkey(&mut self, hotkey: &str, command_id: &str) -> Result<(), String> {
+    pub fn register_command_hotkey(
+        &mut self,
+        hotkey: &str,
+        command_id: &str,
+    ) -> Result<(), String> {
         println!("[Hotkeys] Registering command hotkey: {}", hotkey);
-        
+
         // Проверяем, не зарегистрирован ли уже этот хоткей
         if self.registered_hotkeys.contains_key(hotkey) {
-            return Err(format!("Hotkey '{}' is already registered for another command", hotkey));
+            return Err(format!(
+                "Hotkey '{}' is already registered for another command",
+                hotkey
+            ));
         }
-        
+
         let shortcut = self.parse_hotkey(hotkey)?;
         if let Some(app_handle) = &self.app_handle {
-            app_handle.global_shortcut()
+            app_handle
+                .global_shortcut()
                 .register(shortcut.clone())
                 .map_err(|e| e.to_string())?;
             self.registered_hotkeys.insert(hotkey.to_string(), shortcut);
-            println!("[Hotkeys] Successfully registered command hotkey: {} for command: {}", hotkey, command_id);
+            println!(
+                "[Hotkeys] Successfully registered command hotkey: {} for command: {}",
+                hotkey, command_id
+            );
         }
         Ok(())
     }
@@ -176,7 +188,12 @@ impl HotkeyManager {
     }
 
     /// Регистрирует все хоткеи из конфигураций
-    pub fn register_all_hotkeys(&mut self, configs: &[Config], app: &AppHandle, settings_state: &Arc<Mutex<AppSettings>>) -> Result<(), String> {
+    pub fn register_all_hotkeys(
+        &mut self,
+        configs: &[Config],
+        app: &AppHandle,
+        settings_state: &Arc<Mutex<AppSettings>>,
+    ) -> Result<(), String> {
         println!("[Hotkeys] Starting registration of all hotkeys");
         // Сначала отменяем все существующие регистрации
         self.unregister_all();
@@ -187,14 +204,14 @@ impl HotkeyManager {
         if !conflicts.is_empty() {
             println!("[Hotkeys] Found {} conflicts", conflicts.len());
             let message = format_conflict_message(&conflicts);
-            
+
             // Показываем уведомление об ошибке
-            settings_state.lock().unwrap().show_error_notification(
-                app,
-                "Hotkey Conflict",
-                &message
-            ).ok();
-            
+            settings_state
+                .lock()
+                .unwrap()
+                .show_error_notification(app, "Hotkey Conflict", &message)
+                .ok();
+
             // Продолжаем регистрацию хоткеев без конфликтов
             println!("[Hotkeys] Continuing registration for non-conflicting hotkeys");
         } else {
@@ -211,7 +228,10 @@ impl HotkeyManager {
             }
 
             // Регистрируем хоткеи для команд
-            println!("[Hotkeys] Registering command hotkeys for config: {}", config.title);
+            println!(
+                "[Hotkeys] Registering command hotkeys for config: {}",
+                config.title
+            );
             self.register_commands_hotkeys(&config.commands, &config.title)?;
         }
 
@@ -220,15 +240,24 @@ impl HotkeyManager {
     }
 
     /// Рекурсивно регистрирует хоткеи для команд
-    fn register_commands_hotkeys(&mut self, commands: &[CommandConfig], config_title: &str) -> Result<(), String> {
+    fn register_commands_hotkeys(
+        &mut self,
+        commands: &[CommandConfig],
+        config_title: &str,
+    ) -> Result<(), String> {
         for command in commands {
             if let Some(hotkey) = &command.hotkey {
                 if !hotkey.trim().is_empty() {
                     if let Some(id) = &command.id {
-                        println!("[Hotkeys] Registering hotkey {} for command {} in {}", hotkey, command.name, config_title);
+                        println!(
+                            "[Hotkeys] Registering hotkey {} for command {} in {}",
+                            hotkey, command.name, config_title
+                        );
                         if let Err(e) = self.register_command_hotkey(hotkey, id) {
-                            eprintln!("[Hotkeys] Failed to register hotkey {} for command {} in {}: {}", 
-                                     hotkey, command.name, config_title, e);
+                            eprintln!(
+                                "[Hotkeys] Failed to register hotkey {} for command {} in {}: {}",
+                                hotkey, command.name, config_title, e
+                            );
                         }
                     }
                 }
@@ -244,7 +273,11 @@ impl HotkeyManager {
     }
 
     /// Находит команду по хоткею в зарегистрированных хоткеях
-    pub fn find_command_by_hotkey<'a>(&self, hotkey_str: &str, configs: &'a [Config]) -> Option<(&'a CommandConfig, &'a Config)> {
+    pub fn find_command_by_hotkey<'a>(
+        &self,
+        hotkey_str: &str,
+        configs: &'a [Config],
+    ) -> Option<(&'a CommandConfig, &'a Config)> {
         // Проверяем, есть ли этот хоткей в зарегистрированных
         if !self.registered_hotkeys.contains_key(hotkey_str) {
             return None;
@@ -362,4 +395,4 @@ impl Default for HotkeyManager {
     fn default() -> Self {
         Self::new()
     }
-} 
+}
