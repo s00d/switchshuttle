@@ -2,7 +2,7 @@
   <div class="macos-menu-bar">
     <div class="menu-bar-left">
       <div class="menu-bar-item">
-        <img src="/icon.png" alt="SwitchShuttle" class="menu-bar-icon">
+        <img :src="getIconPath('icon.png')" alt="SwitchShuttle" class="menu-bar-icon">
         <span class="menu-bar-text">SwitchShuttle Demo</span>
       </div>
     </div>
@@ -17,7 +17,7 @@
         <div class="locale-arrow">▼</div>
       </div>
       <div class="menu-bar-item" @click="toggleMenu" v-if="props.showSwitchShuttleIcon">
-        <img src="/icon.png" alt="SwitchShuttle" class="menu-bar-icon">
+        <img :src="getIconPath('icon.png')" alt="SwitchShuttle" class="menu-bar-icon">
       </div>
       <div class="menu-bar-item">
         <span class="menu-bar-text">{{ currentTime }}</span>
@@ -207,7 +207,9 @@ function openLink(url) {
 }
 
 function getIconPath(icon) {
-  return `/${icon}`
+  // Учитываем baseURL для GitHub Pages
+  const baseURL = process.env.NODE_ENV === 'production' ? '/switchshuttle' : ''
+  return `${baseURL}/${icon}`
 }
 
 function getItemName(item) {

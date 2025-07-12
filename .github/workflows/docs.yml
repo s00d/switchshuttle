@@ -33,7 +33,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('docs/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
             
@@ -41,8 +41,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+            docs/node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('docs/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-node-modules-
             
