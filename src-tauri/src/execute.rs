@@ -1,7 +1,7 @@
 use crate::config::CommandConfig;
+use serde::Serialize;
 use std::collections::HashMap;
 use std::process::Command;
-use serde::Serialize;
 
 static SCRIPTS_DIR: include_dir::Dir = include_dir::include_dir!("scripts");
 
@@ -28,67 +28,85 @@ pub struct TerminalInfo {
 #[cfg(target_os = "macos")]
 fn get_macos_terminals() -> HashMap<&'static str, TerminalConfig> {
     let mut terminals = HashMap::new();
-    
+
     // iTerm2
-    terminals.insert("iterm", TerminalConfig {
-        name: "iTerm2",
-        executable: "osascript",
-        current_args: vec!["-e", "{script}"],
-        new_tab_args: vec!["-e", "{script}"],
-        new_window_args: vec!["-e", "{script}"],
-        icon: "🖥️",
-    });
-    
+    terminals.insert(
+        "iterm",
+        TerminalConfig {
+            name: "iTerm2",
+            executable: "osascript",
+            current_args: vec!["-e", "{script}"],
+            new_tab_args: vec!["-e", "{script}"],
+            new_window_args: vec!["-e", "{script}"],
+            icon: "🖥️",
+        },
+    );
+
     // Terminal.app
-    terminals.insert("terminal", TerminalConfig {
-        name: "Terminal.app",
-        executable: "osascript",
-        current_args: vec!["-e", "{script}"],
-        new_tab_args: vec!["-e", "{script}"],
-        new_window_args: vec!["-e", "{script}"],
-        icon: "💻",
-    });
-    
+    terminals.insert(
+        "terminal",
+        TerminalConfig {
+            name: "Terminal.app",
+            executable: "osascript",
+            current_args: vec!["-e", "{script}"],
+            new_tab_args: vec!["-e", "{script}"],
+            new_window_args: vec!["-e", "{script}"],
+            icon: "💻",
+        },
+    );
+
     // Warp
-    terminals.insert("warp", TerminalConfig {
-        name: "Warp",
-        executable: "osascript",
-        current_args: vec!["-e", "{script}"],
-        new_tab_args: vec!["-e", "{script}"],
-        new_window_args: vec!["-e", "{script}"],
-        icon: "⚡",
-    });
-    
+    terminals.insert(
+        "warp",
+        TerminalConfig {
+            name: "Warp",
+            executable: "osascript",
+            current_args: vec!["-e", "{script}"],
+            new_tab_args: vec!["-e", "{script}"],
+            new_window_args: vec!["-e", "{script}"],
+            icon: "⚡",
+        },
+    );
+
     // Hyper
-    terminals.insert("hyper", TerminalConfig {
-        name: "Hyper",
-        executable: "osascript",
-        current_args: vec!["-e", "{script}"],
-        new_tab_args: vec!["-e", "{script}"],
-        new_window_args: vec!["-e", "{script}"],
-        icon: "🚀",
-    });
-    
+    terminals.insert(
+        "hyper",
+        TerminalConfig {
+            name: "Hyper",
+            executable: "osascript",
+            current_args: vec!["-e", "{script}"],
+            new_tab_args: vec!["-e", "{script}"],
+            new_window_args: vec!["-e", "{script}"],
+            icon: "🚀",
+        },
+    );
+
     // Alacritty
-    terminals.insert("alacritty", TerminalConfig {
-        name: "Alacritty",
-        executable: "osascript",
-        current_args: vec!["-e", "{script}"],
-        new_tab_args: vec!["-e", "{script}"],
-        new_window_args: vec!["-e", "{script}"],
-        icon: "⚡",
-    });
-    
+    terminals.insert(
+        "alacritty",
+        TerminalConfig {
+            name: "Alacritty",
+            executable: "osascript",
+            current_args: vec!["-e", "{script}"],
+            new_tab_args: vec!["-e", "{script}"],
+            new_window_args: vec!["-e", "{script}"],
+            icon: "⚡",
+        },
+    );
+
     // VSCode Terminal
-    terminals.insert("vscode-terminal", TerminalConfig {
-        name: "VSCode Terminal",
-        executable: "osascript",
-        current_args: vec!["-e", "{script}"],
-        new_tab_args: vec!["-e", "{script}"],
-        new_window_args: vec!["-e", "{script}"],
-        icon: "🔧",
-    });
-    
+    terminals.insert(
+        "vscode-terminal",
+        TerminalConfig {
+            name: "VSCode Terminal",
+            executable: "osascript",
+            current_args: vec!["-e", "{script}"],
+            new_tab_args: vec!["-e", "{script}"],
+            new_window_args: vec!["-e", "{script}"],
+            icon: "🔧",
+        },
+    );
+
     terminals
 }
 
@@ -96,107 +114,149 @@ fn get_macos_terminals() -> HashMap<&'static str, TerminalConfig> {
 #[cfg(target_os = "windows")]
 fn get_windows_terminals() -> HashMap<&'static str, TerminalConfig> {
     let mut terminals = HashMap::new();
-    
+
     // Hyper
-    terminals.insert("hyper", TerminalConfig {
-        name: "Hyper",
-        executable: "cmd",
-        current_args: vec!["/C", "start hyper -e \"{command}\""],
-        new_tab_args: vec!["/C", "start hyper --new-tab -e \"{command}\""],
-        new_window_args: vec!["/C", "start hyper --new-window -e \"{command}\""],
-        icon: "🚀",
-    });
-    
+    terminals.insert(
+        "hyper",
+        TerminalConfig {
+            name: "Hyper",
+            executable: "cmd",
+            current_args: vec!["/C", "start hyper -e \"{command}\""],
+            new_tab_args: vec!["/C", "start hyper --new-tab -e \"{command}\""],
+            new_window_args: vec!["/C", "start hyper --new-window -e \"{command}\""],
+            icon: "🚀",
+        },
+    );
+
     // WSL
-    terminals.insert("wsl", TerminalConfig {
-        name: "WSL",
-        executable: "wsl",
-        current_args: vec!["-e", "bash", "-c", "{command}"],
-        new_tab_args: vec!["/C", "start wsl -e bash -c \"{command}\""],
-        new_window_args: vec!["/C", "start wsl -e bash -c \"{command}\""],
-        icon: "🐧",
-    });
-    
+    terminals.insert(
+        "wsl",
+        TerminalConfig {
+            name: "WSL",
+            executable: "wsl",
+            current_args: vec!["-e", "bash", "-c", "{command}"],
+            new_tab_args: vec!["/C", "start wsl -e bash -c \"{command}\""],
+            new_window_args: vec!["/C", "start wsl -e bash -c \"{command}\""],
+            icon: "🐧",
+        },
+    );
+
     // PowerShell
-    terminals.insert("powershell", TerminalConfig {
-        name: "PowerShell",
-        executable: "powershell",
-        current_args: vec!["-Command", "{command}"],
-        new_tab_args: vec!["/C", "start powershell -Command \"{command}\""],
-        new_window_args: vec!["/C", "start powershell -Command \"{command}\""],
-        icon: "💻",
-    });
-    
+    terminals.insert(
+        "powershell",
+        TerminalConfig {
+            name: "PowerShell",
+            executable: "powershell",
+            current_args: vec!["-Command", "{command}"],
+            new_tab_args: vec!["/C", "start powershell -Command \"{command}\""],
+            new_window_args: vec!["/C", "start powershell -Command \"{command}\""],
+            icon: "💻",
+        },
+    );
+
     // Windows Terminal
-    terminals.insert("windows-terminal", TerminalConfig {
-        name: "Windows Terminal",
-        executable: "cmd",
-        current_args: vec!["/C", "wt -d . \"{command}\""],
-        new_tab_args: vec!["/C", "start wt -d . new-tab \"{command}\""],
-        new_window_args: vec!["/C", "start wt -d . new-window \"{command}\""],
-        icon: "🪟",
-    });
-    
+    terminals.insert(
+        "windows-terminal",
+        TerminalConfig {
+            name: "Windows Terminal",
+            executable: "cmd",
+            current_args: vec!["/C", "wt -d . \"{command}\""],
+            new_tab_args: vec!["/C", "start wt -d . new-tab \"{command}\""],
+            new_window_args: vec!["/C", "start wt -d . new-window \"{command}\""],
+            icon: "🪟",
+        },
+    );
+
     // ConEmu
-    terminals.insert("conemu", TerminalConfig {
-        name: "ConEmu",
-        executable: "cmd",
-        current_args: vec!["/C", "conemu /cmd \"{command}\""],
-        new_tab_args: vec!["/C", "start conemu /new-tab /cmd \"{command}\""],
-        new_window_args: vec!["/C", "start conemu /new-window /cmd \"{command}\""],
-        icon: "🖥️",
-    });
-    
+    terminals.insert(
+        "conemu",
+        TerminalConfig {
+            name: "ConEmu",
+            executable: "cmd",
+            current_args: vec!["/C", "conemu /cmd \"{command}\""],
+            new_tab_args: vec!["/C", "start conemu /new-tab /cmd \"{command}\""],
+            new_window_args: vec!["/C", "start conemu /new-window /cmd \"{command}\""],
+            icon: "🖥️",
+        },
+    );
+
     // Cmder
-    terminals.insert("cmder", TerminalConfig {
-        name: "Cmder",
-        executable: "cmd",
-        current_args: vec!["/C", "cmder /cmd \"{command}\""],
-        new_tab_args: vec!["/C", "start cmder /new-tab /cmd \"{command}\""],
-        new_window_args: vec!["/C", "start cmder /new-window /cmd \"{command}\""],
-        icon: "💻",
-    });
-    
+    terminals.insert(
+        "cmder",
+        TerminalConfig {
+            name: "Cmder",
+            executable: "cmd",
+            current_args: vec!["/C", "cmder /cmd \"{command}\""],
+            new_tab_args: vec!["/C", "start cmder /new-tab /cmd \"{command}\""],
+            new_window_args: vec!["/C", "start cmder /new-window /cmd \"{command}\""],
+            icon: "💻",
+        },
+    );
+
     // Git Bash
-    terminals.insert("git-bash", TerminalConfig {
-        name: "Git Bash",
-        executable: "cmd",
-        current_args: vec!["/C", "\"C:\\Program Files\\Git\\bin\\bash.exe\" -c \"{command}\""],
-        new_tab_args: vec!["/C", "start \"C:\\Program Files\\Git\\bin\\bash.exe\" -c \"{command}\""],
-        new_window_args: vec!["/C", "start \"C:\\Program Files\\Git\\bin\\bash.exe\" -c \"{command}\""],
-        icon: "🐧",
-    });
-    
+    terminals.insert(
+        "git-bash",
+        TerminalConfig {
+            name: "Git Bash",
+            executable: "cmd",
+            current_args: vec![
+                "/C",
+                "\"C:\\Program Files\\Git\\bin\\bash.exe\" -c \"{command}\"",
+            ],
+            new_tab_args: vec![
+                "/C",
+                "start \"C:\\Program Files\\Git\\bin\\bash.exe\" -c \"{command}\"",
+            ],
+            new_window_args: vec![
+                "/C",
+                "start \"C:\\Program Files\\Git\\bin\\bash.exe\" -c \"{command}\"",
+            ],
+            icon: "🐧",
+        },
+    );
+
     // Alacritty
-    terminals.insert("alacritty", TerminalConfig {
-        name: "Alacritty",
-        executable: "cmd",
-        current_args: vec!["/C", "alacritty -e \"{command}\""],
-        new_tab_args: vec!["/C", "start alacritty -e \"{command}\""],
-        new_window_args: vec!["/C", "start alacritty -e \"{command}\""],
-        icon: "⚡",
-    });
-    
+    terminals.insert(
+        "alacritty",
+        TerminalConfig {
+            name: "Alacritty",
+            executable: "cmd",
+            current_args: vec!["/C", "alacritty -e \"{command}\""],
+            new_tab_args: vec!["/C", "start alacritty -e \"{command}\""],
+            new_window_args: vec!["/C", "start alacritty -e \"{command}\""],
+            icon: "⚡",
+        },
+    );
+
     // WezTerm
-    terminals.insert("wezterm", TerminalConfig {
-        name: "WezTerm",
-        executable: "cmd",
-        current_args: vec!["/C", "wezterm cli spawn -- \"{command}\""],
-        new_tab_args: vec!["/C", "start wezterm cli spawn --new-tab -- \"{command}\""],
-        new_window_args: vec!["/C", "start wezterm cli spawn --new-window -- \"{command}\""],
-        icon: "🚀",
-    });
-    
+    terminals.insert(
+        "wezterm",
+        TerminalConfig {
+            name: "WezTerm",
+            executable: "cmd",
+            current_args: vec!["/C", "wezterm cli spawn -- \"{command}\""],
+            new_tab_args: vec!["/C", "start wezterm cli spawn --new-tab -- \"{command}\""],
+            new_window_args: vec![
+                "/C",
+                "start wezterm cli spawn --new-window -- \"{command}\"",
+            ],
+            icon: "🚀",
+        },
+    );
+
     // VSCode Terminal
-    terminals.insert("vscode-terminal", TerminalConfig {
-        name: "VSCode Terminal",
-        executable: "cmd",
-        current_args: vec!["/C", "code --new-terminal \"{command}\""],
-        new_tab_args: vec!["/C", "start code --new-terminal \"{command}\""],
-        new_window_args: vec!["/C", "start code --new-window --new-terminal \"{command}\""],
-        icon: "🔧",
-    });
-    
+    terminals.insert(
+        "vscode-terminal",
+        TerminalConfig {
+            name: "VSCode Terminal",
+            executable: "cmd",
+            current_args: vec!["/C", "code --new-terminal \"{command}\""],
+            new_tab_args: vec!["/C", "start code --new-terminal \"{command}\""],
+            new_window_args: vec!["/C", "start code --new-window --new-terminal \"{command}\""],
+            icon: "🔧",
+        },
+    );
+
     terminals
 }
 
@@ -204,87 +264,126 @@ fn get_windows_terminals() -> HashMap<&'static str, TerminalConfig> {
 #[cfg(target_os = "linux")]
 fn get_linux_terminals() -> HashMap<&'static str, TerminalConfig> {
     let mut terminals = HashMap::new();
-    
+
     // Hyper
-    terminals.insert("hyper", TerminalConfig {
-        name: "Hyper",
-        executable: "hyper",
-        current_args: vec!["-e", "{command}"],
-        new_tab_args: vec!["--new-tab", "-e", "{command}"],
-        new_window_args: vec!["--new-window", "-e", "{command}"],
-        icon: "🚀",
-    });
-    
+    terminals.insert(
+        "hyper",
+        TerminalConfig {
+            name: "Hyper",
+            executable: "hyper",
+            current_args: vec!["-e", "{command}"],
+            new_tab_args: vec!["--new-tab", "-e", "{command}"],
+            new_window_args: vec!["--new-window", "-e", "{command}"],
+            icon: "🚀",
+        },
+    );
+
     // GNOME Terminal
-    terminals.insert("gnome-terminal", TerminalConfig {
-        name: "GNOME Terminal",
-        executable: "gnome-terminal",
-        current_args: vec!["--", "bash", "-c", "{command}"],
-        new_tab_args: vec!["--tab", "--", "bash", "-c", "{command}"],
-        new_window_args: vec!["--new-window", "--", "bash", "-c", "{command}"],
-        icon: "🖥️",
-    });
-    
+    terminals.insert(
+        "gnome-terminal",
+        TerminalConfig {
+            name: "GNOME Terminal",
+            executable: "gnome-terminal",
+            current_args: vec!["--", "bash", "-c", "{command}"],
+            new_tab_args: vec!["--tab", "--", "bash", "-c", "{command}"],
+            new_window_args: vec!["--new-window", "--", "bash", "-c", "{command}"],
+            icon: "🖥️",
+        },
+    );
+
     // Konsole
-    terminals.insert("konsole", TerminalConfig {
-        name: "Konsole",
-        executable: "konsole",
-        current_args: vec!["-e", "bash", "-c", "{command}"],
-        new_tab_args: vec!["--new-tab", "-e", "bash", "-c", "{command}"],
-        new_window_args: vec!["--new-window", "-e", "bash", "-c", "{command}"],
-        icon: "💻",
-    });
-    
+    terminals.insert(
+        "konsole",
+        TerminalConfig {
+            name: "Konsole",
+            executable: "konsole",
+            current_args: vec!["-e", "bash", "-c", "{command}"],
+            new_tab_args: vec!["--new-tab", "-e", "bash", "-c", "{command}"],
+            new_window_args: vec!["--new-window", "-e", "bash", "-c", "{command}"],
+            icon: "💻",
+        },
+    );
+
     // XFCE4 Terminal
-    terminals.insert("xfce4-terminal", TerminalConfig {
-        name: "XFCE4 Terminal",
-        executable: "xfce4-terminal",
-        current_args: vec!["-e", "bash", "-c", "{command}"],
-        new_tab_args: vec!["--tab", "-e", "bash", "-c", "{command}"],
-        new_window_args: vec!["--new-window", "-e", "bash", "-c", "{command}"],
-        icon: "🖥️",
-    });
-    
+    terminals.insert(
+        "xfce4-terminal",
+        TerminalConfig {
+            name: "XFCE4 Terminal",
+            executable: "xfce4-terminal",
+            current_args: vec!["-e", "bash", "-c", "{command}"],
+            new_tab_args: vec!["--tab", "-e", "bash", "-c", "{command}"],
+            new_window_args: vec!["--new-window", "-e", "bash", "-c", "{command}"],
+            icon: "🖥️",
+        },
+    );
+
     // Alacritty
-    terminals.insert("alacritty", TerminalConfig {
-        name: "Alacritty",
-        executable: "alacritty",
-        current_args: vec!["-e", "bash", "-c", "{command}"],
-        new_tab_args: vec!["--new-tab", "-e", "bash", "-c", "{command}"],
-        new_window_args: vec!["--new-window", "-e", "bash", "-c", "{command}"],
-        icon: "⚡",
-    });
-    
+    terminals.insert(
+        "alacritty",
+        TerminalConfig {
+            name: "Alacritty",
+            executable: "alacritty",
+            current_args: vec!["-e", "bash", "-c", "{command}"],
+            new_tab_args: vec!["--new-tab", "-e", "bash", "-c", "{command}"],
+            new_window_args: vec!["--new-window", "-e", "bash", "-c", "{command}"],
+            icon: "⚡",
+        },
+    );
+
     // WezTerm
-    terminals.insert("wezterm", TerminalConfig {
-        name: "WezTerm",
-        executable: "wezterm",
-        current_args: vec!["cli", "spawn", "--", "bash", "-c", "{command}"],
-        new_tab_args: vec!["cli", "spawn", "--new-tab", "--", "bash", "-c", "{command}"],
-        new_window_args: vec!["cli", "spawn", "--new-window", "--", "bash", "-c", "{command}"],
-        icon: "🚀",
-    });
-    
+    terminals.insert(
+        "wezterm",
+        TerminalConfig {
+            name: "WezTerm",
+            executable: "wezterm",
+            current_args: vec!["cli", "spawn", "--", "bash", "-c", "{command}"],
+            new_tab_args: vec!["cli", "spawn", "--new-tab", "--", "bash", "-c", "{command}"],
+            new_window_args: vec![
+                "cli",
+                "spawn",
+                "--new-window",
+                "--",
+                "bash",
+                "-c",
+                "{command}",
+            ],
+            icon: "🚀",
+        },
+    );
+
     // Kitty
-    terminals.insert("kitty", TerminalConfig {
-        name: "Kitty",
-        executable: "kitty",
-        current_args: vec!["@", "launch", "--type=tab", "bash", "-c", "{command}"],
-        new_tab_args: vec!["@", "launch", "--type=tab", "bash", "-c", "{command}"],
-        new_window_args: vec!["@", "launch", "--type=window", "bash", "-c", "{command}"],
-        icon: "🐱",
-    });
-    
+    terminals.insert(
+        "kitty",
+        TerminalConfig {
+            name: "Kitty",
+            executable: "kitty",
+            current_args: vec!["@", "launch", "--type=tab", "bash", "-c", "{command}"],
+            new_tab_args: vec!["@", "launch", "--type=tab", "bash", "-c", "{command}"],
+            new_window_args: vec!["@", "launch", "--type=window", "bash", "-c", "{command}"],
+            icon: "🐱",
+        },
+    );
+
     // VSCode Terminal
-    terminals.insert("vscode-terminal", TerminalConfig {
-        name: "VSCode Terminal",
-        executable: "code",
-        current_args: vec!["--new-terminal", "--", "bash", "-c", "{command}"],
-        new_tab_args: vec!["--new-terminal", "--", "bash", "-c", "{command}"],
-        new_window_args: vec!["--new-window", "--new-terminal", "--", "bash", "-c", "{command}"],
-        icon: "🔧",
-    });
-    
+    terminals.insert(
+        "vscode-terminal",
+        TerminalConfig {
+            name: "VSCode Terminal",
+            executable: "code",
+            current_args: vec!["--new-terminal", "--", "bash", "-c", "{command}"],
+            new_tab_args: vec!["--new-terminal", "--", "bash", "-c", "{command}"],
+            new_window_args: vec![
+                "--new-window",
+                "--new-terminal",
+                "--",
+                "bash",
+                "-c",
+                "{command}",
+            ],
+            icon: "🔧",
+        },
+    );
+
     terminals
 }
 
@@ -294,17 +393,17 @@ pub fn get_terminals() -> HashMap<&'static str, TerminalConfig> {
     {
         get_macos_terminals()
     }
-    
+
     #[cfg(target_os = "windows")]
     {
         get_windows_terminals()
     }
-    
+
     #[cfg(target_os = "linux")]
     {
         get_linux_terminals()
     }
-    
+
     #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
     {
         HashMap::new()
@@ -312,6 +411,7 @@ pub fn get_terminals() -> HashMap<&'static str, TerminalConfig> {
 }
 
 /// Читает содержимое скрипта из встроенных ресурсов
+#[cfg(target_os = "macos")]
 fn read_script(script_path: &str) -> Option<String> {
     SCRIPTS_DIR
         .get_file(script_path)
@@ -322,22 +422,22 @@ fn read_script(script_path: &str) -> Option<String> {
 #[cfg(target_os = "macos")]
 fn get_script_path(terminal: &str, launch_in: &str) -> Option<String> {
     let terminals = get_terminals();
-    
+
     // Получаем конфигурацию терминала
     let terminal_config = terminals.get(terminal)?;
-    
+
     // Формируем название скрипта на основе имени терминала и опции запуска
     let terminal_name = terminal_config.name;
     let launch_suffix = match launch_in {
         "current" => "Current",
-        "new_tab" => "Tab", 
+        "new_tab" => "Tab",
         "new_window" => "Window",
         _ => return None,
     };
-    
+
     // Формируем название скрипта
     let script_name = format!("{}-{}.scpt", terminal_name, launch_suffix);
-    
+
     Some(script_name)
 }
 
@@ -350,10 +450,10 @@ fn execute_command_impl(
     title: &str,
 ) {
     let terminals = get_terminals();
-    
+
     for command in commands_to_execute {
         println!("Executing command: {}", command);
-        
+
         #[cfg(target_os = "macos")]
         {
             // Для macOS используем скрипты
@@ -361,43 +461,46 @@ fn execute_command_impl(
                 Some(config) => config,
                 None => {
                     println!("Unsupported terminal: {}", terminal);
-        return;
-    }
+                    return;
+                }
             };
 
             if let Some(script_path) = get_script_path(terminal, launch_in) {
                 let script_content = match read_script(&script_path) {
-        Some(content) => content,
-        None => {
-            println!("Failed to read script: {}", script_path);
+                    Some(content) => content,
+                    None => {
+                        println!("Failed to read script: {}", script_path);
                         continue;
-        }
-    };
+                    }
+                };
 
-        let script = script_content
-            .replace("{command}", command)
-            .replace("{theme}", theme)
-            .replace("{title}", title);
+                let script = script_content
+                    .replace("{command}", command)
+                    .replace("{theme}", theme)
+                    .replace("{title}", title);
 
                 let output = Command::new(terminal_config.executable)
-            .arg("-e")
-            .arg(&script)
-            .output()
-            .expect("Failed to execute command");
+                    .arg("-e")
+                    .arg(&script)
+                    .output()
+                    .expect("Failed to execute command");
 
-        if output.status.success() {
-            println!("Command succeeded: {}", command);
-        } else {
-            println!("Command failed: {}", command);
+                if output.status.success() {
+                    println!("Command succeeded: {}", command);
+                } else {
+                    println!("Command failed: {}", command);
                     println!("Error: {}", String::from_utf8_lossy(&output.stderr));
                     break;
                 }
             } else {
-                println!("No script found for terminal: {} with launch_in: {}", terminal, launch_in);
-            break;
+                println!(
+                    "No script found for terminal: {} with launch_in: {}",
+                    terminal, launch_in
+                );
+                break;
+            }
         }
-    }
-        
+
         #[cfg(not(target_os = "macos"))]
         {
             // Для Windows и Linux используем прямые команды
@@ -427,13 +530,13 @@ fn execute_command_impl(
             let status = Command::new(terminal_config.executable)
                 .args(&cmd_args)
                 .status()
-        .expect("Failed to execute command");
+                .expect("Failed to execute command");
 
-        if status.success() {
-            println!("Command succeeded: {}", command);
-        } else {
-            println!("Command failed: {}", command);
-            break;
+            if status.success() {
+                println!("Command succeeded: {}", command);
+            } else {
+                println!("Command failed: {}", command);
+                break;
             }
         }
     }
@@ -506,14 +609,15 @@ pub fn execute_command(
 
     if !is_launch_option_supported(&launch_in) {
         println!("Unsupported launch option: {}", launch_in);
-        println!("Available launch options: {:?}", get_available_launch_options());
+        println!(
+            "Available launch options: {:?}",
+            get_available_launch_options()
+        );
         return;
     }
 
     execute_command_impl(&commands_to_execute, &terminal, &launch_in, theme, title);
 }
-
-
 
 #[cfg(test)]
 mod tests {
@@ -524,7 +628,7 @@ mod tests {
     fn test_get_available_terminals() {
         let terminals = get_available_terminals();
         assert!(!terminals.is_empty());
-        
+
         // Проверяем, что все терминалы уникальны
         let mut unique_terminals = std::collections::HashSet::new();
         for terminal in &terminals {
@@ -545,12 +649,12 @@ mod tests {
     #[test]
     fn test_is_terminal_supported() {
         let terminals = get_available_terminals();
-        
+
         // Проверяем, что все доступные терминалы поддерживаются
         for terminal in terminals {
             assert!(is_terminal_supported(terminal));
         }
-        
+
         // Проверяем, что несуществующий терминал не поддерживается
         assert!(!is_terminal_supported("nonexistent-terminal"));
     }
@@ -561,7 +665,7 @@ mod tests {
         assert!(is_launch_option_supported("current"));
         assert!(is_launch_option_supported("new_tab"));
         assert!(is_launch_option_supported("new_window"));
-        
+
         // Проверяем неподдерживаемые опции
         assert!(!is_launch_option_supported("invalid"));
         assert!(!is_launch_option_supported(""));
@@ -570,7 +674,7 @@ mod tests {
     #[test]
     fn test_terminal_config_structure() {
         let terminals = get_terminals();
-        
+
         for (name, config) in terminals {
             // Проверяем, что у каждого терминала есть все необходимые поля
             assert!(!config.name.is_empty());
@@ -578,7 +682,7 @@ mod tests {
             assert!(!config.current_args.is_empty());
             assert!(!config.new_tab_args.is_empty());
             assert!(!config.new_window_args.is_empty());
-            
+
             // Проверяем, что имя терминала соответствует ключу
             assert_eq!(name, name.to_lowercase());
         }
@@ -598,9 +702,15 @@ mod tests {
             monitor: None,
             icon: None,
         };
-        
+
         // Функция должна завершиться без ошибок
-        execute_command(&config, "terminal", "current", &"default".to_string(), &"Test".to_string());
+        execute_command(
+            &config,
+            "terminal",
+            "current",
+            &"default".to_string(),
+            &"Test".to_string(),
+        );
     }
 
     #[test]
@@ -617,9 +727,15 @@ mod tests {
             monitor: None,
             icon: None,
         };
-        
+
         // Функция должна завершиться без ошибок
-        execute_command(&config, "terminal", "current", &"default".to_string(), &"Test".to_string());
+        execute_command(
+            &config,
+            "terminal",
+            "current",
+            &"default".to_string(),
+            &"Test".to_string(),
+        );
     }
 
     #[test]
@@ -639,9 +755,15 @@ mod tests {
             monitor: None,
             icon: None,
         };
-        
+
         // Функция должна завершиться без ошибок
-        execute_command(&config, "terminal", "current", &"default".to_string(), &"Test".to_string());
+        execute_command(
+            &config,
+            "terminal",
+            "current",
+            &"default".to_string(),
+            &"Test".to_string(),
+        );
     }
 
     #[test]
@@ -658,9 +780,15 @@ mod tests {
             monitor: None,
             icon: None,
         };
-        
+
         // Функция должна завершиться без ошибок при неподдерживаемом терминале
-        execute_command(&config, "unsupported-terminal", "current", &"default".to_string(), &"Test".to_string());
+        execute_command(
+            &config,
+            "unsupported-terminal",
+            "current",
+            &"default".to_string(),
+            &"Test".to_string(),
+        );
     }
 
     #[test]
@@ -677,9 +805,15 @@ mod tests {
             monitor: None,
             icon: None,
         };
-        
+
         // Функция должна завершиться без ошибок при неподдерживаемой опции запуска
-        execute_command(&config, "terminal", "unsupported", &"default".to_string(), &"Test".to_string());
+        execute_command(
+            &config,
+            "terminal",
+            "unsupported",
+            &"default".to_string(),
+            &"Test".to_string(),
+        );
     }
 
     #[test]
@@ -703,9 +837,9 @@ mod tests {
             new_window_args: vec!["window1", "window2"],
             icon: "🖥️",
         };
-        
+
         let cloned = config.clone();
-        
+
         assert_eq!(config.name, cloned.name);
         assert_eq!(config.executable, cloned.executable);
         assert_eq!(config.current_args, cloned.current_args);
@@ -724,7 +858,7 @@ mod tests {
             new_window_args: vec!["window1"],
             icon: "🖥️",
         };
-        
+
         let debug_str = format!("{:?}", config);
         assert!(debug_str.contains("Test Terminal"));
         assert!(debug_str.contains("test"));
@@ -733,32 +867,41 @@ mod tests {
     #[test]
     fn test_get_terminals_returns_valid_configs() {
         let terminals = get_terminals();
-        
+
         for (name, config) in terminals {
             // Проверяем, что имя терминала не пустое
             assert!(!name.is_empty());
-            
+
             // Проверяем, что конфигурация валидна
             assert!(!config.name.is_empty());
             assert!(!config.executable.is_empty());
-            
+
             #[cfg(target_os = "macos")]
             {
                 // На macOS проверяем только executable и name
                 assert!(!config.executable.is_empty());
             }
-            
+
             #[cfg(not(target_os = "macos"))]
             {
                 // Проверяем, что аргументы не пустые
                 assert!(!config.current_args.is_empty());
                 assert!(!config.new_tab_args.is_empty());
                 assert!(!config.new_window_args.is_empty());
-                
+
                 // Проверяем, что аргументы содержат плейсхолдеры команд
-                let has_command_placeholder = config.current_args.iter().any(|arg| arg.contains("{command}")) ||
-                                            config.new_tab_args.iter().any(|arg| arg.contains("{command}")) ||
-                                            config.new_window_args.iter().any(|arg| arg.contains("{command}"));
+                let has_command_placeholder = config
+                    .current_args
+                    .iter()
+                    .any(|arg| arg.contains("{command}"))
+                    || config
+                        .new_tab_args
+                        .iter()
+                        .any(|arg| arg.contains("{command}"))
+                    || config
+                        .new_window_args
+                        .iter()
+                        .any(|arg| arg.contains("{command}"));
                 assert!(has_command_placeholder);
             }
         }
@@ -770,15 +913,24 @@ mod tests {
         {
             // Проверяем, что функция возвращает правильные пути для поддерживаемых комбинаций
             // Используем динамические названия на основе конфигурации терминалов
-            assert_eq!(get_script_path("iterm", "current"), Some("iTerm2-Current.scpt".to_string()));
-            assert_eq!(get_script_path("terminal", "new_tab"), Some("Terminal.app-Tab.scpt".to_string()));
-            assert_eq!(get_script_path("warp", "new_window"), Some("Warp-Window.scpt".to_string()));
-            
+            assert_eq!(
+                get_script_path("iterm", "current"),
+                Some("iTerm2-Current.scpt".to_string())
+            );
+            assert_eq!(
+                get_script_path("terminal", "new_tab"),
+                Some("Terminal.app-Tab.scpt".to_string())
+            );
+            assert_eq!(
+                get_script_path("warp", "new_window"),
+                Some("Warp-Window.scpt".to_string())
+            );
+
             // Проверяем, что функция возвращает None для неподдерживаемых комбинаций
             assert_eq!(get_script_path("unsupported", "current"), None);
             assert_eq!(get_script_path("iterm", "unsupported"), None);
         }
-        
+
         #[cfg(not(target_os = "macos"))]
         {
             // На других ОС функция не должна быть доступна
