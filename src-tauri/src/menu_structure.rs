@@ -15,8 +15,7 @@ use tauri::{AppHandle, Wry};
 use crate::helpers::{create_check_menu_item, create_menu_item};
 
 // Глобальная переменная для отслеживания активности трея
-pub static TRAY_ACTIVE: Lazy<Arc<Mutex<bool>>> = 
-    Lazy::new(|| Arc::new(Mutex::new(false)));
+pub static TRAY_ACTIVE: Lazy<Arc<Mutex<bool>>> = Lazy::new(|| Arc::new(Mutex::new(false)));
 
 /// Представляет элемент меню
 #[derive(Clone)]
@@ -182,25 +181,38 @@ impl MenuItem {
                             if *tray_active {
                                 drop(tray_active); // Освобождаем блокировку
 
-                                println!("[Monitor] spawn: monitor_command = '{}'", monitor_command);
+                                println!(
+                                    "[Monitor] spawn: monitor_command = '{}'",
+                                    monitor_command
+                                );
                                 // Используем пул соединений для выполнения команды
-                                let new_text = match console::ConsoleInstance::execute_command_via_pool(&id, &monitor_command) {
-                                    Ok(output) => {
-                                        let result = output.trim();
-                                        if !result.is_empty() {
-                                            format!("{}: {}", name, result)
-                                        } else {
-                                            name.clone()
+                                let new_text =
+                                    match console::ConsoleInstance::execute_command_via_pool(
+                                        &id,
+                                        &monitor_command,
+                                    ) {
+                                        Ok(output) => {
+                                            let result = output.trim();
+                                            if !result.is_empty() {
+                                                format!("{}: {}", name, result)
+                                            } else {
+                                                name.clone()
+                                            }
                                         }
-                                    }
-                                    Err(_) => name.clone(),
-                                };
+                                        Err(_) => name.clone(),
+                                    };
                                 eprintln!("[Monitor] Updating text for {}: {}", id, new_text);
 
                                 if let Err(e) = icon_item.set_accelerator(hotkey.clone()) {
-                                    eprintln!("[Monitor] Failed to set accelerator for {}: {}", id, e);
+                                    eprintln!(
+                                        "[Monitor] Failed to set accelerator for {}: {}",
+                                        id, e
+                                    );
                                 } else {
-                                    eprintln!("[Monitor] Successfully updated accelerator for {}", id);
+                                    eprintln!(
+                                        "[Monitor] Successfully updated accelerator for {}",
+                                        id
+                                    );
                                 }
 
                                 // Обновляем текст с сохранением иконки
@@ -275,9 +287,16 @@ impl MenuItem {
         let name = &self.config.name;
         let hotkey = self.config.hotkey.as_deref();
         let icon = self.config.icon.as_deref();
-        
-        println!("[Menu Structure] Creating tauri menu item with ID: '{}', name: '{}'", id, name);
-        println!("[Menu Structure] Is switch: {}, is monitor: {}", self.is_switch(), self.is_monitor());
+
+        println!(
+            "[Menu Structure] Creating tauri menu item with ID: '{}', name: '{}'",
+            id, name
+        );
+        println!(
+            "[Menu Structure] Is switch: {}, is monitor: {}",
+            self.is_switch(),
+            self.is_monitor()
+        );
 
         if self.is_switch() {
             let is_enabled = self.get_switch_state(Some(app));
