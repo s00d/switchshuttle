@@ -20,17 +20,20 @@ pub fn execute_command_by_id(
     config_manager: &ConfigManager,
 ) -> Result<(), String> {
     println!("[Execute] Looking for command with ID: '{}'", command_id);
-    
+
     // Приостанавливаем таймеры мониторинга перед выполнением команды
     pause_monitor_timers();
     println!("[Execute] Paused monitor timers before command execution");
-    
+
     match config_manager.find_command_by_id(command_id) {
         Some((command, config)) => {
-            println!("[Execute] Found command: '{}' (ID: {:?})", command.name, command.id);
+            println!(
+                "[Execute] Found command: '{}' (ID: {:?})",
+                command.name, command.id
+            );
             println!("[Execute] Command has switch: {:?}", command.switch);
             println!("[Execute] Command has inputs: {:?}", command.inputs);
-            
+
             // Проверяем, является ли это командой мониторинга
             if command.switch.is_some() {
                 let should_show_inputs = command
@@ -63,7 +66,10 @@ pub fn execute_command_by_id(
                                     .notification()
                                     .builder()
                                     .title("SwitchShuttle Success")
-                                    .body(&format!("Switch '{}' executed successfully", command.name))
+                                    .body(&format!(
+                                        "Switch '{}' executed successfully",
+                                        command.name
+                                    ))
                                     .show()
                                 {
                                     // Уведомление отправлено
@@ -78,7 +84,10 @@ pub fn execute_command_by_id(
                                     .notification()
                                     .builder()
                                     .title("SwitchShuttle Error")
-                                    .body(&format!("Failed to execute switch '{}': {}", command.name, e))
+                                    .body(&format!(
+                                        "Failed to execute switch '{}': {}",
+                                        command.name, e
+                                    ))
                                     .show()
                                 {
                                     // Уведомление отправлено
@@ -118,7 +127,7 @@ pub fn execute_command_by_id(
                     );
                 }
             }
-            
+
             Ok(())
         }
         None => {
@@ -129,18 +138,18 @@ pub fn execute_command_by_id(
                     println!("[Execute]   - '{}' (ID: {:?})", command.name, command.id);
                 }
             }
-            
+
             // Возобновляем таймеры мониторинга даже если команда не найдена
             resume_monitor_timers();
             println!("[Execute] Resumed monitor timers after command not found");
-            
+
             Err(format!("Command not found for ID: '{}'", command_id))
         }
     }
 }
 
 // Глобальное состояние для хранения текущей структуры меню
-static CURRENT_MENU: Lazy<Arc<Mutex<Option<SystemMenu>>>> = 
+static CURRENT_MENU: Lazy<Arc<Mutex<Option<SystemMenu>>>> =
     Lazy::new(|| Arc::new(Mutex::new(None)));
 
 pub fn create_system_tray_menu(
@@ -281,7 +290,7 @@ pub fn handle_system_tray_event(
     let event_id = event.id().0.as_str();
     println!("[Tray Event] Received menu event with ID: '{}'", event_id);
     println!("[Tray Event] Event type: {:?}", event);
-    
+
     let config_path = get_config_path();
 
     match event_id {
