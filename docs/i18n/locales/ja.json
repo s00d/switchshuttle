@@ -1,19 +1,228 @@
 {
   "demo": {
     "notifications": {
-      "notAvailable": "利用不可",
+      "notAvailable": "利用できません",
       "notAvailableMessage": "この機能はデモ版では利用できません。",
       "homepage": "ホームページ",
       "homepageMessage": "ブラウザでホームページを開いています...\n\nhttps://github.com/s00d/switchshuttle",
       "quit": "SwitchShuttleを終了",
-      "quitMessage": "SwitchShuttleを本当に終了しますか？",
+      "quitMessage": "SwitchShuttleを終了してもよろしいですか？",
       "settings": "設定",
       "settingsMessage": "設定ウィンドウはこのデモ版では利用できません。",
       "about": "SwitchShuttleについて",
-      "aboutMessage": "SwitchShuttle v1.12.0\nクロスプラットフォームのターミナルコマンドマネージャー\n\nこれはデモ版です。"
+      "aboutMessage": "SwitchShuttle\nクロスプラットフォームターミナルコマンドマネージャー\n\nこれはデモ版です。"
+    },
+    "help": {
+      "title": "SwitchShuttle",
+      "subtitle": "クロスプラットフォームターミナルコマンドマネージャー",
+      "description": "SwitchShuttleは、開発者やシステム管理者が異なるプラットフォームで頻繁に使用するターミナルコマンドを整理、実行、管理するのに役立つ強力なターミナルコマンドマネージャーです。",
+      "features": {
+        "title": "✨ 機能",
+        "commandTemplates": "コマンドテンプレート: 一般的な開発タスク用の事前設定されたコマンドテンプレート",
+        "hotkeySupport": "ホットキーサポート: カスタマイズ可能なホットキーによるコマンドへのクイックアクセス",
+        "crossPlatform": "クロスプラットフォーム: macOS、Windows、Linuxで動作",
+        "visualEditor": "ビジュアルエディター: コマンド設定の作成と編集用の組み込みビジュアルエディター",
+        "systemMonitoring": "システム監視: CPUとメモリ使用量のリアルタイム監視",
+        "autoRefresh": "自動更新: 設定の自動リロード",
+        "launchAtLogin": "ログイン時起動: システムと共に自動起動するオプション"
+      },
+      "usage": {
+        "title": "🚀 使用方法",
+        "steps": [
+          "メニューバーアイコンを使用してSwitchShuttleにアクセス",
+          "事前定義されたコマンドテンプレートから選択",
+          "ビジュアルエディターを使用してコマンドをカスタマイズ",
+          "ホットキーを使用してコマンドを素早く実行",
+          "リアルタイムでシステムリソースを監視"
+        ]
+      },
+      "installation": {
+        "title": "📦 インストール",
+        "homebrew": {
+          "title": "Homebrew (macOS - 推奨)",
+          "command": "brew tap s00d/switchshuttle && brew install --cask switchshuttle"
+        },
+        "manual": {
+          "title": "手動ダウンロード",
+          "steps": [
+            "GitHub Releasesからお使いのプラットフォーム用の最新リリースをダウンロード",
+            "アプリケーションをインストール",
+            "SwitchShuttleを起動 - システムトレイに表示されます",
+            "トレイアイコンを右クリックしてメニューにアクセス"
+          ]
+        },
+        "firstConfig": {
+          "title": "初期設定",
+          "steps": [
+            "Edit Config → デフォルトエディターで設定ファイルを開く",
+            "JSON形式でコマンドを追加",
+            "保存してアプリケーションを再起動",
+            "整理されたコマンドショートカットをお楽しみください！"
+          ]
+        }
+      },
+      "cli": {
+        "title": "💻 コマンドラインインターフェース",
+        "description": "SwitchShuttleは、GUIを開かずにコマンドを素早く実行するための強力なコマンドラインインターフェースも提供します。",
+        "usage": {
+          "title": "CLI使用方法",
+          "execute": "コマンドIDで実行: switch-shuttle cmd_8",
+          "executeByName": "コマンド名で実行: switch-shuttle \"Example Command\"",
+          "list": "すべてのコマンドをリスト: switch-shuttle --list",
+          "search": "コマンドを検索: switch-shuttle --search \"git\""
+        },
+        "examples": {
+          "title": "CLI例",
+          "git": "クイックgit操作: switch-shuttle \"git status\"",
+          "dev": "開発ワークフロー: switch-shuttle \"npm run dev\"",
+          "docker": "Docker操作: switch-shuttle \"docker-compose up\""
+        }
+      },
+      "commands": {
+        "title": "⚡ コマンド",
+        "devServer": "開発サーバー: ローカル開発サーバーを起動",
+        "installDeps": "依存関係のインストール: プロジェクト依存関係をインストール",
+        "runTests": "テスト実行: テストスイートを実行",
+        "buildProject": "プロジェクトビルド: 本番用にプロジェクトをビルド",
+        "gitOps": "Git操作: 一般的なGitコマンド"
+      },
+      "config": {
+        "title": "⚙️ 設定",
+        "description": "設定ファイルは以下に保存されます:",
+        "macos": "macOS: ~/.config/switch-shuttle/",
+        "windows": "Windows: %APPDATA%/switch-shuttle/",
+        "linux": "Linux: ~/.config/switch-shuttle/"
+      },
+      "configuration": {
+        "title": "📋 設定ガイド",
+        "basicStructure": {
+          "title": "基本構造",
+          "description": "SwitchShuttleは以下の構造を持つJSON設定ファイルを使用します:"
+        },
+        "example": {
+          "title": "簡単な例"
+        },
+        "features": {
+          "title": "高度な機能",
+          "dynamicInputs": "動的入力 - ユーザー入力のプロンプトがあるインタラクティブなコマンドを作成",
+          "multipleCommands": "複数コマンド - コマンドシーケンスを実行",
+          "nestedSubmenus": "ネストしたサブメニュー - 階層メニューでコマンドを整理",
+          "switchCommands": "スイッチコマンド - バックグラウンド実行でシステム機能を切り替え",
+          "monitorCommands": "監視コマンド - システムリソースのリアルタイム監視"
+        }
+      },
+      "useCases": {
+        "title": "🎯 ユースケース",
+        "developers": {
+          "title": "👨‍💻 開発者",
+          "features": [
+            "クイックプロジェクトナビゲーション - 異なるプロジェクトに瞬時にジャンプ",
+            "ビルドとテストワークフロー - ワンクリック開発サイクル",
+            "Docker管理 - ホットキーでコンテナを起動/停止",
+            "Git操作 - 手元にある一般的なgitコマンド"
+          ]
+        },
+        "devops": {
+          "title": "🛠️ DevOpsエンジニア",
+          "features": [
+            "サーバー管理 - SSH接続とサーバーコマンド",
+            "監視ツール - ログとメトリクスへのクイックアクセス",
+            "デプロイメントスクリプト - 自動化されたデプロイメントワークフロー",
+            "データベース操作 - 一般的なデータベースコマンド"
+          ]
+        },
+        "designers": {
+          "title": "🎨 デザイナー",
+          "features": [
+            "アセット最適化 - 画像処理と最適化",
+            "デザインシステムツール - コンポーネント生成と更新",
+            "プロトタイプサーバー - クイックデザインサーバー起動"
+          ]
+        }
+      },
+      "footer": {
+        "info": "詳細情報は以下をご覧ください: https://github.com/s00d/switchshuttle",
+        "note": "これはインターフェースと機能を示すデモ版です。"
+      }
+    },
+    "about": {
+      "title": "SwitchShuttleについて",
+      "subtitle": "クロスプラットフォームターミナルコマンドマネージャー",
+      "version": "バージョン: 1.12.0",
+      "features": {
+        "title": "機能",
+        "config": {
+          "title": "設定作成",
+          "description": "ユニークなコマンドとホットキーを持つ様々なターミナル用のカスタマイズ可能な設定を作成。"
+        },
+        "editing": {
+          "title": "編集",
+          "description": "既存の設定を簡単に編集し、新しいコマンドを追加し、設定を変更。"
+        },
+        "quickAccess": {
+          "title": "クイックアクセス",
+          "description": "コマンドと設定へのクイックアクセス用のホットキーを設定。"
+        },
+        "terminalSupport": {
+          "title": "ターミナルサポート",
+          "description": "人気のターミナルをサポート: iTerm2、Terminal.app、Alacritty、Hyper、Warp。"
+        }
+      },
+      "technical": {
+        "title": "技術情報",
+        "technologies": {
+          "title": "技術",
+          "vue": "Vue.js 3 - フロントエンドフレームワーク",
+          "nuxt": "Nuxt 3 - SSRフレームワーク",
+          "typescript": "TypeScript - 型安全性",
+          "css": "CSS GridとFlexbox - スタイリング"
+        },
+        "requirements": {
+          "title": "システム要件",
+          "browser": "モダンなウェブブラウザ",
+          "memory": "4 GB RAM",
+          "storage": "100 MB空き容量"
+        }
+      },
+      "links": {
+        "title": "リンク"
+      }
+    },
+    "homepage": {
+      "title": "ホームページ",
+      "subtitle": "公式プロジェクトウェブサイト",
+      "description": {
+        "title": "説明",
+        "text": "SwitchShuttleは、ターミナル設定を管理するための強力なツールです。様々なターミナル設定を簡単に作成、編集、切り替えできます。"
+      },
+      "features": {
+        "title": "主要機能",
+        "feature1": "様々なターミナル用のカスタマイズ可能な設定を作成",
+        "feature2": "クイックアクセス用のホットキーサポート",
+        "feature3": "クロスプラットフォーム: macOS、Windows、Linux",
+        "feature4": "コマンドの作成と編集用のビジュアルエディター"
+      },
+      "links": {
+        "title": "便利なリンク"
+      },
+      "footer": {
+        "note": "これはインターフェースと機能を示すデモ版です。"
+      }
     },
     "jsonEditor": {
-      "title": "JSON エディター"
+      "title": "JSONエディター"
+    }
+  },
+  "readme": {
+    "title": "ドキュメント",
+    "loading": "ドキュメントを読み込み中...",
+    "error": "ドキュメントの読み込みに失敗しました",
+    "retry": "再試行",
+    "search": {
+      "placeholder": "ドキュメント内を検索..."
+    },
+    "toc": {
+      "title": "目次"
     }
   }
 } 

@@ -3,17 +3,226 @@
     "notifications": {
       "notAvailable": "Nicht verfügbar",
       "notAvailableMessage": "Diese Funktion ist in der Demo-Version nicht verfügbar.",
-      "homepage": "Homepage",
-      "homepageMessage": "Homepage wird im Browser geöffnet...\n\nhttps://github.com/s00d/switchshuttle",
+      "homepage": "Startseite",
+      "homepageMessage": "Öffne Startseite im Browser...\n\nhttps://github.com/s00d/switchshuttle",
       "quit": "SwitchShuttle beenden",
-      "quitMessage": "Möchten Sie SwitchShuttle wirklich beenden?",
+      "quitMessage": "Sind Sie sicher, dass Sie SwitchShuttle beenden möchten?",
       "settings": "Einstellungen",
-      "settingsMessage": "Das Einstellungsfenster ist in dieser Demo-Version nicht verfügbar.",
+      "settingsMessage": "Einstellungsfenster ist in dieser Demo-Version nicht verfügbar.",
       "about": "Über SwitchShuttle",
-      "aboutMessage": "SwitchShuttle v1.12.0\nPlattformübergreifender Terminal-Befehlsmanager\n\nDies ist eine Demo-Version."
+      "aboutMessage": "SwitchShuttle\nPlattformübergreifender Terminal-Befehlsmanager\n\nDies ist eine Demo-Version."
+    },
+    "help": {
+      "title": "SwitchShuttle",
+      "subtitle": "Plattformübergreifender Terminal-Befehlsmanager",
+      "description": "SwitchShuttle ist ein leistungsstarker Terminal-Befehlsmanager, der Entwicklern und Systemadministratoren dabei hilft, ihre häufig verwendeten Terminal-Befehle auf verschiedenen Plattformen zu organisieren, auszuführen und zu verwalten.",
+      "features": {
+        "title": "✨ Funktionen",
+        "commandTemplates": "Befehlsvorlagen: Vorkonfigurierte Befehlsvorlagen für häufige Entwicklungsaufgaben",
+        "hotkeySupport": "Hotkey-Unterstützung: Schneller Zugriff auf Befehle über anpassbare Hotkeys",
+        "crossPlatform": "Plattformübergreifend: Funktioniert auf macOS, Windows und Linux",
+        "visualEditor": "Visueller Editor: Integrierter visueller Editor zum Erstellen und Bearbeiten von Befehls-Konfigurationen",
+        "systemMonitoring": "Systemüberwachung: Echtzeitüberwachung von CPU- und Speichernutzung",
+        "autoRefresh": "Auto-Refresh: Automatisches Neuladen von Konfigurationen",
+        "launchAtLogin": "Beim Anmelden starten: Option zum automatischen Starten mit dem System"
+      },
+      "usage": {
+        "title": "🚀 Verwendung",
+        "steps": [
+          "Verwenden Sie das Menüleisten-Symbol, um auf SwitchShuttle zuzugreifen",
+          "Wählen Sie aus vordefinierten Befehlsvorlagen",
+          "Passen Sie Befehle mit dem visuellen Editor an",
+          "Verwenden Sie Hotkeys für schnelle Befehlsausführung",
+          "Überwachen Sie Systemressourcen in Echtzeit"
+        ]
+      },
+      "installation": {
+        "title": "📦 Installation",
+        "homebrew": {
+          "title": "Homebrew (macOS - Empfohlen)",
+          "command": "brew tap s00d/switchshuttle && brew install --cask switchshuttle"
+        },
+        "manual": {
+          "title": "Manueller Download",
+          "steps": [
+            "Laden Sie die neueste Version für Ihre Plattform von GitHub Releases herunter",
+            "Installieren Sie die Anwendung",
+            "Starten Sie SwitchShuttle - es erscheint in Ihrem System-Tray",
+            "Rechtsklick auf das Tray-Symbol für den Zugriff auf das Menü"
+          ]
+        },
+        "firstConfig": {
+          "title": "Erste Konfiguration",
+          "steps": [
+            "Edit Config → Öffnet Ihre Konfigurationsdatei in Ihrem Standard-Editor",
+            "Fügen Sie Ihre Befehle im JSON-Format hinzu",
+            "Speichern und Neustart der Anwendung",
+            "Genießen Sie Ihre organisierten Befehls-Shortcuts!"
+          ]
+        }
+      },
+      "cli": {
+        "title": "💻 Kommandozeilen-Interface",
+        "description": "SwitchShuttle bietet auch eine leistungsstarke Kommandozeilen-Schnittstelle für schnelle Befehlsausführung ohne Öffnen der GUI.",
+        "usage": {
+          "title": "CLI-Verwendung",
+          "execute": "Ausführen nach Befehls-ID: switch-shuttle cmd_8",
+          "executeByName": "Ausführen nach Befehlsname: switch-shuttle \"Beispiel-Befehl\"",
+          "list": "Alle Befehle auflisten: switch-shuttle --list",
+          "search": "Befehle suchen: switch-shuttle --search \"git\""
+        },
+        "examples": {
+          "title": "CLI-Beispiele",
+          "git": "Schnelle Git-Operationen: switch-shuttle \"git status\"",
+          "dev": "Entwicklungsworkflows: switch-shuttle \"npm run dev\"",
+          "docker": "Docker-Operationen: switch-shuttle \"docker-compose up\""
+        }
+      },
+      "commands": {
+        "title": "⚡ Befehle",
+        "devServer": "Entwicklungsserver: Lokale Entwicklungsserver starten",
+        "installDeps": "Abhängigkeiten installieren: Projektabhängigkeiten installieren",
+        "runTests": "Tests ausführen: Testsuites ausführen",
+        "buildProject": "Projekt bauen: Projekte für Produktion bauen",
+        "gitOps": "Git-Operationen: Häufige Git-Befehle"
+      },
+      "config": {
+        "title": "⚙️ Konfiguration",
+        "description": "Konfigurationsdateien werden gespeichert in:",
+        "macos": "macOS: ~/.config/switch-shuttle/",
+        "windows": "Windows: %APPDATA%/switch-shuttle/",
+        "linux": "Linux: ~/.config/switch-shuttle/"
+      },
+      "configuration": {
+        "title": "📋 Konfigurationsanleitung",
+        "basicStructure": {
+          "title": "Grundstruktur",
+          "description": "SwitchShuttle verwendet JSON-Konfigurationsdateien mit der folgenden Struktur:"
+        },
+        "example": {
+          "title": "Einfaches Beispiel"
+        },
+        "features": {
+          "title": "Erweiterte Funktionen",
+          "dynamicInputs": "Dynamische Eingaben - Erstellen Sie interaktive Befehle, die nach Benutzereingaben fragen",
+          "multipleCommands": "Mehrere Befehle - Führen Sie eine Befehlssequenz aus",
+          "nestedSubmenus": "Verschachtelte Untermenüs - Organisieren Sie Befehle in hierarchischen Menüs",
+          "switchCommands": "Schaltbefehle - Schalten Sie Systemfunktionen mit Hintergrundausführung um",
+          "monitorCommands": "Überwachungsbefehle - Echtzeitüberwachung von Systemressourcen"
+        }
+      },
+      "useCases": {
+        "title": "🎯 Anwendungsfälle",
+        "developers": {
+          "title": "👨‍💻 Entwickler",
+          "features": [
+            "Schnelle Projektnavigation - Springen Sie sofort zu verschiedenen Projekten",
+            "Build- und Test-Workflows - Ein-Klick-Entwicklungszyklen",
+            "Docker-Management - Container mit Hotkeys starten/stoppen",
+            "Git-Operationen - Häufige Git-Befehle griffbereit"
+          ]
+        },
+        "devops": {
+          "title": "🛠️ DevOps-Ingenieure",
+          "features": [
+            "Server-Management - SSH-Verbindungen und Server-Befehle",
+            "Überwachungstools - Schneller Zugriff auf Logs und Metriken",
+            "Deployment-Skripte - Automatisierte Deployment-Workflows",
+            "Datenbankoperationen - Häufige Datenbankbefehle"
+          ]
+        },
+        "designers": {
+          "title": "🎨 Designer",
+          "features": [
+            "Asset-Optimierung - Bildverarbeitung und -optimierung",
+            "Design-System-Tools - Komponentengenerierung und -aktualisierung",
+            "Prototyp-Server - Schneller Design-Server-Start"
+          ]
+        }
+      },
+      "footer": {
+        "info": "Weitere Informationen finden Sie unter: https://github.com/s00d/switchshuttle",
+        "note": "Dies ist eine Demo-Version, die die Benutzeroberfläche und Funktionalität zeigt."
+      }
+    },
+    "about": {
+      "title": "Über SwitchShuttle",
+      "subtitle": "Plattformübergreifender Terminal-Befehlsmanager",
+      "version": "Version: 1.12.0",
+      "features": {
+        "title": "Funktionen",
+        "config": {
+          "title": "Konfigurationserstellung",
+          "description": "Erstellen Sie anpassbare Konfigurationen für verschiedene Terminals mit einzigartigen Befehlen und Hotkeys."
+        },
+        "editing": {
+          "title": "Bearbeitung",
+          "description": "Bearbeiten Sie einfach bestehende Konfigurationen, fügen Sie neue Befehle hinzu und ändern Sie Einstellungen."
+        },
+        "quickAccess": {
+          "title": "Schneller Zugriff",
+          "description": "Konfigurieren Sie Hotkeys für schnellen Zugriff auf Befehle und Konfigurationen."
+        },
+        "terminalSupport": {
+          "title": "Terminal-Unterstützung",
+          "description": "Unterstützung für beliebte Terminals: iTerm2, Terminal.app, Alacritty, Hyper, Warp."
+        }
+      },
+      "technical": {
+        "title": "Technische Informationen",
+        "technologies": {
+          "title": "Technologien",
+          "vue": "Vue.js 3 - Frontend-Framework",
+          "nuxt": "Nuxt 3 - SSR-Framework",
+          "typescript": "TypeScript - Typsicherheit",
+          "css": "CSS Grid und Flexbox - Styling"
+        },
+        "requirements": {
+          "title": "Systemanforderungen",
+          "browser": "Moderner Webbrowser",
+          "memory": "4 GB RAM",
+          "storage": "100 MB freier Speicherplatz"
+        }
+      },
+      "links": {
+        "title": "Links"
+      }
+    },
+    "homepage": {
+      "title": "Startseite",
+      "subtitle": "Offizielle Projektwebsite",
+      "description": {
+        "title": "Beschreibung",
+        "text": "SwitchShuttle ist ein leistungsstarkes Tool zur Verwaltung von Terminal-Konfigurationen. Erstellen, bearbeiten und wechseln Sie zwischen verschiedenen Terminal-Einstellungen mit Leichtigkeit."
+      },
+      "features": {
+        "title": "Hauptfunktionen",
+        "feature1": "Erstellen Sie anpassbare Konfigurationen für verschiedene Terminals",
+        "feature2": "Hotkey-Unterstützung für schnellen Zugriff",
+        "feature3": "Plattformübergreifend: macOS, Windows, Linux",
+        "feature4": "Visueller Editor zum Erstellen und Bearbeiten von Befehlen"
+      },
+      "links": {
+        "title": "Nützliche Links"
+      },
+      "footer": {
+        "note": "Dies ist eine Demo-Version, die die Benutzeroberfläche und Funktionalität zeigt."
+      }
     },
     "jsonEditor": {
-      "title": "JSON Editor"
+      "title": "JSON-Editor"
+    }
+  },
+  "readme": {
+    "title": "Dokumentation",
+    "loading": "Dokumentation wird geladen...",
+    "error": "Dokumentation konnte nicht geladen werden",
+    "retry": "Wiederholen",
+    "search": {
+      "placeholder": "In Dokumentation suchen..."
+    },
+    "toc": {
+      "title": "Inhaltsverzeichnis"
     }
   }
 } 

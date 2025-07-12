@@ -10,10 +10,10 @@
       "settings": "Settings",
       "settingsMessage": "Settings window is not available in this demo version.",
       "about": "About SwitchShuttle",
-      "aboutMessage": "SwitchShuttle v1.12.0\nCross-platform terminal command manager\n\nThis is a demo version."
+      "aboutMessage": "SwitchShuttle\nCross-platform terminal command manager\n\nThis is a demo version."
     },
     "help": {
-      "title": "SwitchShuttle v1.12.0",
+      "title": "SwitchShuttle",
       "subtitle": "Cross-platform terminal command manager",
       "description": "SwitchShuttle is a powerful terminal command manager that helps developers and system administrators organize, execute, and manage their frequently used terminal commands across different platforms.",
       "features": {

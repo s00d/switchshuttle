@@ -67,32 +67,27 @@
   <!-- Links Menu - телепортирован в body -->
   <Teleport to="body">
     <div class="dropdown-menu links-menu" v-show="isLinksMenuOpen" @click.stop>
-      <div class="menu-item" @click="openLink('https://github.com/switchshuttle/switchshuttle')">
+      <div class="menu-item" @click="openLink('https://github.com/s00d/switchshuttle')">
         <div class="menu-item-content">
           <span class="menu-item-text">📥 Download</span>
         </div>
       </div>
-      <div class="menu-item" @click="openLink('https://docs.switchshuttle.dev')">
+      <div class="menu-item" @click="openLink('https://s00d.github.io/switchshuttle/')">
         <div class="menu-item-content">
           <span class="menu-item-text">📚 Documentation</span>
         </div>
       </div>
-      <div class="menu-item" @click="openLink('https://github.com/switchshuttle')">
+      <div class="menu-item" @click="openLink('https://github.com/s00d')">
         <div class="menu-item-content">
           <span class="menu-item-text">👨‍💻 Author</span>
         </div>
       </div>
-      <div class="menu-item" @click="openLink('https://github.com/switchshuttle/switchshuttle/issues')">
+      <div class="menu-item" @click="openLink('https://github.com/s00d/switchshuttle/issues')">
         <div class="menu-item-content">
           <span class="menu-item-text">🐛 Issues</span>
         </div>
       </div>
-      <div class="menu-item" @click="openLink('https://github.com/switchshuttle/switchshuttle/discussions')">
-        <div class="menu-item-content">
-          <span class="menu-item-text">💬 Discussions</span>
-        </div>
-      </div>
-      <div class="menu-item" @click="openLink('https://github.com/switchshuttle/switchshuttle/blob/main/LICENSE')">
+      <div class="menu-item" @click="openLink('https://github.com/s00d/switchshuttle/blob/main/LICENSE')">
         <div class="menu-item-content">
           <span class="menu-item-text">📄 License</span>
         </div>
