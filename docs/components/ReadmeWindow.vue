@@ -1,5 +1,5 @@
 <template>
-  <Window :title="`${$t('readme.title')} — SwitchShuttle`" :initial-x="800" :initial-y="50" :z="1200" :closable="true" :width="800" :height="600" @close="$emit('close')">
+  <Window :title="`${$t('readme.title')} — SwitchShuttle`" :initial-x="800" :initial-y="150" :z="1200" :closable="true" :width="800" :height="500" @close="$emit('close')">
     <template #titlebar>
       <div class="window-title">{{ $t('readme.title') }} — SwitchShuttle</div>
     </template>

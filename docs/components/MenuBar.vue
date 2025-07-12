@@ -16,7 +16,7 @@
         <span class="menu-bar-text">Links</span>
         <div class="locale-arrow">▼</div>
       </div>
-      <div class="menu-bar-item" @click="toggleMenu" v-if="props.showSwitchShuttleIcon">
+      <div class="menu-bar-item" @click="toggleMenu" v-if="props.showSwitchShuttleIcon" ref="switchShuttleIconRef">
         <img :src="getIconPath('icon.png')" alt="SwitchShuttle" class="menu-bar-icon">
       </div>
       <div class="menu-bar-item">
@@ -94,6 +94,23 @@
       </div>
     </div>
   </Teleport>
+
+  <!-- Click Hint - телепортирован в body -->
+  <Teleport to="body">
+    <div 
+      class="click-hint-overlay" 
+      v-show="props.showSwitchShuttleIcon && isClickHintVisible"
+      :style="{
+        top: clickHintPosition.top + 'px',
+        left: clickHintPosition.left + 'px'
+      }"
+    >
+      <div class="click-hint">
+        <div class="click-icon">👆</div>
+        <div class="click-text">Click to open</div>
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <script setup>
@@ -126,6 +143,11 @@ const isLinksMenuOpen = ref(false)
 const openSubmenu = ref(null)
 const currentTime = ref('')
 const currentLocale = ref('🇺🇸 EN')
+
+// Позиция подсказки клика
+const clickHintPosition = ref({ top: 0, left: 0 })
+const switchShuttleIconRef = ref(null)
+const isClickHintVisible = ref(false)
 
 // Динамические значения для мониторинга
 const cpuUsage = ref('25')
@@ -202,9 +224,16 @@ function openLink(url) {
 }
 
 function getIconPath(icon) {
-  // Автоматически получаем baseURL из конфигурации Nuxt
+  // Получаем baseURL из конфигурации Nuxt
   const config = useRuntimeConfig()
   const baseURL = config.app.baseURL || ''
+  
+  // Если baseURL пустой или равен '/', используем относительный путь
+  if (!baseURL || baseURL === '/') {
+    return `/${icon}`
+  }
+  
+  // Иначе добавляем baseURL
   return `${baseURL}/${icon}`
 }
 
@@ -308,9 +337,51 @@ function updateTime() {
   })
 }
 
+function updateClickHintPosition() {
+  if (switchShuttleIconRef.value && props.showSwitchShuttleIcon) {
+    const rect = switchShuttleIconRef.value.getBoundingClientRect()
+    
+    if (rect.width > 0 && rect.height > 0) {
+      // Сначала устанавливаем позицию без учета размера подсказки
+      clickHintPosition.value = {
+        top: rect.bottom + 8,
+        left: rect.left + (rect.width / 2)
+      }
+      
+      // Показываем подсказку
+      isClickHintVisible.value = true
+      
+      // После показа получаем реальные размеры и корректируем позицию
+      setTimeout(() => {
+        const hintElement = document.querySelector('.click-hint')
+        if (hintElement) {
+          const hintWidth = hintElement.offsetWidth
+          clickHintPosition.value = {
+            top: rect.bottom + 8,
+            left: rect.left + (rect.width / 2) - (hintWidth / 2)
+          }
+        }
+      }, 50)
+    }
+  }
+}
+
 // Следим за изменениями локали
 watch(locale, (newLocale) => {
   setCurrentLocale(newLocale)
+})
+
+// Следим за изменением видимости иконки
+watch(() => props.showSwitchShuttleIcon, (newValue) => {
+  if (newValue) {
+    // Скрываем подсказку до правильного позиционирования
+    isClickHintVisible.value = false
+    // Обновляем позицию с задержкой
+    setTimeout(updateClickHintPosition, 100)
+  } else {
+    // Скрываем подсказку при скрытии иконки
+    isClickHintVisible.value = false
+  }
 })
 
 // Lifecycle
@@ -319,6 +390,11 @@ onMounted(() => {
   
   // Устанавливаем текущую локаль на основе i18n
   setCurrentLocale(locale.value)
+  
+  // Скрываем подсказку до правильного позиционирования
+  isClickHintVisible.value = false
+  // Обновляем позицию подсказки с задержкой
+  setTimeout(updateClickHintPosition, 100)
   
   const timeInterval = setInterval(updateTime, 1000)
   
@@ -329,6 +405,13 @@ onMounted(() => {
     ramUsage.value = `${Math.floor(Math.random() * 2000 + 500)} MB`
   }, 1000)
   
+  // Обновляем позицию подсказки при изменении размера окна
+  window.addEventListener('resize', () => {
+    if (props.showSwitchShuttleIcon && isClickHintVisible.value) {
+      updateClickHintPosition()
+    }
+  })
+  
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.dropdown-menu') && !e.target.closest('.locale-menu') && !e.target.closest('.links-menu') && !e.target.closest('.menu-bar-right') && !e.target.closest('.menu-bar-left')) {
       closeMenu()
@@ -338,6 +421,7 @@ onMounted(() => {
   onUnmounted(() => {
     clearInterval(timeInterval)
     clearInterval(dynamicInterval)
+    window.removeEventListener('resize', updateClickHintPosition)
   })
 })
 </script>
