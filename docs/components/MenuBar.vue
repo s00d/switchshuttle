@@ -207,8 +207,9 @@ function openLink(url) {
 }
 
 function getIconPath(icon) {
-  // Учитываем baseURL для GitHub Pages
-  const baseURL = process.env.NODE_ENV === 'production' ? '/switchshuttle' : ''
+  // Автоматически получаем baseURL из конфигурации Nuxt
+  const config = useRuntimeConfig()
+  const baseURL = config.app.baseURL || ''
   return `${baseURL}/${icon}`
 }
 
