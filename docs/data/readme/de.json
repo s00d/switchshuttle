@@ -1,0 +1,222 @@
+{
+  "success": true,
+  "content": "</div>\n\n<hr>\n\n      <h2 id=\"heading--was-ist-switchshuttle-\">\n        <a name=\"-was-ist-switchshuttle-\" class=\"anchor\" href=\"#-was-ist-switchshuttle-\">\n          <span class=\"header-link\"></span>\n        </a>\n        ✨ Was ist SwitchShuttle?\n      </h2>\n<p>SwitchShuttle ist eine leistungsstarke plattformübergreifende System-Tray-Anwendung, die die Art und Weise revolutioniert, wie Sie Terminal-Befehle verwalten und ausführen. Entwickelt mit modernen Technologien (Rust + Tauri + Vue.js) bietet es eine elegante Oberfläche zur Organisation, Anpassung und zum schnellen Zugriff auf Ihre am häufigsten verwendeten Terminal-Operationen.</p>\n\n      <h3 id=\"heading--hauptfunktionen\">\n        <a name=\"-hauptfunktionen\" class=\"anchor\" href=\"#-hauptfunktionen\">\n          <span class=\"header-link\"></span>\n        </a>\n        🎯 Hauptfunktionen\n      </h3>\n<ul>\n<li><strong>🖥️ Multi-Plattform-Unterstützung</strong> - Funktioniert nahtlos auf macOS, Windows und Linux</li>\n<li><strong>⚡ Globale Hotkeys</strong> - Führen Sie Befehle sofort von überall mit Tastenkombinationen aus</li>\n<li><strong>🎨 Mehrere Terminal-Unterstützung</strong> - iTerm, Terminal, Warp, Alacritty, Hyper und mehr</li>\n<li><strong>📁 Intelligente Organisation</strong> - Erstellen Sie verschachtelte Untermenüs für bessere Befehlsorganisation</li>\n<li><strong>🔧 Dynamische Eingaben</strong> - Interaktive Eingabeaufforderungen für Befehle, die Benutzereingaben benötigen</li>\n<li><strong>🔄 Mehrere Ausführungsmodi</strong> - Ausführung im aktuellen Fenster, neuer Tab oder neues Fenster</li>\n<li><strong>🚀 Auto-Start</strong> - Start beim Systemstart für sofortigen Zugriff</li>\n<li><strong>🎨 Moderne UI</strong> - Schöne, intuitive Oberfläche entwickelt mit Vue.js</li>\n<li><strong>💻 Kommandozeilen-Interface</strong> - Führen Sie Befehle direkt aus dem Terminal mit CLI aus</li>\n<li><strong>⚙️ Konfigurationsverwaltung</strong> - Aktivieren/Deaktivieren von Konfigurationen ohne Löschung</li>\n<li><strong>🔄 Schalter-Befehle</strong> - Systemfunktionen mit Hintergrundausführung umschalten</li>\n<li><strong>📊 Überwachungsbefehle</strong> - Echtzeit-Überwachung von Systemressourcen mit visuellen Indikatoren</li>\n</ul>\n\n      <h2 id=\"heading--schnellstart\">\n        <a name=\"-schnellstart\" class=\"anchor\" href=\"#-schnellstart\">\n          <span class=\"header-link\"></span>\n        </a>\n        🚀 Schnellstart\n      </h2>\n\n      <h3 id=\"heading-download-amp-installation\">\n        <a name=\"download-amp-installation\" class=\"anchor\" href=\"#download-amp-installation\">\n          <span class=\"header-link\"></span>\n        </a>\n        Download &amp; Installation\n      </h3>\n\n      <h4 id=\"heading-option-1-homebrew-macos-empfohlen-\">\n        <a name=\"option-1-homebrew-macos-empfohlen-\" class=\"anchor\" href=\"#option-1-homebrew-macos-empfohlen-\">\n          <span class=\"header-link\"></span>\n        </a>\n        Option 1: Homebrew (macOS - Empfohlen)\n      </h4>\n<pre class=\"code-block\" data-language=\"bash\"><code class=\"language-bash\"># Installation über Homebrew\nbrew tap s00d/switchshuttle\nbrew install --cask switchshuttle\n</code></pre>\n\n      <h4 id=\"heading-option-2-manueller-download\">\n        <a name=\"option-2-manueller-download\" class=\"anchor\" href=\"#option-2-manueller-download\">\n          <span class=\"header-link\"></span>\n        </a>\n        Option 2: Manueller Download\n      </h4>\n<ol>\n<li><strong>Laden Sie</strong> die neueste Version für Ihre Plattform von <a href=\"https://github.com/s00d/switchshuttle/releases\" target=\"_blank\" rel=\"noopener noreferrer\">GitHub Releases</a> herunter</li>\n<li><strong>Installieren Sie</strong> die Anwendung</li>\n<li><strong>Starten Sie</strong> SwitchShuttle - es erscheint in Ihrem System-Tray</li>\n<li><strong>Rechtsklick</strong> auf das Tray-Symbol für den Menüzugriff</li>\n</ol>\n\n      <h3 id=\"heading-erste-konfiguration\">\n        <a name=\"erste-konfiguration\" class=\"anchor\" href=\"#erste-konfiguration\">\n          <span class=\"header-link\"></span>\n        </a>\n        Erste Konfiguration\n      </h3>\n<ol>\n<li><strong>Konfiguration bearbeiten</strong> → Öffnet Ihre Konfigurationsdatei in Ihrem Standardeditor</li>\n<li><strong>Fügen Sie Ihre Befehle</strong> mit dem JSON-Format hinzu (siehe Beispiele unten)</li>\n<li><strong>Speichern und neu starten</strong> Sie die Anwendung</li>\n<li><strong>Genießen Sie</strong> Ihre organisierten Befehlsverknüpfungen!</li>\n</ol>\n\n      <h2 id=\"heading--konfigurationsanleitung\">\n        <a name=\"-konfigurationsanleitung\" class=\"anchor\" href=\"#-konfigurationsanleitung\">\n          <span class=\"header-link\"></span>\n        </a>\n        📋 Konfigurationsanleitung\n      </h2>\n\n      <h3 id=\"heading-grundstruktur\">\n        <a name=\"grundstruktur\" class=\"anchor\" href=\"#grundstruktur\">\n          <span class=\"header-link\"></span>\n        </a>\n        Grundstruktur\n      </h3>\n<p>SwitchShuttle verwendet JSON-Konfigurationsdateien, gespeichert in:</p>\n<ul>\n<li><strong>macOS/Linux</strong>: <code>~/.config/switch-shuttle/</code></li>\n<li><strong>Windows</strong>: <code>C:\\Users\\&lt;Username&gt;\\AppData\\Roaming\\switch-shuttle\\</code></li>\n</ul>\n\n      <h3 id=\"heading-einfaches-beispiel\">\n        <a name=\"einfaches-beispiel\" class=\"anchor\" href=\"#einfaches-beispiel\">\n          <span class=\"header-link\"></span>\n        </a>\n        Einfaches Beispiel\n      </h3>\n<pre class=\"code-block\" data-language=\"json\"><code class=\"language-json\">{\n  &quot;terminal&quot;: &quot;iterm&quot;,\n  &quot;launch_in&quot;: &quot;new_tab&quot;,\n  &quot;title&quot;: &quot;Meine Befehle&quot;,\n  &quot;commands&quot;: [\n    {\n      &quot;name&quot;: &quot;🚀 Entwicklungsserver starten&quot;,\n      &quot;command&quot;: &quot;npm run dev&quot;,\n      &quot;hotkey&quot;: &quot;Ctrl+Shift+D&quot;\n    },\n    {\n      &quot;name&quot;: &quot;📦 Abhängigkeiten installieren&quot;,\n      &quot;command&quot;: &quot;npm install&quot;,\n      &quot;hotkey&quot;: &quot;Ctrl+Shift+I&quot;\n    },\n    {\n      &quot;name&quot;: &quot;🔧 Entwicklungstools&quot;,\n      &quot;submenu&quot;: [\n        {\n          &quot;name&quot;: &quot;🧪 Tests ausführen&quot;,\n          &quot;command&quot;: &quot;npm test&quot;,\n          &quot;hotkey&quot;: &quot;Ctrl+Shift+T&quot;\n        },\n        {\n          &quot;name&quot;: &quot;📊 Projekt bauen&quot;,\n          &quot;command&quot;: &quot;npm run build&quot;,\n          &quot;hotkey&quot;: &quot;Ctrl+Shift+B&quot;\n        }\n      ]\n    }\n  ]\n}\n</code></pre>\n\n      <h3 id=\"heading-erweiterte-funktionen\">\n        <a name=\"erweiterte-funktionen\" class=\"anchor\" href=\"#erweiterte-funktionen\">\n          <span class=\"header-link\"></span>\n        </a>\n        Erweiterte Funktionen\n      </h3>\n\n      <h4 id=\"heading--dynamische-eingaben\">\n        <a name=\"-dynamische-eingaben\" class=\"anchor\" href=\"#-dynamische-eingaben\">\n          <span class=\"header-link\"></span>\n        </a>\n        🔧 Dynamische Eingaben\n      </h4>\n<p>Erstellen Sie interaktive Befehle, die nach Benutzereingaben fragen:</p>\n<pre class=\"code-block\" data-language=\"json\"><code class=\"language-json\">{\n  &quot;name&quot;: &quot;📝 Neue Komponente erstellen&quot;,\n  &quot;inputs&quot;: {\n    &quot;componentName&quot;: &quot;MyComponent&quot;,\n    &quot;componentType&quot;: &quot;functional&quot;\n  },\n  &quot;commands&quot;: [\n    &quot;mkdir -p src/components/[componentName]&quot;,\n    &quot;touch src/components/[componentName]/index.tsx&quot;,\n    &quot;echo &#39;import React from \\&quot;react\\&quot;;&#39; &gt; src/components/[componentName]/index.tsx&quot;,\n    &quot;echo &#39;export const [componentName] = () =&gt; &lt;div&gt;[componentName]&lt;/div&gt;;&#39; &gt;&gt; src/components/[componentName]/index.tsx&quot;\n  ],\n  &quot;hotkey&quot;: &quot;Ctrl+Shift+N&quot;\n}\n</code></pre>\n\n      <h4 id=\"heading--mehrere-befehle\">\n        <a name=\"-mehrere-befehle\" class=\"anchor\" href=\"#-mehrere-befehle\">\n          <span class=\"header-link\"></span>\n        </a>\n        🔄 Mehrere Befehle\n      </h4>\n<p>Führen Sie eine Befehlssequenz aus:</p>\n<pre class=\"code-block\" data-language=\"json\"><code class=\"language-json\">{\n  &quot;name&quot;: &quot;🔄 Vollständiger Entwicklungszyklus&quot;,\n  &quot;commands&quot;: [\n    &quot;git pull origin main&quot;,\n    &quot;npm install&quot;,\n    &quot;npm run lint&quot;,\n    &quot;npm run test&quot;,\n    &quot;npm run build&quot;\n  ],\n  &quot;hotkey&quot;: &quot;Ctrl+Shift+F&quot;\n}\n</code></pre>\n\n      <h4 id=\"heading--verschachtelte-untermen-s\">\n        <a name=\"-verschachtelte-untermen-s\" class=\"anchor\" href=\"#-verschachtelte-untermen-s\">\n          <span class=\"header-link\"></span>\n        </a>\n        📁 Verschachtelte Untermenüs\n      </h4>\n<p>Organisieren Sie Befehle in hierarchischen Menüs:</p>\n<pre class=\"code-block\" data-language=\"json\"><code class=\"language-json\">{\n  &quot;name&quot;: &quot;🐳 Docker-Operationen&quot;,\n  &quot;submenu&quot;: [\n    {\n      &quot;name&quot;: &quot;🚀 Dienste starten&quot;,\n      &quot;submenu&quot;: [\n        {\n          &quot;name&quot;: &quot;🏗️ Entwicklung&quot;,\n          &quot;command&quot;: &quot;docker-compose -f docker-compose.dev.yml up -d&quot;\n        },\n        {\n          &quot;name&quot;: &quot;🏭 Produktion&quot;,\n          &quot;command&quot;: &quot;docker-compose -f docker-compose.prod.yml up -d&quot;\n        }\n      ]\n    },\n    {\n      &quot;name&quot;: &quot;🛑 Alle stoppen&quot;,\n      &quot;command&quot;: &quot;docker-compose down&quot;\n    }\n  ]\n}\n</code></pre>\n\n      <h4 id=\"heading--schalter-befehle\">\n        <a name=\"-schalter-befehle\" class=\"anchor\" href=\"#-schalter-befehle\">\n          <span class=\"header-link\"></span>\n        </a>\n        🔄 Schalter-Befehle\n      </h4>\n<p>Systemfunktionen mit Hintergrundausführung umschalten:</p>\n<pre class=\"code-block\" data-language=\"json\"><code class=\"language-json\">{\n  &quot;name&quot;: &quot;🔧 Systemsteuerung&quot;,\n  &quot;submenu&quot;: [\n    {\n      &quot;name&quot;: &quot;📶 WiFi umschalten&quot;,\n      &quot;command&quot;: &quot;networksetup -setairportpower en0 toggle&quot;,\n      &quot;switch&quot;: &quot;networksetup -getairportpower en0 | grep -q &#39;On&#39; &amp;&amp; echo &#39;true&#39; || echo &#39;false&#39;&quot;\n    },\n    {\n      &quot;name&quot;: &quot;🔊 Bluetooth umschalten&quot;,\n      &quot;command&quot;: &quot;blueutil -p toggle&quot;,\n      &quot;switch&quot;: &quot;blueutil -p | grep -q &#39;1&#39; &amp;&amp; echo &#39;true&#39; || echo &#39;false&#39;&quot;\n    },\n    {\n      &quot;name&quot;: &quot;🌙 Dunklen Modus umschalten&quot;,\n      &quot;command&quot;: &quot;osascript -e &#39;tell app \\&quot;System Events\\&quot; to tell appearance preferences to set dark mode to not dark mode&#39;&quot;,\n      &quot;switch&quot;: &quot;osascript -e &#39;tell app \\&quot;System Events\\&quot; to tell appearance preferences to get dark mode&#39;&quot;\n    }\n  ]\n}\n</code></pre>\n<p><strong>Schalter-Befehl-Funktionen:</strong></p>\n<ul>\n<li><strong>Hintergrundausführung</strong> - Befehle werden leise ausgeführt ohne Terminal zu öffnen</li>\n<li><strong>Statusprüfung</strong> - Erkennt automatisch den aktuellen Zustand</li>\n<li><strong>Visuelles Feedback</strong> - Zeigt aktiviert/deaktiviert Status im Menü</li>\n<li><strong>Plattformübergreifend</strong> - Funktioniert auf macOS, Windows und Linux</li>\n</ul>\n\n      <h4 id=\"heading--berwachungsbefehle\">\n        <a name=\"-berwachungsbefehle\" class=\"anchor\" href=\"#-berwachungsbefehle\">\n          <span class=\"header-link\"></span>\n        </a>\n        📊 Überwachungsbefehle\n      </h4>\n<p>Überwachung von Systemressourcen und Diensten mit Echtzeit-Informationen:</p>\n<pre class=\"code-block\" data-language=\"json\"><code class=\"language-json\">{\n  &quot;name&quot;: &quot;📊 Systemüberwachung&quot;,\n  &quot;submenu&quot;: [\n    {\n      &quot;name&quot;: &quot;💾 Speichernutzung&quot;,\n      &quot;command&quot;: &quot;top -l 1 | head -n 10&quot;,\n      &quot;monitor&quot;: &quot;memory&quot;,\n      &quot;icon&quot;: &quot;🧠&quot;\n    },\n    {\n      &quot;name&quot;: &quot;💻 CPU-Auslastung&quot;,\n      &quot;command&quot;: &quot;top -l 1 | grep &#39;CPU usage&#39;&quot;,\n      &quot;monitor&quot;: &quot;cpu&quot;,\n      &quot;icon&quot;: &quot;⚡&quot;\n    },\n    {\n      &quot;name&quot;: &quot;💾 Festplattenspeicher&quot;,\n      &quot;command&quot;: &quot;df -h | grep &#39;/dev/&#39;&quot;,\n      &quot;monitor&quot;: &quot;disk&quot;,\n      &quot;icon&quot;: &quot;💾&quot;\n    },\n    {\n      &quot;name&quot;: &quot;🌐 Netzwerkstatus&quot;,\n      &quot;command&quot;: &quot;ifconfig | grep -E &#39;inet |status:&#39;&quot;,\n      &quot;monitor&quot;: &quot;network&quot;,\n      &quot;icon&quot;: &quot;🌐&quot;\n    }\n  ]\n}\n</code></pre>\n<p><strong>Überwachungsbefehle Funktionen:</strong></p>\n<ul>\n<li><strong>Menüintegration</strong> - Hinzufügen von Überwachungsbuttons zum System-Tray-Menü</li>\n<li><strong>Befehlsausführung</strong> - Ausführung von Überwachungsbefehlen beim Öffnen des Menüs</li>\n<li><strong>Datenanzeige</strong> - Anzeige der Befehlsausgabe direkt in der Menüoberfläche</li>\n<li><strong>Visuelle Indikatoren</strong> - Icons und Statusindikatoren im Menü</li>\n<li><strong>Plattformübergreifend</strong> - Funktioniert auf macOS, Windows und Linux</li>\n</ul>\n\n      <h2 id=\"heading--konfigurationsreferenz\">\n        <a name=\"-konfigurationsreferenz\" class=\"anchor\" href=\"#-konfigurationsreferenz\">\n          <span class=\"header-link\"></span>\n        </a>\n        ⚙️ Konfigurationsreferenz\n      </h2>\n\n      <h3 id=\"heading-hauptkonfiguration\">\n        <a name=\"hauptkonfiguration\" class=\"anchor\" href=\"#hauptkonfiguration\">\n          <span class=\"header-link\"></span>\n        </a>\n        Hauptkonfiguration\n      </h3>\n<table class=\"console-table\">\n<thead>\n<tr>\n<th>Parameter</th>\n<th>Typ</th>\n<th>Beschreibung</th>\n<th>Standard</th>\n</tr>\n</thead>\n<tbody><tr>\n<td><code>terminal</code></td>\n<td>String</td>\n<td>Zu verwendende Terminal-Anwendung</td>\n<td><code>&quot;terminal&quot;</code></td>\n</tr>\n<tr>\n<td><code>launch_in</code></td>\n<td>String</td>\n<td>Wo Befehle gestartet werden sollen</td>\n<td><code>&quot;current&quot;</code></td>\n</tr>\n<tr>\n<td><code>theme</code></td>\n<td>String</td>\n<td>Terminal-Thema (falls unterstützt)</td>\n<td>-</td>\n</tr>\n<tr>\n<td><code>title</code></td>\n<td>String</td>\n<td>Fenster/Tab-Titel</td>\n<td>-</td>\n</tr>\n<tr>\n<td><code>menu_hotkey</code></td>\n<td>String</td>\n<td>Globaler Hotkey zum Öffnen des Menüs</td>\n<td>-</td>\n</tr>\n<tr>\n<td><code>commands</code></td>\n<td>Array</td>\n<td>Liste der Befehls-Konfigurationen</td>\n<td><code>[]</code></td>\n</tr>\n<tr>\n<td><code>enabled</code></td>\n<td>Boolean</td>\n<td>Ob diese Konfiguration geladen werden soll</td>\n<td><code>true</code></td>\n</tr>\n</tbody></table>\n\n      <h3 id=\"heading-terminal-optionen\">\n        <a name=\"terminal-optionen\" class=\"anchor\" href=\"#terminal-optionen\">\n          <span class=\"header-link\"></span>\n        </a>\n        Terminal-Optionen\n      </h3>\n<table class=\"console-table\">\n<thead>\n<tr>\n<th>Terminal</th>\n<th>macOS</th>\n<th>Windows</th>\n<th>Linux</th>\n</tr>\n</thead>\n<tbody><tr>\n<td><code>iterm</code></td>\n<td>✅</td>\n<td>❌</td>\n<td>❌</td>\n</tr>\n<tr>\n<td><code>terminal</code></td>\n<td>✅</td>\n<td>✅</td>\n<td>✅</td>\n</tr>\n<tr>\n<td><code>warp</code></td>\n<td>✅</td>\n<td>❌</td>\n<td>❌</td>\n</tr>\n<tr>\n<td><code>alacritty</code></td>\n<td>✅</td>\n<td>✅</td>\n<td>✅</td>\n</tr>\n<tr>\n<td><code>hyper</code></td>\n<td>✅</td>\n<td>✅</td>\n<td>✅</td>\n</tr>\n</tbody></table>\n\n      <h3 id=\"heading-startmodi\">\n        <a name=\"startmodi\" class=\"anchor\" href=\"#startmodi\">\n          <span class=\"header-link\"></span>\n        </a>\n        Startmodi\n      </h3>\n<table class=\"console-table\">\n<thead>\n<tr>\n<th>Modus</th>\n<th>Beschreibung</th>\n</tr>\n</thead>\n<tbody><tr>\n<td><code>current</code></td>\n<td>Im aktuellen Terminal-Fenster ausführen</td>\n</tr>\n<tr>\n<td><code>new_tab</code></td>\n<td>Neuen Tab öffnen und ausführen</td>\n</tr>\n<tr>\n<td><code>new_window</code></td>\n<td>Neues Fenster öffnen und ausführen</td>\n</tr>\n</tbody></table>\n\n      <h3 id=\"heading-befehls-konfiguration\">\n        <a name=\"befehls-konfiguration\" class=\"anchor\" href=\"#befehls-konfiguration\">\n          <span class=\"header-link\"></span>\n        </a>\n        Befehls-Konfiguration\n      </h3>\n<table class=\"console-table\">\n<thead>\n<tr>\n<th>Parameter</th>\n<th>Typ</th>\n<th>Erforderlich</th>\n<th>Beschreibung</th>\n</tr>\n</thead>\n<tbody><tr>\n<td><code>name</code></td>\n<td>String</td>\n<td>✅</td>\n<td>Anzeigename für den Befehl</td>\n</tr>\n<tr>\n<td><code>command</code></td>\n<td>String</td>\n<td>❌</td>\n<td>Einzelner auszuführender Befehl</td>\n</tr>\n<tr>\n<td><code>commands</code></td>\n<td>Array</td>\n<td>❌</td>\n<td>Mehrere auszuführende Befehle</td>\n</tr>\n<tr>\n<td><code>submenu</code></td>\n<td>Array</td>\n<td>❌</td>\n<td>Verschachtelte Unterbefehle</td>\n</tr>\n<tr>\n<td><code>inputs</code></td>\n<td>Object</td>\n<td>❌</td>\n<td>Dynamische Eingabefelder</td>\n</tr>\n<tr>\n<td><code>hotkey</code></td>\n<td>String</td>\n<td>❌</td>\n<td>Globaler Hotkey</td>\n</tr>\n<tr>\n<td><code>switch</code></td>\n<td>String</td>\n<td>❌</td>\n<td>Befehl zum Überprüfen des aktuellen Status (für Schalter-Befehle)</td>\n</tr>\n<tr>\n<td><code>monitor</code></td>\n<td>String</td>\n<td>❌</td>\n<td>Überwachungstyp für Echtzeit-Ressourcenverfolgung</td>\n</tr>\n<tr>\n<td><code>icon</code></td>\n<td>String</td>\n<td>❌</td>\n<td>Emoji-Icon zur visuellen Identifikation</td>\n</tr>\n</tbody></table>\n\n      <h3 id=\"heading-konfigurationsverwaltung\">\n        <a name=\"konfigurationsverwaltung\" class=\"anchor\" href=\"#konfigurationsverwaltung\">\n          <span class=\"header-link\"></span>\n        </a>\n        Konfigurationsverwaltung\n      </h3>\n\n      <h4 id=\"heading-konfigurationen-aktivieren-deaktivieren\">\n        <a name=\"konfigurationen-aktivieren-deaktivieren\" class=\"anchor\" href=\"#konfigurationen-aktivieren-deaktivieren\">\n          <span class=\"header-link\"></span>\n        </a>\n        Konfigurationen aktivieren/deaktivieren\n      </h4>\n<p>Sie können einzelne Konfigurationsdateien aktivieren oder deaktivieren, um zu steuern, welche Befehle im System-Tray-Menü verfügbar sind. Dies ist nützlich für:</p>\n<ul>\n<li><strong>Temporäres Deaktivieren</strong> - Deaktivieren Sie Konfigurationen ohne Löschung</li>\n<li><strong>Tests</strong> - Aktivieren/Deaktivieren von Konfigurationen während der Entwicklung</li>\n<li><strong>Organisation</strong> - Behalten Sie mehrere Konfigurationen, verwenden Sie aber nur bestimmte</li>\n</ul>\n<p><strong>Im visuellen Editor:</strong></p>\n<ul>\n<li>Öffnen Sie den Konfigurationseditor</li>\n<li>Verwenden Sie den Umschalter im Abschnitt &quot;Konfigurationsstatus&quot;</li>\n<li>Aktivierte Konfigurationen werden geladen und im Menü verfügbar sein</li>\n<li>Deaktivierte Konfigurationen werden ignoriert</li>\n</ul>\n<p><strong>In JSON-Konfiguration:</strong></p>\n<pre class=\"code-block\" data-language=\"json\"><code class=\"language-json\">{\n  &quot;terminal&quot;: &quot;iterm&quot;,\n  &quot;launch_in&quot;: &quot;current&quot;,\n  &quot;title&quot;: &quot;Meine Befehle&quot;,\n  &quot;enabled&quot;: true,\n  &quot;commands&quot;: [\n    {\n      &quot;name&quot;: &quot;Beispiel-Befehl&quot;,\n      &quot;command&quot;: &quot;echo Hello World&quot;\n    }\n  ]\n}\n</code></pre>\n<table class=\"console-table\">\n<thead>\n<tr>\n<th>Parameter</th>\n<th>Typ</th>\n<th>Standard</th>\n<th>Beschreibung</th>\n</tr>\n</thead>\n<tbody><tr>\n<td><code>enabled</code></td>\n<td>Boolean</td>\n<td><code>true</code></td>\n<td>Ob diese Konfiguration geladen und im Menü verfügbar sein soll</td>\n</tr>\n</tbody></table>\n<p><strong>Hinweis:</strong> Wenn <code>enabled</code> auf <code>false</code> gesetzt oder weggelassen wird, wird die Konfiguration ignoriert und ihre Befehle erscheinen nicht im System-Tray-Menü.</p>\n\n      <h2 id=\"heading--anwendungsf-lle\">\n        <a name=\"-anwendungsf-lle\" class=\"anchor\" href=\"#-anwendungsf-lle\">\n          <span class=\"header-link\"></span>\n        </a>\n        🎯 Anwendungsfälle\n      </h2>\n\n      <h3 id=\"heading--entwickler\">\n        <a name=\"-entwickler\" class=\"anchor\" href=\"#-entwickler\">\n          <span class=\"header-link\"></span>\n        </a>\n        👨‍💻 Entwickler\n      </h3>\n<ul>\n<li><strong>Schnelle Projektnavigation</strong> - Springen Sie sofort zu verschiedenen Projekten</li>\n<li><strong>Build- und Test-Workflows</strong> - Entwicklungszyklen mit einem Klick</li>\n<li><strong>Docker-Verwaltung</strong> - Container mit Hotkeys starten/stoppen</li>\n<li><strong>Git-Operationen</strong> - Häufige Git-Befehle griffbereit</li>\n</ul>\n\n      <h3 id=\"heading--devops-ingenieure\">\n        <a name=\"-devops-ingenieure\" class=\"anchor\" href=\"#-devops-ingenieure\">\n          <span class=\"header-link\"></span>\n        </a>\n        🛠️ DevOps-Ingenieure\n      </h3>\n<ul>\n<li><strong>Serververwaltung</strong> - SSH-Verbindungen und Server-Befehle</li>\n<li><strong>Überwachungstools</strong> - Schneller Zugriff auf Logs und Metriken</li>\n<li><strong>Deployment-Skripte</strong> - Automatisierte Deployment-Workflows</li>\n<li><strong>Datenbankoperationen</strong> - Häufige Datenbank-Befehle</li>\n</ul>\n\n      <h3 id=\"heading--designer\">\n        <a name=\"-designer\" class=\"anchor\" href=\"#-designer\">\n          <span class=\"header-link\"></span>\n        </a>\n        🎨 Designer\n      </h3>\n<ul>\n<li><strong>Asset-Optimierung</strong> - Bildverarbeitung und -optimierung</li>\n<li><strong>Design-System-Tools</strong> - Komponenten-Generierung und -Updates</li>\n<li><strong>Prototyp-Server</strong> - Schneller Design-Server-Start</li>\n</ul>\n\n      <h2 id=\"heading--build-aus-quellcode\">\n        <a name=\"-build-aus-quellcode\" class=\"anchor\" href=\"#-build-aus-quellcode\">\n          <span class=\"header-link\"></span>\n        </a>\n        🔧 Build aus Quellcode\n      </h2>\n\n      <h3 id=\"heading-voraussetzungen\">\n        <a name=\"voraussetzungen\" class=\"anchor\" href=\"#voraussetzungen\">\n          <span class=\"header-link\"></span>\n        </a>\n        Voraussetzungen\n      </h3>\n<ul>\n<li><a href=\"https://www.rust-lang.org/tools/install\" target=\"_blank\" rel=\"noopener noreferrer\">Rust</a> (neueste stabile Version)</li>\n<li><a href=\"https://nodejs.org/\" target=\"_blank\" rel=\"noopener noreferrer\">Node.js</a> (v16 oder höher)</li>\n<li><a href=\"https://tauri.app/v1/guides/getting-started/prerequisites/\" target=\"_blank\" rel=\"noopener noreferrer\">Tauri CLI</a></li>\n</ul>\n\n      <h3 id=\"heading-build-schritte\">\n        <a name=\"build-schritte\" class=\"anchor\" href=\"#build-schritte\">\n          <span class=\"header-link\"></span>\n        </a>\n        Build-Schritte\n      </h3>\n<pre class=\"code-block\" data-language=\"bash\"><code class=\"language-bash\"># Repository klonen\ngit clone https://github.com/s00d/switchshuttle.git\ncd switchshuttle\n\n# Abhängigkeiten installieren\nnpm install\n\n# Entwicklungsmodus\nnpm run tauri dev\n\n# Für Produktion bauen\nnpm run tauri build\n</code></pre>\n\n      <h3 id=\"heading-plattformspezifische-hinweise\">\n        <a name=\"plattformspezifische-hinweise\" class=\"anchor\" href=\"#plattformspezifische-hinweise\">\n          <span class=\"header-link\"></span>\n        </a>\n        Plattformspezifische Hinweise\n      </h3>\n\n      <h4 id=\"heading-macos\">\n        <a name=\"macos\" class=\"anchor\" href=\"#macos\">\n          <span class=\"header-link\"></span>\n        </a>\n        macOS\n      </h4>\n<pre class=\"code-block\" data-language=\"bash\"><code class=\"language-bash\"># Bei Signierungsproblemen\nchmod +x /Applications/switch-shuttle.app\nxattr -cr /Applications/switch-shuttle.app\ncodesign --force --deep --sign - /Applications/switch-shuttle.app\n</code></pre>\n\n      <h2 id=\"heading--beitragen\">\n        <a name=\"-beitragen\" class=\"anchor\" href=\"#-beitragen\">\n          <span class=\"header-link\"></span>\n        </a>\n        🤝 Beitragen\n      </h2>\n<p>Wir freuen uns über Beiträge! So können Sie helfen:</p>\n<ol>\n<li><strong>Forken Sie</strong> das Repository</li>\n<li><strong>Erstellen Sie</strong> einen Feature-Branch (<code>git checkout -b feature/amazing-feature</code>)</li>\n<li><strong>Committen Sie</strong> Ihre Änderungen (<code>git commit -m &#39;Add amazing feature&#39;</code>)</li>\n<li><strong>Pushen Sie</strong> zum Branch (<code>git push origin feature/amazing-feature</code>)</li>\n<li><strong>Öffnen Sie</strong> einen Pull Request</li>\n</ol>\n\n      <h3 id=\"heading-entwicklungsrichtlinien\">\n        <a name=\"entwicklungsrichtlinien\" class=\"anchor\" href=\"#entwicklungsrichtlinien\">\n          <span class=\"header-link\"></span>\n        </a>\n        Entwicklungsrichtlinien\n      </h3>\n<ul>\n<li>Folgen Sie dem bestehenden Codestil</li>\n<li>Fügen Sie Tests für neue Features hinzu</li>\n<li>Aktualisieren Sie die Dokumentation nach Bedarf</li>\n<li>Stellen Sie plattformübergreifende Kompatibilität sicher</li>\n</ul>\n\n      <h2 id=\"heading--lizenz\">\n        <a name=\"-lizenz\" class=\"anchor\" href=\"#-lizenz\">\n          <span class=\"header-link\"></span>\n        </a>\n        📄 Lizenz\n      </h2>\n<p>Dieses Projekt ist unter der MIT-Lizenz lizenziert - siehe <a href=\"LICENSE\">LICENSE</a> Datei für Details.</p>\n\n      <h2 id=\"heading--danksagungen\">\n        <a name=\"-danksagungen\" class=\"anchor\" href=\"#-danksagungen\">\n          <span class=\"header-link\"></span>\n        </a>\n        🙏 Danksagungen\n      </h2>\n<ul>\n<li>Inspiriert vom ursprünglichen <a href=\"https://github.com/fitztrev/shuttle\" target=\"_blank\" rel=\"noopener noreferrer\">Shuttle</a> Projekt</li>\n<li>Entwickelt mit <a href=\"https://tauri.app/\" target=\"_blank\" rel=\"noopener noreferrer\">Tauri</a> für plattformübergreifende Desktop-Apps</li>\n<li>UI powered by <a href=\"https://vuejs.org/\" target=\"_blank\" rel=\"noopener noreferrer\">Vue.js</a></li>\n</ul>\n\n      <h2 id=\"heading--support\">\n        <a name=\"-support\" class=\"anchor\" href=\"#-support\">\n          <span class=\"header-link\"></span>\n        </a>\n        📞 Support\n      </h2>\n<ul>\n<li><strong>Issues</strong>: <a href=\"https://github.com/s00d/switchshuttle/issues\" target=\"_blank\" rel=\"noopener noreferrer\">GitHub Issues</a></li>\n<li><strong>Releases</strong>: <a href=\"https://github.com/s00d/switchshuttle/releases\" target=\"_blank\" rel=\"noopener noreferrer\">GitHub Releases</a></li>\n</ul>\n<hr>\n\n",
+  "toc": [
+    {
+      "id": "heading--was-ist-switchshuttle-",
+      "title": "✨ Was ist SwitchShuttle?",
+      "level": 2
+    },
+    {
+      "id": "heading--hauptfunktionen",
+      "title": "🎯 Hauptfunktionen",
+      "level": 3
+    },
+    {
+      "id": "heading--schnellstart",
+      "title": "🚀 Schnellstart",
+      "level": 2
+    },
+    {
+      "id": "heading-download-installation",
+      "title": "Download & Installation",
+      "level": 3
+    },
+    {
+      "id": "heading-option-1-homebrew-macos-empfohlen-",
+      "title": "Option 1: Homebrew (macOS - Empfohlen)",
+      "level": 4
+    },
+    {
+      "id": "heading-installation-ber-homebrew",
+      "title": "Installation über Homebrew",
+      "level": 1
+    },
+    {
+      "id": "heading-option-2-manueller-download",
+      "title": "Option 2: Manueller Download",
+      "level": 4
+    },
+    {
+      "id": "heading-erste-konfiguration",
+      "title": "Erste Konfiguration",
+      "level": 3
+    },
+    {
+      "id": "heading--konfigurationsanleitung",
+      "title": "📋 Konfigurationsanleitung",
+      "level": 2
+    },
+    {
+      "id": "heading-grundstruktur",
+      "title": "Grundstruktur",
+      "level": 3
+    },
+    {
+      "id": "heading-einfaches-beispiel",
+      "title": "Einfaches Beispiel",
+      "level": 3
+    },
+    {
+      "id": "heading-erweiterte-funktionen",
+      "title": "Erweiterte Funktionen",
+      "level": 3
+    },
+    {
+      "id": "heading--dynamische-eingaben",
+      "title": "🔧 Dynamische Eingaben",
+      "level": 4
+    },
+    {
+      "id": "heading--mehrere-befehle",
+      "title": "🔄 Mehrere Befehle",
+      "level": 4
+    },
+    {
+      "id": "heading--verschachtelte-untermen-s",
+      "title": "📁 Verschachtelte Untermenüs",
+      "level": 4
+    },
+    {
+      "id": "heading--schalter-befehle",
+      "title": "🔄 Schalter-Befehle",
+      "level": 4
+    },
+    {
+      "id": "heading--berwachungsbefehle",
+      "title": "📊 Überwachungsbefehle",
+      "level": 4
+    },
+    {
+      "id": "heading--konfigurationsreferenz",
+      "title": "⚙️ Konfigurationsreferenz",
+      "level": 2
+    },
+    {
+      "id": "heading-hauptkonfiguration",
+      "title": "Hauptkonfiguration",
+      "level": 3
+    },
+    {
+      "id": "heading-terminal-optionen",
+      "title": "Terminal-Optionen",
+      "level": 3
+    },
+    {
+      "id": "heading-startmodi",
+      "title": "Startmodi",
+      "level": 3
+    },
+    {
+      "id": "heading-befehls-konfiguration",
+      "title": "Befehls-Konfiguration",
+      "level": 3
+    },
+    {
+      "id": "heading-konfigurationsverwaltung",
+      "title": "Konfigurationsverwaltung",
+      "level": 3
+    },
+    {
+      "id": "heading-konfigurationen-aktivieren-deaktivieren",
+      "title": "Konfigurationen aktivieren/deaktivieren",
+      "level": 4
+    },
+    {
+      "id": "heading--anwendungsf-lle",
+      "title": "🎯 Anwendungsfälle",
+      "level": 2
+    },
+    {
+      "id": "heading--entwickler",
+      "title": "👨‍💻 Entwickler",
+      "level": 3
+    },
+    {
+      "id": "heading--devops-ingenieure",
+      "title": "🛠️ DevOps-Ingenieure",
+      "level": 3
+    },
+    {
+      "id": "heading--designer",
+      "title": "🎨 Designer",
+      "level": 3
+    },
+    {
+      "id": "heading--build-aus-quellcode",
+      "title": "🔧 Build aus Quellcode",
+      "level": 2
+    },
+    {
+      "id": "heading-voraussetzungen",
+      "title": "Voraussetzungen",
+      "level": 3
+    },
+    {
+      "id": "heading-build-schritte",
+      "title": "Build-Schritte",
+      "level": 3
+    },
+    {
+      "id": "heading-repository-klonen",
+      "title": "Repository klonen",
+      "level": 1
+    },
+    {
+      "id": "heading-abh-ngigkeiten-installieren",
+      "title": "Abhängigkeiten installieren",
+      "level": 1
+    },
+    {
+      "id": "heading-entwicklungsmodus",
+      "title": "Entwicklungsmodus",
+      "level": 1
+    },
+    {
+      "id": "heading-f-r-produktion-bauen",
+      "title": "Für Produktion bauen",
+      "level": 1
+    },
+    {
+      "id": "heading-plattformspezifische-hinweise",
+      "title": "Plattformspezifische Hinweise",
+      "level": 3
+    },
+    {
+      "id": "heading-macos",
+      "title": "macOS",
+      "level": 4
+    },
+    {
+      "id": "heading-bei-signierungsproblemen",
+      "title": "Bei Signierungsproblemen",
+      "level": 1
+    },
+    {
+      "id": "heading--beitragen",
+      "title": "🤝 Beitragen",
+      "level": 2
+    },
+    {
+      "id": "heading-entwicklungsrichtlinien",
+      "title": "Entwicklungsrichtlinien",
+      "level": 3
+    },
+    {
+      "id": "heading--lizenz",
+      "title": "📄 Lizenz",
+      "level": 2
+    },
+    {
+      "id": "heading--danksagungen",
+      "title": "🙏 Danksagungen",
+      "level": 2
+    },
+    {
+      "id": "heading--support",
+      "title": "📞 Support",
+      "level": 2
+    }
+  ],
+  "locale": "de"
+}

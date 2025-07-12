@@ -1,0 +1,19 @@
+{
+  "demo": {
+    "notifications": {
+      "notAvailable": "利用不可",
+      "notAvailableMessage": "この機能はデモ版では利用できません。",
+      "homepage": "ホームページ",
+      "homepageMessage": "ブラウザでホームページを開いています...\n\nhttps://github.com/s00d/switchshuttle",
+      "quit": "SwitchShuttleを終了",
+      "quitMessage": "SwitchShuttleを本当に終了しますか？",
+      "settings": "設定",
+      "settingsMessage": "設定ウィンドウはこのデモ版では利用できません。",
+      "about": "SwitchShuttleについて",
+      "aboutMessage": "SwitchShuttle v1.12.0\nクロスプラットフォームのターミナルコマンドマネージャー\n\nこれはデモ版です。"
+    },
+    "jsonEditor": {
+      "title": "JSON エディター"
+    }
+  }
+} 

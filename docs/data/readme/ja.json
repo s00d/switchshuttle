@@ -1,0 +1,222 @@
+{
+  "success": true,
+  "content": "</div>\n\n<hr>\n\n      <h2 id=\"heading--switchshuttle-\">\n        <a name=\"-switchshuttle-\" class=\"anchor\" href=\"#-switchshuttle-\">\n          <span class=\"header-link\"></span>\n        </a>\n        ✨ SwitchShuttleとは？\n      </h2>\n<p>SwitchShuttleは、ターミナルコマンドの管理と実行方法を革新する強力なクロスプラットフォームシステムトレイアプリケーションです。最新技術（Rust + Tauri + Vue.js）で構築され、最も頻繁に使用するターミナル操作の整理、カスタマイズ、迅速なアクセスのためのエレガントなインターフェースを提供します。</p>\n\n      <h3 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        🎯 主な機能\n      </h3>\n<ul>\n<li><strong>🖥️ マルチプラットフォームサポート</strong> - macOS、Windows、Linuxでシームレスに動作</li>\n<li><strong>⚡ グローバルホットキー</strong> - キーボードショートカットでどこからでも即座にコマンドを実行</li>\n<li><strong>🎨 複数ターミナルサポート</strong> - iTerm、Terminal、Warp、Alacritty、Hyperなど</li>\n<li><strong>📁 スマートな整理</strong> - コマンドの整理のためのネストしたサブメニューを作成</li>\n<li><strong>🔧 動的入力</strong> - ユーザー入力が必要なコマンドのためのインタラクティブなプロンプト</li>\n<li><strong>🔄 複数の実行モード</strong> - 現在のウィンドウ、新しいタブ、または新しいウィンドウで実行</li>\n<li><strong>🚀 自動起動</strong> - システム起動時に起動して即座にアクセス可能</li>\n<li><strong>🎨 モダンUI</strong> - Vue.jsで構築された美しく直感的なインターフェース</li>\n<li><strong>💻 コマンドラインインターフェース</strong> - CLIでターミナルから直接コマンドを実行</li>\n<li><strong>⚙️ 設定管理</strong> - 削除せずに設定を有効/無効にする</li>\n<li><strong>🔄 スイッチコマンド</strong> - バックグラウンド実行でシステム機能を切り替え</li>\n<li><strong>📊 モニターコマンド</strong> - 視覚的インジケーター付きのリアルタイムシステムリソース監視</li>\n</ul>\n\n      <h2 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        🚀 クイックスタート\n      </h2>\n\n      <h3 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        ダウンロードとインストール\n      </h3>\n\n      <h4 id=\"heading--1-homebrew-macos-\">\n        <a name=\"-1-homebrew-macos-\" class=\"anchor\" href=\"#-1-homebrew-macos-\">\n          <span class=\"header-link\"></span>\n        </a>\n        オプション1: Homebrew (macOS - 推奨)\n      </h4>\n<pre class=\"code-block\" data-language=\"bash\"><code class=\"language-bash\"># Homebrew経由でインストール\nbrew tap s00d/switchshuttle\nbrew install --cask switchshuttle\n</code></pre>\n\n      <h4 id=\"heading--2-\">\n        <a name=\"-2-\" class=\"anchor\" href=\"#-2-\">\n          <span class=\"header-link\"></span>\n        </a>\n        オプション2: 手動ダウンロード\n      </h4>\n<ol>\n<li><strong>ダウンロード</strong> <a href=\"https://github.com/s00d/switchshuttle/releases\" target=\"_blank\" rel=\"noopener noreferrer\">GitHub Releases</a>からお使いのプラットフォーム用の最新リリースをダウンロード</li>\n<li><strong>インストール</strong> アプリケーションをインストール</li>\n<li><strong>起動</strong> SwitchShuttleを起動 - システムトレイに表示されます</li>\n<li><strong>右クリック</strong> トレイアイコンを右クリックしてメニューにアクセス</li>\n</ol>\n\n      <h3 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        初期設定\n      </h3>\n<ol>\n<li><strong>設定を編集</strong> → デフォルトエディタで設定ファイルを開きます</li>\n<li><strong>コマンドを追加</strong> JSON形式を使用して（以下の例を参照）</li>\n<li><strong>保存して再起動</strong> アプリケーションを保存して再起動</li>\n<li><strong>楽しむ</strong> 整理されたコマンドショートカットをお楽しみください！</li>\n</ol>\n\n      <h2 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        📋 設定ガイド\n      </h2>\n\n      <h3 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        基本構造\n      </h3>\n<p>SwitchShuttleはJSON設定ファイルを使用し、以下に保存されます：</p>\n<ul>\n<li><strong>macOS/Linux</strong>: <code>~/.config/switch-shuttle/</code></li>\n<li><strong>Windows</strong>: <code>C:\\Users\\&lt;Username&gt;\\AppData\\Roaming\\switch-shuttle\\</code></li>\n</ul>\n\n      <h3 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        簡単な例\n      </h3>\n<pre class=\"code-block\" data-language=\"json\"><code class=\"language-json\">{\n  &quot;terminal&quot;: &quot;iterm&quot;,\n  &quot;launch_in&quot;: &quot;new_tab&quot;,\n  &quot;title&quot;: &quot;マイコマンド&quot;,\n  &quot;commands&quot;: [\n    {\n      &quot;name&quot;: &quot;🚀 開発サーバーを起動&quot;,\n      &quot;command&quot;: &quot;npm run dev&quot;,\n      &quot;hotkey&quot;: &quot;Ctrl+Shift+D&quot;\n    },\n    {\n      &quot;name&quot;: &quot;📦 依存関係をインストール&quot;,\n      &quot;command&quot;: &quot;npm install&quot;,\n      &quot;hotkey&quot;: &quot;Ctrl+Shift+I&quot;\n    },\n    {\n      &quot;name&quot;: &quot;🔧 開発ツール&quot;,\n      &quot;submenu&quot;: [\n        {\n          &quot;name&quot;: &quot;🧪 テストを実行&quot;,\n          &quot;command&quot;: &quot;npm test&quot;,\n          &quot;hotkey&quot;: &quot;Ctrl+Shift+T&quot;\n        },\n        {\n          &quot;name&quot;: &quot;📊 プロジェクトをビルド&quot;,\n          &quot;command&quot;: &quot;npm run build&quot;,\n          &quot;hotkey&quot;: &quot;Ctrl+Shift+B&quot;\n        }\n      ]\n    }\n  ]\n}\n</code></pre>\n\n      <h3 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        高度な機能\n      </h3>\n\n      <h4 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        🔧 動的入力\n      </h4>\n<p>ユーザー入力にプロンプトを表示するインタラクティブなコマンドを作成：</p>\n<pre class=\"code-block\" data-language=\"json\"><code class=\"language-json\">{\n  &quot;name&quot;: &quot;📝 新しいコンポーネントを作成&quot;,\n  &quot;inputs&quot;: {\n    &quot;componentName&quot;: &quot;MyComponent&quot;,\n    &quot;componentType&quot;: &quot;functional&quot;\n  },\n  &quot;commands&quot;: [\n    &quot;mkdir -p src/components/[componentName]&quot;,\n    &quot;touch src/components/[componentName]/index.tsx&quot;,\n    &quot;echo &#39;import React from \\&quot;react\\&quot;;&#39; &gt; src/components/[componentName]/index.tsx&quot;,\n    &quot;echo &#39;export const [componentName] = () =&gt; &lt;div&gt;[componentName]&lt;/div&gt;;&#39; &gt;&gt; src/components/[componentName]/index.tsx&quot;\n  ],\n  &quot;hotkey&quot;: &quot;Ctrl+Shift+N&quot;\n}\n</code></pre>\n\n      <h4 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        🔄 複数コマンド\n      </h4>\n<p>コマンドシーケンスを実行：</p>\n<pre class=\"code-block\" data-language=\"json\"><code class=\"language-json\">{\n  &quot;name&quot;: &quot;🔄 完全な開発サイクル&quot;,\n  &quot;commands&quot;: [\n    &quot;git pull origin main&quot;,\n    &quot;npm install&quot;,\n    &quot;npm run lint&quot;,\n    &quot;npm run test&quot;,\n    &quot;npm run build&quot;\n  ],\n  &quot;hotkey&quot;: &quot;Ctrl+Shift+F&quot;\n}\n</code></pre>\n\n      <h4 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        📁 ネストしたサブメニュー\n      </h4>\n<p>階層メニューでコマンドを整理：</p>\n<pre class=\"code-block\" data-language=\"json\"><code class=\"language-json\">{\n  &quot;name&quot;: &quot;🐳 Docker操作&quot;,\n  &quot;submenu&quot;: [\n    {\n      &quot;name&quot;: &quot;🚀 サービスを起動&quot;,\n      &quot;submenu&quot;: [\n        {\n          &quot;name&quot;: &quot;🏗️ 開発&quot;,\n          &quot;command&quot;: &quot;docker-compose -f docker-compose.dev.yml up -d&quot;\n        },\n        {\n          &quot;name&quot;: &quot;🏭 本番&quot;,\n          &quot;command&quot;: &quot;docker-compose -f docker-compose.prod.yml up -d&quot;\n        }\n      ]\n    },\n    {\n      &quot;name&quot;: &quot;🛑 すべて停止&quot;,\n      &quot;command&quot;: &quot;docker-compose down&quot;\n    }\n  ]\n}\n</code></pre>\n\n      <h4 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        🔄 スイッチコマンド\n      </h4>\n<p>バックグラウンド実行でシステム機能を切り替え：</p>\n<pre class=\"code-block\" data-language=\"json\"><code class=\"language-json\">{\n  &quot;name&quot;: &quot;🔧 システム制御&quot;,\n  &quot;submenu&quot;: [\n    {\n      &quot;name&quot;: &quot;📶 WiFiを切り替え&quot;,\n      &quot;command&quot;: &quot;networksetup -setairportpower en0 toggle&quot;,\n      &quot;switch&quot;: &quot;networksetup -getairportpower en0 | grep -q &#39;On&#39; &amp;&amp; echo &#39;true&#39; || echo &#39;false&#39;&quot;\n    },\n    {\n      &quot;name&quot;: &quot;🔊 ブルートゥースを切り替え&quot;,\n      &quot;command&quot;: &quot;blueutil -p toggle&quot;,\n      &quot;switch&quot;: &quot;blueutil -p | grep -q &#39;1&#39; &amp;&amp; echo &#39;true&#39; || echo &#39;false&#39;&quot;\n    },\n    {\n      &quot;name&quot;: &quot;🌙 ダークモードを切り替え&quot;,\n      &quot;command&quot;: &quot;osascript -e &#39;tell app \\&quot;System Events\\&quot; to tell appearance preferences to set dark mode to not dark mode&#39;&quot;,\n      &quot;switch&quot;: &quot;osascript -e &#39;tell app \\&quot;System Events\\&quot; to tell appearance preferences to get dark mode&#39;&quot;\n    }\n  ]\n}\n</code></pre>\n<p><strong>スイッチコマンド機能：</strong></p>\n<ul>\n<li><strong>バックグラウンド実行</strong> - ターミナルを開かずにコマンドが静かに実行される</li>\n<li><strong>ステータスチェック</strong> - 現在の状態を自動的に検出</li>\n<li><strong>視覚的フィードバック</strong> - メニューで有効/無効の状態を表示</li>\n<li><strong>クロスプラットフォーム</strong> - macOS、Windows、Linuxで動作</li>\n</ul>\n\n      <h4 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        📊 モニターコマンド\n      </h4>\n<p>リアルタイム情報でシステムリソースとサービスを監視：</p>\n<pre class=\"code-block\" data-language=\"json\"><code class=\"language-json\">{\n  &quot;name&quot;: &quot;📊 システム監視&quot;,\n  &quot;submenu&quot;: [\n    {\n      &quot;name&quot;: &quot;💾 メモリ使用量&quot;,\n      &quot;command&quot;: &quot;top -l 1 | head -n 10&quot;,\n      &quot;monitor&quot;: &quot;memory&quot;,\n      &quot;icon&quot;: &quot;🧠&quot;\n    },\n    {\n      &quot;name&quot;: &quot;💻 CPU負荷&quot;,\n      &quot;command&quot;: &quot;top -l 1 | grep &#39;CPU usage&#39;&quot;,\n      &quot;monitor&quot;: &quot;cpu&quot;,\n      &quot;icon&quot;: &quot;⚡&quot;\n    },\n    {\n      &quot;name&quot;: &quot;💾 ディスク容量&quot;,\n      &quot;command&quot;: &quot;df -h | grep &#39;/dev/&#39;&quot;,\n      &quot;monitor&quot;: &quot;disk&quot;,\n      &quot;icon&quot;: &quot;💾&quot;\n    },\n    {\n      &quot;name&quot;: &quot;🌐 ネットワークステータス&quot;,\n      &quot;command&quot;: &quot;ifconfig | grep -E &#39;inet |status:&#39;&quot;,\n      &quot;monitor&quot;: &quot;network&quot;,\n      &quot;icon&quot;: &quot;🌐&quot;\n    }\n  ]\n}\n</code></pre>\n<p><strong>モニターコマンド機能：</strong></p>\n<ul>\n<li><strong>メニュー統合</strong> - システムトレイメニューに監視ボタンを追加</li>\n<li><strong>コマンド実行</strong> - メニューを開くときに監視コマンドを実行</li>\n<li><strong>データ表示</strong> - メニューインターフェースでコマンド出力を直接表示</li>\n<li><strong>視覚的インジケーター</strong> - メニュー内のアイコンとステータスインジケーター</li>\n<li><strong>クロスプラットフォーム</strong> - macOS、Windows、Linuxで動作</li>\n</ul>\n\n      <h2 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        ⚙️ 設定リファレンス\n      </h2>\n\n      <h3 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        メイン設定\n      </h3>\n<table class=\"console-table\">\n<thead>\n<tr>\n<th>パラメータ</th>\n<th>タイプ</th>\n<th>説明</th>\n<th>デフォルト</th>\n</tr>\n</thead>\n<tbody><tr>\n<td><code>terminal</code></td>\n<td>String</td>\n<td>使用するターミナルアプリケーション</td>\n<td><code>&quot;terminal&quot;</code></td>\n</tr>\n<tr>\n<td><code>launch_in</code></td>\n<td>String</td>\n<td>コマンドを起動する場所</td>\n<td><code>&quot;current&quot;</code></td>\n</tr>\n<tr>\n<td><code>theme</code></td>\n<td>String</td>\n<td>ターミナルテーマ（サポートされている場合）</td>\n<td>-</td>\n</tr>\n<tr>\n<td><code>title</code></td>\n<td>String</td>\n<td>ウィンドウ/タブのタイトル</td>\n<td>-</td>\n</tr>\n<tr>\n<td><code>menu_hotkey</code></td>\n<td>String</td>\n<td>メニューを開くためのグローバルホットキー</td>\n<td>-</td>\n</tr>\n<tr>\n<td><code>commands</code></td>\n<td>Array</td>\n<td>コマンド設定のリスト</td>\n<td><code>[]</code></td>\n</tr>\n<tr>\n<td><code>enabled</code></td>\n<td>Boolean</td>\n<td>この設定を読み込むかどうか</td>\n<td><code>true</code></td>\n</tr>\n</tbody></table>\n\n      <h3 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        ターミナルオプション\n      </h3>\n<table class=\"console-table\">\n<thead>\n<tr>\n<th>ターミナル</th>\n<th>macOS</th>\n<th>Windows</th>\n<th>Linux</th>\n</tr>\n</thead>\n<tbody><tr>\n<td><code>iterm</code></td>\n<td>✅</td>\n<td>❌</td>\n<td>❌</td>\n</tr>\n<tr>\n<td><code>terminal</code></td>\n<td>✅</td>\n<td>✅</td>\n<td>✅</td>\n</tr>\n<tr>\n<td><code>warp</code></td>\n<td>✅</td>\n<td>❌</td>\n<td>❌</td>\n</tr>\n<tr>\n<td><code>alacritty</code></td>\n<td>✅</td>\n<td>✅</td>\n<td>✅</td>\n</tr>\n<tr>\n<td><code>hyper</code></td>\n<td>✅</td>\n<td>✅</td>\n<td>✅</td>\n</tr>\n</tbody></table>\n\n      <h3 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        起動モード\n      </h3>\n<table class=\"console-table\">\n<thead>\n<tr>\n<th>モード</th>\n<th>説明</th>\n</tr>\n</thead>\n<tbody><tr>\n<td><code>current</code></td>\n<td>現在のターミナルウィンドウで実行</td>\n</tr>\n<tr>\n<td><code>new_tab</code></td>\n<td>新しいタブを開いて実行</td>\n</tr>\n<tr>\n<td><code>new_window</code></td>\n<td>新しいウィンドウを開いて実行</td>\n</tr>\n</tbody></table>\n\n      <h3 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        コマンド設定\n      </h3>\n<table class=\"console-table\">\n<thead>\n<tr>\n<th>パラメータ</th>\n<th>タイプ</th>\n<th>必須</th>\n<th>説明</th>\n</tr>\n</thead>\n<tbody><tr>\n<td><code>name</code></td>\n<td>String</td>\n<td>✅</td>\n<td>コマンドの表示名</td>\n</tr>\n<tr>\n<td><code>command</code></td>\n<td>String</td>\n<td>❌</td>\n<td>実行する単一コマンド</td>\n</tr>\n<tr>\n<td><code>commands</code></td>\n<td>Array</td>\n<td>❌</td>\n<td>実行する複数コマンド</td>\n</tr>\n<tr>\n<td><code>submenu</code></td>\n<td>Array</td>\n<td>❌</td>\n<td>ネストしたサブコマンド</td>\n</tr>\n<tr>\n<td><code>inputs</code></td>\n<td>Object</td>\n<td>❌</td>\n<td>動的入力フィールド</td>\n</tr>\n<tr>\n<td><code>hotkey</code></td>\n<td>String</td>\n<td>❌</td>\n<td>グローバルホットキー</td>\n</tr>\n<tr>\n<td><code>switch</code></td>\n<td>String</td>\n<td>❌</td>\n<td>現在の状態をチェックするコマンド（スイッチコマンド用）</td>\n</tr>\n<tr>\n<td><code>monitor</code></td>\n<td>String</td>\n<td>❌</td>\n<td>リアルタイムリソース追跡の監視タイプ</td>\n</tr>\n<tr>\n<td><code>icon</code></td>\n<td>String</td>\n<td>❌</td>\n<td>視覚的識別のための絵文字アイコン</td>\n</tr>\n</tbody></table>\n\n      <h3 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        設定管理\n      </h3>\n\n      <h4 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        設定の有効/無効\n      </h4>\n<p>個別の設定ファイルを有効または無効にして、システムトレイメニューで利用可能なコマンドを制御できます。これは以下に役立ちます：</p>\n<ul>\n<li><strong>一時的な無効化</strong> - 削除せずに設定を無効にする</li>\n<li><strong>テスト</strong> - 開発中に設定を有効/無効にする</li>\n<li><strong>整理</strong> - 複数の設定を保持するが、特定の設定のみを使用する</li>\n</ul>\n<p><strong>ビジュアルエディターで：</strong></p>\n<ul>\n<li>設定エディターを開く</li>\n<li>「設定ステータス」セクションでトグルスイッチを使用</li>\n<li>有効な設定は読み込まれ、メニューで利用可能になる</li>\n<li>無効な設定は無視される</li>\n</ul>\n<p><strong>JSON設定で：</strong></p>\n<pre class=\"code-block\" data-language=\"json\"><code class=\"language-json\">{\n  &quot;terminal&quot;: &quot;iterm&quot;,\n  &quot;launch_in&quot;: &quot;current&quot;,\n  &quot;title&quot;: &quot;マイコマンド&quot;,\n  &quot;enabled&quot;: true,\n  &quot;commands&quot;: [\n    {\n      &quot;name&quot;: &quot;サンプルコマンド&quot;,\n      &quot;command&quot;: &quot;echo Hello World&quot;\n    }\n  ]\n}\n</code></pre>\n<table class=\"console-table\">\n<thead>\n<tr>\n<th>パラメータ</th>\n<th>タイプ</th>\n<th>デフォルト</th>\n<th>説明</th>\n</tr>\n</thead>\n<tbody><tr>\n<td><code>enabled</code></td>\n<td>Boolean</td>\n<td><code>true</code></td>\n<td>この設定を読み込み、メニューで利用可能にするかどうか</td>\n</tr>\n</tbody></table>\n<p><strong>注意：</strong> <code>enabled</code>が<code>false</code>に設定されているか省略されている場合、設定は無視され、そのコマンドはシステムトレイメニューに表示されません。</p>\n\n      <h2 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        🎯 ユースケース\n      </h2>\n\n      <h3 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        👨‍💻 開発者\n      </h3>\n<ul>\n<li><strong>クイックプロジェクトナビゲーション</strong> - 異なるプロジェクトに即座にジャンプ</li>\n<li><strong>ビルドとテストワークフロー</strong> - ワンクリックで開発サイクル</li>\n<li><strong>Docker管理</strong> - ホットキーでコンテナの開始/停止</li>\n<li><strong>Git操作</strong> - 頻繁に使用するGitコマンドを手元に</li>\n</ul>\n\n      <h3 id=\"heading--devops-\">\n        <a name=\"-devops-\" class=\"anchor\" href=\"#-devops-\">\n          <span class=\"header-link\"></span>\n        </a>\n        🛠️ DevOpsエンジニア\n      </h3>\n<ul>\n<li><strong>サーバー管理</strong> - SSH接続とサーバーコマンド</li>\n<li><strong>監視ツール</strong> - ログとメトリクスへのクイックアクセス</li>\n<li><strong>デプロイメントスクリプト</strong> - 自動化されたデプロイメントワークフロー</li>\n<li><strong>データベース操作</strong> - 頻繁に使用するデータベースコマンド</li>\n</ul>\n\n      <h3 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        🎨 デザイナー\n      </h3>\n<ul>\n<li><strong>アセット最適化</strong> - 画像処理と最適化</li>\n<li><strong>デザインシステムツール</strong> - コンポーネント生成と更新</li>\n<li><strong>プロトタイプサーバー</strong> - クイックデザインサーバー起動</li>\n</ul>\n\n      <h2 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        🔧 ソースからのビルド\n      </h2>\n\n      <h3 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        前提条件\n      </h3>\n<ul>\n<li><a href=\"https://www.rust-lang.org/tools/install\" target=\"_blank\" rel=\"noopener noreferrer\">Rust</a> (最新の安定版)</li>\n<li><a href=\"https://nodejs.org/\" target=\"_blank\" rel=\"noopener noreferrer\">Node.js</a> (v16以上)</li>\n<li><a href=\"https://tauri.app/v1/guides/getting-started/prerequisites/\" target=\"_blank\" rel=\"noopener noreferrer\">Tauri CLI</a></li>\n</ul>\n\n      <h3 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        ビルド手順\n      </h3>\n<pre class=\"code-block\" data-language=\"bash\"><code class=\"language-bash\"># リポジトリをクローン\ngit clone https://github.com/s00d/switchshuttle.git\ncd switchshuttle\n\n# 依存関係をインストール\nnpm install\n\n# 開発モード\nnpm run tauri dev\n\n# 本番用にビルド\nnpm run tauri build\n</code></pre>\n\n      <h3 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        プラットフォーム固有の注意事項\n      </h3>\n\n      <h4 id=\"heading-macos\">\n        <a name=\"macos\" class=\"anchor\" href=\"#macos\">\n          <span class=\"header-link\"></span>\n        </a>\n        macOS\n      </h4>\n<pre class=\"code-block\" data-language=\"bash\"><code class=\"language-bash\"># 署名の問題が発生した場合\nchmod +x /Applications/switch-shuttle.app\nxattr -cr /Applications/switch-shuttle.app\ncodesign --force --deep --sign - /Applications/switch-shuttle.app\n</code></pre>\n\n      <h2 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        🤝 貢献\n      </h2>\n<p>貢献を歓迎します！以下の方法でお手伝いできます：</p>\n<ol>\n<li><strong>フォーク</strong> リポジトリをフォーク</li>\n<li><strong>作成</strong> 機能ブランチを作成 (<code>git checkout -b feature/amazing-feature</code>)</li>\n<li><strong>コミット</strong> 変更をコミット (<code>git commit -m &#39;Add amazing feature&#39;</code>)</li>\n<li><strong>プッシュ</strong> ブランチにプッシュ (<code>git push origin feature/amazing-feature</code>)</li>\n<li><strong>プルリクエスト</strong> プルリクエストを開く</li>\n</ol>\n\n      <h3 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        開発ガイドライン\n      </h3>\n<ul>\n<li>既存のコードスタイルに従う</li>\n<li>新機能にテストを追加</li>\n<li>必要に応じてドキュメントを更新</li>\n<li>クロスプラットフォーム互換性を確保</li>\n</ul>\n\n      <h2 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        📄 ライセンス\n      </h2>\n<p>このプロジェクトはMITライセンスの下でライセンスされています - 詳細は<a href=\"LICENSE\">LICENSE</a>ファイルを参照してください。</p>\n\n      <h2 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        🙏 謝辞\n      </h2>\n<ul>\n<li>元の<a href=\"https://github.com/fitztrev/shuttle\" target=\"_blank\" rel=\"noopener noreferrer\">Shuttle</a>プロジェクトに触発されました</li>\n<li>クロスプラットフォームデスクトップアプリ用の<a href=\"https://tauri.app/\" target=\"_blank\" rel=\"noopener noreferrer\">Tauri</a>で構築</li>\n<li>UIは<a href=\"https://vuejs.org/\" target=\"_blank\" rel=\"noopener noreferrer\">Vue.js</a>で動作</li>\n</ul>\n\n      <h2 id=\"heading--\">\n        <a name=\"-\" class=\"anchor\" href=\"#-\">\n          <span class=\"header-link\"></span>\n        </a>\n        📞 サポート\n      </h2>\n<ul>\n<li><strong>Issues</strong>: <a href=\"https://github.com/s00d/switchshuttle/issues\" target=\"_blank\" rel=\"noopener noreferrer\">GitHub Issues</a></li>\n<li><strong>Releases</strong>: <a href=\"https://github.com/s00d/switchshuttle/releases\" target=\"_blank\" rel=\"noopener noreferrer\">GitHub Releases</a></li>\n</ul>\n<hr>\n\n",
+  "toc": [
+    {
+      "id": "heading--switchshuttle-",
+      "title": "✨ SwitchShuttleとは？",
+      "level": 2
+    },
+    {
+      "id": "heading--",
+      "title": "🎯 主な機能",
+      "level": 3
+    },
+    {
+      "id": "heading--",
+      "title": "🚀 クイックスタート",
+      "level": 2
+    },
+    {
+      "id": "heading--",
+      "title": "ダウンロードとインストール",
+      "level": 3
+    },
+    {
+      "id": "heading--1-homebrew-macos-",
+      "title": "オプション1: Homebrew (macOS - 推奨)",
+      "level": 4
+    },
+    {
+      "id": "heading-homebrew-",
+      "title": "Homebrew経由でインストール",
+      "level": 1
+    },
+    {
+      "id": "heading--2-",
+      "title": "オプション2: 手動ダウンロード",
+      "level": 4
+    },
+    {
+      "id": "heading--",
+      "title": "初期設定",
+      "level": 3
+    },
+    {
+      "id": "heading--",
+      "title": "📋 設定ガイド",
+      "level": 2
+    },
+    {
+      "id": "heading--",
+      "title": "基本構造",
+      "level": 3
+    },
+    {
+      "id": "heading--",
+      "title": "簡単な例",
+      "level": 3
+    },
+    {
+      "id": "heading--",
+      "title": "高度な機能",
+      "level": 3
+    },
+    {
+      "id": "heading--",
+      "title": "🔧 動的入力",
+      "level": 4
+    },
+    {
+      "id": "heading--",
+      "title": "🔄 複数コマンド",
+      "level": 4
+    },
+    {
+      "id": "heading--",
+      "title": "📁 ネストしたサブメニュー",
+      "level": 4
+    },
+    {
+      "id": "heading--",
+      "title": "🔄 スイッチコマンド",
+      "level": 4
+    },
+    {
+      "id": "heading--",
+      "title": "📊 モニターコマンド",
+      "level": 4
+    },
+    {
+      "id": "heading--",
+      "title": "⚙️ 設定リファレンス",
+      "level": 2
+    },
+    {
+      "id": "heading--",
+      "title": "メイン設定",
+      "level": 3
+    },
+    {
+      "id": "heading--",
+      "title": "ターミナルオプション",
+      "level": 3
+    },
+    {
+      "id": "heading--",
+      "title": "起動モード",
+      "level": 3
+    },
+    {
+      "id": "heading--",
+      "title": "コマンド設定",
+      "level": 3
+    },
+    {
+      "id": "heading--",
+      "title": "設定管理",
+      "level": 3
+    },
+    {
+      "id": "heading--",
+      "title": "設定の有効/無効",
+      "level": 4
+    },
+    {
+      "id": "heading--",
+      "title": "🎯 ユースケース",
+      "level": 2
+    },
+    {
+      "id": "heading--",
+      "title": "👨‍💻 開発者",
+      "level": 3
+    },
+    {
+      "id": "heading--devops-",
+      "title": "🛠️ DevOpsエンジニア",
+      "level": 3
+    },
+    {
+      "id": "heading--",
+      "title": "🎨 デザイナー",
+      "level": 3
+    },
+    {
+      "id": "heading--",
+      "title": "🔧 ソースからのビルド",
+      "level": 2
+    },
+    {
+      "id": "heading--",
+      "title": "前提条件",
+      "level": 3
+    },
+    {
+      "id": "heading--",
+      "title": "ビルド手順",
+      "level": 3
+    },
+    {
+      "id": "heading--",
+      "title": "リポジトリをクローン",
+      "level": 1
+    },
+    {
+      "id": "heading--",
+      "title": "依存関係をインストール",
+      "level": 1
+    },
+    {
+      "id": "heading--",
+      "title": "開発モード",
+      "level": 1
+    },
+    {
+      "id": "heading--",
+      "title": "本番用にビルド",
+      "level": 1
+    },
+    {
+      "id": "heading--",
+      "title": "プラットフォーム固有の注意事項",
+      "level": 3
+    },
+    {
+      "id": "heading-macos",
+      "title": "macOS",
+      "level": 4
+    },
+    {
+      "id": "heading--",
+      "title": "署名の問題が発生した場合",
+      "level": 1
+    },
+    {
+      "id": "heading--",
+      "title": "🤝 貢献",
+      "level": 2
+    },
+    {
+      "id": "heading--",
+      "title": "開発ガイドライン",
+      "level": 3
+    },
+    {
+      "id": "heading--",
+      "title": "📄 ライセンス",
+      "level": 2
+    },
+    {
+      "id": "heading--",
+      "title": "🙏 謝辞",
+      "level": 2
+    },
+    {
+      "id": "heading--",
+      "title": "📞 サポート",
+      "level": 2
+    }
+  ],
+  "locale": "ja"
+}

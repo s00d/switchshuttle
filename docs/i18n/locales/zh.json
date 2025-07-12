@@ -1,0 +1,19 @@
+{
+  "demo": {
+    "notifications": {
+      "notAvailable": "不可用",
+      "notAvailableMessage": "此功能在演示版本中不可用。",
+      "homepage": "主页",
+      "homepageMessage": "在浏览器中打开主页...\n\nhttps://github.com/s00d/switchshuttle",
+      "quit": "退出 SwitchShuttle",
+      "quitMessage": "您确定要退出 SwitchShuttle 吗？",
+      "settings": "设置",
+      "settingsMessage": "设置窗口在此演示版本中不可用。",
+      "about": "关于 SwitchShuttle",
+      "aboutMessage": "SwitchShuttle v1.12.0\n跨平台终端命令管理器\n\n这是演示版本。"
+    },
+    "jsonEditor": {
+      "title": "JSON 编辑器"
+    }
+  }
+} 

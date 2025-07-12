@@ -1,0 +1,228 @@
+{
+  "demo": {
+    "notifications": {
+      "notAvailable": "Not available",
+      "notAvailableMessage": "This feature is not available in the demo version.",
+      "homepage": "Homepage",
+      "homepageMessage": "Opening homepage in browser...\n\nhttps://github.com/s00d/switchshuttle",
+      "quit": "Quit SwitchShuttle",
+      "quitMessage": "Are you sure you want to quit SwitchShuttle?",
+      "settings": "Settings",
+      "settingsMessage": "Settings window is not available in this demo version.",
+      "about": "About SwitchShuttle",
+      "aboutMessage": "SwitchShuttle v1.12.0\nCross-platform terminal command manager\n\nThis is a demo version."
+    },
+    "help": {
+      "title": "SwitchShuttle v1.12.0",
+      "subtitle": "Cross-platform terminal command manager",
+      "description": "SwitchShuttle is a powerful terminal command manager that helps developers and system administrators organize, execute, and manage their frequently used terminal commands across different platforms.",
+      "features": {
+        "title": "✨ Features",
+        "commandTemplates": "Command Templates: Pre-configured command templates for common development tasks",
+        "hotkeySupport": "Hotkey Support: Quick access to commands via customizable hotkeys",
+        "crossPlatform": "Cross-platform: Works on macOS, Windows, and Linux",
+        "visualEditor": "Visual Editor: Built-in visual editor for creating and editing command configurations",
+        "systemMonitoring": "System Monitoring: Real-time CPU and memory usage monitoring",
+        "autoRefresh": "Auto-refresh: Automatic configuration reloading",
+        "launchAtLogin": "Launch at Login: Option to start automatically with system"
+      },
+      "usage": {
+        "title": "🚀 Usage",
+        "steps": [
+          "Use the menu bar icon to access SwitchShuttle",
+          "Select from predefined command templates",
+          "Customize commands using the visual editor",
+          "Use hotkeys for quick command execution",
+          "Monitor system resources in real-time"
+        ]
+      },
+      "installation": {
+        "title": "📦 Installation",
+        "homebrew": {
+          "title": "Homebrew (macOS - Recommended)",
+          "command": "brew tap s00d/switchshuttle && brew install --cask switchshuttle"
+        },
+        "manual": {
+          "title": "Manual Download",
+          "steps": [
+            "Download the latest release for your platform from GitHub Releases",
+            "Install the application",
+            "Launch SwitchShuttle - it will appear in your system tray",
+            "Right-click the tray icon to access the menu"
+          ]
+        },
+        "firstConfig": {
+          "title": "First Configuration",
+          "steps": [
+            "Edit Config → Opens your configuration file in your default editor",
+            "Add your commands using the JSON format",
+            "Save and restart the application",
+            "Enjoy your organized command shortcuts!"
+          ]
+        }
+      },
+      "cli": {
+        "title": "💻 Command Line Interface",
+        "description": "SwitchShuttle also provides a powerful command-line interface for quick command execution without opening the GUI.",
+        "usage": {
+          "title": "CLI Usage",
+          "execute": "Execute by command ID: switch-shuttle cmd_8",
+          "executeByName": "Execute by command name: switch-shuttle \"Example Command\"",
+          "list": "List all commands: switch-shuttle --list",
+          "search": "Search commands: switch-shuttle --search \"git\""
+        },
+        "examples": {
+          "title": "CLI Examples",
+          "git": "Quick git operations: switch-shuttle \"git status\"",
+          "dev": "Development workflows: switch-shuttle \"npm run dev\"",
+          "docker": "Docker operations: switch-shuttle \"docker-compose up\""
+        }
+      },
+      "commands": {
+        "title": "⚡ Commands",
+        "devServer": "Development Server: Start local development servers",
+        "installDeps": "Install Dependencies: Install project dependencies",
+        "runTests": "Run Tests: Execute test suites",
+        "buildProject": "Build Project: Build projects for production",
+        "gitOps": "Git Operations: Common Git commands"
+      },
+      "config": {
+        "title": "⚙️ Configuration",
+        "description": "Configuration files are stored in:",
+        "macos": "macOS: ~/.config/switch-shuttle/",
+        "windows": "Windows: %APPDATA%/switch-shuttle/",
+        "linux": "Linux: ~/.config/switch-shuttle/"
+      },
+      "configuration": {
+        "title": "📋 Configuration Guide",
+        "basicStructure": {
+          "title": "Basic Structure",
+          "description": "SwitchShuttle uses JSON configuration files with the following structure:"
+        },
+        "example": {
+          "title": "Simple Example"
+        },
+        "features": {
+          "title": "Advanced Features",
+          "dynamicInputs": "Dynamic Inputs - Create interactive commands that prompt for user input",
+          "multipleCommands": "Multiple Commands - Execute a sequence of commands",
+          "nestedSubmenus": "Nested Submenus - Organize commands in hierarchical menus",
+          "switchCommands": "Switch Commands - Toggle system features with background execution",
+          "monitorCommands": "Monitor Commands - Real-time system resource monitoring"
+        }
+      },
+      "useCases": {
+        "title": "🎯 Use Cases",
+        "developers": {
+          "title": "👨‍💻 Developers",
+          "features": [
+            "Quick project navigation - Jump to different projects instantly",
+            "Build and test workflows - One-click development cycles",
+            "Docker management - Start/stop containers with hotkeys",
+            "Git operations - Common git commands at your fingertips"
+          ]
+        },
+        "devops": {
+          "title": "🛠️ DevOps Engineers",
+          "features": [
+            "Server management - SSH connections and server commands",
+            "Monitoring tools - Quick access to logs and metrics",
+            "Deployment scripts - Automated deployment workflows",
+            "Database operations - Common database commands"
+          ]
+        },
+        "designers": {
+          "title": "🎨 Designers",
+          "features": [
+            "Asset optimization - Image processing and optimization",
+            "Design system tools - Component generation and updates",
+            "Prototype servers - Quick design server startup"
+          ]
+        }
+      },
+      "footer": {
+        "info": "For more information, visit: https://github.com/s00d/switchshuttle",
+        "note": "This is a demo version showing the interface and functionality."
+      }
+    },
+    "about": {
+      "title": "About SwitchShuttle",
+      "subtitle": "Cross-platform terminal command manager",
+      "version": "Version: 1.12.0",
+      "features": {
+        "title": "Features",
+        "config": {
+          "title": "Configuration Creation",
+          "description": "Create customizable configurations for various terminals with unique commands and hotkeys."
+        },
+        "editing": {
+          "title": "Editing",
+          "description": "Easily edit existing configurations, add new commands, and modify settings."
+        },
+        "quickAccess": {
+          "title": "Quick Access",
+          "description": "Configure hotkeys for quick access to commands and configurations."
+        },
+        "terminalSupport": {
+          "title": "Terminal Support",
+          "description": "Support for popular terminals: iTerm2, Terminal.app, Alacritty, Hyper, Warp."
+        }
+      },
+      "technical": {
+        "title": "Technical Information",
+        "technologies": {
+          "title": "Technologies",
+          "vue": "Vue.js 3 - Frontend Framework",
+          "nuxt": "Nuxt 3 - SSR Framework",
+          "typescript": "TypeScript - Type Safety",
+          "css": "CSS Grid and Flexbox - Styling"
+        },
+        "requirements": {
+          "title": "System Requirements",
+          "browser": "Modern web browser",
+          "memory": "4 GB RAM",
+          "storage": "100 MB free space"
+        }
+      },
+      "links": {
+        "title": "Links"
+      }
+    },
+    "homepage": {
+      "title": "Homepage",
+      "subtitle": "Official project website",
+      "description": {
+        "title": "Description",
+        "text": "SwitchShuttle is a powerful tool for managing terminal configurations. Create, edit, and switch between different terminal settings with ease."
+      },
+      "features": {
+        "title": "Key Features",
+        "feature1": "Create customizable configurations for various terminals",
+        "feature2": "Hotkey support for quick access",
+        "feature3": "Cross-platform: macOS, Windows, Linux",
+        "feature4": "Visual editor for creating and editing commands"
+      },
+      "links": {
+        "title": "Useful Links"
+      },
+      "footer": {
+        "note": "This is a demo version showing the interface and functionality."
+      }
+    },
+    "jsonEditor": {
+      "title": "JSON Editor"
+    }
+  },
+  "readme": {
+    "title": "Documentation",
+    "loading": "Loading documentation...",
+    "error": "Failed to load documentation",
+    "retry": "Retry",
+    "search": {
+      "placeholder": "Search in documentation..."
+    },
+    "toc": {
+      "title": "Table of Contents"
+    }
+  }
+} 

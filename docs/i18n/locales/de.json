@@ -1,0 +1,19 @@
+{
+  "demo": {
+    "notifications": {
+      "notAvailable": "Nicht verfügbar",
+      "notAvailableMessage": "Diese Funktion ist in der Demo-Version nicht verfügbar.",
+      "homepage": "Homepage",
+      "homepageMessage": "Homepage wird im Browser geöffnet...\n\nhttps://github.com/s00d/switchshuttle",
+      "quit": "SwitchShuttle beenden",
+      "quitMessage": "Möchten Sie SwitchShuttle wirklich beenden?",
+      "settings": "Einstellungen",
+      "settingsMessage": "Das Einstellungsfenster ist in dieser Demo-Version nicht verfügbar.",
+      "about": "Über SwitchShuttle",
+      "aboutMessage": "SwitchShuttle v1.12.0\nPlattformübergreifender Terminal-Befehlsmanager\n\nDies ist eine Demo-Version."
+    },
+    "jsonEditor": {
+      "title": "JSON Editor"
+    }
+  }
+} 
