@@ -8,11 +8,11 @@ use std::time::Duration;
 use tauri::{AppHandle, Wry};
 
 // Глобальный пул консольных соединений
-static CONSOLE_POOL: Lazy<Arc<Mutex<ConsolePool>>> = 
+static CONSOLE_POOL: Lazy<Arc<Mutex<ConsolePool>>> =
     Lazy::new(|| Arc::new(Mutex::new(ConsolePool::new())));
 
 // Глобальный инстанс консоли (для обратной совместимости)
-static CONSOLE_INSTANCE: Lazy<Arc<Mutex<Option<ConsoleInstance>>>> = 
+static CONSOLE_INSTANCE: Lazy<Arc<Mutex<Option<ConsoleInstance>>>> =
     Lazy::new(|| Arc::new(Mutex::new(None)));
 
 /// Пул консольных соединений для параллельного выполнения команд
@@ -53,11 +53,11 @@ impl ConsolePool {
                 false
             }
         };
-        
+
         if should_remove {
             self.connections.remove(command_id);
         }
-        
+
         // Проверяем лимит соединений
         if self.connections.len() >= self.max_connections {
             // Удаляем самое старое соединение
@@ -71,9 +71,10 @@ impl ConsolePool {
         // Создаем новое соединение, если его нет
         if !self.connections.contains_key(command_id) {
             let new_connection = ConsoleInstance::new()?;
-            self.connections.insert(command_id.to_string(), new_connection);
+            self.connections
+                .insert(command_id.to_string(), new_connection);
         }
-        
+
         Ok(self.connections.get_mut(command_id).unwrap())
     }
 
@@ -86,7 +87,7 @@ impl ConsolePool {
     /// Очищает неактивные соединения
     pub fn cleanup_inactive_connections(&mut self) {
         let mut to_remove = Vec::new();
-        
+
         for (id, connection) in &mut self.connections {
             if !connection.is_alive() {
                 to_remove.push(id.clone());
@@ -150,8 +151,8 @@ impl ConsoleInstance {
         if let Some(ref mut process) = self.process {
             match process.try_wait() {
                 Ok(Some(_)) => false, // Процесс завершился
-                Ok(None) => true,      // Процесс еще работает
-                Err(_) => false,       // Ошибка при проверке
+                Ok(None) => true,     // Процесс еще работает
+                Err(_) => false,      // Ошибка при проверке
             }
         } else {
             false
@@ -425,7 +426,10 @@ impl ConsoleInstance {
 
     /// Выполняет команду через пул соединений
     pub fn execute_command_via_pool(command_id: &str, command: &str) -> Result<String, String> {
-        println!("[Console] execute_command_via_pool: {} -> {}", command_id, command);
+        println!(
+            "[Console] execute_command_via_pool: {} -> {}",
+            command_id, command
+        );
         let mut pool_guard = CONSOLE_POOL.lock().unwrap();
         pool_guard.execute_command(command_id, command)
     }
@@ -468,18 +472,18 @@ mod tests {
     #[test]
     fn test_console_pool_get_connection() {
         let mut pool = ConsolePool::new();
-        
+
         // Тест создания нового соединения
         let result = pool.get_connection("test_command_1");
         assert!(result.is_ok());
-        
+
         let connection = result.unwrap();
         assert!(connection.is_alive());
-        
+
         // Тест повторного использования соединения
         let result2 = pool.get_connection("test_command_1");
         assert!(result2.is_ok());
-        
+
         // Проверяем, что соединение все еще живо
         let connection2 = result2.unwrap();
         assert!(connection2.is_alive());
@@ -488,20 +492,20 @@ mod tests {
     #[test]
     fn test_console_pool_max_connections() {
         let mut pool = ConsolePool::new();
-        
+
         // Создаем максимальное количество соединений
         for i in 0..3 {
             let result = pool.get_connection(&format!("command_{}", i));
             assert!(result.is_ok());
         }
-        
+
         // Проверяем, что количество соединений не превышает лимит
         assert_eq!(pool.connections.len(), 3);
-        
+
         // Создаем еще одно соединение - должно удалить самое старое
         let result = pool.get_connection("command_4");
         assert!(result.is_ok());
-        
+
         // Количество соединений должно остаться равным лимиту
         assert_eq!(pool.connections.len(), 3);
     }
@@ -509,17 +513,17 @@ mod tests {
     #[test]
     fn test_console_pool_cleanup_inactive_connections() {
         let mut pool = ConsolePool::new();
-        
+
         // Создаем соединение
         let result = pool.get_connection("test_cleanup");
         assert!(result.is_ok());
-        
+
         // Проверяем, что соединение активно
         assert_eq!(pool.connections.len(), 1);
-        
+
         // Очищаем неактивные соединения
         pool.cleanup_inactive_connections();
-        
+
         // Соединение должно остаться, так как оно активно
         assert_eq!(pool.connections.len(), 1);
     }
@@ -528,7 +532,7 @@ mod tests {
     fn test_console_instance_new() {
         let result = ConsoleInstance::new();
         assert!(result.is_ok());
-        
+
         let instance = result.unwrap();
         assert!(instance.process.is_some());
         assert!(instance.stdin_sender.is_some());
@@ -540,10 +544,10 @@ mod tests {
     #[test]
     fn test_console_instance_is_alive() {
         let mut instance = ConsoleInstance::new().unwrap();
-        
+
         // Свежесозданный инстанс должен быть жив
         assert!(instance.is_alive());
-        
+
         // Обновляем активность
         let old_activity = instance.last_activity;
         instance.update_activity();
@@ -553,13 +557,13 @@ mod tests {
     #[test]
     fn test_console_instance_execute_simple_command() {
         let mut instance = ConsoleInstance::new().unwrap();
-        
+
         // Тестируем выполнение простой команды
         let result = instance.execute_command("echo 'test'");
-        
+
         // Команда должна выполниться успешно
         assert!(result.is_ok());
-        
+
         let output = result.unwrap();
         // Проверяем, что получили какой-то ответ
         assert!(!output.is_empty());
@@ -568,12 +572,12 @@ mod tests {
     #[test]
     fn test_console_instance_execute_empty_command() {
         let mut instance = ConsoleInstance::new().unwrap();
-        
+
         // Тестируем выполнение пустой команды
         let result = instance.execute_command("");
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), "");
-        
+
         let result2 = instance.execute_command("   ");
         assert!(result2.is_ok());
         assert_eq!(result2.unwrap(), "");
@@ -582,13 +586,13 @@ mod tests {
     #[test]
     fn test_console_instance_close() {
         let mut instance = ConsoleInstance::new().unwrap();
-        
+
         // Проверяем, что инстанс жив
         assert!(instance.is_alive());
-        
+
         // Закрываем инстанс
         instance.close();
-        
+
         // Проверяем, что инстанс больше не жив
         assert!(!instance.is_alive());
     }
@@ -602,17 +606,17 @@ mod tests {
                 console.close();
             }
         }
-        
+
         // Инициализируем консоль через статическую функцию ConsolePool
         let result = ConsolePool::init_console();
         assert!(result.is_ok());
-        
+
         // Проверяем, что инстанс создан
         {
             let console_guard = CONSOLE_INSTANCE.lock().unwrap();
             assert!(console_guard.is_some());
         }
-        
+
         // Очищаем глобальный инстанс после теста
         {
             let mut console_guard = CONSOLE_INSTANCE.lock().unwrap();
@@ -631,21 +635,21 @@ mod tests {
                 console.close();
             }
         }
-        
+
         // Инициализируем консоль через статическую функцию ConsolePool
         let result = ConsolePool::init_console();
         assert!(result.is_ok());
-        
+
         // Проверяем, что инстанс создан
         {
             let console_guard = CONSOLE_INSTANCE.lock().unwrap();
             assert!(console_guard.is_some());
         }
-        
+
         // Повторная инициализация должна пройти успешно (уже существует)
         let result2 = ConsolePool::init_console();
         assert!(result2.is_ok());
-        
+
         // Очищаем глобальный инстанс после теста
         {
             let mut console_guard = CONSOLE_INSTANCE.lock().unwrap();
@@ -664,17 +668,17 @@ mod tests {
                 console.close();
             }
         }
-        
+
         // Инициализируем консоль
         ConsolePool::init_console().unwrap();
-        
+
         // Выполняем простую команду
         let result = ConsoleInstance::execute_command_silent("echo 'silent test'");
         assert!(result.is_ok());
-        
+
         let output = result.unwrap();
         assert!(!output.is_empty());
-        
+
         // Очищаем глобальный инстанс после теста
         {
             let mut console_guard = CONSOLE_INSTANCE.lock().unwrap();
@@ -687,9 +691,10 @@ mod tests {
     #[test]
     fn test_execute_command_via_pool() {
         // Выполняем команду через пул
-        let result = ConsoleInstance::execute_command_via_pool("test_pool_command", "echo 'pool test'");
+        let result =
+            ConsoleInstance::execute_command_via_pool("test_pool_command", "echo 'pool test'");
         assert!(result.is_ok());
-        
+
         let output = result.unwrap();
         assert!(!output.is_empty());
     }
@@ -701,18 +706,18 @@ mod tests {
             let mut pool_guard = CONSOLE_POOL.lock().unwrap();
             pool_guard.close_all();
         }
-        
+
         // Создаем несколько соединений в пуле
         ConsoleInstance::execute_command_via_pool("cleanup_test_1", "echo 'test1'").unwrap();
         ConsoleInstance::execute_command_via_pool("cleanup_test_2", "echo 'test2'").unwrap();
-        
+
         // Очищаем пул
         ConsoleInstance::cleanup_console_pool();
-        
+
         // Проверяем, что пул все еще работает
         let result = ConsoleInstance::execute_command_via_pool("cleanup_test_3", "echo 'test3'");
         assert!(result.is_ok());
-        
+
         // Очищаем пул после теста
         {
             let mut pool_guard = CONSOLE_POOL.lock().unwrap();
@@ -729,30 +734,30 @@ mod tests {
                 console.close();
             }
         }
-        
+
         // Инициализируем консоль
         ConsolePool::init_console().unwrap();
-        
+
         // Тестируем с командой, которая возвращает "true"
         let result = ConsoleInstance::is_switch_enabled("echo 'true'", None);
         assert!(result);
-        
+
         // Тестируем с командой, которая возвращает "false"
         let result2 = ConsoleInstance::is_switch_enabled("echo 'false'", None);
         assert!(!result2);
-        
+
         // Тестируем с командой, которая возвращает "1"
         let result3 = ConsoleInstance::is_switch_enabled("echo '1'", None);
         assert!(result3);
-        
+
         // Тестируем с командой, которая возвращает "on"
         let result4 = ConsoleInstance::is_switch_enabled("echo 'on'", None);
         assert!(result4);
-        
+
         // Тестируем с командой, которая возвращает "enabled"
         let result5 = ConsoleInstance::is_switch_enabled("echo 'enabled'", None);
         assert!(result5);
-        
+
         // Очищаем глобальный инстанс после теста
         {
             let mut console_guard = CONSOLE_INSTANCE.lock().unwrap();
@@ -765,11 +770,11 @@ mod tests {
     #[test]
     fn test_console_pool_execute_command() {
         let mut pool = ConsolePool::new();
-        
+
         // Выполняем команду через пул
         let result = pool.execute_command("test_execute", "echo 'pool execute test'");
         assert!(result.is_ok());
-        
+
         let output = result.unwrap();
         assert!(!output.is_empty());
     }
@@ -777,15 +782,15 @@ mod tests {
     #[test]
     fn test_console_instance_timeout() {
         let mut instance = ConsoleInstance::new().unwrap();
-        
+
         // Тестируем команду, которая может вызвать таймаут
         // (команда sleep с большим временем)
         let result = instance.execute_command("sleep 5");
-        
+
         // Должен быть таймаут, так как команда выполняется дольше 3 секунд
         assert!(result.is_err());
         assert!(result.unwrap_err().contains("Timeout"));
-        
+
         // Явно закрываем инстанс
         instance.close();
     }
@@ -793,14 +798,14 @@ mod tests {
     #[test]
     fn test_console_pool_drop() {
         let mut pool = ConsolePool::new();
-        
+
         // Создаем несколько соединений
         pool.get_connection("drop_test_1").unwrap();
         pool.get_connection("drop_test_2").unwrap();
-        
+
         // Проверяем, что соединения созданы
         assert_eq!(pool.connections.len(), 2);
-        
+
         // При дропе пула все соединения должны быть закрыты
         // Это тестируется автоматически при выходе из области видимости
     }
@@ -808,10 +813,10 @@ mod tests {
     #[test]
     fn test_console_instance_drop() {
         let instance = ConsoleInstance::new().unwrap();
-        
+
         // Проверяем, что инстанс создан
         assert!(instance.process.is_some());
-        
+
         // При дропе инстанса все ресурсы должны быть освобождены
         // Это тестируется автоматически при выходе из области видимости
     }
@@ -819,22 +824,22 @@ mod tests {
     #[test]
     fn test_multiple_commands_same_connection() {
         let mut instance = ConsoleInstance::new().unwrap();
-        
+
         // Выполняем несколько команд через одно соединение
         let result1 = instance.execute_command("echo 'command1'");
         assert!(result1.is_ok());
-        
+
         let result2 = instance.execute_command("echo 'command2'");
         assert!(result2.is_ok());
-        
+
         let result3 = instance.execute_command("echo 'command3'");
         assert!(result3.is_ok());
-        
+
         // Все команды должны выполниться успешно
         assert!(!result1.unwrap().is_empty());
         assert!(!result2.unwrap().is_empty());
         assert!(!result3.unwrap().is_empty());
-        
+
         // Явно закрываем инстанс
         instance.close();
     }
@@ -842,12 +847,14 @@ mod tests {
     #[test]
     fn test_console_pool_concurrent_commands() {
         let mut pool = ConsolePool::new();
-        
+
         // Выполняем несколько команд с разными ID
         let results: Vec<Result<String, String>> = (0..5)
-            .map(|i| pool.execute_command(&format!("concurrent_{}", i), &format!("echo 'test{}'", i)))
+            .map(|i| {
+                pool.execute_command(&format!("concurrent_{}", i), &format!("echo 'test{}'", i))
+            })
             .collect();
-        
+
         // Все команды должны выполниться успешно
         for result in results {
             assert!(result.is_ok());
@@ -858,15 +865,15 @@ mod tests {
     #[test]
     fn test_error_handling() {
         let mut instance = ConsoleInstance::new().unwrap();
-        
+
         // Тестируем команду, которая может вызвать ошибку
         let result = instance.execute_command("nonexistent_command_12345");
-        
+
         // Команда должна выполниться, но вернуть сообщение об ошибке через stderr
         assert!(result.is_ok());
         let output = result.unwrap();
         assert!(output.contains("command not found"));
-        
+
         // Явно закрываем инстанс
         instance.close();
     }
@@ -874,15 +881,15 @@ mod tests {
     #[test]
     fn test_console_pool_connection_reuse() {
         let mut pool = ConsolePool::new();
-        
+
         // Создаем соединение
         let connection1 = pool.get_connection("reuse_test").unwrap();
         assert!(connection1.is_alive());
-        
+
         // Используем то же соединение снова
         let connection2 = pool.get_connection("reuse_test").unwrap();
         assert!(connection2.is_alive());
-        
+
         // Проверяем, что это то же самое соединение
         assert_eq!(pool.connections.len(), 1);
     }
@@ -890,18 +897,18 @@ mod tests {
     #[test]
     fn test_console_instance_activity_tracking() {
         let mut instance = ConsoleInstance::new().unwrap();
-        
+
         let initial_activity = instance.last_activity;
-        
+
         // Ждем немного
         std::thread::sleep(Duration::from_millis(10));
-        
+
         // Обновляем активность
         instance.update_activity();
-        
+
         // Проверяем, что время активности обновилось
         assert!(instance.last_activity > initial_activity);
-        
+
         // Явно закрываем инстанс
         instance.close();
     }
