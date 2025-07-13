@@ -1,161 +1,150 @@
 <template>
-  <Window :title="`${$t('demo.about.title')} — SwitchShuttle`" :initial-x="150" :initial-y="150" :z="1600" @close="$emit('close')">
-    <template #titlebar>
-      <div class="window-title">{{ $t('demo.about.title') }} — SwitchShuttle</div>
-    </template>
-    <div class="about-content">
-      <!-- App Info -->
-      <div class="app-info">
-        <div class="app-header">
-          <div class="app-logo">
-            <img src="/logo.svg" alt="SwitchShuttle" class="logo-image" />
-          </div>
-          <div class="app-details">
-            <h2 class="app-title">SwitchShuttle</h2>
-            <p class="app-version">{{ $t('demo.about.version') }}</p>
-          </div>
+  <div class="about-content">
+    <!-- App Info -->
+    <div class="app-info">
+      <div class="app-header">
+        <div class="app-logo">
+          <img src="/logo.svg" alt="SwitchShuttle" class="logo-image" />
         </div>
-        <p class="app-description">
-          SwitchShuttle is a powerful tool for managing terminal configurations. 
-          Create, edit, and switch between different terminal settings with ease.
-        </p>
-      </div>
-
-      <!-- Features -->
-      <div class="features-section">
-        <h3 class="section-title">{{ $t('demo.about.features.title') }}</h3>
-        <div class="features-grid">
-          <div class="feature-item">
-            <div class="feature-icon blue">
-              <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-            </div>
-            <div class="feature-content">
-              <h4 class="feature-title">{{ $t('demo.about.features.config.title') }}</h4>
-              <p class="feature-description">{{ $t('demo.about.features.config.description') }}</p>
-            </div>
-          </div>
-          
-          <div class="feature-item">
-            <div class="feature-icon green">
-              <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-            </div>
-            <div class="feature-content">
-              <h4 class="feature-title">{{ $t('demo.about.features.editing.title') }}</h4>
-              <p class="feature-description">{{ $t('demo.about.features.editing.description') }}</p>
-            </div>
-          </div>
-          
-          <div class="feature-item">
-            <div class="feature-icon purple">
-              <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <div class="feature-content">
-              <h4 class="feature-title">{{ $t('demo.about.features.quickAccess.title') }}</h4>
-              <p class="feature-description">{{ $t('demo.about.features.quickAccess.description') }}</p>
-            </div>
-          </div>
-          
-          <div class="feature-item">
-            <div class="feature-icon orange">
-              <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <div class="feature-content">
-              <h4 class="feature-title">{{ $t('demo.about.features.terminalSupport.title') }}</h4>
-              <p class="feature-description">{{ $t('demo.about.features.terminalSupport.description') }}</p>
-            </div>
-          </div>
+        <div class="app-details">
+          <h2 class="app-title">SwitchShuttle</h2>
+          <p class="app-version">{{ $t('demo.about.version') }}</p>
         </div>
       </div>
+      <p class="app-description">
+        SwitchShuttle is a powerful tool for managing terminal configurations. 
+        Create, edit, and switch between different terminal settings with ease.
+      </p>
+    </div>
 
-      <!-- Technical Info -->
-      <div class="technical-section">
-        <h3 class="section-title">{{ $t('demo.about.technical.title') }}</h3>
-        <div class="technical-grid">
-          <div class="technical-column">
-            <h4 class="technical-subtitle">{{ $t('demo.about.technical.technologies.title') }}</h4>
-            <ul class="technical-list">
-              <li class="technical-item">
-                <span class="bullet blue"></span>
-                <span>{{ $t('demo.about.technical.technologies.vue') }}</span>
-              </li>
-              <li class="technical-item">
-                <span class="bullet green"></span>
-                <span>{{ $t('demo.about.technical.technologies.nuxt') }}</span>
-              </li>
-              <li class="technical-item">
-                <span class="bullet purple"></span>
-                <span>{{ $t('demo.about.technical.technologies.typescript') }}</span>
-              </li>
-              <li class="technical-item">
-                <span class="bullet orange"></span>
-                <span>{{ $t('demo.about.technical.technologies.css') }}</span>
-              </li>
-            </ul>
+    <!-- Features -->
+    <div class="features-section">
+      <h3 class="section-title">{{ $t('demo.about.features.title') }}</h3>
+      <div class="features-grid">
+        <div class="feature-item">
+          <div class="feature-icon blue">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
           </div>
-          
-          <div class="technical-column">
-            <h4 class="technical-subtitle">{{ $t('demo.about.technical.requirements.title') }}</h4>
-            <ul class="technical-list">
-              <li class="technical-item">
-                <span class="bullet blue"></span>
-                <span>{{ $t('demo.about.technical.requirements.browser') }}</span>
-              </li>
-              <li class="technical-item">
-                <span class="bullet green"></span>
-                <span>{{ $t('demo.about.technical.requirements.memory') }}</span>
-              </li>
-              <li class="technical-item">
-                <span class="bullet purple"></span>
-                <span>{{ $t('demo.about.technical.requirements.storage') }}</span>
-              </li>
-            </ul>
+          <div class="feature-content">
+            <h4 class="feature-title">{{ $t('demo.about.features.config.title') }}</h4>
+            <p class="feature-description">{{ $t('demo.about.features.config.description') }}</p>
           </div>
         </div>
-      </div>
-
-      <!-- Links -->
-      <div class="links-section">
-        <h3 class="section-title">{{ $t('demo.about.links.title') }}</h3>
-        <div class="links-grid">
-          <button class="link-button" @click="openLink('https://github.com/s00d/switchshuttle')">
-            <svg class="link-icon" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+        
+        <div class="feature-item">
+          <div class="feature-icon green">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
-            GitHub
-          </button>
-          <button class="link-button" @click="openLink('https://s00d.github.io/switchshuttle/')">
-            <svg class="link-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
+          </div>
+          <div class="feature-content">
+            <h4 class="feature-title">{{ $t('demo.about.features.editing.title') }}</h4>
+            <p class="feature-description">{{ $t('demo.about.features.editing.description') }}</p>
+          </div>
+        </div>
+        
+        <div class="feature-item">
+          <div class="feature-icon purple">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            Website
-          </button>
-          <button class="link-button" @click="openLink('mailto:virus191288@gmail.com')">
-            <svg class="link-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </div>
+          <div class="feature-content">
+            <h4 class="feature-title">{{ $t('demo.about.features.quickAccess.title') }}</h4>
+            <p class="feature-description">{{ $t('demo.about.features.quickAccess.description') }}</p>
+          </div>
+        </div>
+        
+        <div class="feature-item">
+          <div class="feature-icon orange">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            Support
-          </button>
+          </div>
+          <div class="feature-content">
+            <h4 class="feature-title">{{ $t('demo.about.features.terminalSupport.title') }}</h4>
+            <p class="feature-description">{{ $t('demo.about.features.terminalSupport.description') }}</p>
+          </div>
         </div>
       </div>
     </div>
-  </Window>
+
+    <!-- Technical Info -->
+    <div class="technical-section">
+      <h3 class="section-title">{{ $t('demo.about.technical.title') }}</h3>
+      <div class="technical-grid">
+        <div class="technical-column">
+          <h4 class="technical-subtitle">{{ $t('demo.about.technical.technologies.title') }}</h4>
+          <ul class="technical-list">
+            <li class="technical-item">
+              <span class="bullet blue"></span>
+              <span>{{ $t('demo.about.technical.technologies.vue') }}</span>
+            </li>
+            <li class="technical-item">
+              <span class="bullet green"></span>
+              <span>{{ $t('demo.about.technical.technologies.nuxt') }}</span>
+            </li>
+            <li class="technical-item">
+              <span class="bullet purple"></span>
+              <span>{{ $t('demo.about.technical.technologies.typescript') }}</span>
+            </li>
+            <li class="technical-item">
+              <span class="bullet orange"></span>
+              <span>{{ $t('demo.about.technical.technologies.css') }}</span>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="technical-column">
+          <h4 class="technical-subtitle">{{ $t('demo.about.technical.requirements.title') }}</h4>
+          <ul class="technical-list">
+            <li class="technical-item">
+              <span class="bullet blue"></span>
+              <span>{{ $t('demo.about.technical.requirements.browser') }}</span>
+            </li>
+            <li class="technical-item">
+              <span class="bullet green"></span>
+              <span>{{ $t('demo.about.technical.requirements.memory') }}</span>
+            </li>
+            <li class="technical-item">
+              <span class="bullet purple"></span>
+              <span>{{ $t('demo.about.technical.requirements.storage') }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Links -->
+    <div class="links-section">
+      <h3 class="section-title">{{ $t('demo.about.links.title') }}</h3>
+      <div class="links-grid">
+        <button class="link-button" @click="openLink('https://github.com/s00d/switchshuttle')">
+          <svg class="link-icon" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+          GitHub
+        </button>
+        <button class="link-button" @click="openLink('https://s00d.github.io/switchshuttle/')">
+          <svg class="link-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
+          </svg>
+          Website
+        </button>
+        <button class="link-button" @click="openLink('mailto:virus191288@gmail.com')">
+          <svg class="link-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          Support
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import Window from './Window.vue'
-
-defineEmits<{
-  close: []
-}>()
-
 const openLink = (url: string) => {
   window.open(url, '_blank')
 }

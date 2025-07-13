@@ -1,7 +1,7 @@
 <div align="center">
   
   [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-blue?style=for-the-badge)](https://github.com/s00d/switchshuttle)
-  [![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](LICENSE)
+  [![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](https://github.com/s00d/switchshuttle/blob/main/LICENSE)
   [![GitHub release](https://img.shields.io/github/v/release/s00d/switchshuttle?style=for-the-badge)](https://github.com/s00d/switchshuttle/releases)
   [![GitHub downloads](https://img.shields.io/github/downloads/s00d/switchshuttle/total?style=for-the-badge)](https://github.com/s00d/switchshuttle/releases)
   [![GitHub issues](https://img.shields.io/github/issues/s00d/switchshuttle?style=for-the-badge)](https://github.com/s00d/switchshuttle/issues)
@@ -418,7 +418,7 @@ codesign --force --deep --sign - /Applications/switch-shuttle.app
 
 ## 📄 Лицензия
 
-Этот проект лицензирован под MIT License - см. файл [LICENSE](LICENSE) для деталей.
+Этот проект лицензирован под MIT License - см. файл [LICENSE](https://github.com/s00d/switchshuttle/blob/main/LICENSE) для деталей.
 
 ## 🙏 Благодарности
 

@@ -1,8 +1,4 @@
 <template>
-  <Window :title="`${$t('demo.help.title')} — SwitchShuttle`" :initial-x="100" :initial-y="100" :z="1500" @close="$emit('close')">
-    <template #titlebar>
-      <div class="window-title">{{ $t('demo.help.title') }} — SwitchShuttle</div>
-    </template>
     <div class="help-content">
       <div class="help-header">
         <h2>{{ $t('demo.help.title') }}</h2>
@@ -134,13 +130,11 @@
         <p class="help-note">{{ $t('demo.help.footer.note') }}</p>
       </div>
     </div>
-  </Window>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import Window from './Window.vue'
 
 const { t } = useI18n()
 
@@ -188,205 +182,133 @@ const configExample = computed(() => {
   ]
 }`
 })
-
-defineEmits<{
-  close: []
-}>()
 </script>
 
 <style scoped>
-
 .help-content {
   padding: 20px;
-  font-size: 14px;
-  line-height: 1.6;
-  color: #1d1d1f;
-  height: 100%;
+  max-height: 100%;
   overflow-y: auto;
-  pointer-events: auto;
-  user-select: text;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  color: #333;
 }
 
+.help-header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.help-header h2 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 8px;
+}
+
+.help-subtitle {
+  font-size: 16px;
+  color: #718096;
+  margin: 0;
+}
+
+.help-section {
+  margin-bottom: 30px;
+}
+
+.help-section h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.help-section h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #4a5568;
+  margin: 20px 0 10px 0;
+}
+
+.help-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.help-features li {
+  padding: 8px 0;
+  border-bottom: 1px solid #f7fafc;
+  color: #4a5568;
+}
+
+.help-features li:last-child {
+  border-bottom: none;
+}
+
+.help-usage {
+  padding-left: 20px;
+  color: #4a5568;
+}
+
+.help-usage li {
+  margin-bottom: 8px;
+}
+
+.code-block {
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 15px;
+  margin: 15px 0;
+  overflow-x: auto;
+}
+
+.code-block code {
+  font-family: 'JetBrains Mono', 'Fira Mono', 'Menlo', 'Consolas', monospace;
+  font-size: 13px;
+  color: #2d3748;
+  background: none;
+  padding: 0;
+}
+
+.code-block pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.help-footer {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 2px solid #e2e8f0;
+  text-align: center;
+  color: #718096;
+}
+
+.help-note {
+  font-size: 14px;
+  font-style: italic;
+  margin-top: 10px;
+}
+
+/* Скроллбар */
 .help-content::-webkit-scrollbar {
   width: 8px;
 }
 
 .help-content::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 4px;
+  background: #f7fafc;
 }
 
 .help-content::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
+  background: #cbd5e0;
   border-radius: 4px;
 }
 
 .help-content::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
-}
-
-/* Header */
-.help-header {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.help-header h2 {
-  margin: 0 0 8px 0;
-  color: #1a1a1a;
-  font-size: 24px;
-  font-weight: 700;
-}
-
-.help-subtitle {
-  color: #86868b;
-  font-size: 16px;
-  margin: 0;
-}
-
-/* Sections */
-.help-section {
-  margin-bottom: 25px;
-}
-
-.help-section h3 {
-  margin: 0 0 12px 0;
-  color: #333;
-  font-size: 18px;
-  font-weight: 600;
-  border-bottom: 1px solid #f0f0f0;
-  padding-bottom: 8px;
-}
-
-.help-features,
-.help-usage {
-  margin: 0;
-  padding-left: 20px;
-}
-
-.help-features li,
-.help-usage li {
-  margin-bottom: 8px;
-  line-height: 1.5;
-}
-
-.help-features strong,
-.help-usage strong {
-  color: #007AFF;
-  font-weight: 600;
-  pointer-events: auto;
-}
-
-/* Numbered list */
-.help-usage {
-  counter-reset: item;
-  list-style: none;
-  padding-left: 0;
-}
-
-.help-usage li {
-  counter-increment: item;
-  margin-bottom: 12px;
-  padding-left: 30px;
-  position: relative;
-}
-
-.help-usage li::before {
-  content: counter(item);
-  position: absolute;
-  left: 0;
-  top: 0;
-  background: #007AFF;
-  color: white;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-
-
-/* Footer */
-.help-footer {
-  margin-top: 30px;
-  padding-top: 20px;
-  border-top: 1px solid #f0f0f0;
-  text-align: center;
-}
-
-.help-footer p {
-  margin-bottom: 8px;
-  color: #86868b;
-}
-
-.help-footer a {
-  color: #007AFF;
-  text-decoration: none;
-  pointer-events: auto;
-  cursor: pointer;
-}
-
-.help-footer a:hover {
-  text-decoration: underline;
-}
-
-.help-note {
-  font-style: italic;
-  color: #86868b;
-  font-size: 13px;
-}
-
-/* Code elements */
-.help-content code {
-  background: rgba(0, 0, 0, 0.1);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-family: 'Monaco', 'Menlo', monospace;
-  font-size: 14px;
-}
-
-.code-block {
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
-  border-radius: 6px;
-  padding: 12px;
-  margin: 12px 0;
-  overflow-x: auto;
-}
-
-.code-block pre {
-  margin: 0;
-  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
-  font-size: 13px;
-  line-height: 1.4;
-  color: #333;
-}
-
-.code-block code {
-  background: none;
-  padding: 0;
-  color: inherit;
-}
-
-/* Subheadings */
-.help-section h4 {
-  margin: 16px 0 8px 0;
-  color: #333;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.help-content kbd {
-  background: #f5f5f5;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  padding: 2px 6px;
-  font-family: 'Monaco', 'Menlo', monospace;
-  font-size: 12px;
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+  background: #a0aec0;
 }
 </style> 

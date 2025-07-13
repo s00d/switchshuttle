@@ -10,7 +10,24 @@
       "settings": "Настройки",
       "settingsMessage": "Окно настроек недоступно в этой демо-версии.",
       "about": "О SwitchShuttle",
-      "aboutMessage": "SwitchShuttle\nКроссплатформенный менеджер терминальных команд\n\nЭто демо-версия."
+      "aboutMessage": "SwitchShuttle\nКроссплатформенный менеджер терминальных команд\n\nЭто демо-версия.",
+      "panel": {
+        "title": "Уведомления",
+        "clearAll": "Очистить все",
+        "noNotifications": "Нет уведомлений"
+      },
+      "terminal": {
+        "commandExecuted": "Команда выполнена",
+        "commandExecuting": "Выполняется команда",
+        "commandSuccess": "Команда выполнена успешно",
+        "commandError": "Ошибка выполнения команды"
+      },
+      "time": {
+        "justNow": "Только что",
+        "minutesAgo": "{minutes} мин назад",
+        "hoursAgo": "{hours} ч назад",
+        "daysAgo": "{days} дн назад"
+      }
     },
     "help": {
       "title": "SwitchShuttle",

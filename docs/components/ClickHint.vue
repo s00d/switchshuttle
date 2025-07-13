@@ -41,8 +41,6 @@ const positionStyle = computed(() => ({
 function updatePosition() {
   if (props.show) {
     const targetElement = document.querySelector(props.targetClass)
-
-    console.log(props.targetClass, targetElement)
     
     if (targetElement) {
       const rect = targetElement.getBoundingClientRect()

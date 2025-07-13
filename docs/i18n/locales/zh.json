@@ -10,7 +10,24 @@
       "settings": "设置",
       "settingsMessage": "设置窗口在此演示版本中不可用。",
       "about": "关于 SwitchShuttle",
-      "aboutMessage": "SwitchShuttle\n跨平台终端命令管理器\n\n这是演示版本。"
+      "aboutMessage": "SwitchShuttle\n跨平台终端命令管理器\n\n这是演示版本。",
+      "panel": {
+        "title": "通知",
+        "clearAll": "清除全部",
+        "noNotifications": "没有通知"
+      },
+      "terminal": {
+        "commandExecuted": "命令已执行",
+        "commandExecuting": "正在执行命令",
+        "commandSuccess": "命令执行成功",
+        "commandError": "命令执行错误"
+      },
+      "time": {
+        "justNow": "刚刚",
+        "minutesAgo": "{minutes} 分钟前",
+        "hoursAgo": "{hours} 小时前",
+        "daysAgo": "{days} 天前"
+      }
     },
     "help": {
       "title": "SwitchShuttle",

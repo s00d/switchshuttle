@@ -1,8 +1,4 @@
 <template>
-  <Window :title="title" :initial-x="100" :initial-y="200" :z="100" :closable="true" @close="$emit('close')">
-    <template #titlebar>
-      <div class="window-title">{{ title }}</div>
-    </template>
     <div class="terminal-content">
       <div class="terminal-output" ref="terminalOutput">
         <div v-for="(line, index) in terminalLines" :key="index" class="terminal-line">
@@ -14,22 +10,19 @@
           <span v-else-if="line.type === 'info'" class="info">{{ line.content }}</span>
           <span v-else-if="line.type === 'prompt'" class="prompt">{{ line.content }}</span>
           <span v-else class="output">{{ line.content }}</span>
-        </div>
-
       </div>
     </div>
-  </Window>
+  </div>
 </template>
 
 <script setup>
 import { ref, onMounted, nextTick, watch } from 'vue'
-import Window from './Window.vue'
 
 const props = defineProps({
-  title: { type: String, default: 'Terminal — SwitchShuttle' }
+  title: { type: String, default: 'Terminal — SwitchShuttle' },
+  command: { type: String, default: '' },
+  output: { type: String, default: '' }
 })
-
-const emit = defineEmits(['close'])
 
 // Константы терминала
 const defaultTerminalOutput = `Last login: Mon Jan 15 10:30:15 on ttys000`
@@ -51,7 +44,29 @@ onMounted(() => {
   // Добавляем приветственное сообщение
   addTerminalLine(defaultTerminalOutput, 'prompt')
   scrollToBottom()
+  
+  // Сбрасываем состояние команды и вывода при монтировании
+  console.log('TerminalWindow mounted, checking for initial command')
 })
+
+// Следим за изменениями команды и вывода
+watch(() => [props.command, props.output], ([command, output], oldValues) => {
+  if (command && output && command !== oldValues?.[0]) {
+    console.log('TerminalWindow: executing command from props:', command)
+    // Добавляем небольшую задержку, чтобы компонент успел смонтироваться
+    setTimeout(() => {
+      executeCommandFromMenu(command, output)
+    }, 100)
+  }
+}, { immediate: false })
+
+// Также следим за изменениями после монтирования
+watch(() => [props.command, props.output], ([command, output], oldValues) => {
+  if (command && output && command !== oldValues?.[0] && terminalLines.value.length > 0) {
+    console.log('TerminalWindow: executing command after mount:', command)
+    executeCommandFromMenu(command, output)
+  }
+}, { immediate: false })
 
 // Функции
 function addTerminalLine(content, type = 'output') {
@@ -66,8 +81,6 @@ function scrollToBottom() {
     terminalOutput.value.scrollTop = terminalOutput.value.scrollHeight
   }
 }
-
-
 
 async function executeCommandFromMenu(command, output) {
   if (isExecuting.value) return
@@ -96,11 +109,7 @@ async function executeCommandFromMenu(command, output) {
   }
   
   isExecuting.value = false
-  
-
 }
-
-
 
 // Экспортируем метод для внешнего вызова
 defineExpose({

@@ -10,7 +10,24 @@
       "settings": "Einstellungen",
       "settingsMessage": "Einstellungsfenster ist in dieser Demo-Version nicht verfügbar.",
       "about": "Über SwitchShuttle",
-      "aboutMessage": "SwitchShuttle\nPlattformübergreifender Terminal-Befehlsmanager\n\nDies ist eine Demo-Version."
+      "aboutMessage": "SwitchShuttle\nPlattformübergreifender Terminal-Befehlsmanager\n\nDies ist eine Demo-Version.",
+      "panel": {
+        "title": "Benachrichtigungen",
+        "clearAll": "Alle löschen",
+        "noNotifications": "Keine Benachrichtigungen"
+      },
+      "terminal": {
+        "commandExecuted": "Befehl ausgeführt",
+        "commandExecuting": "Befehl wird ausgeführt",
+        "commandSuccess": "Befehl erfolgreich ausgeführt",
+        "commandError": "Fehler bei der Befehlsausführung"
+      },
+      "time": {
+        "justNow": "Gerade eben",
+        "minutesAgo": "vor {minutes} Min",
+        "hoursAgo": "vor {hours} Std",
+        "daysAgo": "vor {days} Tagen"
+      }
     },
     "help": {
       "title": "SwitchShuttle",

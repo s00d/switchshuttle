@@ -22,6 +22,10 @@
       <div class="menu-bar-item">
         <span class="menu-bar-text">{{ currentTime }}</span>
       </div>
+      <div class="menu-bar-item notification-toggle" @click="toggleNotificationPanel">
+        <span class="menu-bar-text">🔔</span>
+        <span v-if="hasUnreadNotifications" class="notification-badge">{{ unreadCount }}</span>
+      </div>
       <!-- Слот для дополнительных элементов справа -->
       <slot name="right"></slot>
     </div>
@@ -107,6 +111,7 @@ import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { menuStructure } from '~/config/menu'
 import ClickHint from './ClickHint.vue'
+import { useNotifications } from '~/composables/useNotifications'
 
 const emit = defineEmits(['showNotification', 'showHelp', 'showTerminal', 'editConfig', 'toggleItem', 'showHelpWindow', 'showAboutWindow', 'showHomepageWindow', 'showJsonEditorWindow', 'showConfigFolderWindow', 'hideMenuBar'])
 
@@ -119,7 +124,18 @@ const props = defineProps({
 })
 
 // i18n
-const { locale, locales, setLocale } = useI18n()
+const { locale, locales, setLocale, t } = useI18n()
+
+// Nuxt config
+const config = useRuntimeConfig()
+
+// Notifications
+const {
+  unreadCount,
+  hasUnreadNotifications,
+  toggleNotificationPanel,
+  addNotification
+} = useNotifications()
 
 // Доступные локали (исключаем текущую)
 const availableLocales = computed(() => {
@@ -209,8 +225,7 @@ function openLink(url) {
 }
 
 function getIconPath(icon) {
-  // Получаем baseURL из конфигурации Nuxt
-  const config = useRuntimeConfig()
+  // Используем config из setup контекста
   const baseURL = config.app.baseURL || ''
   
   // Если baseURL пустой или равен '/', используем относительный путь
@@ -267,6 +282,13 @@ function handleMenuItem(item) {
         output = output.replace(/{usage}/g, dynamicValue)
       }
       emit('showTerminal', item.command, output)
+      
+      // Добавляем уведомление о выполнении команды
+      addNotification({
+        title: t('demo.notifications.terminal.commandExecuted'),
+        message: `${t('demo.notifications.terminal.commandExecuting')}: ${item.command}`,
+        type: 'success'
+      })
       break
     case 'notification':
       const title = item.title || item.name
@@ -362,4 +384,26 @@ onMounted(() => {
 
 <style scoped>
 /* Стили уже определены в main.css */
+
+.notification-toggle {
+  position: relative;
+  cursor: pointer;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: #FF3B30;
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 8px;
+  min-width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
 </style> 

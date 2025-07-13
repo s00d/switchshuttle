@@ -1,44 +1,37 @@
 <template>
     <div id="demo-window">
       <div class="desktop">
-        <!-- Desktop Icons -->
-        <div class="desktop-icon readme-icon" @click="toggleReadmeWindow" title="README (Click to open)">
-          <div class="icon-image">📖</div>
-          <div class="icon-label">README</div>
-        </div>
-        <div class="desktop-icon terminal-icon" @click="toggleTerminalWindow" title="Terminal (Click to open)">
-          <div class="icon-image">💻</div>
-          <div class="icon-label">Terminal</div>
-        </div>
-        <div class="desktop-icon help-icon" @click="showHelpWindow" title="Help (Click to open)">
-          <div class="icon-image">❓</div>
-          <div class="icon-label">Help</div>
-        </div>
-        <div class="desktop-icon about-icon" @click="showAboutWindow" title="About (Click to open)">
-          <div class="icon-image">ℹ️</div>
-          <div class="icon-label">About</div>
-        </div>
-        <div class="desktop-icon" @click="showMenuBar" title="SwitchShuttle (Click to show menu bar)">
-          <div class="icon-image">
-            <img src="/logo.svg" alt="SwitchShuttle" class="desktop-icon-img">
+        <!-- Desktop Icons Grid -->
+        <div class="desktop-icons-grid">
+          <div 
+            v-for="icon in desktopIcons" 
+            :key="icon.id"
+            class="desktop-icon"
+            @click="icon.action"
+            :title="icon.title"
+          >
+            <div class="icon-image">
+              <span v-if="icon.emoji">{{ icon.emoji }}</span>
+              <img v-else-if="icon.image" :src="icon.image" :alt="icon.label" class="desktop-icon-img">
+            </div>
+            <div class="icon-label">{{ icon.label }}</div>
           </div>
-          <div class="icon-label">SwitchShuttle</div>
         </div>
       </div>
       
           <!-- macOS Menu Bar -->
     <MenuBar 
       :show-switch-shuttle-icon="showSwitchShuttleIcon"
-      @show-notification="showNotification"
-      @show-help="showHelp"
-      @show-terminal="showTerminal"
-      @edit-config="editConfig"
+      @show-notification="openNotification"
+      @show-help="openHelp"
+      @show-terminal="executeTerminalCommand"
+      @edit-config="openJsonEditor"
       @toggle-item="toggleItem"
-      @show-help-window="showHelpWindow"
-      @show-about-window="showAboutWindow"
-      @show-homepage-window="showHomepageWindow"
-      @show-json-editor-window="showJsonEditorWindow"
-      @show-config-folder-window="showConfigFolderWindow"
+      @show-help-window="openHelp"
+      @show-about-window="openAbout"
+      @show-homepage-window="openHomepage"
+      @show-json-editor-window="openJsonEditor"
+      @show-config-folder-window="openConfigFolder"
       @hide-menu-bar="hideMenuBar"
     >
       <template #right>
@@ -46,262 +39,389 @@
     </MenuBar>
   
       <!-- Windows Area -->
-      <div v-if="!readmePending" class="window-area">
-        <TerminalWindow 
-          v-if="showTerminalWindowModal"
-          :title="terminalTitle"
-          ref="terminalRef"
-          @close="closeTerminalWindow"
-        />
-        
-        <NotificationModal
-          :show="showNotificationModal"
-          :title="notificationTitle"
-          :message="notificationMessage"
-          @close="closeNotification"
-        />
-        
-        <HelpWindow
-          v-if="showHelpWindowModal"
-          @close="showHelpWindowModal = false"
-        />
-        
-        <AboutWindow
-          v-if="showAboutWindowModal"
-          @close="showAboutWindowModal = false"
-        />
-        
-        <HomepageWindow
-          v-if="showHomepageWindowModal"
-          @close="showHomepageWindowModal = false"
-        />
-        
-        <JsonEditorWindow
-          v-if="showJsonEditorWindowModal"
-          :config-file="currentConfigFile"
-          @close="showJsonEditorWindowModal = false"
-        />
-        
-        <ConfigFolderWindow
-          v-if="showConfigFolderWindowModal"
-          @close="showConfigFolderWindowModal = false"
-          @open-file="openConfigFile"
-        />
-        
-        <ReadmeWindow 
-          v-if="showReadmeWindowModal && readmeData"
-          :data="readmeData"
-          @close="showReadmeWindowModal = false"
-        />
-        
-        <Window v-if="showConfigEditor" :title="`${configFileName} — SwitchShuttle`" :initial-x="150" :initial-y="150" :z="1600" @close="showConfigEditor = false">
-          <template #titlebar>
-            <div class="window-title">{{ configFileName }} — SwitchShuttle</div>
+      <div class="window-area">
+        <component
+          v-for="win in windows"
+          :is="getComponent(win.component)"
+          v-bind="win.props || {}"
+          :key="win.id"
+        >
+          <template #default>
+            <!-- Содержимое для каждого типа окна -->
+            <ReadmeWindow v-if="win.component === 'readme-window'" />
+            <TerminalWindow 
+              v-else-if="win.component === 'terminal-window'" 
+              :command="terminalCommand"
+              :output="terminalOutput"
+            />
+            <BrowserWindow v-else-if="win.component === 'browser-window'" />
+            <GalaxyGameWindow v-else-if="win.component === 'galaxy-game-window'" />
+            <HelpWindow v-else-if="win.component === 'help-window'" />
+            <AboutWindow v-else-if="win.component === 'about-window'" />
+            <HomepageWindow v-else-if="win.component === 'homepage-window'" />
+            <JsonEditorWindow v-else-if="win.component === 'config-editor-window'" :configFile="currentConfigFile" />
+            <ConfigFolderWindow v-else-if="win.component === 'config-folder-window'" />
+            <CalculatorWindow v-else-if="win.component === 'calculator-window'" />
+            <MusicPlayerWindow v-else-if="win.component === 'music-player-window'" />
+            <NotificationModal v-else-if="win.component === 'notification-modal'" :title="notificationTitle" :message="notificationMessage" :show="true" />
+            <div v-else-if="win.component === 'div'">
+              Тестовое окно: {{ win.id }}
+            </div>
+            <div v-else style="background: yellow; color: black; padding: 20px;">
+              Неизвестное окно: {{ win.id }} ({{ typeof win.component }})
+            </div>
           </template>
-          <div class="config-editor">
-            <pre class="config-code">{{ configContent }}</pre>
-          </div>
-        </Window>
+        </component>
       </div>
+      
+      <!-- TaskBar -->
+      <TaskBar />
+      
+      <!-- Notification Components -->
+      <NotificationPanel />
+      <NotificationBubble />
     </div>
   </template>
   
   <script setup lang="ts">
-  import { ref, nextTick, onMounted, watch } from 'vue'
-  import { useI18n } from 'vue-i18n'
+  import { useWindowManager } from '~/composables/useWindowManager'
+import { useNotifications } from '~/composables/useNotifications'
 import MenuBar from '~/components/MenuBar.vue'
+import TaskBar from '~/components/TaskBar.vue'
+import Window from '~/components/Window.vue'
 import TerminalWindow from '~/components/TerminalWindow.vue'
 import NotificationModal from '~/components/NotificationModal.vue'
-import Window from '~/components/Window.vue'
 import HelpWindow from '~/components/HelpWindow.vue'
 import AboutWindow from '~/components/AboutWindow.vue'
 import HomepageWindow from '~/components/HomepageWindow.vue'
 import JsonEditorWindow from '~/components/JsonEditorWindow.vue'
 import ConfigFolderWindow from '~/components/ConfigFolderWindow.vue'
+import CalculatorWindow from '~/components/CalculatorWindow.vue'
+import MusicPlayerWindow from '~/components/MusicPlayerWindow.vue'
 import ReadmeWindow from '~/components/ReadmeWindow.vue'
+import NotificationPanel from '~/components/NotificationPanel.vue'
+import NotificationBubble from '~/components/NotificationBubble.vue'
+import { ref, onMounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
-// Types
-interface ReadmeResponse {
-  success: boolean
-  content?: string
-  toc?: Array<{id: string, title: string, level: number}>
-  error?: string
-  locale?: string
-  fallback?: boolean
-}
+const { t } = useI18n()
 
-// Получаем данные README на странице
-const { locale } = useI18n()
+const { windows, openWindow } = useWindowManager()
 
-// Импортируем статические данные README
-const readmeData = ref<ReadmeResponse | null>(null)
-const readmePending = ref(false)
+// Автоматическое создание окон на сервере
+openWindow({
+  id: 'readme-window',
+  component: 'readme-window',
+  props: {
+    windowId: 'readme-window',
+    title: 'README'
+  },
+  position: { x: 400, y: 120 },
+  size: { width: 800, height: 600 }
+})
 
-// Загружаем данные при изменении локали
-watch(locale, async () => {
-  readmePending.value = true
-  try {
-    // Динамический импорт JSON файла
-    const data = await import(`../data/readme/${locale.value}.json`)
-    readmeData.value = data.default
-  } catch {
-    // Fallback на английский если файл не найден
-    const fallbackData = await import('../data/readme/en.json')
-    readmeData.value = fallbackData.default
-  } finally {
-    readmePending.value = false
-  }
-}, { immediate: true })
-  
-  // Состояние окон
-const showNotificationModal = ref(false)
-const showHelpModal = ref(false)
-const showHelpWindowModal = ref(false)
-const showAboutWindowModal = ref(false)
-const showHomepageWindowModal = ref(false)
-const showJsonEditorWindowModal = ref(false)
-const showConfigFolderWindowModal = ref(false)
-const showConfigEditor = ref(false)
-const showReadmeWindowModal = ref(true)
-const showTerminalWindowModal = ref(true)
+openWindow({
+  id: 'terminal-window',
+  component: 'terminal-window',
+  props: {
+    windowId: 'terminal-window',
+    title: 'iTerm2 — SwitchShuttle Demo'
+  },
+  position: { x: 120, y: 120 },
+  size: { width: 500, height: 380 }
+})
+
+const notificationTitle = ref('')
+const notificationMessage = ref('')
+const currentConfigFile = ref('config.json')
 const showSwitchShuttleIcon = ref(true)
+
+// Состояние для терминала
+const terminalCommand = ref('')
+const terminalOutput = ref('')
+
+// Массив иконок рабочего стола
+const desktopIcons = ref([
+  {
+    id: 'switchshuttle',
+    label: 'Switch\nShuttle',
+    image: '/logo.svg',
+    title: 'SwitchShuttle (Click to show menu bar)',
+    action: showMenuBar
+  },
+  {
+    id: 'galaxy-game',
+    label: 'Galaxy\nGame',
+    emoji: '🚀',
+    title: 'Galaxy Game (Click to play)',
+    action: openGalaxyGame
+  },
+  {
+    id: 'readme',
+    label: 'README',
+    emoji: '📖',
+    title: 'README (Click to open)',
+    action: openReadme
+  },
+  {
+    id: 'terminal',
+    label: 'Terminal',
+    emoji: '💻',
+    title: 'Terminal (Click to open)',
+    action: openTerminal
+  },
+  {
+    id: 'browser',
+    label: 'Browser',
+    emoji: '🌐',
+    title: 'Browser (Click to open)',
+    action: openBrowser
+  },
+  {
+    id: 'help',
+    label: 'Help',
+    emoji: '❓',
+    title: 'Help (Click to open)',
+    action: openHelp
+  },
+  {
+    id: 'about',
+    label: 'About',
+    emoji: 'ℹ️',
+    title: 'About (Click to open)',
+    action: openAbout
+  },
+  {
+    id: 'calculator',
+    label: 'Calculator',
+    emoji: '🧮',
+    title: 'Calculator (Click to open)',
+    action: openCalculator
+  },
+  {
+    id: 'music-player',
+    label: 'Music\nPlayer',
+    emoji: '🎵',
+    title: 'Music Player (Click to open)',
+    action: openMusicPlayer
+  }
+])
+
+// Функция для выполнения команд в терминале
+function executeTerminalCommand(command: string, output: string) {
+  console.log('Executing terminal command:', command, 'output:', output)
   
-  // Уведомления
-  const notificationTitle = ref('')
-  const notificationMessage = ref('')
+  // Проверяем, открыт ли терминал
+  const terminalExists = windows.value.some(w => w.id === 'terminal-window')
   
-  // Терминал
-  const terminalTitle = ref('iTerm2 — SwitchShuttle Demo')
-  const terminalRef = ref(null)
-  
-  // Редактор конфигурации
-  const configFileName = ref('')
-  const configContent = ref('')
-  const currentConfigFile = ref('config.json')
-  
-  // Состояние toggle элементов
-  const toggleStates = ref({
-    '🔧 System Monitoring': true,
-    'Launch at Login': false
+  if (!terminalExists) {
+    // Если терминал закрыт, сначала открываем его
+    openTerminal()
+    // Ждем немного, чтобы окно создалось, затем устанавливаем команду
+    setTimeout(() => {
+      // Сбрасываем предыдущие значения, чтобы watch сработал
+      terminalCommand.value = ''
+      terminalOutput.value = ''
+      // Устанавливаем новые значения
+      setTimeout(() => {
+        terminalCommand.value = command
+        terminalOutput.value = output
+      }, 50)
+    }, 200)
+  } else {
+    // Если терминал уже открыт, сбрасываем и устанавливаем заново
+    terminalCommand.value = ''
+    terminalOutput.value = ''
+    setTimeout(() => {
+      terminalCommand.value = command
+      terminalOutput.value = output
+    }, 50)
+  }
+}
+
+// Функция для получения компонента по строковому идентификатору
+function getComponent(componentId: string) {
+  const componentMap: Record<string, any> = {
+    'readme-window': Window,
+    'terminal-window': Window,
+    'browser-window': Window,
+    'galaxy-game-window': Window,
+    'help-window': Window,
+    'about-window': Window,
+    'homepage-window': Window,
+    'config-editor-window': Window,
+    'config-folder-window': Window,
+    'calculator-window': Window,
+    'music-player-window': Window,
+    'notification-modal': Window,
+    'div': 'div'
+  }
+  return componentMap[componentId] || 'div'
+}
+
+function openReadme() {
+  openWindow({
+    id: 'readme-window',
+    component: 'readme-window',
+    props: {
+      windowId: 'readme-window',
+      title: 'README'
+    },
+    position: { x: 400, y: 120 }, // Правее и выше
+    size: { width: 800, height: 600 }
   })
-  
-  // Обработчики событий от MenuBar
-  function showNotification(title: string, message: string) {
-    notificationTitle.value = title
-    notificationMessage.value = message
-    showNotificationModal.value = true
-  }
-  
-  function closeNotification() {
-    showNotificationModal.value = false
-  }
-  
-  function showHelp() {
-    showHelpModal.value = true
-  }
-  
-  function showHelpWindow() {
-    showHelpWindowModal.value = true
-  }
-  
-  function showAboutWindow() {
-    showAboutWindowModal.value = true
-  }
-  
-  function showHomepageWindow() {
-    showHomepageWindowModal.value = true
-  }
-  
-  function showJsonEditorWindow(configFile?: string) {
-  showJsonEditorWindowModal.value = true
-  // Можно передать имя файла в компонент, если нужно
-  currentConfigFile.value = configFile || 'config.json'
 }
 
-function showConfigFolderWindow() {
-  showConfigFolderWindowModal.value = true
+function openTerminal() {
+  openWindow({
+    id: 'terminal-window',
+    component: 'terminal-window',
+    props: {
+      windowId: 'terminal-window',
+      title: 'iTerm2 — SwitchShuttle Demo'
+    },
+    position: { x: 120, y: 120 },
+    size: { width: 700, height: 480 }
+  })
 }
 
-function openConfigFile(fileName: string) {
-  showConfigFolderWindowModal.value = false
-  currentConfigFile.value = fileName
-  showJsonEditorWindowModal.value = true
-}
-  
-  async function showTerminal(command?: string, terminalOutput?: string) {
-    // Открываем терминал, если он закрыт
-    if (!showTerminalWindowModal.value) {
-      showTerminalWindowModal.value = true
-      // Ждем обновления DOM
-      await nextTick()
-    }
-    
-    // Обновляем заголовок если есть команда
-    if (command) {
-      terminalTitle.value = `Terminal — ${command}`
-      
-      // Если есть terminalOutput, добавляем его в терминал
-      if (terminalOutput && terminalRef.value) {
-        (terminalRef.value as any).executeCommandFromMenu(command, terminalOutput)
-      }
-    }
-  }
-  
-  function editConfig(config: string) {
-    configFileName.value = config
-    configContent.value = `{
-    "name": "${config}",
-    "version": "1.0.0",
-    "description": "Configuration file for SwitchShuttle",
-    "commands": [
-      {
-        "name": "Development Server",
-        "command": "npm run dev",
-        "hotkey": "Cmd+D"
-      },
-      {
-        "name": "Build Project",
-        "command": "npm run build",
-        "hotkey": "Cmd+B"
-      }
-    ],
-    "settings": {
-      "autoRefresh": true,
-      "launchAtLogin": false,
-      "systemMonitoring": true
-    }
-  }`
-    showConfigEditor.value = true
-  }
-  
-  function toggleItem(itemName: string) {
-  if (toggleStates.value.hasOwnProperty(itemName)) {
-    (toggleStates.value as any)[itemName] = !(toggleStates.value as any)[itemName]
-  }
+function openBrowser() {
+  openWindow({
+    id: 'browser-window',
+    component: 'browser-window',
+    props: {
+      windowId: 'browser-window',
+      title: 'Safari — SwitchShuttle'
+    },
+    position: { x: 200, y: 200 },
+    size: { width: 900, height: 600 }
+  })
 }
 
-function toggleReadmeWindow() {
-  showReadmeWindowModal.value = !showReadmeWindowModal.value
+function openGalaxyGame() {
+  openWindow({
+    id: 'galaxy-game-window',
+    component: 'galaxy-game-window',
+    props: {
+      windowId: 'galaxy-game-window',
+      title: 'Galaxy Game'
+    },
+    position: { x: 150, y: 150 },
+    size: { width: 800, height: 600 }
+  })
 }
 
-function toggleTerminalWindow() {
-  showTerminalWindowModal.value = !showTerminalWindowModal.value
+function openHelp() {
+  openWindow({
+    id: 'help-window',
+    component: 'help-window',
+    props: {
+      windowId: 'help-window',
+      title: 'Help'
+    },
+    position: { x: 300, y: 180 },
+    size: { width: 750, height: 550 }
+  })
 }
 
-function closeTerminalWindow() {
-  showTerminalWindowModal.value = false
-  // Очищаем терминал при закрытии
-  if (terminalRef.value) {
-    (terminalRef.value as any).clearTerminal()
-  }
+function openAbout() {
+  openWindow({
+    id: 'about-window',
+    component: 'about-window',
+    props: {
+      windowId: 'about-window',
+      title: 'About'
+    },
+    position: { x: 250, y: 200 },
+    size: { width: 600, height: 500 }
+  })
+}
+
+function openHomepage() {
+  openWindow({
+    id: 'homepage-window',
+    component: 'homepage-window',
+    props: {
+      windowId: 'homepage-window',
+      title: 'Homepage'
+    },
+    position: { x: 180, y: 160 },
+    size: { width: 850, height: 650 }
+  })
+}
+
+function openJsonEditor(configFile?: string) {
+  openWindow({
+    id: 'config-editor-window',
+    component: 'config-editor-window',
+    props: {
+      windowId: 'config-editor-window',
+      title: 'Config Editor'
+    },
+    position: { x: 220, y: 140 },
+    size: { width: 800, height: 600 }
+  })
+}
+
+function openConfigFolder() {
+  openWindow({
+    id: 'config-folder-window',
+    component: 'config-folder-window',
+    props: {
+      windowId: 'config-folder-window',
+      title: 'Config Folder'
+    },
+    position: { x: 280, y: 180 },
+    size: { width: 700, height: 500 }
+  })
+}
+
+function openCalculator() {
+  openWindow({
+    id: 'calculator-window',
+    component: 'calculator-window',
+    props: {
+      windowId: 'calculator-window',
+      title: 'Calculator'
+    },
+    position: { x: 300, y: 200 },
+    size: { width: 320, height: 550 }
+  })
+}
+
+function openMusicPlayer() {
+  openWindow({
+    id: 'music-player-window',
+    component: 'music-player-window',
+    props: {
+      windowId: 'music-player-window',
+      title: 'Music Player'
+    },
+    position: { x: 400, y: 150 },
+    size: { width: 400, height: 600 }
+  })
+}
+
+function openNotification(title: string, message: string) {
+  // Используем новую систему уведомлений
+  const { addNotification } = useNotifications()
+  addNotification({
+    title: title || t('demo.notifications.notAvailable'),
+    message: message || t('demo.notifications.notAvailableMessage'),
+    type: 'info'
+  })
 }
 
 function showMenuBar() {
   showSwitchShuttleIcon.value = true
 }
-
 function hideMenuBar() {
   showSwitchShuttleIcon.value = false
+}
+
+function toggleItem(itemName: string) {
+  // This function is no longer needed as toggle logic is handled by the component
+  // Keeping it for now, but it will not have an effect on the state.
 }
   </script>
   
@@ -311,7 +431,7 @@ function hideMenuBar() {
     top: 0;
     left: 0;
     right: 0;
-    bottom: 34px;
+    bottom: 74px; /* 34px для MenuBar + 40px для TaskBar */
     width: 100%;
     height: 100vh;
     user-select: none;
@@ -319,21 +439,39 @@ function hideMenuBar() {
     background: url('/background.jpg') center center;
     background-size: cover;
     background-position: center center;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 0;
+  }
+
+  .desktop-icons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 100px);
+    grid-template-rows: repeat(6, 100px);
+    gap: 0;
+    width: 100%;
+    height: 100%;
+    align-content: start;
+    justify-content: start;
+    padding: 60px 50px;
   }
 
   .desktop-icon {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
     width: 80px;
     height: 80px;
     cursor: pointer;
     border-radius: 8px;
     transition: all 0.2s ease;
     user-select: none;
-    /* Сетка: 100px между иконками по вертикали, 50px отступ слева */
+    padding: 0;
+    box-sizing: border-box;
+    min-height: 80px;
+    position: relative;
   }
 
   .desktop-icon:hover {
@@ -345,39 +483,16 @@ function hideMenuBar() {
     transform: scale(0.95);
   }
 
-  /* Сетка иконок: вертикальное выравнивание с отступами */
-  .readme-icon {
-    top: 80px;
-    left: 50px;
-  }
-
-  .terminal-icon {
-    top: 180px;
-    left: 50px;
-  }
-
-  .help-icon {
-    top: 280px;
-    left: 50px;
-  }
-
-  .about-icon {
-    top: 380px;
-    left: 50px;
-  }
-
-  .switchshuttle-icon {
-    top: 480px;
-    left: 50px;
-  }
-
   .icon-image {
     font-size: 48px;
     margin-bottom: 8px;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 48px;
+    flex-shrink: 0;
+    margin-bottom: 4px;
   }
 
   .desktop-icon-img {
@@ -387,14 +502,21 @@ function hideMenuBar() {
   }
 
   .icon-label {
-    font-size: 10px;
-    color: white;
-    text-align: center;
-    font-weight: 500;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    font-size: 10px !important;
+    color: white !important;
+    text-align: center !important;
+    font-weight: 500 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
     max-width: 100%;
     word-wrap: break-word;
-    line-height: 1.1;
+    line-height: 1.1 !important;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    position: relative !important;
+    z-index: 1 !important;
+    margin-top: 4px !important;
+    white-space: pre-line !important;
   }
   
   #demo-window {
@@ -442,5 +564,41 @@ function hideMenuBar() {
     font-family: inherit;
     font-size: inherit;
     color: inherit;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .desktop {
+      padding: 40px 30px;
+    }
+    
+    .desktop-icons-grid {
+      grid-template-columns: 100px;
+      grid-auto-rows: 80px;
+      gap: 15px;
+    }
+    
+    .desktop-icon {
+      width: 70px;
+      height: 70px;
+      min-height: 70px;
+    }
+    
+    .icon-image {
+      font-size: 36px;
+      height: 36px;
+      margin-bottom: 2px;
+    }
+    
+    .desktop-icon-img {
+      width: 36px;
+      height: 36px;
+    }
+    
+    .icon-label {
+      font-size: 9px;
+      opacity: 1;
+      visibility: visible;
+    }
   }
   </style> 

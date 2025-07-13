@@ -1,84 +1,64 @@
 <template>
-  <Window
-    title="Config Folder — SwitchShuttle"
-    :width="600"
-    :height="400"
-    :initial-x="200"
-    :initial-y="100"
-    :z="1500"
-    @close="$emit('close')"
-  >
-    <template #titlebar>
-      <div class="window-title">Config Folder — SwitchShuttle</div>
-    </template>
-    <template #titlebar-right>
-      <div class="window-menu-icon" title="View Options">
-        <span class="menu-icon">👁️</span>
+  <div class="finder-container">
+    <!-- Toolbar -->
+    <div class="finder-toolbar">
+      <div class="toolbar-buttons">
+        <button class="toolbar-btn" title="Back">
+          <span>◀</span>
+        </button>
+        <button class="toolbar-btn" title="Forward">
+          <span>▶</span>
+        </button>
+        <button class="toolbar-btn" title="Up">
+          <span>▲</span>
+        </button>
       </div>
-    </template>
-    
-    <div class="finder-container">
-      <!-- Toolbar -->
-      <div class="finder-toolbar">
-        <div class="toolbar-buttons">
-          <button class="toolbar-btn" title="Back">
-            <span>◀</span>
-          </button>
-          <button class="toolbar-btn" title="Forward">
-            <span>▶</span>
-          </button>
-          <button class="toolbar-btn" title="Up">
-            <span>▲</span>
-          </button>
-        </div>
-        <div class="path-bar">
-          <span class="path-text">~/Library/Application Support/SwitchShuttle/</span>
-        </div>
-        <div class="view-buttons">
-          <button class="view-btn active" title="Icon View">
-            <span>📁</span>
-          </button>
-          <button class="view-btn" title="List View">
-            <span>📋</span>
-          </button>
-        </div>
+      <div class="path-bar">
+        <span class="path-text">~/Library/Application Support/SwitchShuttle/</span>
       </div>
+      <div class="view-buttons">
+        <button class="view-btn active" title="Icon View">
+          <span>📁</span>
+        </button>
+        <button class="view-btn" title="List View">
+          <span>📋</span>
+        </button>
+      </div>
+    </div>
 
-      <!-- Content Area -->
-      <div class="finder-content">
-        <div class="files-grid">
-          <div 
-            v-for="file in configFiles" 
-            :key="file"
-            class="file-item"
-            @click="openFile(file)"
-            @dblclick="openFile(file)"
-          >
-            <div class="file-icon">
-              <span class="icon">📄</span>
-            </div>
-            <div class="file-info">
-              <div class="file-name">{{ file }}</div>
-              <div class="file-meta">JSON File</div>
-            </div>
+    <!-- Content Area -->
+    <div class="finder-content">
+      <div class="files-grid">
+        <div 
+          v-for="file in configFiles" 
+          :key="file"
+          class="file-item"
+          @click="openFile(file)"
+          @dblclick="openFile(file)"
+        >
+          <div class="file-icon">
+            <span class="icon">📄</span>
+          </div>
+          <div class="file-info">
+            <div class="file-name">{{ file }}</div>
+            <div class="file-meta">JSON File</div>
           </div>
         </div>
       </div>
-
-      <!-- Status Bar -->
-      <div class="finder-status">
-        <span class="status-text">{{ configFiles.length }} items</span>
-        <span class="status-size">Available</span>
-      </div>
     </div>
-  </Window>
+
+    <!-- Status Bar -->
+    <div class="finder-status">
+      <span class="status-text">{{ configFiles.length }} items</span>
+      <span class="status-size">Available</span>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { configFiles } from '~/config/menu'
 
 const emit = defineEmits<{
-  close: []
   openFile: [fileName: string]
 }>()
 

@@ -1,46 +1,35 @@
 <template>
-  <Window
-    :title="$t('demo.jsonEditor.title')"
-    :width="800"
-    :height="600"
-    :min-width="600"
-    :min-height="400"
-    @close="handleClose"
-  >
-    <div class="json-editor">
-      <div class="editor-header">
-        <div class="file-tabs">
-          <div class="tab active">
-            <span class="tab-icon">📄</span>
-            <span class="tab-title">{{ props.configFile || 'config.json' }}</span>
-            <span class="tab-close">×</span>
-          </div>
-        </div>
-        <div class="editor-toolbar">
-          <button class="toolbar-btn" title="Save">
-            <span>💾</span>
-          </button>
-          <button class="toolbar-btn" title="Format">
-            <span>🔧</span>
-          </button>
-          <div class="separator"></div>
-          <span class="status">Line 1, Column 1</span>
+  <div class="json-editor">
+    <div class="editor-header">
+      <div class="file-tabs">
+        <div class="tab active">
+          <span class="tab-icon">📄</span>
+          <span class="tab-title">{{ props.configFile || 'config.json' }}</span>
+          <span class="tab-close">×</span>
         </div>
       </div>
-      
-      <div class="editor-content">
-        <div class="line-numbers">
-          <div v-for="line in totalLines" :key="line" class="line-number">
-            {{ line }}
-          </div>
-        </div>
-        
-        <div class="code-area" ref="codeArea">
-          <pre class="code-content" ref="codeContent">{{ jsonContent }}</pre>
-        </div>
+      <div class="editor-toolbar">
+        <button class="toolbar-btn" title="Save">
+          <span>💾</span>
+        </button>
+        <button class="toolbar-btn" title="Format">
+          <span>🔧</span>
+        </button>
+        <div class="separator"></div>
+        <span class="status">Line 1, Column 1</span>
       </div>
     </div>
-  </Window>
+    <div class="editor-content">
+      <div class="line-numbers">
+        <div v-for="line in totalLines" :key="line" class="line-number">
+          {{ line }}
+        </div>
+      </div>
+      <div class="code-area" ref="codeArea">
+        <pre class="code-content" ref="codeContent">{{ jsonContent }}</pre>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -48,10 +37,6 @@ import { ref, computed, onMounted } from 'vue'
 
 const props = defineProps<{
   configFile?: string
-}>()
-
-const emit = defineEmits<{
-  close: []
 }>()
 
 const codeArea = ref<HTMLElement>()
@@ -68,10 +53,6 @@ const jsonContent = ref(getConfigContent(props.configFile || 'switch-shuttle.jso
 const totalLines = computed(() => {
   return jsonContent.value.split('\n').length
 })
-
-const handleClose = () => {
-  emit('close')
-}
 
 onMounted(() => {
   if (codeArea.value && codeContent.value) {

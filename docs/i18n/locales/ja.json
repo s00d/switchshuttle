@@ -10,7 +10,24 @@
       "settings": "設定",
       "settingsMessage": "設定ウィンドウはこのデモ版では利用できません。",
       "about": "SwitchShuttleについて",
-      "aboutMessage": "SwitchShuttle\nクロスプラットフォームターミナルコマンドマネージャー\n\nこれはデモ版です。"
+      "aboutMessage": "SwitchShuttle\nクロスプラットフォームターミナルコマンドマネージャー\n\nこれはデモ版です。",
+      "panel": {
+        "title": "通知",
+        "clearAll": "すべてクリア",
+        "noNotifications": "通知がありません"
+      },
+      "terminal": {
+        "commandExecuted": "コマンドが実行されました",
+        "commandExecuting": "コマンドを実行中",
+        "commandSuccess": "コマンドが正常に実行されました",
+        "commandError": "コマンド実行エラー"
+      },
+      "time": {
+        "justNow": "今",
+        "minutesAgo": "{minutes}分前",
+        "hoursAgo": "{hours}時間前",
+        "daysAgo": "{days}日前"
+      }
     },
     "help": {
       "title": "SwitchShuttle",

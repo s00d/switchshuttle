@@ -1,29 +1,13 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
+  compatibilityDate: '2025-07-13',
   modules: [
     '@nuxtjs/i18n',
     '@pinia/nuxt',
     '@nuxt/image',
     '@nuxt/eslint'
   ],
-  hooks: {
-    'build:before': async () => {
-      const { execSync } = await import('child_process')
-      const { join } = await import('path')
-      
-      try {
-        console.log('🔄 Generating README data...')
-        execSync('node scripts/generate-readme-data.js', { 
-          cwd: join(process.cwd()),
-          stdio: 'inherit'
-        })
-        console.log('✅ README data generated successfully!')
-      } catch (error: any) {
-        console.error('❌ Error generating README data:', error.message)
-      }
-    }
-  },
   i18n: {
     locales: [
       { code: 'en', iso: 'en-US', name: 'English', file: 'en.json' },
@@ -48,7 +32,24 @@ export default defineNuxtConfig({
   ssr: true,
   nitro: {
     prerender: {
-      routes: ['/', '/ru', '/de', '/ja', '/zh']
+      routes: [
+        '/',
+        '/ru', 
+        '/de', 
+        '/ja', 
+        '/zh',
+        '/api/readme?locale=en',
+        '/api/readme?locale=ru',
+        '/api/readme?locale=de',
+        '/api/readme?locale=ja',
+        '/api/readme?locale=zh'
+      ],
+      ignore: [
+        '/LICENSE',
+        '/CHANGELOG.md',
+        '/README.md',
+        '/README_*.md'
+      ]
     }
   },
   app: {

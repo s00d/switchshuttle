@@ -3,7 +3,7 @@ export interface MenuItem {
   icon?: string
   hotkey?: string
   checkmark?: boolean
-  action: 'terminal' | 'notification' | 'help' | 'config' | 'toggle' | 'showHelp' | 'showAbout' | 'showHomepage' | 'showJsonEditor' | 'showConfigFolder' | 'refresh' | 'separator' | 'hideMenuBar'
+  action: 'terminal' | 'notification' | 'help' | 'config' | 'toggle' | 'showHelp' | 'showAbout' | 'showHomepage' | 'showJsonEditor' | 'showConfigFolder' | 'showCalculator' | 'refresh' | 'separator' | 'hideMenuBar'
   command?: string
   title?: string
   message?: string

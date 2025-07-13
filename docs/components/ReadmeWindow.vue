@@ -1,47 +1,35 @@
 <template>
-  <Window :title="`${$t('readme.title')} — SwitchShuttle`" :initial-x="800" :initial-y="150" :z="1200" :closable="true" :width="800" :height="500" @close="$emit('close')">
-    <template #titlebar>
-      <div class="window-title">{{ $t('readme.title') }} — SwitchShuttle</div>
-    </template>
-    <template #titlebar-right>
-      <div class="window-menu-icon" @click="toggleToc" title="Toggle Table of Contents">
-        <span class="menu-icon">📋</span>
+  <div class="readme-container">
+    <div class="readme-content" ref="contentRef">
+      <div class="markdown-content" v-html="content"></div>
+    </div>
+    <div v-if="showToc && toc.length > 0" class="toc-sidebar">
+      <div class="toc-header">
+        <h3>{{ $t('readme.toc.title') }}</h3>
       </div>
-    </template>
-    <div class="readme-container">
-      <div v-if="isDataLoaded" class="readme-content" ref="contentRef">
-        <div class="markdown-content" v-html="content"></div>
-      </div>
-      <div v-else class="loading">
-        <div class="spinner"></div>
-        <p>{{ $t('readme.loading') }}</p>
-      </div>
-      <div v-if="showToc && toc.length > 0 && isDataLoaded" class="toc-sidebar">
-        <div class="toc-header">
-          <h3>{{ $t('readme.toc.title') }}</h3>
-        </div>
-        <div class="toc-content">
-          <ul class="toc-list">
-            <li v-for="(item, index) in toc" :key="index" class="toc-item">
-              <a 
-                :href="`#${item.id}`" 
-                @click.prevent="scrollToSection(item.id)"
-                :class="{ 'toc-active': activeSection === item.id }"
-              >
-                {{ item.title }}
-              </a>
-            </li>
-          </ul>
-        </div>
+      <div class="toc-content">
+        <ul class="toc-list">
+          <li v-for="(item, index) in toc" :key="index" class="toc-item">
+            <a 
+              :href="`#${item.id}`" 
+              @click.prevent="scrollToSection(item.id)"
+              :class="{ 'toc-active': activeSection === item.id }"
+            >
+              {{ item.title }}
+            </a>
+          </li>
+        </ul>
       </div>
     </div>
-  </Window>
+    <div class="window-menu-icon" @click="toggleToc" title="Toggle Table of Contents">
+      <span class="menu-icon">📋</span>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, nextTick, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import Window from './Window.vue'
 
 // Types
 interface ReadmeResponse {
@@ -53,34 +41,30 @@ interface ReadmeResponse {
   fallback?: boolean
 }
 
-// Props
-interface Props {
-  data?: ReadmeResponse | null
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  data: undefined
-})
-
-const emit = defineEmits(['close'])
-
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 // State
 const showToc = ref(false)
 const activeSection = ref('')
 const contentRef = ref<HTMLElement>()
 
-// Computed
-const content = computed(() => props.data?.content || '')
-const toc = computed(() => props.data?.toc || [])
+const { data: readmeData } = await useAsyncData<ReadmeResponse>(`readme-${locale.value}`, async () => {
+  const currentLocale = locale.value
+  return await $fetch(`/api/readme?locale=${currentLocale}`)
+}, {
+  watch: [locale],
+  deep: true,
+  lazy: false,
+})
 
-// Проверяем что данные загружены
-const isDataLoaded = computed(() => props.data && props.data.success)
+// Computed
+const content = computed(() => readmeData.value?.content || '')
+const toc = computed(() => readmeData.value?.toc || [])
 
 function toggleToc() {
   showToc.value = !showToc.value
 }
+
 function scrollToSection(id: string) {
   const element = document.getElementById(id)
   if (element) {
@@ -88,6 +72,7 @@ function scrollToSection(id: string) {
     activeSection.value = id
   }
 }
+
 onMounted(() => {
   nextTick(() => {
     const observer = new IntersectionObserver(
@@ -289,8 +274,17 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 200px;
+  height: 100%;
+  width: 100%;
   color: var(--text-muted);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg-primary);
+  z-index: 10;
+  
   .spinner {
     width: 32px;
     height: 32px;
@@ -300,6 +294,13 @@ onMounted(() => {
     animation: spin 1s linear infinite;
     margin-bottom: var(--space-lg);
   }
+  
+  p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+  
   .retry-btn {
     padding: var(--space-sm) var(--space-lg);
     background: var(--primary);

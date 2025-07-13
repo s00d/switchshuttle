@@ -10,7 +10,24 @@
       "settings": "Settings",
       "settingsMessage": "Settings window is not available in this demo version.",
       "about": "About SwitchShuttle",
-      "aboutMessage": "SwitchShuttle\nCross-platform terminal command manager\n\nThis is a demo version."
+      "aboutMessage": "SwitchShuttle\nCross-platform terminal command manager\n\nThis is a demo version.",
+      "panel": {
+        "title": "Notifications",
+        "clearAll": "Clear All",
+        "noNotifications": "No notifications"
+      },
+      "terminal": {
+        "commandExecuted": "Command executed",
+        "commandExecuting": "Executing command",
+        "commandSuccess": "Command executed successfully",
+        "commandError": "Command execution error"
+      },
+      "time": {
+        "justNow": "Just now",
+        "minutesAgo": "{minutes} min ago",
+        "hoursAgo": "{hours} h ago",
+        "daysAgo": "{days} days ago"
+      }
     },
     "help": {
       "title": "SwitchShuttle",
