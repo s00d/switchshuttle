@@ -53,7 +53,7 @@ onMounted(() => {
 })
 
 function loadDefaultPage() {
-  currentUrl.value = 'https://github.com/s00d/SwitchShuttle'
+  currentUrl.value = 'https://s00d.github.io/switchshuttle/'
   navigate()
 }
 
