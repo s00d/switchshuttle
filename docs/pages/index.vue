@@ -144,9 +144,9 @@ const terminalOutput = ref('')
 const desktopIcons = ref([
   {
     id: 'switchshuttle',
-    label: 'Switch\nShuttle',
+    label: 'SwitchShuttle',
     image: '/switchshuttle.svg',
-    title: 'SwitchShuttle (Click to show menu bar)',
+    title: 'SwitchShuttle (Click to show menu bar icon)',
     action: showMenuBar
   },
   {
@@ -413,8 +413,21 @@ function openNotification(title: string, message: string) {
 }
 
 function showMenuBar() {
-  showSwitchShuttleIcon.value = true
+  // Проверяем, есть ли уже иконка SwitchShuttle в меню-баре
+  if (showSwitchShuttleIcon.value) {
+    // Если иконка уже видна, показываем уведомление
+    const { addNotification } = useNotifications()
+    addNotification({
+      title: 'SwitchShuttle is already active',
+      message: 'SwitchShuttle icon is already displayed in the menu bar',
+      type: 'warning'
+    })
+  } else {
+    // Если иконки нет, показываем её
+    showSwitchShuttleIcon.value = true
+  }
 }
+
 function hideMenuBar() {
   showSwitchShuttleIcon.value = false
 }

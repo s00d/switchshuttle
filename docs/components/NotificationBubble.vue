@@ -70,32 +70,40 @@ const visibleNotifications = computed(() => {
 .notification-bubble {
   display: flex;
   align-items: flex-start;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(30px) saturate(1.5);
+  -webkit-backdrop-filter: blur(30px) saturate(1.5);
+  border-radius: 6px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 0 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   padding: 12px 16px;
   max-width: 320px;
   pointer-events: auto;
   position: relative;
   overflow: hidden;
+  font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1d1d1f;
 }
 
-.notification-bubble::before {
-  content: '';
+.notification-bubble::after {
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--notification-color, #007AFF);
+  width: 100%;
+  height: 100%;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  pointer-events: none;
 }
 
 .notification-bubble-icon {
   font-size: 16px;
   margin-right: 12px;
   flex-shrink: 0;
+  margin-top: 1px;
 }
 
 .notification-bubble-content {
@@ -106,68 +114,77 @@ const visibleNotifications = computed(() => {
 .notification-bubble-title {
   font-weight: 600;
   font-size: 13px;
-  color: #333;
+  color: #1d1d1f;
   margin-bottom: 2px;
   line-height: 1.3;
 }
 
 .notification-bubble-message {
   font-size: 12px;
-  color: #666;
+  color: #86868b;
   line-height: 1.3;
 }
 
 .notification-bubble-close {
   background: none;
   border: none;
-  color: #999;
+  color: #86868b;
   font-size: 14px;
   cursor: pointer;
-  padding: 2px;
+  padding: 4px;
   margin-left: 8px;
-  border-radius: 2px;
-  transition: color 0.2s;
+  border-radius: 4px;
+  transition: all 0.2s ease;
   flex-shrink: 0;
+  font-weight: 500;
 }
 
 .notification-bubble-close:hover {
-  color: #666;
+  background: rgba(0, 0, 0, 0.05);
+  color: #1d1d1f;
 }
 
-/* Типы уведомлений */
-.notification-bubble-info::before {
-  --notification-color: #007AFF;
+/* Типы уведомлений с macOS цветами */
+.notification-bubble-info {
+  border-left: 3px solid #007AFF;
 }
 
-.notification-bubble-success::before {
-  --notification-color: #34C759;
+.notification-bubble-success {
+  border-left: 3px solid #34C759;
 }
 
-.notification-bubble-warning::before {
-  --notification-color: #FF9500;
+.notification-bubble-warning {
+  border-left: 3px solid #FF9500;
 }
 
-.notification-bubble-error::before {
-  --notification-color: #FF3B30;
+.notification-bubble-error {
+  border-left: 3px solid #FF3B30;
 }
 
-/* Анимации */
+/* Анимации в стиле macOS */
 .notification-bubble-enter-active,
 .notification-bubble-leave-active {
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .notification-bubble-enter-from {
   opacity: 0;
-  transform: translateX(100%) scale(0.8);
+  transform: translateX(100%) scale(0.95);
 }
 
 .notification-bubble-leave-to {
   opacity: 0;
-  transform: translateX(100%) scale(0.8);
+  transform: translateX(100%) scale(0.95);
 }
 
 .notification-bubble-move {
-  transition: transform 0.3s ease;
+  transition: transform 0.2s ease;
+}
+
+/* Hover эффект */
+.notification-bubble:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-1px);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.18), 0 0 12px rgba(0, 0, 0, 0.12);
 }
 </style> 
