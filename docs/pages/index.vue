@@ -109,6 +109,7 @@ import NotificationPanel from '~/components/NotificationPanel.vue'
 import NotificationBubble from '~/components/NotificationBubble.vue'
 import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRuntimeConfig } from '#app'
 
 const { t } = useI18n()
 
@@ -128,6 +129,13 @@ function getImagePath(imagePath: string) {
   
   // Иначе добавляем baseURL
   return `${baseURL}${imagePath}`
+}
+
+// Функция для обработки ошибок загрузки изображений
+function handleImageError(event: Event) {
+  const img = event.target as HTMLImageElement
+  console.warn(`Failed to load image: ${img.src}`)
+  // Можно добавить fallback изображение или скрыть элемент
 }
 
 // Автоматическое создание окон на сервере
