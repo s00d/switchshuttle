@@ -12,7 +12,13 @@
           >
             <div class="icon-image">
               <span v-if="icon.emoji">{{ icon.emoji }}</span>
-              <img v-else-if="icon.image" :src="icon.image" :alt="icon.label" class="desktop-icon-img">
+              <img 
+                v-else-if="icon.image" 
+                :src="icon.image" 
+                :alt="icon.label" 
+                class="desktop-icon-img"
+                @error="handleImageError"
+              >
             </div>
             <div class="icon-label">{{ icon.label }}</div>
           </div>
@@ -108,6 +114,22 @@ const { t } = useI18n()
 
 const { windows, openWindow } = useWindowManager()
 
+// Nuxt config для правильного формирования путей
+const config = useRuntimeConfig()
+
+// Функция для правильного формирования путей к изображениям
+function getImagePath(imagePath: string) {
+  const baseURL = config.app?.baseURL || ''
+  
+  // Если baseURL пустой или равен '/', используем относительный путь
+  if (!baseURL || baseURL === '/') {
+    return imagePath
+  }
+  
+  // Иначе добавляем baseURL
+  return `${baseURL}${imagePath}`
+}
+
 // Автоматическое создание окон на сервере
 openWindow({
   id: 'readme-window',
@@ -145,7 +167,7 @@ const desktopIcons = ref([
   {
     id: 'switchshuttle',
     label: 'SwitchShuttle',
-    image: '/switchshuttle.svg',
+    image: getImagePath('/switchshuttle.svg'),
     title: 'SwitchShuttle (Click to show menu bar icon)',
     action: showMenuBar
   },
