@@ -549,11 +549,11 @@ function getLogoPath() {
   
   // Если baseURL пустой или равен '/', используем относительный путь
   if (!baseURL || baseURL === '/') {
-    return '/logo.svg'
+    return '/switchshuttle.svg'
   }
   
   // Иначе добавляем baseURL
-  return `${baseURL}/logo.svg`
+  return `${baseURL}/switchshuttle.svg`
 }
 
 function loadLogoImage() {

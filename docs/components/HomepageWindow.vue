@@ -2,7 +2,7 @@
   <div class="homepage-content">
     <div class="homepage-header">
       <div class="homepage-icon">
-        <img src="/logo.svg" alt="SwitchShuttle" class="icon" />
+        <img src="/switchshuttle.svg" alt="SwitchShuttle" class="icon" />
       </div>
       <h2>{{ $t('demo.homepage.title') }}</h2>
       <p class="homepage-subtitle">{{ $t('demo.homepage.subtitle') }}</p>

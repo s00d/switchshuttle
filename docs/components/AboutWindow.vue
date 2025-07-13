@@ -4,7 +4,7 @@
     <div class="app-info">
       <div class="app-header">
         <div class="app-logo">
-          <img src="/logo.svg" alt="SwitchShuttle" class="logo-image" />
+          <img src="/switchshuttle.svg" alt="SwitchShuttle" class="logo-image" />
         </div>
         <div class="app-details">
           <h2 class="app-title">SwitchShuttle</h2>

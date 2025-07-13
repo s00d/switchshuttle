@@ -145,7 +145,7 @@ const desktopIcons = ref([
   {
     id: 'switchshuttle',
     label: 'Switch\nShuttle',
-    image: '/logo.svg',
+    image: '/switchshuttle.svg',
     title: 'SwitchShuttle (Click to show menu bar)',
     action: showMenuBar
   },
