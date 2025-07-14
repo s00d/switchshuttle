@@ -49,9 +49,6 @@
             <MusicPlayerWindow v-else-if="win.component === 'music-player-window'" />
             <DownloadWindow v-else-if="win.component === 'download-window'" />
             <NotificationModal v-else-if="win.component === 'notification-modal'" :title="notificationTitle" :message="notificationMessage" :show="true" />
-            <div v-else-if="win.component === 'div'">
-              Тестовое окно: {{ win.id }}
-            </div>
             <div v-else style="background: yellow; color: black; padding: 20px;">
               Неизвестное окно: {{ win.id }} ({{ typeof win.component }})
             </div>
