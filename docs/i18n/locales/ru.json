@@ -336,5 +336,21 @@
       "step2": "Установите через менеджер пакетов или запустите AppImage",
       "step3": "Запустите SwitchShuttle из меню приложений"
     }
+  },
+  "windows": {
+    "readme": "README",
+    "terminal": "Терминал",
+    "browser": "Браузер",
+    "galaxyGame": "Galaxy Game",
+    "help": "Помощь",
+    "about": "О программе",
+    "homepage": "Главная",
+    "configEditor": "Редактор конфигурации",
+    "configFolder": "Папка конфигурации",
+    "calculator": "Калькулятор",
+    "musicPlayer": "Музыкальный плеер",
+    "download": "Скачать",
+    "notification": "Уведомления",
+    "unknown": "Неизвестно"
   }
 } 

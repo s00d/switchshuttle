@@ -309,5 +309,21 @@
       "step3": "Anwendung starten",
       "step3Description": "Starten Sie SwitchShuttle aus dem Anwendungsmenü"
     }
+  },
+  "windows": {
+    "readme": "README",
+    "terminal": "Terminal",
+    "browser": "Browser",
+    "galaxyGame": "Galaxy Game",
+    "help": "Hilfe",
+    "about": "Über",
+    "homepage": "Startseite",
+    "configEditor": "Konfigurations-Editor",
+    "configFolder": "Konfigurations-Ordner",
+    "calculator": "Taschenrechner",
+    "musicPlayer": "Musik-Player",
+    "download": "Herunterladen",
+    "notification": "Benachrichtigung",
+    "unknown": "Unbekannt"
   }
 } 

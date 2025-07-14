@@ -1,11 +1,9 @@
 <template>
     <div id="demo-window">
       <div class="desktop">
-        <!-- Desktop Icons Grid -->
         <DesktopIcons />
       </div>
-      
-          <!-- macOS Menu Bar -->
+
     <MenuBar 
       :show-switch-shuttle-icon="showSwitchShuttleIcon"
       @show-notification="openNotification"
@@ -75,7 +73,6 @@
 import { useNotifications } from '~/composables/useNotifications'
 import MenuBar from '~/components/MenuBar.vue'
 import TaskBar from '~/components/TaskBar.vue'
-import Window from '~/components/Window.vue'
 import TerminalWindow from '~/components/TerminalWindow.vue'
 import NotificationModal from '~/components/NotificationModal.vue'
 import HelpWindow from '~/components/HelpWindow.vue'
@@ -90,36 +87,13 @@ import NotificationPanel from '~/components/NotificationPanel.vue'
 import NotificationBubble from '~/components/NotificationBubble.vue'
 import DesktopIcons from '~/components/DesktopIcons.vue'
 import DownloadWindow from '~/components/DownloadWindow.vue'
-import { ref, onMounted, watch } from 'vue'
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRuntimeConfig } from '#app'
+import { getComponent } from '~/config/windows'
 
 const { t } = useI18n()
 
 const { windows, openWindow } = useWindowManager()
-
-// Nuxt config для правильного формирования путей
-const config = useRuntimeConfig()
-
-// Функция для правильного формирования путей к изображениям
-function getImagePath(imagePath: string) {
-  const baseURL = config.app?.baseURL || ''
-  
-  // Если baseURL пустой или равен '/', используем относительный путь
-  if (!baseURL || baseURL === '/') {
-    return imagePath
-  }
-  
-  // Иначе добавляем baseURL
-  return `${baseURL}${imagePath}`
-}
-
-// Функция для обработки ошибок загрузки изображений
-function handleImageError(event: Event) {
-  const img = event.target as HTMLImageElement
-  console.warn(`Failed to load image: ${img.src}`)
-  // Можно добавить fallback изображение или скрыть элемент
-}
 
 // Автоматическое создание окон на сервере
 openWindow({
@@ -153,8 +127,6 @@ const showSwitchShuttleIcon = ref(true)
 const terminalCommand = ref('')
 const terminalOutput = ref('')
 
-
-
 // Функция для выполнения команд в терминале
 function executeTerminalCommand(command: string, output: string) {
   console.log('Executing terminal command:', command, 'output:', output)
@@ -187,26 +159,7 @@ function executeTerminalCommand(command: string, output: string) {
   }
 }
 
-// Функция для получения компонента по строковому идентификатору
-function getComponent(componentId: string) {
-  const componentMap: Record<string, any> = {
-    'readme-window': Window,
-    'terminal-window': Window,
-    'browser-window': Window,
-    'galaxy-game-window': Window,
-    'help-window': Window,
-    'about-window': Window,
-    'homepage-window': Window,
-    'config-editor-window': Window,
-    'config-folder-window': Window,
-    'calculator-window': Window,
-    'music-player-window': Window,
-    'download-window': Window,
-    'notification-modal': Window,
-    'div': 'div'
-  }
-  return componentMap[componentId] || 'div'
-}
+// Функция getComponent теперь импортируется из конфигурации окон
 
 function openTerminal() {
   openWindow({

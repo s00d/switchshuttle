@@ -313,5 +313,21 @@
     "otherPlatforms": "Other Platforms",
     "macosDescription": "Universal macOS application (.dmg)",
     "macosArchiveDescription": "Compressed archive for manual installation"
+  },
+  "windows": {
+    "readme": "README",
+    "terminal": "Terminal",
+    "browser": "Browser",
+    "galaxyGame": "Galaxy Game",
+    "help": "Help",
+    "about": "About",
+    "homepage": "Homepage",
+    "configEditor": "Config Editor",
+    "configFolder": "Config Folder",
+    "calculator": "Calculator",
+    "musicPlayer": "Music Player",
+    "download": "Download",
+    "notification": "Notification",
+    "unknown": "Unknown"
   }
 } 

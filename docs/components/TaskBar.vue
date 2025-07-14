@@ -22,8 +22,11 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useWindowManager } from '~/composables/useWindowManager'
+import { getTaskBarWindows } from '~/config/windows'
 
+const { t } = useI18n()
 const { 
   windows,
   minimizedWindows, 
@@ -33,20 +36,11 @@ const {
   activateWindow
 } = useWindowManager()
 
-// Список окон с их иконками и заголовками
-const windowInfo: Record<string, { title: string; icon: string }> = {
-  'readme-window': { title: 'README', icon: '📖' },
-  'terminal-window': { title: 'Terminal', icon: '💻' },
-  'browser-window': { title: 'Browser', icon: '🌐' },
-  'galaxy-game-window': { title: 'Galaxy Game', icon: '🚀' },
-  'help-window': { title: 'Help', icon: '❓' },
-  'about-window': { title: 'About', icon: 'ℹ️' },
-  'homepage-window': { title: 'Homepage', icon: '🏠' },
-  'notification-modal': { title: 'Notification', icon: '🔔' },
-  'config-editor-window': { title: 'Config Editor', icon: '⚙️' },
-  'config-folder-window': { title: 'Config Folder', icon: '📁' },
-  'download-window': { title: 'Download', icon: '⬇️' }
-}
+// Получаем список окон из централизованной конфигурации с переводами
+const windowInfo = getTaskBarWindows().reduce((acc, window) => {
+  acc[window.id] = { title: t(window.title), icon: window.icon }
+  return acc
+}, {} as Record<string, { title: string; icon: string }>)
 
 // Computed для получения всех окон с их состоянием
 const allWindows = computed(() => {
