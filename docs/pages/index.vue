@@ -2,27 +2,7 @@
     <div id="demo-window">
       <div class="desktop">
         <!-- Desktop Icons Grid -->
-        <div class="desktop-icons-grid">
-          <div 
-            v-for="icon in desktopIcons" 
-            :key="icon.id"
-            class="desktop-icon"
-            @click="icon.action"
-            :title="icon.title"
-          >
-            <div class="icon-image">
-              <span v-if="icon.emoji">{{ icon.emoji }}</span>
-              <img 
-                v-else-if="icon.image" 
-                :src="icon.image" 
-                :alt="icon.label" 
-                class="desktop-icon-img"
-                @error="handleImageError"
-              >
-            </div>
-            <div class="icon-label">{{ icon.label }}</div>
-          </div>
-        </div>
+        <DesktopIcons />
       </div>
       
           <!-- macOS Menu Bar -->
@@ -69,6 +49,7 @@
             <ConfigFolderWindow v-else-if="win.component === 'config-folder-window'" />
             <CalculatorWindow v-else-if="win.component === 'calculator-window'" />
             <MusicPlayerWindow v-else-if="win.component === 'music-player-window'" />
+            <DownloadWindow v-else-if="win.component === 'download-window'" />
             <NotificationModal v-else-if="win.component === 'notification-modal'" :title="notificationTitle" :message="notificationMessage" :show="true" />
             <div v-else-if="win.component === 'div'">
               Тестовое окно: {{ win.id }}
@@ -107,6 +88,8 @@ import MusicPlayerWindow from '~/components/MusicPlayerWindow.vue'
 import ReadmeWindow from '~/components/ReadmeWindow.vue'
 import NotificationPanel from '~/components/NotificationPanel.vue'
 import NotificationBubble from '~/components/NotificationBubble.vue'
+import DesktopIcons from '~/components/DesktopIcons.vue'
+import DownloadWindow from '~/components/DownloadWindow.vue'
 import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRuntimeConfig } from '#app'
@@ -146,8 +129,8 @@ openWindow({
     windowId: 'readme-window',
     title: 'README'
   },
-  position: { x: 400, y: 120 },
-  size: { width: 800, height: 600 }
+  position: { x: 700, y: 120 },
+  size: { width: 600, height: 500 }
 })
 
 openWindow({
@@ -170,72 +153,7 @@ const showSwitchShuttleIcon = ref(true)
 const terminalCommand = ref('')
 const terminalOutput = ref('')
 
-// Массив иконок рабочего стола
-const desktopIcons = ref([
-  {
-    id: 'switchshuttle',
-    label: 'SwitchShuttle',
-    image: getImagePath('/switchshuttle.svg'),
-    title: 'SwitchShuttle (Click to show menu bar icon)',
-    action: showMenuBar
-  },
-  {
-    id: 'galaxy-game',
-    label: 'Galaxy\nGame',
-    emoji: '🚀',
-    title: 'Galaxy Game (Click to play)',
-    action: openGalaxyGame
-  },
-  {
-    id: 'readme',
-    label: 'README',
-    emoji: '📖',
-    title: 'README (Click to open)',
-    action: openReadme
-  },
-  {
-    id: 'terminal',
-    label: 'Terminal',
-    emoji: '💻',
-    title: 'Terminal (Click to open)',
-    action: openTerminal
-  },
-  {
-    id: 'browser',
-    label: 'Browser',
-    emoji: '🌐',
-    title: 'Browser (Click to open)',
-    action: openBrowser
-  },
-  {
-    id: 'help',
-    label: 'Help',
-    emoji: '❓',
-    title: 'Help (Click to open)',
-    action: openHelp
-  },
-  {
-    id: 'about',
-    label: 'About',
-    emoji: 'ℹ️',
-    title: 'About (Click to open)',
-    action: openAbout
-  },
-  {
-    id: 'calculator',
-    label: 'Calculator',
-    emoji: '🧮',
-    title: 'Calculator (Click to open)',
-    action: openCalculator
-  },
-  {
-    id: 'music-player',
-    label: 'Music\nPlayer',
-    emoji: '🎵',
-    title: 'Music Player (Click to open)',
-    action: openMusicPlayer
-  }
-])
+
 
 // Функция для выполнения команд в терминале
 function executeTerminalCommand(command: string, output: string) {
@@ -283,23 +201,11 @@ function getComponent(componentId: string) {
     'config-folder-window': Window,
     'calculator-window': Window,
     'music-player-window': Window,
+    'download-window': Window,
     'notification-modal': Window,
     'div': 'div'
   }
   return componentMap[componentId] || 'div'
-}
-
-function openReadme() {
-  openWindow({
-    id: 'readme-window',
-    component: 'readme-window',
-    props: {
-      windowId: 'readme-window',
-      title: 'README'
-    },
-    position: { x: 400, y: 120 }, // Правее и выше
-    size: { width: 800, height: 600 }
-  })
 }
 
 function openTerminal() {
@@ -315,32 +221,6 @@ function openTerminal() {
   })
 }
 
-function openBrowser() {
-  openWindow({
-    id: 'browser-window',
-    component: 'browser-window',
-    props: {
-      windowId: 'browser-window',
-      title: 'Safari — SwitchShuttle'
-    },
-    position: { x: 200, y: 200 },
-    size: { width: 900, height: 600 }
-  })
-}
-
-function openGalaxyGame() {
-  openWindow({
-    id: 'galaxy-game-window',
-    component: 'galaxy-game-window',
-    props: {
-      windowId: 'galaxy-game-window',
-      title: 'Galaxy Game'
-    },
-    position: { x: 150, y: 150 },
-    size: { width: 800, height: 600 }
-  })
-}
-
 function openHelp() {
   openWindow({
     id: 'help-window',
@@ -350,7 +230,7 @@ function openHelp() {
       title: 'Help'
     },
     position: { x: 300, y: 180 },
-    size: { width: 750, height: 550 }
+    size: { width: 600, height: 500 }
   })
 }
 
@@ -381,12 +261,16 @@ function openHomepage() {
 }
 
 function openJsonEditor(configFile?: string) {
+  // Если configFile не передан, используем дефолтный файл
+  const fileToOpen = configFile || 'switch-shuttle.json'
+  
   openWindow({
     id: 'config-editor-window',
     component: 'config-editor-window',
     props: {
       windowId: 'config-editor-window',
-      title: 'Config Editor'
+      title: `Config Editor - ${fileToOpen}`,
+      configFile: fileToOpen
     },
     position: { x: 220, y: 140 },
     size: { width: 800, height: 600 }
@@ -406,32 +290,6 @@ function openConfigFolder() {
   })
 }
 
-function openCalculator() {
-  openWindow({
-    id: 'calculator-window',
-    component: 'calculator-window',
-    props: {
-      windowId: 'calculator-window',
-      title: 'Calculator'
-    },
-    position: { x: 300, y: 200 },
-    size: { width: 320, height: 550 }
-  })
-}
-
-function openMusicPlayer() {
-  openWindow({
-    id: 'music-player-window',
-    component: 'music-player-window',
-    props: {
-      windowId: 'music-player-window',
-      title: 'Music Player'
-    },
-    position: { x: 400, y: 150 },
-    size: { width: 400, height: 600 }
-  })
-}
-
 function openNotification(title: string, message: string) {
   // Используем новую систему уведомлений
   const { addNotification } = useNotifications()
@@ -440,22 +298,6 @@ function openNotification(title: string, message: string) {
     message: message || t('demo.notifications.notAvailableMessage'),
     type: 'info'
   })
-}
-
-function showMenuBar() {
-  // Проверяем, есть ли уже иконка SwitchShuttle в меню-баре
-  if (showSwitchShuttleIcon.value) {
-    // Если иконка уже видна, показываем уведомление
-    const { addNotification } = useNotifications()
-    addNotification({
-      title: 'SwitchShuttle is already active',
-      message: 'SwitchShuttle icon is already displayed in the menu bar',
-      type: 'warning'
-    })
-  } else {
-    // Если иконки нет, показываем её
-    showSwitchShuttleIcon.value = true
-  }
 }
 
 function hideMenuBar() {
@@ -488,79 +330,7 @@ function toggleItem(itemName: string) {
     padding: 0;
   }
 
-  .desktop-icons-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, 100px);
-    grid-template-rows: repeat(6, 100px);
-    gap: 0;
-    width: 100%;
-    height: 100%;
-    align-content: start;
-    justify-content: start;
-    padding: 60px 50px;
-  }
 
-  .desktop-icon {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 80px;
-    height: 80px;
-    cursor: pointer;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-    user-select: none;
-    padding: 0;
-    box-sizing: border-box;
-    min-height: 80px;
-    position: relative;
-  }
-
-  .desktop-icon:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: scale(1.05);
-  }
-
-  .desktop-icon:active {
-    transform: scale(0.95);
-  }
-
-  .icon-image {
-    font-size: 48px;
-    margin-bottom: 8px;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    height: 48px;
-    flex-shrink: 0;
-    margin-bottom: 4px;
-  }
-
-  .desktop-icon-img {
-    width: 48px;
-    height: 48px;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-  }
-
-  .icon-label {
-    font-size: 10px !important;
-    color: white !important;
-    text-align: center !important;
-    font-weight: 500 !important;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
-    max-width: 100%;
-    word-wrap: break-word;
-    line-height: 1.1 !important;
-    display: block !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    position: relative !important;
-    z-index: 1 !important;
-    margin-top: 4px !important;
-    white-space: pre-line !important;
-  }
   
   #demo-window {
     position: relative;

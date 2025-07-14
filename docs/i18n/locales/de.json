@@ -241,5 +241,73 @@
     "toc": {
       "title": "Inhaltsverzeichnis"
     }
+  },
+  "download": {
+    "title": "SwitchShuttle herunterladen",
+    "latestVersion": "Neueste Version",
+    "releaseDate": "Veröffentlichungsdatum",
+    "loading": "Daten werden geladen...",
+    "downloadForCurrentOS": "Für aktuelles Betriebssystem herunterladen",
+    "downloadForOtherOS": "Für andere Betriebssysteme herunterladen",
+    "recommendedForYourSystem": "Empfohlene Version für Ihr System",
+    "availableForOtherPlatforms": "Verfügbare Versionen für andere Plattformen",
+    "universalVersion": "Universelle Version",
+    "download": "Herunterladen",
+    "downloadNow": "Jetzt herunterladen",
+    "downloadStarted": "Download gestartet",
+    "downloadStartedMessage": "Download von {filename} wird gestartet",
+    "installationInstructions": "Installationsanweisungen",
+    "terminalCommands": "Terminal-Befehle",
+    "copy": "Kopieren",
+    "copied": "Kopiert",
+    "copiedMessage": "Befehle in Zwischenablage kopiert",
+    "platforms": {
+      "windows": "Windows",
+      "macos": "macOS",
+      "linux": "Linux"
+    },
+    "fileTypes": {
+      "x64Setup": "x64 Setup",
+      "x86Setup": "x86 Setup",
+      "x64Msi": "x64 MSI",
+      "x86Msi": "x86 MSI",
+      "appImage": "AppImage",
+      "deb": ".deb",
+      "rpm": ".rpm",
+      "dmg": ".dmg",
+      "tarGz": ".tar.gz"
+    },
+    "difficulty": {
+      "easy": "Einfache Installation",
+      "medium": "Mittlerer Schwierigkeitsgrad"
+    },
+    "macosInstructions": {
+      "title": "macOS Installation",
+      "step1": "Heruntergeladene Datei öffnen",
+      "step1Description": "Öffnen Sie die heruntergeladene .dmg-Datei im Finder",
+      "step2": "Anwendung ziehen",
+      "step2Description": "Ziehen Sie die Anwendung in den Applications-Ordner",
+      "step3": "Ausführung erlauben",
+      "step3Description": "Führen Sie diese Befehle im Terminal aus, um die Ausführung zu erlauben:",
+      "terminalCommands": "chmod +x /Applications/switch-shuttle.app\nxattr -cr /Applications/switch-shuttle.app\ncodesign --force --deep --sign - /Applications/switch-shuttle.app"
+    },
+    "windowsInstructions": {
+      "title": "Windows Installation",
+      "step1": "Installer wählen",
+      "step1Description": "Wählen Sie den passenden Installer für Ihr System",
+      "step2": "Als Administrator ausführen",
+      "step2Description": "Führen Sie den Installer als Administrator aus",
+      "step3": "Installationsassistent befolgen",
+      "step3Description": "Befolgen Sie den Installationsassistenten und schließen Sie den Prozess ab"
+    },
+    "linuxInstructions": {
+      "title": "Linux Installation",
+      "step1": "Paket herunterladen",
+      "step1Description": "Laden Sie das passende Paket für Ihre Distribution herunter",
+      "step2": "Paket installieren",
+      "step2Description": "Installieren Sie über den Paketmanager oder führen Sie AppImage aus",
+      "step3": "Anwendung starten",
+      "step3Description": "Starten Sie SwitchShuttle aus dem Anwendungsmenü"
+    }
   }
 } 

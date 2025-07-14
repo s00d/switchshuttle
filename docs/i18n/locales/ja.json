@@ -241,5 +241,73 @@
     "toc": {
       "title": "目次"
     }
+  },
+  "download": {
+    "title": "SwitchShuttleをダウンロード",
+    "latestVersion": "最新バージョン",
+    "releaseDate": "リリース日",
+    "loading": "データを読み込み中...",
+    "downloadForCurrentOS": "現在のOS用にダウンロード",
+    "downloadForOtherOS": "他のOS用にダウンロード",
+    "recommendedForYourSystem": "お使いのシステムに推奨されるバージョン",
+    "availableForOtherPlatforms": "他のプラットフォーム用の利用可能なバージョン",
+    "universalVersion": "ユニバーサルバージョン",
+    "download": "ダウンロード",
+    "downloadNow": "今すぐダウンロード",
+    "downloadStarted": "ダウンロード開始",
+    "downloadStartedMessage": "{filename}のダウンロードを開始しています",
+    "installationInstructions": "インストール手順",
+    "terminalCommands": "ターミナルコマンド",
+    "copy": "コピー",
+    "copied": "コピーしました",
+    "copiedMessage": "コマンドをクリップボードにコピーしました",
+    "platforms": {
+      "windows": "Windows",
+      "macos": "macOS",
+      "linux": "Linux"
+    },
+    "fileTypes": {
+      "x64Setup": "x64 Setup",
+      "x86Setup": "x86 Setup",
+      "x64Msi": "x64 MSI",
+      "x86Msi": "x86 MSI",
+      "appImage": "AppImage",
+      "deb": ".deb",
+      "rpm": ".rpm",
+      "dmg": ".dmg",
+      "tarGz": ".tar.gz"
+    },
+    "difficulty": {
+      "easy": "簡単なインストール",
+      "medium": "中程度の難易度"
+    },
+    "macosInstructions": {
+      "title": "macOSインストール",
+      "step1": "ダウンロードしたファイルを開く",
+      "step1Description": "Finderでダウンロードした.dmgファイルを開く",
+      "step2": "アプリケーションをドラッグ",
+      "step2Description": "アプリケーションをApplicationsフォルダにドラッグ",
+      "step3": "実行を許可",
+      "step3Description": "実行を許可するためにターミナルでこれらのコマンドを実行:",
+      "terminalCommands": "chmod +x /Applications/switch-shuttle.app\nxattr -cr /Applications/switch-shuttle.app\ncodesign --force --deep --sign - /Applications/switch-shuttle.app"
+    },
+    "windowsInstructions": {
+      "title": "Windowsインストール",
+      "step1": "インストーラーを選択",
+      "step1Description": "お使いのシステムに適したインストーラーを選択",
+      "step2": "管理者として実行",
+      "step2Description": "インストーラーを管理者として実行",
+      "step3": "インストールウィザードに従う",
+      "step3Description": "インストールウィザードに従い、プロセスを完了"
+    },
+    "linuxInstructions": {
+      "title": "Linuxインストール",
+      "step1": "パッケージをダウンロード",
+      "step1Description": "お使いのディストリビューション用の適切なパッケージをダウンロード",
+      "step2": "パッケージをインストール",
+      "step2Description": "パッケージマネージャーを使用してインストールするか、AppImageを実行",
+      "step3": "アプリケーションを起動",
+      "step3Description": "アプリケーションメニューからSwitchShuttleを起動"
+    }
   }
 } 

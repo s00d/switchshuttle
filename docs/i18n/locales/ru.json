@@ -241,5 +241,100 @@
     "toc": {
       "title": "Содержание"
     }
+  },
+  "download": {
+    "title": "Скачать SwitchShuttle",
+    "latestVersion": "Последняя версия",
+    "releaseDate": "Дата выпуска",
+    "loading": "Загрузка данных...",
+    "downloadForCurrentOS": "Скачать для текущей ОС",
+    "downloadForOtherOS": "Скачать для других ОС",
+    "recommendedForYourSystem": "Рекомендуемая версия для вашей системы",
+    "availableForOtherPlatforms": "Доступные версии для других платформ",
+    "universalVersion": "Универсальная версия",
+    "download": "Скачать",
+    "downloadNow": "Скачать сейчас",
+    "downloadStarted": "Скачивание началось",
+    "downloadStartedMessage": "Начинается скачивание файла {filename}",
+    "installationInstructions": "Инструкции по установке",
+    "terminalCommands": "Команды терминала",
+    "copy": "Копировать",
+    "copied": "Скопировано",
+    "copiedMessage": "Команды скопированы в буфер обмена",
+    "platforms": {
+      "windows": "Windows",
+      "macos": "macOS",
+      "linux": "Linux"
+    },
+    "fileTypes": {
+      "x64Setup": "x64 Setup",
+      "x86Setup": "x86 Setup",
+      "x64Msi": "x64 MSI",
+      "x86Msi": "x86 MSI",
+      "appImage": "AppImage",
+      "deb": ".deb",
+      "rpm": ".rpm",
+      "dmg": ".dmg",
+      "tarGz": ".tar.gz"
+    },
+    "difficulty": {
+      "easy": "Простая установка",
+      "medium": "Средняя сложность"
+    },
+    "macosInstructions": {
+      "title": "Установка на macOS",
+      "step1": "Откройте скачанный файл",
+      "step1Description": "Откройте скачанный файл .dmg в Finder",
+      "step2": "Перетащите приложение",
+      "step2Description": "Перетащите приложение в папку Applications",
+      "step3": "Разрешите выполнение",
+      "step3Description": "Выполните команды в Терминале для разрешения выполнения:",
+      "terminalCommands": "chmod +x /Applications/switch-shuttle.app\nxattr -cr /Applications/switch-shuttle.app\ncodesign --force --deep --sign - /Applications/switch-shuttle.app"
+    },
+    "windowsInstructions": {
+      "title": "Установка на Windows",
+      "step1": "Выберите установщик",
+      "step1Description": "Выберите подходящий установщик для вашей системы",
+      "step2": "Запустите от имени администратора",
+      "step2Description": "Запустите установщик от имени администратора",
+      "step3": "Следуйте мастеру установки",
+      "step3Description": "Следуйте мастеру установки и завершите процесс"
+    },
+    "linuxInstructions": {
+      "title": "Установка на Linux",
+      "step1": "Скачайте пакет",
+      "step1Description": "Скачайте подходящий пакет для вашего дистрибутива",
+      "step2": "Установите пакет",
+      "step2Description": "Установите через менеджер пакетов или запустите AppImage",
+      "step3": "Запустите приложение",
+      "step3Description": "Запустите SwitchShuttle из меню приложений"
+    },
+    "primaryPlatform": "Основная платформа",
+    "otherPlatforms": "Другие платформы",
+    "macosDescription": "Универсальное приложение macOS (.dmg)",
+    "macosArchiveDescription": "Сжатый архив для ручной установки",
+    "download": "Скачать",
+    "loading": "Загрузка информации о релизе...",
+    "downloadStarted": "Загрузка началась",
+    "downloadStartedMessage": "Скачивание {filename}...",
+    "installationInstructions": "Инструкции по установке",
+    "macosInstructions": {
+      "title": "Установка на macOS",
+      "step1": "Скачайте и откройте файл .dmg",
+      "step2": "Перетащите SwitchShuttle в папку Applications",
+      "step3": "Выполните эти команды в Терминале для разрешения выполнения:"
+    },
+    "windowsInstructions": {
+      "title": "Установка на Windows",
+      "step1": "Скачайте подходящий установщик (.exe или .msi)",
+      "step2": "Запустите установщик от имени администратора",
+      "step3": "Следуйте мастеру установки"
+    },
+    "linuxInstructions": {
+      "title": "Установка на Linux",
+      "step1": "Скачайте подходящий пакет для вашего дистрибутива",
+      "step2": "Установите через менеджер пакетов или запустите AppImage",
+      "step3": "Запустите SwitchShuttle из меню приложений"
+    }
   }
 } 

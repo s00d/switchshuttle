@@ -241,5 +241,77 @@
     "toc": {
       "title": "Table of Contents"
     }
+  },
+  "download": {
+    "title": "Download SwitchShuttle",
+    "latestVersion": "Latest Version",
+    "releaseDate": "Release Date",
+    "loading": "Loading data...",
+    "downloadForCurrentOS": "Download for Current OS",
+    "downloadForOtherOS": "Download for Other OS",
+    "recommendedForYourSystem": "Recommended version for your system",
+    "availableForOtherPlatforms": "Available versions for other platforms",
+    "universalVersion": "Universal version",
+    "download": "Download",
+    "downloadNow": "Download Now",
+    "downloadStarted": "Download Started",
+    "downloadStartedMessage": "Starting download of {filename}",
+    "installationInstructions": "Installation Instructions",
+    "terminalCommands": "Terminal Commands",
+    "copy": "Copy",
+    "copied": "Copied",
+    "copiedMessage": "Commands copied to clipboard",
+    "platforms": {
+      "windows": "Windows",
+      "macos": "macOS",
+      "linux": "Linux"
+    },
+    "fileTypes": {
+      "x64Setup": "x64 Setup",
+      "x86Setup": "x86 Setup",
+      "x64Msi": "x64 MSI",
+      "x86Msi": "x86 MSI",
+      "appImage": "AppImage",
+      "deb": ".deb",
+      "rpm": ".rpm",
+      "dmg": ".dmg",
+      "tarGz": ".tar.gz"
+    },
+    "difficulty": {
+      "easy": "Easy Installation",
+      "medium": "Medium Difficulty"
+    },
+    "macosInstructions": {
+      "title": "macOS Installation",
+      "step1": "Open the downloaded file",
+      "step1Description": "Open the downloaded .dmg file in Finder",
+      "step2": "Drag the application",
+      "step2Description": "Drag the application to the Applications folder",
+      "step3": "Allow execution",
+      "step3Description": "Run these commands in Terminal to allow execution:",
+      "terminalCommands": "chmod +x /Applications/switch-shuttle.app\nxattr -cr /Applications/switch-shuttle.app\ncodesign --force --deep --sign - /Applications/switch-shuttle.app"
+    },
+    "windowsInstructions": {
+      "title": "Windows Installation",
+      "step1": "Choose installer",
+      "step1Description": "Select the appropriate installer for your system",
+      "step2": "Run as administrator",
+      "step2Description": "Run the installer as administrator",
+      "step3": "Follow installation wizard",
+      "step3Description": "Follow the installation wizard and complete the process"
+    },
+    "linuxInstructions": {
+      "title": "Linux Installation",
+      "step1": "Download package",
+      "step1Description": "Download the appropriate package for your distribution",
+      "step2": "Install package",
+      "step2Description": "Install using package manager or run AppImage",
+      "step3": "Launch application",
+      "step3Description": "Launch SwitchShuttle from applications menu"
+    },
+    "primaryPlatform": "Primary Platform",
+    "otherPlatforms": "Other Platforms",
+    "macosDescription": "Universal macOS application (.dmg)",
+    "macosArchiveDescription": "Compressed archive for manual installation"
   }
 } 

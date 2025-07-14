@@ -44,7 +44,8 @@ const windowInfo: Record<string, { title: string; icon: string }> = {
   'homepage-window': { title: 'Homepage', icon: '🏠' },
   'notification-modal': { title: 'Notification', icon: '🔔' },
   'config-editor-window': { title: 'Config Editor', icon: '⚙️' },
-  'config-folder-window': { title: 'Config Folder', icon: '📁' }
+  'config-folder-window': { title: 'Config Folder', icon: '📁' },
+  'download-window': { title: 'Download', icon: '⬇️' }
 }
 
 // Computed для получения всех окон с их состоянием

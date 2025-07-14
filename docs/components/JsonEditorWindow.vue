@@ -45,7 +45,19 @@ const codeContent = ref<HTMLElement>()
 import { configFileContents } from '~/config/menu'
 
 const getConfigContent = (fileName: string) => {
-  return configFileContents[fileName] || configFileContents['switch-shuttle.json']
+  // Проверяем, существует ли файл в configFileContents
+  if (configFileContents[fileName]) {
+    return configFileContents[fileName]
+  }
+  
+  // Если файл не найден, возвращаем дефолтный конфиг
+  const defaultConfig = configFileContents['switch-shuttle.json']
+  if (defaultConfig) {
+    return defaultConfig
+  }
+  
+  // Если даже дефолтный конфиг не найден, возвращаем пустой JSON
+  return '{\n  "error": "Config file not found",\n  "message": "The requested config file does not exist."\n}'
 }
 
 const jsonContent = ref(getConfigContent(props.configFile || 'switch-shuttle.json'))

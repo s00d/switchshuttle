@@ -241,5 +241,73 @@
     "toc": {
       "title": "目录"
     }
+  },
+  "download": {
+    "title": "下载 SwitchShuttle",
+    "latestVersion": "最新版本",
+    "releaseDate": "发布日期",
+    "loading": "正在加载数据...",
+    "downloadForCurrentOS": "为当前操作系统下载",
+    "downloadForOtherOS": "为其他操作系统下载",
+    "recommendedForYourSystem": "为您的系统推荐的版本",
+    "availableForOtherPlatforms": "其他平台可用的版本",
+    "universalVersion": "通用版本",
+    "download": "下载",
+    "downloadNow": "立即下载",
+    "downloadStarted": "下载已开始",
+    "downloadStartedMessage": "正在开始下载 {filename}",
+    "installationInstructions": "安装说明",
+    "terminalCommands": "终端命令",
+    "copy": "复制",
+    "copied": "已复制",
+    "copiedMessage": "命令已复制到剪贴板",
+    "platforms": {
+      "windows": "Windows",
+      "macos": "macOS",
+      "linux": "Linux"
+    },
+    "fileTypes": {
+      "x64Setup": "x64 Setup",
+      "x86Setup": "x86 Setup",
+      "x64Msi": "x64 MSI",
+      "x86Msi": "x86 MSI",
+      "appImage": "AppImage",
+      "deb": ".deb",
+      "rpm": ".rpm",
+      "dmg": ".dmg",
+      "tarGz": ".tar.gz"
+    },
+    "difficulty": {
+      "easy": "简单安装",
+      "medium": "中等难度"
+    },
+    "macosInstructions": {
+      "title": "macOS 安装",
+      "step1": "打开下载的文件",
+      "step1Description": "在 Finder 中打开下载的 .dmg 文件",
+      "step2": "拖拽应用程序",
+      "step2Description": "将应用程序拖拽到 Applications 文件夹",
+      "step3": "允许执行",
+      "step3Description": "在终端中运行这些命令以允许执行：",
+      "terminalCommands": "chmod +x /Applications/switch-shuttle.app\nxattr -cr /Applications/switch-shuttle.app\ncodesign --force --deep --sign - /Applications/switch-shuttle.app"
+    },
+    "windowsInstructions": {
+      "title": "Windows 安装",
+      "step1": "选择安装程序",
+      "step1Description": "为您的系统选择合适的安装程序",
+      "step2": "以管理员身份运行",
+      "step2Description": "以管理员身份运行安装程序",
+      "step3": "遵循安装向导",
+      "step3Description": "遵循安装向导并完成过程"
+    },
+    "linuxInstructions": {
+      "title": "Linux 安装",
+      "step1": "下载软件包",
+      "step1Description": "为您的发行版下载合适的软件包",
+      "step2": "安装软件包",
+      "step2Description": "使用包管理器安装或运行 AppImage",
+      "step3": "启动应用程序",
+      "step3Description": "从应用程序菜单启动 SwitchShuttle"
+    }
   }
 } 
