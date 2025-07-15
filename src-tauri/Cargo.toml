@@ -28,6 +28,8 @@ reqwest = { version = "0.12.20", features = ["json", "blocking"] }
 once_cell = "1.21.3"
 tokio = { version = "1.0", features = ["full"] }
 openssl = { version = "0.10.73", features = ["vendored"] }
+cron = "0.15.0"
+chrono = { version = "0.4.41", features = ["serde"] }
 
 [lib]
 name = "app_lib"
