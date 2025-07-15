@@ -59,7 +59,7 @@ const activeSection = ref('')
 const contentRef = ref<HTMLElement>()
 
 const { data: changelogData } = await useAsyncData<ChangelogResponse>('changelog', async () => {
-  return await $fetch('/api/changelog')
+  return await $fetch('/api/changelog,json')
 }, {
   deep: true,
   lazy: false,
