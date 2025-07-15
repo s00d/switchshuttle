@@ -48,9 +48,10 @@
             <CalculatorWindow v-else-if="win.component === 'calculator-window'" />
             <MusicPlayerWindow v-else-if="win.component === 'music-player-window'" />
             <DownloadWindow v-else-if="win.component === 'download-window'" />
+            <ChangelogWindow v-else-if="win.component === 'changelog-window'" />
             <NotificationModal v-else-if="win.component === 'notification-modal'" :title="notificationTitle" :message="notificationMessage" :show="true" />
             <div v-else style="background: yellow; color: black; padding: 20px;">
-              Неизвестное окно: {{ win.id }} ({{ typeof win.component }})
+              Unknown window: {{ win.id }} ({{ typeof win.component }})
             </div>
           </template>
         </component>
@@ -80,6 +81,7 @@ import ConfigFolderWindow from '~/components/ConfigFolderWindow.vue'
 import CalculatorWindow from '~/components/CalculatorWindow.vue'
 import MusicPlayerWindow from '~/components/MusicPlayerWindow.vue'
 import ReadmeWindow from '~/components/ReadmeWindow.vue'
+import ChangelogWindow from '~/components/ChangelogWindow.vue'
 import NotificationPanel from '~/components/NotificationPanel.vue'
 import NotificationBubble from '~/components/NotificationBubble.vue'
 import DesktopIcons from '~/components/DesktopIcons.vue'
