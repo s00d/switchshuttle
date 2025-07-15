@@ -249,6 +249,25 @@ const desktopIcons = computed<DesktopIcon[]>(() => [
         size: { width: 650, height: 500 }
       })
     }
+  },
+  {
+    id: 'changelog',
+    label: 'Changelog',
+    emoji: '📝',
+    title: 'Changelog (Click to open)',
+    action: () => {
+      const { openWindow } = useWindowManager()
+      openWindow({
+        id: 'changelog-window',
+        component: 'changelog-window',
+        props: {
+          windowId: 'changelog-window',
+          title: 'Changelog'
+        },
+        position: { x: 350, y: 150 },
+        size: { width: 600, height: 500 }
+      })
+    }
   }
 ])
 </script>
