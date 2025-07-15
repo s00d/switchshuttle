@@ -11,14 +11,14 @@ export interface WindowConfig {
 export const windowConfigs: WindowConfig[] = [
   {
     id: 'readme-window',
-    title: 'windows.readme',
+    title: 'Readme',
     icon: '📖',
     component: 'ReadmeWindow',
     description: 'Documentation and guides'
   },
   {
     id: 'terminal-window',
-    title: 'windows.terminal',
+    title: 'Terminal',
     icon: '💻',
     component: 'TerminalWindow',
     description: 'Command line interface',
@@ -26,42 +26,42 @@ export const windowConfigs: WindowConfig[] = [
   },
   {
     id: 'browser-window',
-    title: 'windows.browser',
+    title: 'Browser',
     icon: '🌐',
     component: 'BrowserWindow',
     description: 'Web browser'
   },
   {
     id: 'galaxy-game-window',
-    title: 'windows.galaxyGame',
+    title: 'GalaxyGame',
     icon: '🚀',
     component: 'GalaxyGameWindow',
     description: 'Space exploration game'
   },
   {
     id: 'help-window',
-    title: 'windows.help',
+    title: 'Help',
     icon: '❓',
     component: 'HelpWindow',
     description: 'Help and support'
   },
   {
     id: 'about-window',
-    title: 'windows.about',
+    title: 'About',
     icon: 'ℹ️',
     component: 'AboutWindow',
     description: 'About SwitchShuttle'
   },
   {
     id: 'homepage-window',
-    title: 'windows.homepage',
+    title: 'Homepage',
     icon: '🏠',
     component: 'HomepageWindow',
     description: 'Official homepage'
   },
   {
     id: 'config-editor-window',
-    title: 'windows.configEditor',
+    title: 'ConfigEditor',
     icon: '⚙️',
     component: 'JsonEditorWindow',
     description: 'Configuration editor',
@@ -69,42 +69,42 @@ export const windowConfigs: WindowConfig[] = [
   },
   {
     id: 'config-folder-window',
-    title: 'windows.configFolder',
+    title: 'ConfigFolder',
     icon: '📁',
     component: 'ConfigFolderWindow',
     description: 'Configuration folder'
   },
   {
     id: 'calculator-window',
-    title: 'windows.calculator',
+    title: 'Calculator',
     icon: '🧮',
     component: 'CalculatorWindow',
     description: 'Calculator tool'
   },
   {
     id: 'music-player-window',
-    title: 'windows.musicPlayer',
+    title: 'MusicPlayer',
     icon: '🎵',
     component: 'MusicPlayerWindow',
     description: 'Music player'
   },
   {
     id: 'download-window',
-    title: 'windows.download',
+    title: 'Download',
     icon: '⬇️',
     component: 'DownloadWindow',
     description: 'Download SwitchShuttle'
   },
   {
     id: 'changelog-window',
-    title: 'windows.changelog',
+    title: 'Changelog',
     icon: '📝',
     component: 'ChangelogWindow',
     description: 'Changelog and version history'
   },
   {
     id: 'notification-modal',
-    title: 'windows.notification',
+    title: 'Notification',
     icon: '🔔',
     component: 'NotificationModal',
     description: 'Notification center',
@@ -126,7 +126,7 @@ export function getWindowConfig(windowId: string): WindowConfig | undefined {
 export function getWindowInfo(windowId: string) {
   const config = windowConfigMap.get(windowId)
   if (!config) {
-    return { title: 'windows.unknown', icon: '❓' }
+    return { title: 'Unknown', icon: '❓' }
   }
   return {
     title: config.title,

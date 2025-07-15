@@ -309,22 +309,5 @@
       "step3": "启动应用程序",
       "step3Description": "从应用程序菜单启动 SwitchShuttle"
     }
-  },
-  "windows": {
-    "readme": "README",
-    "terminal": "终端",
-    "browser": "浏览器",
-    "galaxyGame": "Galaxy Game",
-    "help": "帮助",
-    "about": "关于",
-    "homepage": "主页",
-    "configEditor": "配置编辑器",
-    "configFolder": "配置文件夹",
-    "calculator": "计算器",
-    "musicPlayer": "音乐播放器",
-    "download": "下载",
-    "changelog": "更新日志",
-    "notification": "通知",
-    "unknown": "未知"
   }
 } 

@@ -309,22 +309,5 @@
       "step3": "アプリケーションを起動",
       "step3Description": "アプリケーションメニューからSwitchShuttleを起動"
     }
-  },
-  "windows": {
-    "readme": "README",
-    "terminal": "ターミナル",
-    "browser": "ブラウザ",
-    "galaxyGame": "Galaxy Game",
-    "help": "ヘルプ",
-    "about": "について",
-    "homepage": "ホームページ",
-    "configEditor": "設定エディター",
-    "configFolder": "設定フォルダ",
-    "calculator": "計算機",
-    "musicPlayer": "音楽プレーヤー",
-    "download": "ダウンロード",
-    "changelog": "変更履歴",
-    "notification": "通知",
-    "unknown": "不明"
   }
 } 

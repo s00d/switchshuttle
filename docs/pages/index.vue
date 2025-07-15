@@ -29,7 +29,7 @@
         v-for="win in windows"
         :key="win.id"
         :windowId="win.id"
-        v-bind="{ ...win.props, title: t(win.props?.title) }"
+        v-bind="{ ...win.props }"
       >
         <component
           :is="getWindowComponent(win.component)"
