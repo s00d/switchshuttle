@@ -34,7 +34,7 @@ pub fn execute_command_by_id(
             println!("[Execute] Command has switch: {:?}", command.switch);
             println!("[Execute] Command has inputs: {:?}", command.inputs);
 
-            // Проверяем, является ли это командой мониторинга
+            // Проверяем, является ли это командой переключения
             if command.switch.is_some() {
                 let should_show_inputs = command
                     .inputs
@@ -157,9 +157,10 @@ pub fn create_system_tray_menu(
     autostart: bool,
     config_manager: &ConfigManager,
 ) -> tauri::menu::Menu<Wry> {
-    // Останавливаем таймеры в текущем меню, если оно существует
+    // Останавливаем таймеры и планировщики в текущем меню, если оно существует
     if let Some(mut current_menu) = CURRENT_MENU.lock().unwrap().take() {
         current_menu.stop_all_monitor_timers();
+        current_menu.stop_all_schedulers();
     }
 
     // Создаем структуру меню из конфигураций
@@ -168,8 +169,9 @@ pub fn create_system_tray_menu(
     // Создаем Tauri меню из структуры (это сохранит tauri_icon_item)
     let tray_menu = system_menu.create_tauri_menu(app);
 
-    // Теперь запускаем индивидуальные таймеры для элементов с мониторингом
+    // Теперь запускаем индивидуальные таймеры для элементов с мониторингом и планировщики
     system_menu.start_all_monitor_timers();
+    system_menu.start_all_schedulers();
 
     // Запускаем периодическую очистку пула соединений
     SystemMenu::cleanup_console_pool_periodically();
@@ -417,18 +419,14 @@ pub fn update_system_tray_menu(app: &AppHandle<Wry>, config_manager: &ConfigMana
     }
 }
 
-/// Возобновляет таймеры мониторинга
 pub fn resume_monitor_timers() {
-    eprintln!("[Monitor] Resuming monitor timers");
-    if let Ok(mut tray_active) = crate::menu_structure::TRAY_ACTIVE.lock() {
-        *tray_active = true;
+    if let Some(current_menu) = CURRENT_MENU.lock().unwrap().as_mut() {
+        current_menu.start_all_monitor_timers();
     }
 }
 
-/// Приостанавливает таймеры мониторинга
 pub fn pause_monitor_timers() {
-    eprintln!("[Monitor] Pausing monitor timers");
-    if let Ok(mut tray_active) = crate::menu_structure::TRAY_ACTIVE.lock() {
-        *tray_active = false;
+    if let Some(current_menu) = CURRENT_MENU.lock().unwrap().as_mut() {
+        current_menu.stop_all_monitor_timers();
     }
 }
