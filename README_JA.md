@@ -261,6 +261,48 @@ SwitchShuttleはJSON設定ファイルを使用し、以下に保存されます
 - **視覚的インジケーター** - メニュー内のアイコンとステータスインジケーター
 - **クロスプラットフォーム** - macOS、Windows、Linuxで動作
 
+#### ⏰ スケジュールコマンド (Cron)
+
+cron式を使用してコマンドを自動的にスケジュール実行：
+
+```json
+{
+  "name": "🔄 自動バックアップ",
+  "commands": [
+    "rsync -av /source/ /backup/"
+  ],
+  "scheduler": "0 2 * * *",
+  "background": true,
+  "hotkey": "Ctrl+Shift+B"
+}
+```
+
+**スケジューラー機能：**
+- **Cron式** - スケジュールに標準cron形式を使用
+- **バックグラウンド実行** - スケジュールコマンドを静かに実行
+- **クロスプラットフォーム** - macOS、Windows、Linuxで動作
+- **永続性** - メニューが閉じられてもスケジュールは継続実行
+
+#### 🖥️ バックグラウンド実行
+
+コマンドの実行方法を制御 - ConsolePoolを使用したバックグラウンドまたは通常のターミナル実行：
+
+```json
+{
+  "name": "🚀 サーバー起動",
+  "commands": [
+    "npm run dev"
+  ],
+  "background": true,
+  "hotkey": "Ctrl+Shift+S"
+}
+```
+
+**バックグラウンド実行オプション：**
+- `"background": true` - ConsolePoolを使用して実行（バックグラウンド）
+- `"background": false` - 通常のターミナル実行
+- `"background": null` または省略 - コマンドタイプに基づいて自動検出
+
 ## ⚙️ 設定リファレンス
 
 ### メイン設定
@@ -298,14 +340,15 @@ SwitchShuttleはJSON設定ファイルを使用し、以下に保存されます
 | パラメータ | タイプ | 必須 | 説明 |
 |-----------|--------|------|------|
 | `name` | String | ✅ | コマンドの表示名 |
-| `command` | String | ❌ | 実行する単一コマンド |
 | `commands` | Array | ❌ | 実行する複数コマンド |
 | `submenu` | Array | ❌ | ネストしたサブコマンド |
+| `switch` | String | ❌ | スイッチ状態をチェックするコマンド（true/falseを返す） |
+| `monitor` | String | ❌ | 監視表示値を取得するコマンド |
 | `inputs` | Object | ❌ | 動的入力フィールド |
 | `hotkey` | String | ❌ | グローバルホットキー |
-| `switch` | String | ❌ | 現在の状態をチェックするコマンド（スイッチコマンド用） |
-| `monitor` | String | ❌ | リアルタイムリソース追跡の監視タイプ |
 | `icon` | String | ❌ | 視覚的識別のための絵文字アイコン |
+| `background` | Boolean | ❌ | バックグラウンドで実行（ConsolePool）または通常のターミナル |
+| `scheduler` | String | ❌ | スケジュール実行のcron式 |
 
 ### 設定管理
 

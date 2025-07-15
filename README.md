@@ -248,6 +248,64 @@ Execute a sequence of commands:
     "npm run test",
     "npm run build"
   ],
+  "background": true,
+  "hotkey": "Ctrl+Shift+F"
+}
+```
+
+#### ⏰ Scheduled Commands (Cron)
+
+Schedule commands to run automatically using cron expressions:
+
+```json
+{
+  "name": "🔄 Auto Backup",
+  "commands": [
+    "rsync -av /source/ /backup/"
+  ],
+  "scheduler": "0 2 * * *",
+  "background": true,
+  "hotkey": "Ctrl+Shift+B"
+}
+```
+
+**Cron Expression Format:**
+The scheduler uses standard cron expressions with 6 fields: `second minute hour day month weekday`
+
+**Common Cron Examples:**
+- `"0 0 * * * *"` - Every hour at minute 0
+- `"0 0 2 * * *"` - Every day at 2:00 AM
+- `"0 30 9 * * 1-5"` - Weekdays at 9:30 AM
+- `"0 0 12 * * 1"` - Every Monday at noon
+- `"0 0 0 1 * *"` - First day of every month
+- `"0 */15 * * * *"` - Every 15 minutes
+- `"0 0 0 * * 0"` - Every Sunday at midnight
+
+**Scheduler Features:**
+- **Background Execution** - Commands run silently without opening terminal
+- **Cron Support** - Full cron expression parsing and execution
+- **Error Handling** - Graceful fallback if cron parsing fails
+- **Cross-Platform** - Works on macOS, Windows, and Linux
+
+#### 🖥️ Background Execution
+
+Control how commands are executed - in background using ConsolePool or normal terminal execution:
+
+```json
+{
+  "name": "🚀 Start Server",
+  "commands": [
+    "npm run dev"
+  ],
+  "background": true,
+  "hotkey": "Ctrl+Shift+S"
+}
+```
+
+**Background Execution Options:**
+- `"background": true` - Execute using ConsolePool (background)
+- `"background": false` - Execute using normal terminal execution
+- `"background": null` or omit - Auto-detect based on command type
   "hotkey": "Ctrl+Shift+F"
 }
 ```
@@ -394,14 +452,15 @@ Monitor system resources and services with real-time information:
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `name` | String | ✅ | Display name for the command |
-| `command` | String | ❌ | Single command to execute |
 | `commands` | Array | ❌ | Multiple commands to execute |
 | `submenu` | Array | ❌ | Nested subcommands |
+| `switch` | String | ❌ | Command to check switch state (returns true/false) |
+| `monitor` | String | ❌ | Command to get display value for monitoring |
 | `inputs` | Object | ❌ | Dynamic input fields |
 | `hotkey` | String | ❌ | Global hotkey shortcut |
-| `switch` | String | ❌ | Command to check current status (for toggle commands) |
-| `monitor` | String | ❌ | Monitor type for real-time resource tracking |
 | `icon` | String | ❌ | Emoji icon for visual identification |
+| `background` | Boolean | ❌ | Execute in background (ConsolePool) or normal terminal |
+| `scheduler` | String | ❌ | Cron expression for scheduled execution |
 
 ### Configuration Management
 

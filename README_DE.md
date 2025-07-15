@@ -261,6 +261,48 @@ Systemfunktionen mit Hintergrundausführung umschalten:
 - **Visuelle Indikatoren** - Icons und Statusindikatoren im Menü
 - **Plattformübergreifend** - Funktioniert auf macOS, Windows und Linux
 
+#### ⏰ Geplante Befehle (Cron)
+
+Planen Sie Befehle zur automatischen Ausführung mit Cron-Ausdrücken:
+
+```json
+{
+  "name": "🔄 Auto-Backup",
+  "commands": [
+    "rsync -av /source/ /backup/"
+  ],
+  "scheduler": "0 2 * * *",
+  "background": true,
+  "hotkey": "Ctrl+Shift+B"
+}
+```
+
+**Scheduler-Funktionen:**
+- **Cron-Ausdrücke** - Verwenden Sie das Standard-Cron-Format für die Planung
+- **Hintergrundausführung** - Führen Sie geplante Befehle still aus
+- **Plattformübergreifend** - Funktioniert auf macOS, Windows und Linux
+- **Persistent** - Zeitpläne laufen weiter, auch wenn das Menü geschlossen ist
+
+#### 🖥️ Hintergrundausführung
+
+Steuern Sie, wie Befehle ausgeführt werden - im Hintergrund mit ConsolePool oder normale Terminal-Ausführung:
+
+```json
+{
+  "name": "🚀 Server starten",
+  "commands": [
+    "npm run dev"
+  ],
+  "background": true,
+  "hotkey": "Ctrl+Shift+S"
+}
+```
+
+**Hintergrundausführungs-Optionen:**
+- `"background": true` - Ausführung mit ConsolePool (Hintergrund)
+- `"background": false` - Ausführung mit normalem Terminal
+- `"background": null` oder weglassen - Automatische Erkennung basierend auf Befehls-Typ
+
 ## ⚙️ Konfigurationsreferenz
 
 ### Hauptkonfiguration
@@ -298,14 +340,15 @@ Systemfunktionen mit Hintergrundausführung umschalten:
 | Parameter | Typ | Erforderlich | Beschreibung |
 |-----------|-----|--------------|--------------|
 | `name` | String | ✅ | Anzeigename für den Befehl |
-| `command` | String | ❌ | Einzelner auszuführender Befehl |
 | `commands` | Array | ❌ | Mehrere auszuführende Befehle |
 | `submenu` | Array | ❌ | Verschachtelte Unterbefehle |
+| `switch` | String | ❌ | Befehl zum Überprüfen des Schalter-Status (gibt true/false zurück) |
+| `monitor` | String | ❌ | Befehl zum Abrufen des Überwachungs-Anzeigewerts |
 | `inputs` | Object | ❌ | Dynamische Eingabefelder |
 | `hotkey` | String | ❌ | Globaler Hotkey |
-| `switch` | String | ❌ | Befehl zum Überprüfen des aktuellen Status (für Schalter-Befehle) |
-| `monitor` | String | ❌ | Überwachungstyp für Echtzeit-Ressourcenverfolgung |
 | `icon` | String | ❌ | Emoji-Icon zur visuellen Identifikation |
+| `background` | Boolean | ❌ | Im Hintergrund ausführen (ConsolePool) oder normales Terminal |
+| `scheduler` | String | ❌ | Cron-Ausdruck für geplante Ausführung |
 
 ### Konfigurationsverwaltung
 

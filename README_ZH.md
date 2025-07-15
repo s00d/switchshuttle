@@ -261,6 +261,48 @@ SwitchShuttle 使用 JSON 配置文件，存储在：
 - **视觉指示器** - 菜单中的图标和状态指示器
 - **跨平台** - 在 macOS、Windows 和 Linux 上运行
 
+#### ⏰ 计划命令 (Cron)
+
+使用 cron 表达式自动计划命令执行：
+
+```json
+{
+  "name": "🔄 自动备份",
+  "commands": [
+    "rsync -av /source/ /backup/"
+  ],
+  "scheduler": "0 2 * * *",
+  "background": true,
+  "hotkey": "Ctrl+Shift+B"
+}
+```
+
+**调度器功能：**
+- **Cron 表达式** - 使用标准 cron 格式进行调度
+- **后台执行** - 静默运行计划命令
+- **跨平台** - 在 macOS、Windows 和 Linux 上运行
+- **持久性** - 即使菜单关闭，计划也会继续运行
+
+#### 🖥️ 后台执行
+
+控制命令的执行方式 - 使用 ConsolePool 在后台或普通终端执行：
+
+```json
+{
+  "name": "🚀 启动服务器",
+  "commands": [
+    "npm run dev"
+  ],
+  "background": true,
+  "hotkey": "Ctrl+Shift+S"
+}
+```
+
+**后台执行选项：**
+- `"background": true` - 使用 ConsolePool 执行（后台）
+- `"background": false` - 使用普通终端执行
+- `"background": null` 或省略 - 根据命令类型自动检测
+
 ## ⚙️ 配置参考
 
 ### 主配置
@@ -298,14 +340,15 @@ SwitchShuttle 使用 JSON 配置文件，存储在：
 | 参数 | 类型 | 必需 | 描述 |
 |------|------|------|------|
 | `name` | String | ✅ | 命令的显示名称 |
-| `command` | String | ❌ | 要执行的单个命令 |
 | `commands` | Array | ❌ | 要执行的多个命令 |
 | `submenu` | Array | ❌ | 嵌套子命令 |
+| `switch` | String | ❌ | 检查开关状态的命令（返回 true/false） |
+| `monitor` | String | ❌ | 获取监控显示值的命令 |
 | `inputs` | Object | ❌ | 动态输入字段 |
 | `hotkey` | String | ❌ | 全局热键 |
-| `switch` | String | ❌ | 检查当前状态的命令（用于开关命令） |
-| `monitor` | String | ❌ | 实时资源跟踪的监控类型 |
 | `icon` | String | ❌ | 用于视觉识别的表情符号图标 |
+| `background` | Boolean | ❌ | 在后台执行（ConsolePool）或普通终端 |
+| `scheduler` | String | ❌ | 计划执行的 cron 表达式 |
 
 ### 配置管理
 
