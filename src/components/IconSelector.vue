@@ -1,12 +1,12 @@
 <template>
   <div class="relative">
-    <label class="block text-sm font-medium text-slate-700 mb-2">{{ label }}</label>
+    <label class="block text-sm font-medium text-slate-700 mb-1">{{ label }}</label>
     <div class="relative">
       <input
         :value="modelValue"
         @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
         :placeholder="placeholder"
-        class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        class="w-full px-2 py-1 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         :class="inputClass"
         @focus="showDropdown = true"
         @blur="handleBlur"
