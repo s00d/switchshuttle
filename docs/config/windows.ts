@@ -1,12 +1,11 @@
-import Window from '~/components/Window.vue'
-
 // Централизованная конфигурация окон
 export interface WindowConfig {
   id: string
   title: string
   icon: string
-  component: any
+  component: string // Имя компонента для динамического импорта
   description?: string
+  props?: Record<string, any> // Дополнительные пропсы
 }
 
 export const windowConfigs: WindowConfig[] = [
@@ -14,99 +13,102 @@ export const windowConfigs: WindowConfig[] = [
     id: 'readme-window',
     title: 'windows.readme',
     icon: '📖',
-    component: Window,
+    component: 'ReadmeWindow',
     description: 'Documentation and guides'
   },
   {
     id: 'terminal-window',
     title: 'windows.terminal',
     icon: '💻',
-    component: Window,
-    description: 'Command line interface'
+    component: 'TerminalWindow',
+    description: 'Command line interface',
+    props: { command: '', output: '' }
   },
   {
     id: 'browser-window',
     title: 'windows.browser',
     icon: '🌐',
-    component: Window,
+    component: 'BrowserWindow',
     description: 'Web browser'
   },
   {
     id: 'galaxy-game-window',
     title: 'windows.galaxyGame',
     icon: '🚀',
-    component: Window,
+    component: 'GalaxyGameWindow',
     description: 'Space exploration game'
   },
   {
     id: 'help-window',
     title: 'windows.help',
     icon: '❓',
-    component: Window,
+    component: 'HelpWindow',
     description: 'Help and support'
   },
   {
     id: 'about-window',
     title: 'windows.about',
     icon: 'ℹ️',
-    component: Window,
+    component: 'AboutWindow',
     description: 'About SwitchShuttle'
   },
   {
     id: 'homepage-window',
     title: 'windows.homepage',
     icon: '🏠',
-    component: Window,
+    component: 'HomepageWindow',
     description: 'Official homepage'
   },
   {
     id: 'config-editor-window',
     title: 'windows.configEditor',
     icon: '⚙️',
-    component: Window,
-    description: 'Configuration editor'
+    component: 'JsonEditorWindow',
+    description: 'Configuration editor',
+    props: { configFile: 'config.json' }
   },
   {
     id: 'config-folder-window',
     title: 'windows.configFolder',
     icon: '📁',
-    component: Window,
+    component: 'ConfigFolderWindow',
     description: 'Configuration folder'
   },
   {
     id: 'calculator-window',
     title: 'windows.calculator',
     icon: '🧮',
-    component: Window,
+    component: 'CalculatorWindow',
     description: 'Calculator tool'
   },
   {
     id: 'music-player-window',
     title: 'windows.musicPlayer',
     icon: '🎵',
-    component: Window,
+    component: 'MusicPlayerWindow',
     description: 'Music player'
   },
   {
     id: 'download-window',
     title: 'windows.download',
     icon: '⬇️',
-    component: Window,
+    component: 'DownloadWindow',
     description: 'Download SwitchShuttle'
   },
   {
     id: 'changelog-window',
     title: 'windows.changelog',
     icon: '📝',
-    component: Window,
+    component: 'ChangelogWindow',
     description: 'Changelog and version history'
   },
   {
     id: 'notification-modal',
     title: 'windows.notification',
     icon: '🔔',
-    component: Window,
-    description: 'Notification center'
+    component: 'NotificationModal',
+    description: 'Notification center',
+    props: { title: '', message: '', show: true }
   }
 ]
 
@@ -115,10 +117,9 @@ export const windowConfigMap = new Map<string, WindowConfig>(
   windowConfigs.map(config => [config.id, config])
 )
 
-// Функция для получения компонента по ID
-export function getComponent(componentId: string) {
-  const config = windowConfigMap.get(componentId)
-  return config?.component || 'div'
+// Функция для получения конфигурации окна по ID
+export function getWindowConfig(windowId: string): WindowConfig | undefined {
+  return windowConfigMap.get(windowId)
 }
 
 // Функция для получения информации об окне по ID
@@ -147,4 +148,28 @@ export function getTaskBarWindows() {
       title: config.title,
       icon: config.icon
     }))
+}
+
+// Функция для открытия окна по ID
+export function createWindowConfig(windowId: string, customProps?: Record<string, any>) {
+  const config = windowConfigMap.get(windowId)
+  if (!config) {
+    throw new Error(`Window ${windowId} not found`)
+  }
+  
+  // Разделяем пропсы на те, что идут в WindowInfo и те, что в props
+  const { position, size, ...otherProps } = customProps || {}
+  
+  return {
+    id: windowId,
+    component: windowId,
+    position,
+    size,
+    props: {
+      windowId,
+      title: config.title, // Ключ для перевода (например, 'windows.readme')
+      ...config.props,
+      ...otherProps
+    }
+  }
 } 
