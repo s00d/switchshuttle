@@ -442,6 +442,113 @@ const faqData = {
           <code class="block bg-slate-200 p-2 rounded text-sm">switch-shuttle export &gt; config.json</code>
         </div>
       `
+    },
+    {
+      id: 'af-4',
+      question: 'How do I schedule commands with cron?',
+      answer: `
+        <p class="mb-3">SwitchShuttle supports scheduled command execution using standard cron expressions. This allows you to automate repetitive tasks.</p>
+        
+        <p class="mb-3"><strong>Features:</strong></p>
+        <ul class="list-disc list-inside space-y-1 mb-3">
+          <li>Standard cron format support</li>
+          <li>Background execution without terminal windows</li>
+          <li>Persistent scheduling (continues when menu is closed)</li>
+          <li>Cross-platform compatibility</li>
+        </ul>
+        
+        <p class="mb-3"><strong>Example:</strong></p>
+        <pre class="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm"><code>{
+  "name": "🔄 Auto Backup",
+  "commands": [
+    "rsync -av /source/ /backup/"
+  ],
+  "scheduler": "0 2 * * *",
+  "background": true,
+  "hotkey": "Ctrl+Shift+B"
+}</code></pre>
+        
+        <p class="mb-3"><strong>Common cron patterns:</strong></p>
+        <div class="grid md:grid-cols-2 gap-4">
+          <div class="bg-slate-50 p-3 rounded-lg">
+            <code class="text-sm font-medium">* * * * *</code>
+            <p class="text-xs text-slate-600 mt-1">Every minute</p>
+          </div>
+          <div class="bg-slate-50 p-3 rounded-lg">
+            <code class="text-sm font-medium">0 */2 * * *</code>
+            <p class="text-xs text-slate-600 mt-1">Every 2 hours</p>
+          </div>
+          <div class="bg-slate-50 p-3 rounded-lg">
+            <code class="text-sm font-medium">0 9 * * 1-5</code>
+            <p class="text-xs text-slate-600 mt-1">Weekdays at 9 AM</p>
+          </div>
+          <div class="bg-slate-50 p-3 rounded-lg">
+            <code class="text-sm font-medium">0 0 1 * *</code>
+            <p class="text-xs text-slate-600 mt-1">First day of month</p>
+          </div>
+        </div>
+        
+        <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mt-4">
+          <p class="text-sm text-blue-700">
+            <strong>Tip:</strong> Use <code class="bg-blue-100 px-1 rounded">"background": true</code> for scheduled commands to run silently without opening terminal windows.
+          </p>
+        </div>
+      `
+    },
+    {
+      id: 'af-5',
+      question: 'How do I control background execution?',
+      answer: `
+        <p class="mb-3">SwitchShuttle provides flexible control over how commands are executed - either in the background using ConsolePool or through normal terminal execution.</p>
+        
+        <p class="mb-3"><strong>Background Execution Options:</strong></p>
+        <div class="space-y-3">
+          <div class="bg-slate-50 p-4 rounded-lg">
+            <h4 class="font-medium text-slate-700 mb-2">ConsolePool (Background)</h4>
+            <p class="text-sm text-slate-600 mb-2">Commands run silently without opening terminal windows. Perfect for scheduled tasks and system operations.</p>
+            <pre class="bg-slate-900 text-slate-100 p-2 rounded text-xs"><code>"background": true</code></pre>
+          </div>
+          
+          <div class="bg-slate-50 p-4 rounded-lg">
+            <h4 class="font-medium text-slate-700 mb-2">Normal Terminal</h4>
+            <p class="text-sm text-slate-600 mb-2">Commands open in visible terminal windows. Best for interactive commands and development work.</p>
+            <pre class="bg-slate-900 text-slate-100 p-2 rounded text-xs"><code>"background": false</code></pre>
+          </div>
+          
+          <div class="bg-slate-50 p-4 rounded-lg">
+            <h4 class="font-medium text-slate-700 mb-2">Auto-Detect</h4>
+            <p class="text-sm text-slate-600 mb-2">SwitchShuttle automatically chooses the best execution method based on command type.</p>
+            <pre class="bg-slate-900 text-slate-100 p-2 rounded text-xs"><code>"background": null  // or omit the field</code></pre>
+          </div>
+        </div>
+        
+        <p class="mb-3"><strong>Example configurations:</strong></p>
+        <div class="grid md:grid-cols-2 gap-4">
+          <div class="bg-slate-50 p-4 rounded-lg">
+            <h4 class="font-medium text-slate-700 mb-2">Background Server</h4>
+            <pre class="bg-slate-900 text-slate-100 p-2 rounded text-xs"><code>{
+  "name": "🚀 Start Server",
+  "commands": ["npm run dev"],
+  "background": true
+}</code></pre>
+          </div>
+          
+          <div class="bg-slate-50 p-4 rounded-lg">
+            <h4 class="font-medium text-slate-700 mb-2">Interactive Terminal</h4>
+            <pre class="bg-slate-900 text-slate-100 p-2 rounded text-xs"><code>{
+  "name": "🔧 Debug Mode",
+  "commands": ["node --inspect app.js"],
+  "background": false
+}</code></pre>
+          </div>
+        </div>
+        
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mt-4">
+          <p class="text-sm text-yellow-700">
+            <strong>Note:</strong> Switch commands and monitor commands always use background execution regardless of the background setting.
+          </p>
+        </div>
+      `
     }
   ],
   troubleshooting: [
