@@ -8,6 +8,7 @@
       "command": "sudo update-alternatives --config bash",
       "hotkey": "Ctrl+Shift+U",
       "icon": "🐧",
+      "background": true,
       "description": "Switches the default shell to Ubuntu's bash configuration. This command allows you to change between different bash installations and configurations available on your system."
     },
     {
@@ -16,6 +17,7 @@
       "command": "sudo update-alternatives --config bash",
       "hotkey": "Ctrl+Shift+D",
       "icon": "🐧",
+      "background": true,
       "description": "Switches the default shell to Debian's bash configuration. This command allows you to change between different bash installations and configurations available on your system."
     },
     {
@@ -24,6 +26,7 @@
       "command": "sudo update-alternatives --config bash",
       "hotkey": "Ctrl+Shift+C",
       "icon": "🐧",
+      "background": true,
       "description": "Switches the default shell to CentOS's bash configuration. This command allows you to change between different bash installations and configurations available on your system."
     },
     {
@@ -32,6 +35,7 @@
       "command": "sudo update-alternatives --config bash",
       "hotkey": "Ctrl+Shift+F",
       "icon": "🐧",
+      "background": true,
       "description": "Switches the default shell to Fedora's bash configuration. This command allows you to change between different bash installations and configurations available on your system."
     },
     {
@@ -40,6 +44,7 @@
       "command": "sudo update-alternatives --config bash",
       "hotkey": "Ctrl+Shift+A",
       "icon": "🐧",
+      "background": true,
       "description": "Switches the default shell to Arch Linux's bash configuration. This command allows you to change between different bash installations and configurations available on your system."
     },
     {
@@ -48,6 +53,7 @@
       "command": "sudo update-alternatives --config bash",
       "hotkey": "Ctrl+Shift+O",
       "icon": "🐧",
+      "background": true,
       "description": "Switches the default shell to openSUSE's bash configuration. This command allows you to change between different bash installations and configurations available on your system."
     },
     {
@@ -56,6 +62,7 @@
       "command": "sudo update-alternatives --config bash",
       "hotkey": "Ctrl+Shift+M",
       "icon": "🐧",
+      "background": true,
       "description": "Switches the default shell to Linux Mint's bash configuration. This command allows you to change between different bash installations and configurations available on your system."
     },
     {
@@ -64,6 +71,7 @@
       "command": "sudo update-alternatives --config bash",
       "hotkey": "Ctrl+Shift+E",
       "icon": "🐧",
+      "background": true,
       "description": "Switches the default shell to Elementary OS's bash configuration. This command allows you to change between different bash installations and configurations available on your system."
     },
     {
@@ -72,6 +80,7 @@
       "command": "chsh -s $(which zsh)",
       "hotkey": "Ctrl+Shift+Z",
       "icon": "🐚",
+      "background": true,
       "description": "Changes the default shell to Zsh. Zsh is a powerful shell that provides advanced features like advanced completion, spelling correction, and extensive customization options."
     },
     {
@@ -80,6 +89,7 @@
       "command": "chsh -s $(which bash)",
       "hotkey": "Ctrl+Shift+B",
       "icon": "🐚",
+      "background": true,
       "description": "Changes the default shell back to Bash. Bash is the default shell for most Linux distributions and provides a stable, feature-rich command-line environment."
     },
     {
@@ -88,6 +98,7 @@
       "command": "chsh -s $(which fish)",
       "hotkey": "Ctrl+Shift+F",
       "icon": "🐠",
+      "background": true,
       "description": "Changes the default shell to Fish. Fish is a smart and user-friendly command line shell with features like syntax highlighting, autosuggestions, and web-based configuration."
     },
     {
@@ -96,6 +107,7 @@
       "command": "chsh -s $(which tcsh)",
       "hotkey": "Ctrl+Shift+T",
       "icon": "🐚",
+      "background": true,
       "description": "Changes the default shell to Tcsh. Tcsh is an enhanced version of the C shell with features like command-line completion, spelling correction, and job control."
     },
     {
@@ -104,6 +116,7 @@
       "command": "chsh -s $(which ksh)",
       "hotkey": "Ctrl+Shift+K",
       "icon": "🐚",
+      "background": true,
       "description": "Changes the default shell to Ksh (Korn shell). Ksh is a Unix shell that combines features of the Bourne shell and C shell, with additional features like command-line editing."
     },
     {
@@ -112,6 +125,7 @@
       "command": "chsh -s $(which dash)",
       "hotkey": "Ctrl+Shift+D",
       "icon": "🐚",
+      "background": true,
       "description": "Changes the default shell to Dash. Dash is a POSIX-compliant shell that is smaller and faster than Bash, often used as the default /bin/sh on many Linux distributions."
     },
     {
@@ -123,6 +137,7 @@
       },
       "hotkey": "Ctrl+Shift+P",
       "icon": "🐍",
+      "background": true,
       "description": "Activates a Python virtual environment. Virtual environments allow you to isolate Python dependencies for different projects, preventing conflicts between package versions."
     },
     {
@@ -134,6 +149,7 @@
       },
       "hotkey": "Ctrl+Shift+N",
       "icon": "🟢",
+      "background": true,
       "description": "Switches to a specific Node.js version using NVM (Node Version Manager). This allows you to easily switch between different Node.js versions for different projects."
     },
     {
@@ -145,6 +161,7 @@
       },
       "hotkey": "Ctrl+Shift+R",
       "icon": "💎",
+      "background": true,
       "description": "Switches to a specific Ruby version using rbenv. This allows you to manage multiple Ruby versions on the same system and switch between them as needed."
     },
     {
@@ -156,6 +173,7 @@
       },
       "hotkey": "Ctrl+Shift+P",
       "icon": "🐘",
+      "background": true,
       "description": "Switches to a specific PHP version using update-alternatives. This allows you to change the default PHP version used by the system and web servers."
     },
     {
@@ -164,6 +182,7 @@
       "command": "sudo update-alternatives --config java",
       "hotkey": "Ctrl+Shift+J",
       "icon": "☕",
+      "background": true,
       "description": "Switches between installed Java versions using update-alternatives. This allows you to change the default Java version used by applications and development tools."
     },
     {
@@ -172,6 +191,7 @@
       "command": "sudo update-alternatives --config gcc",
       "hotkey": "Ctrl+Shift+G",
       "icon": "🔧",
+      "background": true,
       "description": "Switches between installed GCC compiler versions using update-alternatives. This allows you to change the default C/C++ compiler used for building software."
     },
     {
@@ -180,6 +200,7 @@
       "command": "sudo update-alternatives --config python",
       "hotkey": "Ctrl+Shift+P",
       "icon": "🐍",
+      "background": true,
       "description": "Switches between installed Python versions using update-alternatives. This allows you to change the default Python interpreter used by the system and applications."
     },
     {
@@ -191,6 +212,7 @@
       },
       "hotkey": "Ctrl+Shift+D",
       "icon": "🖥️",
+      "background": true,
       "description": "Switches the default desktop environment or display manager. This allows you to change between different desktop environments like GNOME, KDE, XFCE, or LXDE."
     },
     {
@@ -202,6 +224,7 @@
       },
       "hotkey": "Ctrl+Shift+M",
       "icon": "🖥️",
+      "background": true,
       "description": "Switches the default display manager (login screen). This allows you to change between different display managers like GDM, LightDM, SDDM, or XDM."
     },
     {
@@ -213,6 +236,7 @@
       },
       "hotkey": "Ctrl+Shift+N",
       "icon": "🌐",
+      "background": true,
       "description": "Switches the default network management service. This allows you to change between different network managers like NetworkManager, systemd-networkd, or Wicd."
     },
     {
@@ -224,6 +248,7 @@
       },
       "hotkey": "Ctrl+Shift+P",
       "icon": "📦",
+      "background": true,
       "description": "Switches between different package managers or package manager frontends. This allows you to change the default package management tool used for installing software."
     },
     {
@@ -232,6 +257,7 @@
       "command": "sudo update-alternatives --config x-terminal-emulator",
       "hotkey": "Ctrl+Shift+T",
       "icon": "💻",
+      "background": true,
       "description": "Switches the default terminal emulator for the X Window System. This allows you to change between different terminal emulators like GNOME Terminal, Konsole, or xterm."
     },
     {
@@ -240,6 +266,7 @@
       "command": "sudo update-alternatives --config editor",
       "hotkey": "Ctrl+Shift+E",
       "icon": "📝",
+      "background": true,
       "description": "Switches the default text editor used by system commands. This allows you to change between different text editors like nano, vim, emacs, or other editors."
     },
     {
@@ -248,6 +275,7 @@
       "command": "sudo update-alternatives --config x-www-browser",
       "hotkey": "Ctrl+Shift+B",
       "icon": "🌐",
+      "background": true,
       "description": "Switches the default web browser for the system. This allows you to change between different browsers like Firefox, Chrome, Chromium, or other web browsers."
     },
     {
@@ -256,6 +284,7 @@
       "command": "sudo update-alternatives --config x-www-browser",
       "hotkey": "Ctrl+Shift+M",
       "icon": "📧",
+      "background": true,
       "description": "Switches the default mail client for the system. This allows you to change between different mail clients like Thunderbird, Evolution, or other email applications."
     },
     {
@@ -264,6 +293,7 @@
       "command": "sudo update-alternatives --config x-file-manager",
       "hotkey": "Ctrl+Shift+F",
       "icon": "📁",
+      "background": true,
       "description": "Switches the default file manager for the system. This allows you to change between different file managers like Nautilus, Dolphin, Thunar, or other file management applications."
     }
   ]
