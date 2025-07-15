@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.13.0](https://github.com/s00d/switchshuttle/compare/v1.12.0...v1.13.0) (2025-07-15)
+
+### ✨ Features
+* **components:** add collapsible section component for better UI organization
+* **command-item:** enhance command display with advanced options and improved styling
+* **commands:** add functionality to create command groups with visual distinction
+* **components:** add CommandSubmenu component for managing grouped commands
+* **scheduler:** add SchedulerInput component for cron expression management with visual editor
+* **HotkeyInput:** add dropdown for selecting key combinations with teleport functionality
+* **help:** add FAQs for scheduling commands and background execution
+* **templates:** add background support for shell switch commands
+* **scheduler:** add new scheduler template for automated tasks
+* **types:** add scheduler and background properties to SwitchShuttle type
+* **menu:** add scheduler functionality for menu items with cron support
+* **config:** add scheduler and background options to CommandConfig
+* **docs:** add scheduled commands and background execution sections to README
+
+### 🔧 Chores
+* **deps:** update dependencies in Cargo.toml for improved compatibility
+
+### ♻️ Code Refactoring
+* **components:** remove CommandTypeSelector.vue component and integrate functionality
+* **commands:** remove unused legacy field from command structure
+* **execute:** streamline command addition logic and remove redundancy
+* **menu:** improve comments and enhance timer management logic
+* **refactor(commands):** remove unused legacy field from command structure
+* **refactor(execute):** streamline command addition logic and remove redundancy
+* **refactor(menu):** improve comments and enhance timer management logic
+
+### 🐛 Bug Fixes
+* **ui:** adjust spacing in IconSelector component for better visual alignment
+
 ## [1.12.0](https://github.com/s00d/switchshuttle/compare/v1.11.0...v1.12.0) (2025-07-11)
 
 ### ✨ Features
