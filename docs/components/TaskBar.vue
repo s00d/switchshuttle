@@ -38,7 +38,7 @@ const {
 
 // Получаем список окон из централизованной конфигурации с переводами
 const windowInfo = getTaskBarWindows().reduce((acc, window) => {
-  acc[window.id] = { title: t(window.title), icon: window.icon }
+  acc[window.id] = { title: window.title, icon: window.icon }
   return acc
 }, {} as Record<string, { title: string; icon: string }>)
 
