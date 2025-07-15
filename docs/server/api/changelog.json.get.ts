@@ -11,6 +11,8 @@ function toId(str: string) {
 }
 
 export default defineEventHandler(async (event) => {
+  // Устанавливаем правильный Content-Type для JSON
+  setHeader(event, 'Content-Type', 'application/json')
   try {
     const changelogPath = join(process.cwd(), '..', 'CHANGELOG.md')
     const changelogContent = readFileSync(changelogPath, 'utf-8')
@@ -56,7 +58,6 @@ export default defineEventHandler(async (event) => {
     // Добавляем target="_blank" к внешним ссылкам
     const htmlWithLinks = html.replace(/<a href="(https?:\/\/[^"]+)">([^<]+)<\/a>/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>')
 
-    setHeader(event, 'Content-Type', 'application/json')
     return {
       success: true,
       content: htmlWithLinks,
