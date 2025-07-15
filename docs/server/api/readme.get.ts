@@ -171,6 +171,7 @@ export default defineEventHandler(async (event) => {
         const html = await parseMarkdown(cleanedRawContent)
         const toc = generateToc(cleanedRawContent)
 
+        setHeader(event, 'Content-Type', 'application/json')
         return {
             success: true,
             content: html,
@@ -192,6 +193,7 @@ export default defineEventHandler(async (event) => {
             const html = await parseMarkdown(cleanedFallbackContent)
             const toc = generateToc(fallbackContent)
 
+            setHeader(event, 'Content-Type', 'application/json')
             return {
                 success: true,
                 content: html,
@@ -202,6 +204,7 @@ export default defineEventHandler(async (event) => {
         } catch (fallbackError) {
             console.error('Error reading fallback README:', fallbackError)
 
+            setHeader(event, 'Content-Type', 'application/json')
             return {
                 success: false,
                 error: 'Failed to load documentation',

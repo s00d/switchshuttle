@@ -56,6 +56,7 @@ export default defineEventHandler(async (event) => {
     // Добавляем target="_blank" к внешним ссылкам
     const htmlWithLinks = html.replace(/<a href="(https?:\/\/[^"]+)">([^<]+)<\/a>/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>')
 
+    setHeader(event, 'Content-Type', 'application/json')
     return {
       success: true,
       content: htmlWithLinks,
