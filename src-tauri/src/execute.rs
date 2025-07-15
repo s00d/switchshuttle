@@ -573,15 +573,8 @@ pub fn execute_command(
     let mut commands_to_execute = Vec::new();
 
     // Собираем команды для выполнения
-    if let Some(command) = &command_config.command {
-        if !command.trim().is_empty() {
-            println!("Adding single command: {}", command);
-            commands_to_execute.push(command.clone());
-        }
-    }
-
     if let Some(commands) = &command_config.commands {
-        println!("Adding multiple commands: {:?}", commands);
+        println!("Adding commands: {:?}", commands);
         for cmd in commands {
             if !cmd.trim().is_empty() {
                 commands_to_execute.push(cmd.clone());
@@ -701,6 +694,8 @@ mod tests {
             switch: None,
             monitor: None,
             icon: None,
+            scheduler: None,
+            background: None
         };
 
         // Функция должна завершиться без ошибок
@@ -726,6 +721,8 @@ mod tests {
             switch: None,
             monitor: None,
             icon: None,
+            scheduler: None,
+            background: None
         };
 
         // Функция должна завершиться без ошибок
@@ -754,6 +751,8 @@ mod tests {
             switch: None,
             monitor: None,
             icon: None,
+            scheduler: None,
+            background: None
         };
 
         // Функция должна завершиться без ошибок
@@ -779,6 +778,8 @@ mod tests {
             switch: None,
             monitor: None,
             icon: None,
+            scheduler: None,
+            background: None
         };
 
         // Функция должна завершиться без ошибок при неподдерживаемом терминале
@@ -804,6 +805,8 @@ mod tests {
             switch: None,
             monitor: None,
             icon: None,
+            scheduler: None,
+            background: None
         };
 
         // Функция должна завершиться без ошибок при неподдерживаемой опции запуска
