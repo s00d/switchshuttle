@@ -427,7 +427,6 @@ const handleGlobalKeyUp = (event: KeyboardEvent) => {
 const handleClickOutside = (event: Event) => {
   if (showDropdown.value) {
     const target = event.target as Element;
-    const dropdown = document.querySelector('.hotkey-dropdown');
     const input = inputRef.value;
     
     if (!target.closest('.hotkey-dropdown') && target !== input) {

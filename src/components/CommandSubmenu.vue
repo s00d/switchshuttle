@@ -95,9 +95,9 @@
             @update:command="updateSubmenuCommand(subIndex, $event)"
             @remove="removeSubmenuCommand(subIndex)"
             @move="moveSubmenuCommand(subIndex, $event)"
-            @add-input="(index) => addSubmenuInput()"
-            @remove-input="(index, key) => removeSubmenuInput(key)"
-            @update-input-key="(index, oldKey, newKey) => updateSubmenuInputKey(oldKey, newKey)"
+            @add-input="() => addSubmenuInput()"
+            @remove-input="(_index, key) => removeSubmenuInput(key)"
+            @update-input-key="(_index, oldKey, newKey) => updateSubmenuInputKey(oldKey, newKey)"
             @add-multiple-command="addSubmenuMultipleCommand"
             @remove-multiple-command="removeSubmenuMultipleCommand"
           />

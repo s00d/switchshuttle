@@ -196,7 +196,6 @@
 import { computed, ref, watch } from 'vue';
 import Input from './Input.vue';
 import Button from './Button.vue';
-import CustomSelect from './CustomSelect.vue';
 import SchedulerSelect from './SchedulerSelect.vue';
 
 const props = defineProps<{
@@ -303,11 +302,6 @@ const parseCronExpression = () => {
       weekday: parts[5] || '*'
     };
   }
-};
-
-// Функция для проверки, является ли значение кастомным
-const isCustomValue = (value: string, options: any[]) => {
-  return !options.some(option => option.value === value);
 };
 
 // Инициализируем из props
