@@ -15,6 +15,8 @@ export interface Command {
   switch?: string | undefined;
   monitor?: string | undefined;
   icon?: string | null;
+  scheduler?: string | undefined; // cron expression
+  background?: boolean | undefined; // true = ConsolePool, false = execute, undefined = auto
 }
 
 export interface Template {
