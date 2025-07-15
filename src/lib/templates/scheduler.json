@@ -1,0 +1,62 @@
+{
+  "name": "Scheduler",
+  "description": "Commands with scheduled execution using cron expressions",
+  "commands": [
+    {
+      "id": "scheduler-backup",
+      "name": "Daily Backup",
+      "description": "Creates a daily backup of important files using environment variables",
+      "command": "tar -czf backup_{HOME}/backup_{DATE}.tar.gz {BACKUP_SOURCE}",
+      "scheduler": "0 2 * * *",
+      "hotkey": "Ctrl+Shift+B",
+      "icon": "💾"
+    },
+    {
+      "id": "scheduler-cleanup",
+      "name": "Weekly Cleanup",
+      "description": "Cleans temporary files and logs weekly",
+      "commands": [
+        "find {TEMP_DIR} -name '*.tmp' -mtime +7 -delete",
+        "find {LOG_DIR} -name '*.log' -mtime +30 -delete",
+        "echo 'Cleanup completed at $(date)' >> {LOG_DIR}/cleanup.log"
+      ],
+      "scheduler": "0 3 * * 0",
+      "hotkey": "Ctrl+Shift+C",
+      "icon": "🧹"
+    },
+    {
+      "id": "scheduler-monitor",
+      "name": "System Monitor",
+      "description": "Monitors system resources every 5 minutes",
+      "command": "echo 'CPU: $(top -l 1 | grep CPU | awk \"{print $3}\")' && echo 'Memory: $(vm_stat | grep \"Pages free\" | awk \"{print $3}\")'",
+      "scheduler": "*/5 * * * *",
+      "monitor": "echo 'System check completed'",
+      "hotkey": "Ctrl+Shift+M",
+      "icon": "📊"
+    },
+    {
+      "id": "scheduler-update",
+      "name": "Auto Update Check",
+      "description": "Checks for application updates daily",
+      "command": "brew update && brew outdated",
+      "scheduler": "0 9 * * *",
+      "hotkey": "Ctrl+Shift+U",
+      "icon": "🔄"
+    },
+    {
+      "id": "scheduler-weather",
+      "name": "Weather Report",
+      "description": "Gets weather report every morning",
+      "command": "curl -s \"wttr.in/{CITY}?format=3\"",
+      "scheduler": "0 7 * * *",
+      "inputs": {
+        "city": "Moscow"
+      },
+      "hotkey": "Ctrl+Shift+W",
+      "icon": "🌤️"
+    }
+  ],
+  "category": "Automation",
+  "icon": "⏰",
+  "tags": ["scheduler", "cron", "automation", "monitoring", "backup"]
+} 

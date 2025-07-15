@@ -14,6 +14,7 @@ import switchesMacos from './templates/switches-macos.json';
 import switchesWindows from './templates/switches-windows.json';
 import switchesLinux from './templates/switches-linux.json';
 import monitoring from './templates/monitoring.json';
+import scheduler from './templates/scheduler.json';
 
 // Функция для преобразования JSON данных в Template
 function createTemplate(jsonData: any, id: string): Template {
@@ -44,7 +45,8 @@ export const templates: Template[] = [
     createTemplate(switchesMacos, 'switches-macos'),
     createTemplate(switchesWindows, 'switches-windows'),
     createTemplate(switchesLinux, 'switches-linux'),
-    createTemplate(monitoring, 'monitoring')
+    createTemplate(monitoring, 'monitoring'),
+    createTemplate(scheduler, 'scheduler')
 ];
 
 export function getTemplatesByCategory(category?: string): Template[] {
