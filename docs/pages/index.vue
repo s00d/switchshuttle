@@ -16,7 +16,6 @@
       @show-homepage-window="openHomepage"
       @show-json-editor-window="openJsonEditor"
       @show-config-folder-window="openConfigFolder"
-      @show-changelog-window="openChangelog"
       @hide-menu-bar="hideMenuBar"
     >
       <template #right>
@@ -233,13 +232,6 @@ function openConfigFolder() {
   openWindow(createWindowConfig('config-folder-window', {
     position: { x: 280, y: 180 },
     size: { width: 700, height: 500 }
-  }))
-}
-
-function openChangelog() {
-  openWindow(createWindowConfig('changelog-window', {
-    position: { x: 300, y: 150 },
-    size: { width: 800, height: 600 }
   }))
 }
 
