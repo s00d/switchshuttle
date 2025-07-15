@@ -1,6 +1,9 @@
 use crate::config::CommandConfig;
 use crate::console;
+use chrono;
+use cron;
 use once_cell::sync::Lazy;
+use std::str::FromStr;
 use std::sync::atomic::AtomicBool;
 use std::sync::atomic::Ordering;
 use std::sync::Arc;
@@ -25,6 +28,7 @@ pub struct MenuItem {
     // Добавляем только специфичные для меню поля
     pub tauri_icon_item: Option<Arc<IconMenuItem<Wry>>>,
     pub stop_flag: Option<Arc<AtomicBool>>,
+    pub scheduler_stop_flag: Option<Arc<AtomicBool>>,
 }
 
 /// Представляет подменю
@@ -49,6 +53,7 @@ impl MenuItem {
             config: cmd.clone(),
             tauri_icon_item: None,
             stop_flag: None,
+            scheduler_stop_flag: None,
         }
     }
 
@@ -70,7 +75,8 @@ impl MenuItem {
 
     /// Проверяет, является ли элемент командой мониторинга
     pub fn is_monitor(&self) -> bool {
-        let is_monitor = self.config.monitor.is_some();
+        let is_monitor = self.config.monitor.is_some() && 
+                        self.config.monitor.as_ref().unwrap().trim().is_empty() == false;
         if is_monitor {
             println!(
                 "[Monitor] is_monitor: {} has monitor = '{:?}'",
@@ -82,6 +88,12 @@ impl MenuItem {
             self.config.name, is_monitor
         );
         is_monitor
+    }
+
+    /// Проверяет, имеет ли элемент планировщик
+    pub fn has_scheduler(&self) -> bool {
+        self.config.scheduler.is_some() && 
+        !self.config.scheduler.as_ref().unwrap().is_empty()
     }
 
     /// Проверяет, имеет ли элемент подменю
@@ -255,12 +267,94 @@ impl MenuItem {
         }
     }
 
-    /// Останавливает таймер мониторинга (выставляет флаг)
+    /// Останавливает таймер мониторинга
     pub fn stop_monitor_timer(&mut self) {
-        if let Some(flag) = &self.stop_flag {
-            flag.store(true, Ordering::Relaxed);
+        if let Some(stop_flag) = &self.stop_flag {
+            stop_flag.store(true, Ordering::Relaxed);
+            self.stop_flag = None;
         }
-        self.stop_flag = None;
+    }
+
+    /// Запускает планировщик для элемента
+    pub fn start_scheduler(&mut self) {
+        println!(
+            "[Scheduler] start_scheduler called for: {}",
+            self.config.name
+        );
+        if self.has_scheduler() {
+            if let Some(scheduler) = &self.config.scheduler {
+                let schedule = scheduler.clone();
+                let commands = self.config.commands.clone();
+                let _name = self.config.name.clone();
+                let id = self
+                    .config
+                    .id
+                    .clone()
+                    .unwrap_or_else(|| self.config.name.clone());
+                
+                // Останавливаем предыдущий планировщик, если был
+                self.stop_scheduler();
+                let stop_flag = Arc::new(AtomicBool::new(false));
+                self.scheduler_stop_flag = Some(stop_flag.clone());
+
+                println!("[Scheduler] Starting scheduler for item: {} with schedule: {}", id, schedule);
+
+                thread::spawn(move || {
+                    eprintln!("[Scheduler] Starting scheduler for item: {}", id);
+                    
+                    // Парсим cron выражение
+                    let cron_expr = match cron::Schedule::from_str(&schedule) {
+                        Ok(schedule) => schedule,
+                        Err(e) => {
+                            eprintln!("[Scheduler] Failed to parse cron expression '{}': {}", schedule, e);
+                            // Используем fallback - каждую минуту
+                            cron::Schedule::from_str("0 * * * * *").unwrap()
+                        }
+                    };
+                    
+                    eprintln!("[Scheduler] Parsed cron expression: {}", schedule);
+                    
+                    while !stop_flag.load(Ordering::Relaxed) {
+                        // Получаем следующее время выполнения
+                        let now = chrono::Utc::now();
+                        let next = cron_expr.after(&now).next();
+                        
+                        if let Some(next_time) = next {
+                            let wait_duration = next_time.signed_duration_since(now);
+                            let wait_seconds = wait_duration.num_seconds() as u64;
+                            
+                            eprintln!("[Scheduler] Next execution at: {}, waiting {} seconds", next_time, wait_seconds);
+                            
+                            // Ждем до следующего выполнения
+                            thread::sleep(Duration::from_secs(wait_seconds));
+                            
+                            // Выполняем команды по расписанию
+                            if let Some(cmds) = &commands {
+                                for cmd in cmds {
+                                    println!("[Scheduler] Executing scheduled command: {}", cmd);
+                                    match console::ConsoleInstance::execute_command_silent(cmd) {
+                                        Ok(_) => println!("[Scheduler] Command executed successfully"),
+                                        Err(e) => eprintln!("[Scheduler] Failed to execute command: {}", e),
+                                    }
+                                }
+                            }
+                        } else {
+                            // Если не удалось получить следующее время, ждем минуту
+                            thread::sleep(Duration::from_secs(60));
+                        }
+                    }
+                    eprintln!("[Scheduler] Scheduler stopped for item: {}", id);
+                });
+            }
+        }
+    }
+
+    /// Останавливает планировщик
+    pub fn stop_scheduler(&mut self) {
+        if let Some(stop_flag) = &self.scheduler_stop_flag {
+            stop_flag.store(true, Ordering::Relaxed);
+            self.scheduler_stop_flag = None;
+        }
     }
 
     /// Получает состояние переключателя
@@ -557,6 +651,61 @@ impl SystemMenu {
         }
 
         eprintln!("[Monitor] Finished stopping timers");
+    }
+
+    /// Запускает планировщики для всех элементов
+    pub fn start_all_schedulers(&mut self) {
+        println!("[Scheduler] start_all_schedulers called");
+        eprintln!("[Scheduler] Starting schedulers for all scheduled items");
+
+        // Запускаем планировщики для основных элементов
+        for item in &mut self.items {
+            if item.has_scheduler() {
+                eprintln!(
+                    "[Scheduler] Found scheduled item in main items: {}",
+                    item.config.id.as_ref().unwrap_or(&item.config.name)
+                );
+                item.start_scheduler();
+            }
+        }
+
+        // Запускаем планировщики для элементов в подменю
+        for submenu in &mut self.submenus {
+            for item in &mut submenu.items {
+                if item.has_scheduler() {
+                    eprintln!(
+                        "[Scheduler] Found scheduled item in submenu: {}",
+                        item.config.id.as_ref().unwrap_or(&item.config.name)
+                    );
+                    item.start_scheduler();
+                }
+            }
+        }
+
+        eprintln!("[Scheduler] Finished starting schedulers");
+    }
+
+    /// Останавливает все планировщики
+    pub fn stop_all_schedulers(&mut self) {
+        eprintln!("[Scheduler] Stopping all schedulers");
+
+        // Останавливаем планировщики для основных элементов
+        for item in &mut self.items {
+            if item.has_scheduler() {
+                item.stop_scheduler();
+            }
+        }
+
+        // Останавливаем планировщики для элементов в подменю
+        for submenu in &mut self.submenus {
+            for item in &mut submenu.items {
+                if item.has_scheduler() {
+                    item.stop_scheduler();
+                }
+            }
+        }
+
+        eprintln!("[Scheduler] Finished stopping schedulers");
     }
 
     /// Периодически очищает неактивные соединения в пуле
