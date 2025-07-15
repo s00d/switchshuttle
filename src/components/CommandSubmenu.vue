@@ -47,25 +47,25 @@
     <!-- Basic Command Fields -->
     <div class="grid gap-6 grid-cols-1">
         <div class="flex items-start gap-3">
-          <div class="w-16">
-            <IconSelector
-              v-model="commandIcon"
-              label="Icon"
-              placeholder="emoji"
-              @update:modelValue="handleIconChange"
+        <div class="w-16">
+          <IconSelector
+            v-model="commandIcon"
+            label="Icon"
+            placeholder="emoji"
+            @update:modelValue="handleIconChange"
               input-class="bg-white h-10 px-2 py-1"
-            />
-          </div>
-          <div class="flex-1">
-            <Input
-              v-model="command.name"
-              label="Name"
-              placeholder="Group name"
-              required
-              input-class="bg-white h-10"
-            />
-          </div>
+          />
         </div>
+        <div class="flex-1">
+          <Input
+            v-model="command.name"
+            label="Name"
+            placeholder="Group name"
+            required
+              input-class="bg-white h-10"
+          />
+        </div>
+      </div>
     </div>
 
     <!-- Submenu -->
