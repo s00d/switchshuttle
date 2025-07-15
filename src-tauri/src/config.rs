@@ -30,6 +30,8 @@ pub struct CommandConfig {
     pub switch: Option<String>,
     pub monitor: Option<String>,
     pub icon: Option<String>,
+    pub scheduler: Option<String>, // cron expression
+    pub background: Option<bool>, // true = ConsolePool, false = execute, None = auto
 }
 
 #[derive(Clone, Debug)]
@@ -159,17 +161,24 @@ impl Config {
             launch_in: launch_in.to_string(),
             theme: theme.to_string(),
             title: title.to_string(),
-            menu_hotkey,
             commands,
+            menu_hotkey,
             enabled: None,
         }
     }
 
+    /// Migrates legacy command field to commands array
+    fn migrate_command_to_commands(&mut self) {
+        for command in &mut self.commands {
+            command.migrate_command_to_commands();
+        }
+    }
+
     pub fn load(path: &PathBuf) -> io::Result<Self> {
-        let config_data = fs::read_to_string(path)?;
-        match serde_json::from_str(&config_data) {
-            Ok(config) => {
-                let mut config: Config = config;
+        match fs::read_to_string(path) {
+            Ok(content) => {
+                let mut config: Config = serde_json::from_str(&content)?;
+                config.migrate_command_to_commands();
                 config.clear_ids();
                 Ok(config)
             }
@@ -194,15 +203,17 @@ impl Config {
             "Homebrew",
             "New tab",
             Some("Ctrl+Shift+M".to_string()),
-            vec![CommandConfig {
-                id: None,
-                name: "Command".to_string(),
-                command: None,
-                inputs: None,
-                commands: None,
-                switch: None,
-                monitor: None,
-                icon: None,
+                            vec![CommandConfig {
+                    id: None,
+                    name: "Command".to_string(),
+                    command: None,
+                    inputs: None,
+                    commands: None,
+                    switch: None,
+                    monitor: None,
+                    icon: None,
+                    scheduler: None,
+                    background: None,
                 submenu: Some(vec![
                     CommandConfig {
                         id: None,
@@ -215,6 +226,8 @@ impl Config {
                         switch: None,
                         monitor: None,
                         icon: None,
+                        scheduler: None,
+                        background: None,
                     },
                     CommandConfig {
                         id: None,
@@ -234,6 +247,8 @@ impl Config {
                         switch: None,
                         monitor: None,
                         icon: None,
+                        scheduler: None,
+                        background: None,
                     },
                     CommandConfig {
                         id: None,
@@ -245,6 +260,8 @@ impl Config {
                         switch: None,
                         monitor: None,
                         icon: None,
+                        scheduler: None,
+                        background: None,
                         submenu: Some(vec![
                             CommandConfig {
                                 id: None,
@@ -257,6 +274,8 @@ impl Config {
                                 switch: None,
                                 monitor: None,
                                 icon: None,
+                                scheduler: None,
+                                background: None,
                             },
                             CommandConfig {
                                 id: None,
@@ -269,6 +288,8 @@ impl Config {
                                 switch: None,
                                 monitor: None,
                                 icon: None,
+                                scheduler: None,
+                                background: None,
                             },
                             CommandConfig {
                                 id: None,
@@ -278,9 +299,11 @@ impl Config {
                                 commands: None,
                                 submenu: None,
                                 hotkey: None,
-                                switch: Some("echo 'true'".to_string()),
+                                                                                        switch: Some("echo 'true'".to_string()),
                                 monitor: None,
                                 icon: None,
+                                scheduler: None,
+                                background: None,
                             },
                         ]),
                     },
@@ -324,6 +347,28 @@ impl Config {
 }
 
 impl CommandConfig {
+    /// Migrates legacy command field to commands array
+    fn migrate_command_to_commands(&mut self) {
+        // Migrate self
+        if let Some(command) = self.command.take() {
+            if !command.trim().is_empty() {
+                println!("Warning: 'command' field is deprecated. Use 'commands' array instead.");
+                if self.commands.is_none() {
+                    self.commands = Some(vec![command]);
+                } else if let Some(ref mut commands) = self.commands {
+                    commands.insert(0, command);
+                }
+            }
+        }
+
+        // Migrate submenu items
+        if let Some(ref mut submenu) = self.submenu {
+            for item in submenu {
+                item.migrate_command_to_commands();
+            }
+        }
+    }
+
     fn assign_id(&mut self, counter: &Arc<AtomicUsize>) {
         self.id = Some(format!("cmd_{}", counter.fetch_add(1, Ordering::SeqCst)));
 
