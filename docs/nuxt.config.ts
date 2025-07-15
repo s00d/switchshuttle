@@ -38,12 +38,12 @@ export default defineNuxtConfig({
         '/de', 
         '/ja', 
         '/zh',
-        '/api/readme?locale=en',
-        '/api/readme?locale=ru',
-        '/api/readme?locale=de',
-        '/api/readme?locale=ja',
-        '/api/readme?locale=zh',
-        '/api/changelog'
+        '/api/readme.json?locale=en',
+        '/api/readme.json?locale=ru',
+        '/api/readme.json?locale=de',
+        '/api/readme.json?locale=ja',
+        '/api/readme.json?locale=zh',
+        '/api/changelog.json'
       ],
       ignore: [
         '/LICENSE',
