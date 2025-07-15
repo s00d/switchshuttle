@@ -174,13 +174,15 @@ pub fn execute_command_with_inputs(
         id: command.id.clone(),
         name: command.name.clone(),
         inputs: command.inputs.clone(),
-        command: cmd,
+        command: None, // Legacy field, not used
         commands: cmds,
         submenu: command.submenu.clone(),
         hotkey: command.hotkey.clone(),
         switch: switch_cmd,
         monitor: command.monitor.clone(),
         icon: command.icon.clone(),
+        scheduler: command.scheduler.clone(),
+        background: command.background.clone(),
     };
 
     // Проверяем, является ли это switch командой
