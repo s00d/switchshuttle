@@ -9,7 +9,7 @@
           <LightningSmallIcon />
         </div>
         <h4 class="font-semibold text-slate-900">
-          {{ commandType === 'submenu' ? `Submenu ${index + 1}` : `Command ${index + 1}` }}
+          Command {{ index + 1 }}{{ command.name ? ` - ${command.name}` : '' }}
         </h4>
       </div>
       <div class="flex items-center space-x-1">
@@ -43,115 +43,36 @@
     </div>
 
     <!-- Basic Command Fields -->
-    <div :class="[
-      'grid gap-6',
-      commandType === 'submenu' ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'
-    ]">
-              <div class="flex items-end gap-3">
+    <div class="grid gap-6 grid-cols-1 md:grid-cols-2">
+              <div class="flex items-start gap-3">
           <div class="w-16">
             <IconSelector
               v-model="commandIcon"
               label="Icon"
               placeholder="emoji"
               @update:modelValue="handleIconChange"
+              input-class="px-2.5 py-1.5"
             />
           </div>
-        <div class="flex-1">
-          <Input
-            v-model="command.name"
-            label="Name"
-            placeholder="Command name"
-            required
-          />
+          <div class="flex-1">
+            <Input
+              v-model="command.name"
+              label="Name"
+              placeholder="Command name"
+              required
+            />
+          </div>
         </div>
-      </div>
       
       <HotkeyInput
-        v-if="commandType !== 'submenu'"
         v-model="command.hotkey"
         label="Hotkey"
         placeholder="Click to record"
       />
     </div>
 
-    <!-- Command Type Selection -->
-    <div class="space-y-4">
-      <CommandTypeSelector 
-        v-model="commandType" 
-        @update:modelValue="handleCommandTypeChange"
-      />
-    </div>
-
-    <!-- Divider after Command Type -->
-    <div class="border-t-2 border-slate-200/70 my-8 -mx-6"></div>
-
-    <!-- Single Command -->
-    <div v-if="commandType === 'single'" class="space-y-6">
-      <Input
-        v-model="command.command"
-        label="Command"
-        placeholder="Enter command to execute"
-        type="textarea"
-        rows="3"
-      />
-      
-      <!-- Divider -->
-      <div class="border-t-2 border-slate-200/70 my-8 -mx-6"></div>
-      
-      <!-- Inputs Section -->
-      <div class="space-y-4">
-        <div class="flex items-center justify-between">
-          <label class="block text-sm font-semibold text-slate-700">Inputs</label>
-          <Button @click="handleAddInput" variant="ghost" size="sm" class="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
-            <AddIcon />
-            Add Field
-          </Button>
-        </div>
-        
-        <div v-if="command.inputs && Object.keys(command.inputs).length > 0" class="space-y-2">
-          <!-- Table Headers -->
-          <div class="flex items-center gap-2 py-1 px-1 rounded-lg">
-            <div class="flex-1">
-              <span class="text-xs font-semibold text-slate-700 uppercase tracking-wide">Key</span>
-            </div>
-            <div class="flex-1">
-              <span class="text-xs font-semibold text-slate-700 uppercase tracking-wide">Default Value</span>
-            </div>
-            <div class="w-8"></div>
-          </div>
-          <!-- Table Rows -->
-          <div
-            v-for="(_, key) in command.inputs"
-            :key="key"
-            class="flex items-center gap-2 py-1"
-          >
-            <div class="flex-1">
-              <Input
-                :model-value="isRootLevel && inputKeys[index] ? inputKeys[index][key] : key"
-                placeholder="Key"
-                size="sm"
-                input-class="border border-slate-300 bg-white rounded px-2 py-1 focus:border-blue-400 focus:ring-0"
-                @input="handleInputKeyChange(key, $event)"
-              />
-            </div>
-            <div class="flex-1">
-              <Input
-                v-model="command.inputs[key]"
-                placeholder="Default value"
-                size="sm"
-                input-class="border border-slate-300 bg-white rounded px-2 py-1 focus:border-blue-400 focus:ring-0"
-              />
-            </div>
-            <Button @click="handleRemoveInput(key)" variant="danger" size="sm" class="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0 w-8">
-              <XIcon />
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Multiple Commands -->
-    <div v-if="commandType === 'multiple'" class="space-y-6">
+    <!-- Commands Section -->
+    <div class="space-y-6">
       <div class="space-y-4">
         <div class="flex items-center justify-between">
           <label class="block text-sm font-semibold text-slate-700">Commands</label>
@@ -181,263 +102,117 @@
           </div>
         </div>
       </div>
-      
-      <!-- Divider -->
-      <div class="border-t-2 border-slate-200/70 my-8 -mx-6"></div>
-      
-      <!-- Inputs for multiple commands -->
-      <div class="space-y-4">
-        <div class="flex items-center justify-between">
-          <label class="block text-sm font-semibold text-slate-700">Inputs</label>
-          <Button @click="handleAddInput" variant="ghost" size="sm" class="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
-            <AddIcon />
-            Add Field
-          </Button>
-        </div>
-        
-        <div v-if="command.inputs && Object.keys(command.inputs).length > 0" class="space-y-2">
-          <!-- Table Headers -->
-          <div class="flex items-center gap-2 py-1 px-1 rounded-lg">
-            <div class="flex-1">
-              <span class="text-xs font-semibold text-slate-700 uppercase tracking-wide">Key</span>
-            </div>
-            <div class="flex-1">
-              <span class="text-xs font-semibold text-slate-700 uppercase tracking-wide">Default Value</span>
-            </div>
-            <div class="w-8"></div>
+
+      <!-- Advanced Options Spoiler -->
+      <CollapsibleSection 
+        title="Advanced Options"
+        :summary="getAdvancedOptionsSummary()"
+      >
+        <!-- Background Execution Option -->
+        <div class="space-y-4">
+          <div class="flex items-center space-x-3">
+            <input
+              v-model="command.background"
+              type="checkbox"
+              id="background"
+              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+            />
+            <label for="background" class="text-sm font-medium text-slate-700">
+              Execute in background (ConsolePool)
+            </label>
           </div>
-          <!-- Table Rows -->
-          <div
-            v-for="(_, key) in command.inputs"
-            :key="key"
-            class="flex items-center gap-2 py-1"
-          >
-            <div class="flex-1">
-              <Input
-                :model-value="isRootLevel && inputKeys[index] ? inputKeys[index][key] : key"
-                placeholder="Key"
-                size="sm"
-                input-class="border border-slate-300 bg-white rounded px-2 py-1 focus:border-blue-400 focus:ring-0"
-                @input="handleInputKeyChange(key, $event)"
-              />
-            </div>
-            <div class="flex-1">
-              <Input
-                v-model="command.inputs[key]"
-                placeholder="Default value"
-                size="sm"
-                input-class="border border-slate-300 bg-white rounded px-2 py-1 focus:border-blue-400 focus:ring-0"
-              />
-            </div>
-            <Button @click="handleRemoveInput(key)" variant="danger" size="sm" class="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0 w-8">
-              <XIcon />
+          <p class="text-xs text-slate-500">
+            When enabled, commands will be executed in background using ConsolePool. When disabled, commands will be executed through normal terminal execution.
+          </p>
+        </div>
+
+        <!-- Divider -->
+        <div class="border-t-2 border-slate-200/70 my-8 -mx-6"></div>
+        <!-- Monitor Field -->
+        <Input
+          v-model="command.monitor"
+          label="Monitor Command (optional)"
+          placeholder="Command to get display value for monitoring (e.g., echo 'CPU: 45%')"
+          type="textarea"
+          rows="2"
+        />
+        
+        <!-- Divider -->
+        <div class="border-t-2 border-slate-200/70 my-8 -mx-6"></div>
+        
+        <!-- Inputs Section -->
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <label class="block text-sm font-semibold text-slate-700">Inputs</label>
+            <Button @click="handleAddInput" variant="ghost" size="sm" class="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+              <AddIcon />
+              Add Field
             </Button>
           </div>
+          
+          <div v-if="command.inputs && Object.keys(command.inputs).length > 0" class="space-y-2">
+            <!-- Table Headers -->
+            <div class="flex items-center gap-2 py-1 px-1 rounded-lg">
+              <div class="flex-1">
+                <span class="text-xs font-semibold text-slate-700 uppercase tracking-wide">Key</span>
+              </div>
+              <div class="flex-1">
+                <span class="text-xs font-semibold text-slate-700 uppercase tracking-wide">Default Value</span>
+              </div>
+              <div class="w-8"></div>
+            </div>
+            <!-- Table Rows -->
+            <div
+              v-for="(_, key) in command.inputs"
+              :key="key"
+              class="flex items-center gap-2 py-1"
+            >
+              <div class="flex-1">
+                <Input
+                  :model-value="isRootLevel && inputKeys[index] ? inputKeys[index][key] : key"
+                  placeholder="Key"
+                  size="sm"
+                  input-class="border border-slate-300 bg-white rounded px-2 py-1 focus:border-blue-400 focus:ring-0"
+                  @input="handleInputKeyChange(key, $event)"
+                />
+              </div>
+              <div class="flex-1">
+                <Input
+                  v-model="command.inputs[key]"
+                  placeholder="Default value"
+                  size="sm"
+                  input-class="border border-slate-300 bg-white rounded px-2 py-1 focus:border-blue-400 focus:ring-0"
+                />
+              </div>
+              <Button @click="handleRemoveInput(key)" variant="danger" size="sm" class="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0 w-8">
+                <XIcon />
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Switch -->
-    <div v-if="commandType === 'switch'" class="space-y-6">
-      <Input
-        v-model="command.command"
-        label="Toggle Command"
-        placeholder="Command to execute when toggled"
-        type="textarea"
-        rows="3"
-      />
-      
-      <Input
-        v-model="command.switch"
-        label="Switch Command"
-        placeholder="Command to check state (e.g., echo 'true')"
-        type="textarea"
-        rows="3"
-      />
-      
-      <!-- Divider -->
-      <div class="border-t-2 border-slate-200/70 my-8 -mx-6"></div>
-      
-      <!-- Inputs Section -->
-      <div class="space-y-4">
-        <div class="flex items-center justify-between">
-          <label class="block text-sm font-semibold text-slate-700">Inputs</label>
-          <Button @click="handleAddInput" variant="ghost" size="sm" class="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
-            <AddIcon />
-            Add Field
-          </Button>
-        </div>
-        
-        <div v-if="command.inputs && Object.keys(command.inputs).length > 0" class="space-y-2">
-          <!-- Table Headers -->
-          <div class="flex items-center gap-2 py-1 px-1 rounded-lg">
-            <div class="flex-1">
-              <span class="text-xs font-semibold text-slate-700 uppercase tracking-wide">Key</span>
-            </div>
-            <div class="flex-1">
-              <span class="text-xs font-semibold text-slate-700 uppercase tracking-wide">Default Value</span>
-            </div>
-            <div class="w-8"></div>
-          </div>
-          <!-- Table Rows -->
-          <div
-            v-for="(_, key) in command.inputs"
-            :key="key"
-            class="flex items-center gap-2 py-1"
-          >
-            <div class="flex-1">
-              <Input
-                :model-value="isRootLevel && inputKeys[index] ? inputKeys[index][key] : key"
-                placeholder="Key"
-                size="sm"
-                input-class="border border-slate-300 bg-white rounded px-2 py-1 focus:border-blue-400 focus:ring-0"
-                @input="handleInputKeyChange(key, $event)"
-              />
-            </div>
-            <div class="flex-1">
-              <Input
-                v-model="command.inputs[key]"
-                placeholder="Default value"
-                size="sm"
-                input-class="border border-slate-300 bg-white rounded px-2 py-1 focus:border-blue-400 focus:ring-0"
-              />
-            </div>
-            <Button @click="handleRemoveInput(key)" variant="danger" size="sm" class="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0 w-8">
-              <XIcon />
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Monitor Command -->
-    <div v-if="commandType === 'monitor'" class="space-y-6">
-      <Input
-        v-model="command.command"
-        label="Monitor Command"
-        placeholder="Command to execute for monitoring (e.g., top -l 1 | grep 'CPU usage')"
-        type="textarea"
-        rows="3"
-      />
-      
-      <Input
-        v-model="command.monitor"
-        label="Monitor Display Command"
-        placeholder="Command to get display value (e.g., echo 'CPU: 45%')"
-        type="textarea"
-        rows="3"
-      />
-      
-      <!-- Divider -->
-      <div class="border-t-2 border-slate-200/70 my-8 -mx-6"></div>
-      
-      <!-- Inputs Section -->
-      <div class="space-y-4">
-        <div class="flex items-center justify-between">
-          <label class="block text-sm font-semibold text-slate-700">Inputs</label>
-          <Button @click="handleAddInput" variant="ghost" size="sm" class="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
-            <AddIcon />
-            Add Field
-          </Button>
-        </div>
-        
-        <div v-if="command.inputs && Object.keys(command.inputs).length > 0" class="space-y-2">
-          <!-- Table Headers -->
-          <div class="flex items-center gap-2 py-1 px-1 rounded-lg">
-            <div class="flex-1">
-              <span class="text-xs font-semibold text-slate-700 uppercase tracking-wide">Key</span>
-            </div>
-            <div class="flex-1">
-              <span class="text-xs font-semibold text-slate-700 uppercase tracking-wide">Default Value</span>
-            </div>
-            <div class="w-8"></div>
-          </div>
-          <!-- Table Rows -->
-          <div
-            v-for="(_, key) in command.inputs"
-            :key="key"
-            class="flex items-center gap-2 py-1"
-          >
-            <div class="flex-1">
-              <Input
-                :model-value="isRootLevel && inputKeys[index] ? inputKeys[index][key] : key"
-                placeholder="Key"
-                size="sm"
-                input-class="border border-slate-300 bg-white rounded px-2 py-1 focus:border-blue-400 focus:ring-0"
-                @input="handleInputKeyChange(key, $event)"
-              />
-            </div>
-            <div class="flex-1">
-              <Input
-                v-model="command.inputs[key]"
-                placeholder="Default value"
-                size="sm"
-                input-class="border border-slate-300 bg-white rounded px-2 py-1 focus:border-blue-400 focus:ring-0"
-              />
-            </div>
-            <Button @click="handleRemoveInput(key)" variant="danger" size="sm" class="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0 w-8">
-              <XIcon />
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Submenu -->
-    <div v-if="commandType === 'submenu'" class="space-y-4">
-      <div class="space-y-4">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <button @click="toggleSubmenu" type="button" class="focus:outline-none">
-              <ChevronRightIcon :collapsed="submenuCollapsed" />
-            </button>
-            <label class="block text-sm font-semibold text-slate-700">Submenu</label>
-          </div>
-          <Button @click="addSubmenuCommand" variant="ghost" size="sm" class="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
-            <AddIcon />
-            Add Submenu Command
-          </Button>
-        </div>
-        <div v-if="command.submenu && command.submenu.length > 0 && !submenuCollapsed" class="space-y-4">
-          <CommandItem
-            v-for="(subCmd, subIndex) in command.submenu"
-            :key="subIndex"
-            :command="subCmd"
-            :index="subIndex"
-            :input-keys="{}"
-            :level="level + 1"
-            :parent-commands="command.submenu"
-            @update:command="updateSubmenuCommand"
-            @remove="removeSubmenuCommand"
-            @move="moveSubmenuCommand"
-            @update-command-type="updateSubmenuCommandType"
-            @add-input="addSubmenuInput"
-            @remove-input="removeSubmenuInput"
-            @update-input-key="updateSubmenuInputKey"
-            @add-multiple-command="addSubmenuMultipleCommand"
-            @remove-multiple-command="removeSubmenuMultipleCommand"
-            @add-submenu-command="addSubmenuSubmenuCommand"
-            @remove-submenu-command="removeSubmenuSubmenuCommand"
-          />
-        </div>
-      </div>
+        <!-- Scheduler Configuration -->
+        <SchedulerInput
+          v-model="command.scheduler"
+        />
+      </CollapsibleSection>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import { PropType } from 'vue';
 import { Command } from '../types';
 import Input from './Input.vue';
 import Button from './Button.vue';
 import HotkeyInput from './HotkeyInput.vue';
-import CommandTypeSelector from './CommandTypeSelector.vue';
 import IconSelector from './IconSelector.vue';
+import CollapsibleSection from './CollapsibleSection.vue';
+import SchedulerInput from './SchedulerInput.vue';
 import LightningSmallIcon from './icons/LightningSmallIcon.vue';
 import ChevronUpIcon from './icons/ChevronUpIcon.vue';
 import ChevronDownIcon from './icons/ChevronDownIcon.vue';
-import ChevronRightIcon from './icons/ChevronRightIcon.vue';
 import TrashIcon from './icons/TrashIcon.vue';
 import AddIcon from './icons/AddIcon.vue';
 import XIcon from './icons/XIcon.vue';
@@ -469,68 +244,23 @@ const emit = defineEmits<{
   (e: 'update:command', value: Command): void;
   (e: 'remove', index: number): void;
   (e: 'move', index: number, direction: number): void;
-  (e: 'update-command-type', index: number, type: string): void;
   (e: 'add-input', index: number): void;
   (e: 'remove-input', index: number, key: string): void;
   (e: 'update-input-key', index: number, oldKey: string, newKey: string): void;
   (e: 'add-multiple-command', index: number): void;
   (e: 'remove-multiple-command', index: number, cmdIndex: number): void;
-  (e: 'add-submenu-command', index: number): void;
-  (e: 'remove-submenu-command', index: number, subIndex: number): void;
 }>();
 
-// Current command type - простой ref
-const commandType = ref<string>('single');
-
-// Инициализируем тип при создании компонента
-const initializeCommandType = () => {
-  const cmd = props.command;
-  
-  // Проверяем наличие monitor (только если это не null и не пустая строка)
-  if (cmd.monitor !== undefined && cmd.monitor !== null && cmd.monitor !== '') {
-    commandType.value = 'monitor';
-    return;
-  }
-  // Проверяем наличие switch (только если это не null и не пустая строка)
-  else if (cmd.switch !== undefined && cmd.switch !== null && cmd.switch !== '') {
-    commandType.value = 'switch';
-    return;
-  }
-  // Проверяем наличие submenu с элементами
-  else if (cmd.submenu && Array.isArray(cmd.submenu) && cmd.submenu.length > 0) {
-    commandType.value = 'submenu';
-    return;
-  }
-  // Проверяем наличие commands с элементами
-  else if (cmd.commands && Array.isArray(cmd.commands) && cmd.commands.length > 0) {
-    commandType.value = 'multiple';
-    return;
-  }
-  // По умолчанию single
-  else {
-    commandType.value = 'single';
-  }
-};
-
-// Инициализируем при монтировании компонента
+// Инициализируем команды если их нет
 onMounted(() => {
-  initializeCommandType();
-});
-
-// Обработчик изменения типа команды
-const handleCommandTypeChange = (type: string) => {
-  commandType.value = type;
-  
-  if (isRootLevel.value) {
-    emit('update-command-type', props.index, type);
-  } else {
-    updateSubmenuCommandType(type);
+  if (!props.command.commands) {
+    props.command.commands = [''];
+    emit('update:command', props.command);
   }
-};
+});
 
 // Computed properties for determining logic
 const isRootLevel = computed(() => props.level === 0);
-// const isSubmenuLevel = computed(() => props.level > 0);
 
 // Computed property for icon handling
 const commandIcon = computed({
@@ -559,16 +289,12 @@ const handleIconChange = (value: string) => {
 const handleAddInput = () => {
   if (isRootLevel.value) {
     emit('add-input', props.index);
-  } else {
-    addSubmenuInput();
   }
 };
 
 const handleRemoveInput = (key: string) => {
   if (isRootLevel.value) {
     emit('remove-input', props.index, key);
-  } else {
-    removeSubmenuInput(key);
   }
 };
 
@@ -576,8 +302,6 @@ const handleInputKeyChange = (key: string, event: Event) => {
   const value = (event.target as HTMLInputElement).value;
   if (isRootLevel.value) {
     emit('update-input-key', props.index, key, value);
-  } else {
-    updateSubmenuInputKey(key, value);
   }
 };
 
@@ -585,184 +309,36 @@ const handleInputKeyChange = (key: string, event: Event) => {
 const handleAddMultipleCommand = () => {
   if (isRootLevel.value) {
     emit('add-multiple-command', props.index);
-  } else {
-    addSubmenuMultipleCommand();
   }
 };
 
 const handleRemoveMultipleCommand = (cmdIndex: number) => {
   if (isRootLevel.value) {
     emit('remove-multiple-command', props.index, cmdIndex);
-  } else {
-    removeSubmenuMultipleCommand(cmdIndex);
   }
 };
 
-const updateSubmenuCommand = (subIndex: number, subCommand: Command) => {
-  if (props.command.submenu) {
-    props.command.submenu[subIndex] = subCommand;
-    emit('update:command', props.command);
-  }
-};
-
-const removeSubmenuCommand = (subIndex: number) => {
-  if (props.command.submenu) {
-    props.command.submenu.splice(subIndex, 1);
-    emit('update:command', props.command);
-  }
-};
-
-const moveSubmenuCommand = (subIndex: number, direction: number) => {
-  if (props.command.submenu) {
-    const newIndex = subIndex + direction;
-    if (newIndex >= 0 && newIndex < props.command.submenu.length) {
-      const subCommand = props.command.submenu[subIndex];
-      props.command.submenu.splice(subIndex, 1);
-      props.command.submenu.splice(newIndex, 0, subCommand);
-      emit('update:command', props.command);
-    }
-  }
-};
-
-const updateSubmenuCommandType = (type: string) => {
-  commandType.value = type;
+// Функция для получения краткой информации о расширенных опциях
+const getAdvancedOptionsSummary = () => {
+  const cmd = props.command;
+  const parts = [];
   
-  const cmd = props.command;
-  if (cmd) {
-    if (type === 'single') {
-      cmd.submenu = null;
-      cmd.commands = null;
-      cmd.inputs = null;
-      cmd.switch = undefined;
-      cmd.monitor = undefined;
-      // Не очищаем command, так как это основное поле для single команды
-    } else if (type === 'multiple') {
-      cmd.command = undefined;
-      cmd.submenu = null;
-      cmd.switch = undefined;
-      cmd.monitor = undefined;
-      cmd.commands = cmd.commands || [];
-      cmd.inputs = cmd.inputs || {};
-    } else if (type === 'submenu') {
-      cmd.command = undefined;
-      cmd.commands = null;
-      cmd.inputs = null;
-      cmd.switch = undefined;
-      cmd.monitor = undefined;
-      cmd.submenu = cmd.submenu || [];
-    } else if (type === 'switch') {
-      cmd.submenu = null;
-      cmd.commands = null;
-      cmd.inputs = cmd.inputs || {};
-      cmd.switch = cmd.switch || '';
-      cmd.monitor = undefined;
-      // Не очищаем command, так как это поле для toggle команды
-    } else if (type === 'monitor') {
-      cmd.submenu = null;
-      cmd.commands = null;
-      cmd.inputs = cmd.inputs || {};
-      cmd.monitor = cmd.monitor || '';
-      cmd.switch = undefined;
-      // Не очищаем command, так как это поле для команды мониторинга
-    }
-    emit('update:command', props.command);
+  if (cmd.background) {
+    parts.push('Background');
   }
-};
-
-const addSubmenuCommand = () => {
-  if (!props.command.submenu) {
-    props.command.submenu = [];
+  
+  if (cmd.monitor && cmd.monitor.trim()) {
+    parts.push('Monitor');
   }
-  props.command.submenu.push({
-    name: '',
-    command: undefined,
-    hotkey: undefined,
-    submenu: null,
-    commands: null,
-    inputs: null
-  });
-  emit('update:command', props.command);
-};
-
-const addSubmenuInput = () => {
-  const cmd = props.command;
-  if (cmd) {
-    if (!cmd.inputs) {
-      cmd.inputs = {};
-    }
-    
-    const key = `key${Object.keys(cmd.inputs).length + 1}`;
-    cmd.inputs[key] = '';
-    emit('update:command', props.command);
+  
+  if (cmd.inputs && Object.keys(cmd.inputs).length > 0) {
+    parts.push(`${Object.keys(cmd.inputs).length} input${Object.keys(cmd.inputs).length > 1 ? 's' : ''}`);
   }
-};
-
-const removeSubmenuInput = (key: string) => {
-  const cmd = props.command;
-  if (cmd?.inputs) {
-    delete cmd.inputs[key];
-    emit('update:command', props.command);
+  
+  if (cmd.scheduler && cmd.scheduler.trim()) {
+    parts.push('Scheduler');
   }
-};
-
-const updateSubmenuInputKey = (oldKey: string, newKey: string) => {
-  const cmd = props.command;
-  if (cmd?.inputs && cmd.inputs[oldKey] !== undefined) {
-    const value = cmd.inputs[oldKey];
-    delete cmd.inputs[oldKey];
-    cmd.inputs[newKey] = value;
-    emit('update:command', props.command);
-  }
-};
-
-const addSubmenuMultipleCommand = () => {
-  const cmd = props.command;
-  if (cmd) {
-    if (!cmd.commands) {
-      cmd.commands = [];
-    }
-    cmd.commands.push('');
-    emit('update:command', props.command);
-  }
-};
-
-const removeSubmenuMultipleCommand = (cmdIndex: number) => {
-  const cmd = props.command;
-  if (cmd?.commands) {
-    cmd.commands.splice(cmdIndex, 1);
-    emit('update:command', props.command);
-  }
-};
-
-const addSubmenuSubmenuCommand = (subIndex: number) => {
-  const subCommand = props.command.submenu?.[subIndex];
-  if (subCommand) {
-    if (!subCommand.submenu) {
-      subCommand.submenu = [];
-    }
-    subCommand.submenu.push({
-      name: '',
-      command: undefined,
-      hotkey: undefined,
-      submenu: null,
-      commands: null,
-      inputs: null
-    });
-    emit('update:command', props.command);
-  }
-};
-
-const removeSubmenuSubmenuCommand = (subIndex: number, subSubIndex: number) => {
-  const subCommand = props.command.submenu?.[subIndex];
-  if (subCommand?.submenu) {
-    subCommand.submenu.splice(subSubIndex, 1);
-    emit('update:command', props.command);
-  }
-};
-
-// Сворачивание секции Submenu
-const submenuCollapsed = ref(false);
-const toggleSubmenu = () => {
-  submenuCollapsed.value = !submenuCollapsed.value;
+  
+  return parts.length > 0 ? parts.join(', ') : 'None configured';
 };
 </script> 
