@@ -50,7 +50,7 @@ const contentRef = ref<HTMLElement>()
 
 const { data: readmeData } = await useAsyncData<ReadmeResponse>(`readme-${locale.value}`, async () => {
   const currentLocale = locale.value
-  return await $fetch(`/api/readme?locale=${currentLocale}`)
+  return await $fetch(`/api/readme.json?locale=${currentLocale}`)
 }, {
   watch: [locale],
   deep: true,
