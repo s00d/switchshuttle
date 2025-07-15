@@ -12,6 +12,10 @@
           <AddIcon />
           Add Command
         </Button>
+        <Button @click="addGroup" variant="secondary" size="sm">
+          <AddIcon />
+          Add Group
+        </Button>
       </div>
     </div>
     
@@ -24,26 +28,37 @@
     </div>
     
     <div v-else class="space-y-6">
-      <CommandItem
-        v-for="(command, index) in commands"
-        :key="index"
-        :command="command"
-        :index="index"
-        :input-keys="inputKeys"
-        :level="0"
-        :parent-commands="commands"
-        @update:command="updateCommand"
-        @remove="removeCommand"
-        @move="moveCommand"
-        @update-command-type="updateCommandType"
-        @add-input="addInput"
-        @remove-input="removeInput"
-        @update-input-key="updateInputKey"
-        @add-multiple-command="addMultipleCommand"
-        @remove-multiple-command="removeMultipleCommand"
-        @add-submenu-command="addSubmenuCommand"
-        @remove-submenu-command="removeSubmenuCommand"
-      />
+      <template v-for="(command, index) in commands" :key="index">
+        <!-- Command Item for regular commands -->
+        <CommandItem
+          v-if="!command.submenu || command.submenu.length === 0"
+          :command="command"
+          :index="index"
+          :input-keys="inputKeys"
+          :level="0"
+          :parent-commands="commands"
+          @update:command="(cmd: Command) => updateCommand(index, cmd)"
+          @remove="removeCommand"
+          @move="moveCommand"
+          @add-input="addInput"
+          @remove-input="removeInput"
+          @update-input-key="updateInputKey"
+          @add-multiple-command="addMultipleCommand"
+          @remove-multiple-command="removeMultipleCommand"
+        />
+        
+        <!-- Submenu Item for groups -->
+        <CommandSubmenu
+          v-else
+          :command="command"
+          :index="index"
+          :level="0"
+          :parent-commands="commands"
+          @update:command="(cmd: Command) => updateCommand(index, cmd)"
+          @remove="removeCommand"
+          @move="moveCommand"
+        />
+      </template>
     </div>
     
     <!-- Add Command Button at Bottom -->
@@ -60,6 +75,10 @@
         <Button @click="addCommand" variant="secondary" size="sm" class="shadow-sm">
           <AddIcon class="mr-2" />
           Add Command
+        </Button>
+        <Button @click="addGroup" variant="secondary" size="sm" class="shadow-sm">
+          <AddIcon class="mr-2" />
+          Add Group
         </Button>
       </div>
     </div>
@@ -79,6 +98,7 @@ import { PropType } from 'vue';
 import { Command } from '../types';
 import Button from './Button.vue';
 import CommandItem from './CommandItem.vue';
+import CommandSubmenu from './CommandSubmenu.vue';
 import TemplateCommandsModal from './TemplateCommandsModal.vue';
 import TemplatesIcon from './icons/TemplatesIcon.vue';
 import AddIcon from './icons/AddIcon.vue';
@@ -120,10 +140,29 @@ const addCommand = () => {
     command: undefined,
     hotkey: undefined,
     submenu: null,
-    commands: null,
+    commands: [''], // По умолчанию создаем команду с commands
     inputs: null
   };
   commands.value.push(newCommand);
+};
+
+const addGroup = () => {
+  const newGroup: Command = {
+    name: 'Group',
+    command: undefined,
+    hotkey: undefined,
+    submenu: [{
+      name: 'Command',
+      command: undefined,
+      hotkey: undefined,
+      submenu: null,
+      commands: [''],
+      inputs: null
+    }],
+    commands: null,
+    inputs: null
+  };
+  commands.value.push(newGroup);
 };
 
 const updateCommand = (index: number, command: Command) => {
@@ -144,45 +183,7 @@ const moveCommand = (index: number, direction: number) => {
   }
 };
 
-const updateCommandType = (index: number, type: string) => {
-  const command = commands.value[index];
-  
-  if (type === 'single') {
-    command.submenu = null;
-    command.commands = null;
-    command.inputs = null;
-    command.switch = undefined;
-    command.monitor = undefined;
-  } else if (type === 'multiple') {
-    command.command = undefined;
-    command.submenu = null;
-    command.switch = undefined;
-    command.monitor = undefined;
-    command.commands = command.commands || [];
-    command.inputs = command.inputs || {};
-  } else if (type === 'submenu') {
-    command.command = undefined;
-    command.commands = null;
-    command.inputs = null;
-    command.switch = undefined;
-    command.monitor = undefined;
-    command.submenu = command.submenu || [];
-  } else if (type === 'switch') {
-    command.submenu = null;
-    command.commands = null;
-    command.inputs = command.inputs || {};
-    command.switch = command.switch || '';
-    command.monitor = undefined;
-    // Не очищаем command, так как это поле для toggle команды
-  } else if (type === 'monitor') {
-    command.submenu = null;
-    command.commands = null;
-    command.inputs = command.inputs || {};
-    command.monitor = command.monitor || '';
-    command.switch = undefined;
-    // Не очищаем command, так как это поле для команды мониторинга
-  }
-};
+
 
 const addInput = (commandIndex: number) => {
   const command = commands.value[commandIndex];
@@ -227,32 +228,12 @@ const addMultipleCommand = (commandIndex: number) => {
 
 const removeMultipleCommand = (commandIndex: number, cmdIndex: number) => {
   const command = commands.value[commandIndex];
-  if (command.commands) {
+  if (command.commands && command.commands.length > 1) {
     command.commands.splice(cmdIndex, 1);
   }
 };
 
-const addSubmenuCommand = (commandIndex: number) => {
-  const command = commands.value[commandIndex];
-  if (!command.submenu) {
-    command.submenu = [];
-  }
-  command.submenu.push({
-    name: '',
-    command: undefined,
-    hotkey: undefined,
-    submenu: null,
-    commands: null,
-    inputs: null
-  });
-};
 
-const removeSubmenuCommand = (commandIndex: number, subIndex: number) => {
-  const command = commands.value[commandIndex];
-  if (command.submenu) {
-    command.submenu.splice(subIndex, 1);
-  }
-};
 
 const showTemplatesModal = () => {
   isTemplatesModalOpen.value = true;
