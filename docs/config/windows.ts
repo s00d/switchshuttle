@@ -95,6 +95,13 @@ export const windowConfigs: WindowConfig[] = [
     description: 'Download SwitchShuttle'
   },
   {
+    id: 'changelog-window',
+    title: 'windows.changelog',
+    icon: '📝',
+    component: Window,
+    description: 'Changelog and version history'
+  },
+  {
     id: 'notification-modal',
     title: 'windows.notification',
     icon: '🔔',
