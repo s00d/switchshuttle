@@ -234,7 +234,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, inject, computed } from 'vue';
+import { ref, onMounted, inject } from 'vue';
 import { open } from '@tauri-apps/plugin-shell';
 import Card from '../components/ui/Card.vue';
 import CustomButton from '../components/ui/CustomButton.vue';
@@ -243,7 +243,6 @@ import Toggle from '../components/ui/Toggle.vue';
 import CustomSelect from '../components/forms/CustomSelect.vue';
 import SettingsIcon from '../components/icons/SettingsIcon.vue';
 import CheckIcon from '../components/icons/CheckIcon.vue';
-import ShieldIcon from '../components/icons/ShieldIcon.vue';
 import type { TauriInjectionKey } from '../lib/tauri-commands-plugin';
 import type { AppSettings, SettingsSchema } from '../lib/tauri-commands';
 import TagEditor from '../components/forms/TagEditor.vue';
