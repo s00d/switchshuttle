@@ -12,6 +12,8 @@ export interface CommandConfig {
   switch?: string;
   monitor?: string;
   icon?: string;
+  scheduler?: string;
+  background?: boolean;
 }
 
 export interface Config {
@@ -26,15 +28,34 @@ export interface Config {
 
 // Универсальная структура для любых настроек
 export interface AppSettings {
-  [section: string]: Record<string, string | number | boolean>;
+  [section: string]: Record<string, string | number | boolean | string[]>;
+}
+
+export interface GeneralSettings {
+  auto_start: boolean;
+}
+
+export interface NotificationSettings {
+  show_notifications: boolean;
+  notification_duration: number;
+  success_notifications: boolean;
+  error_notifications: boolean;
+  info_notifications: boolean;
+  warning_notifications: boolean;
+}
+
+export interface SecuritySettings {
+  enable_security_checks: boolean;
+  max_command_length: number;
+  max_input_length: number;
+  blocked_commands: string[];
+  suspicious_patterns: string[];
 }
 
 export interface GitHubRelease {
   tag_name: string;
   html_url: string;
 }
-
-
 
 export interface ConfigFile {
   name: string;
@@ -57,6 +78,7 @@ export interface SettingsSchema {
       min?: number;
       max?: number;
       options?: Array<{ value: string; label: string }>;
+      placeholder?: string;
     }>;
   }>;
 }
@@ -81,7 +103,6 @@ export interface TerminalOption {
  * Предоставляет типизированные методы для всех доступных команд
  */
 export class SwitchShuttleCommands {
-
   /**
    * @description Открывает папку с конфигурациями в проводнике
    * @returns {Promise<void>} Promise, который разрешается при успешном открытии
@@ -116,7 +137,7 @@ export class SwitchShuttleCommands {
       const result = await invoke<[string, string]>('check_for_updates');
       return {
         message: result[0],
-        url: result[1]
+        url: result[1],
       };
     } catch (error) {
       throw new Error(`Failed to check for updates: ${error}`);
@@ -161,6 +182,26 @@ export class SwitchShuttleCommands {
   }
 
   /**
+   * @description Выполняет произвольную команду напрямую
+   * @param {string} command - Команда для выполнения
+   * @param {string} configId - ID конфигурации для использования её параметров (опционально)
+   * @returns {Promise<string>} Promise с результатом выполнения
+   */
+  static async executeRawCommand(
+    command: string,
+    configId?: string
+  ): Promise<string> {
+    try {
+      return await invoke<string>('execute_raw_command', {
+        command,
+        configId,
+      });
+    } catch (error) {
+      throw new Error(`Failed to execute raw command: ${error}`);
+    }
+  }
+
+  /**
    * @description Выполняет команду с пользовательскими вводами
    * @param {Record<string, string>} inputs - Объект с вводами пользователя
    * @param {string} command - ID команды для выполнения
@@ -171,25 +212,42 @@ export class SwitchShuttleCommands {
     command: string
   ): Promise<string> {
     try {
-      return await invoke<string>('execute_command_with_inputs', { inputs, command });
+      return await invoke<string>('execute_command_with_inputs', {
+        inputs,
+        command,
+      });
     } catch (error) {
       throw new Error(`Failed to execute command with inputs: ${error}`);
     }
   }
-
-
 
   /**
    * @description Получает данные вводов для команды
    * @param {string} command - ID команды
    * @returns {Promise<Record<string, string>>} Promise с данными вводов
    */
-  static async fetch_input_data(command: string): Promise<Record<string, string>> {
+  static async fetch_input_data(
+    command: string
+  ): Promise<Record<string, string>> {
     try {
       const result = await invoke<string>('fetch_input_data', { command });
       return JSON.parse(result);
     } catch (error) {
       throw new Error(`Failed to fetch input data: ${error}`);
+    }
+  }
+
+  /**
+   * @description Получает информацию о команде
+   * @param {string} command - ID команды
+   * @returns {Promise<CommandConfig>} Promise с информацией о команде
+   */
+  static async get_command_info(command: string): Promise<CommandConfig> {
+    try {
+      const result = await invoke<string>('get_command_info', { command });
+      return JSON.parse(result);
+    } catch (error) {
+      throw new Error(`Failed to get command info: ${error}`);
     }
   }
 
@@ -242,7 +300,10 @@ export class SwitchShuttleCommands {
     originalTitle?: string
   ): Promise<void> {
     try {
-      await invoke<void>('save_or_update_configuration', { config, originalTitle });
+      await invoke<void>('save_or_update_configuration', {
+        config,
+        originalTitle,
+      });
     } catch (error) {
       throw new Error(`Failed to save or update configuration: ${error}`);
     }
@@ -267,7 +328,10 @@ export class SwitchShuttleCommands {
    * @param {string} id - ID конфигурации
    * @returns {Promise<void>} Promise, который разрешается при успешном сохранении
    */
-  static async save_configuration_by_id(config: Config, id: string): Promise<void> {
+  static async save_configuration_by_id(
+    config: Config,
+    id: string
+  ): Promise<void> {
     try {
       await invoke<void>('save_configuration_by_id', { config, id });
     } catch (error) {
@@ -388,6 +452,18 @@ export class SwitchShuttleCommands {
   }
 
   /**
+   * @description Получает настройки безопасности
+   * @returns {Promise<SecuritySettings>} Promise с настройками безопасности
+   */
+  static async get_security_settings(): Promise<SecuritySettings> {
+    try {
+      return await invoke<SecuritySettings>('get_security_settings');
+    } catch (error) {
+      throw new Error(`Failed to get security settings: ${error}`);
+    }
+  }
+
+  /**
    * @description Показывает уведомление указанного типа
    * @param {string} title - Заголовок уведомления
    * @param {string} body - Текст уведомления
@@ -395,14 +471,25 @@ export class SwitchShuttleCommands {
    * @returns {Promise<void>} Promise, который разрешается при успешном показе
    */
   static async show_notification(
-    title: string, 
-    body: string, 
-    notificationType: 'default' | 'success' | 'error' | 'info' | 'warning' = 'default'
+    title: string,
+    body: string,
+    notificationType:
+      | 'default'
+      | 'success'
+      | 'error'
+      | 'info'
+      | 'warning' = 'default'
   ): Promise<void> {
     try {
-      await invoke<void>('show_notification', { title, body, notificationType });
+      await invoke<void>('show_notification', {
+        title,
+        body,
+        notificationType,
+      });
     } catch (error) {
-      throw new Error(`Failed to show ${notificationType} notification: ${error}`);
+      throw new Error(
+        `Failed to show ${notificationType} notification: ${error}`
+      );
     }
   }
 
@@ -412,7 +499,10 @@ export class SwitchShuttleCommands {
    * @param {string} body - Текст уведомления
    * @returns {Promise<void>} Promise, который разрешается при успешном показе
    */
-  static async show_success_notification(title: string, body: string): Promise<void> {
+  static async show_success_notification(
+    title: string,
+    body: string
+  ): Promise<void> {
     return this.show_notification(title, body, 'success');
   }
 
@@ -422,7 +512,10 @@ export class SwitchShuttleCommands {
    * @param {string} body - Текст уведомления
    * @returns {Promise<void>} Promise, который разрешается при успешном показе
    */
-  static async show_error_notification(title: string, body: string): Promise<void> {
+  static async show_error_notification(
+    title: string,
+    body: string
+  ): Promise<void> {
     return this.show_notification(title, body, 'error');
   }
 
@@ -432,7 +525,10 @@ export class SwitchShuttleCommands {
    * @param {string} body - Текст уведомления
    * @returns {Promise<void>} Promise, который разрешается при успешном показе
    */
-  static async show_info_notification(title: string, body: string): Promise<void> {
+  static async show_info_notification(
+    title: string,
+    body: string
+  ): Promise<void> {
     return this.show_notification(title, body, 'info');
   }
 
@@ -442,10 +538,13 @@ export class SwitchShuttleCommands {
    * @param {string} body - Текст уведомления
    * @returns {Promise<void>} Promise, который разрешается при успешном показе
    */
-  static async show_warning_notification(title: string, body: string): Promise<void> {
+  static async show_warning_notification(
+    title: string,
+    body: string
+  ): Promise<void> {
     return this.show_notification(title, body, 'warning');
   }
 }
 
 // Экспортируем экземпляр по умолчанию для удобства использования
-export default SwitchShuttleCommands; 
+export default SwitchShuttleCommands;

@@ -9,17 +9,13 @@
             <p class="text-slate-600 mt-1">Manage and edit terminal configurations</p>
           </div>
           <div class="flex items-center space-x-2">
-            <Button @click="openConfigFolder" variant="ghost" size="lg" title="Open Config Folder">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-5l-2-2H5a2 2 0 00-2 2z" />
-              </svg>
-            </Button>
+            <CustomButton variant="ghost" size="lg" title="Open Config Folder" @click="openConfigFolder">
+              <FolderIcon class="w-5 h-5" />
+            </CustomButton>
 
-            <Button @click="createNewConfig" size="lg" title="Create new configuration">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-            </Button>
+            <CustomButton size="lg" title="Create new configuration" @click="createNewConfig">
+              <AddIcon class="w-5 h-5" />
+            </CustomButton>
           </div>
         </div>
 
@@ -35,15 +31,11 @@
                   placeholder="Search configurations..."
                   class="w-64 px-3 py-1.5 pr-8 border border-slate-300 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                <svg class="w-4 h-4 text-slate-400 absolute right-2.5 top-1/2 transform -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+                <SearchIcon class="w-4 h-4 text-slate-400 absolute right-2.5 top-1/2 transform -translate-y-1/2 pointer-events-none" />
               </div>
-              <Button @click="loadConfigurations" variant="ghost" size="sm" title="Refresh list">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-              </Button>
+              <CustomButton variant="ghost" size="sm" title="Refresh list" @click="loadConfigurations">
+                <SpinnerIcon class="w-4 h-4" />
+              </CustomButton>
             </div>
           </div>
 
@@ -54,16 +46,14 @@
 
           <div v-else-if="filteredConfigurations.length === 0" class="text-center py-12">
             <div class="w-16 h-16 bg-slate-100 flex items-center justify-center mx-auto mb-4 rounded-lg">
-              <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
+              <DocumentIcon class="w-8 h-8 text-slate-400" />
             </div>
             <p class="text-slate-500 mb-2">
               {{ searchQuery ? 'No configurations found' : 'No configurations found' }}
             </p>
-            <Button @click="createNewConfig" v-if="!searchQuery">
+            <CustomButton v-if="!searchQuery" @click="createNewConfig">
               Create first configuration
-            </Button>
+            </CustomButton>
           </div>
 
           <div v-else class="space-y-3">
@@ -79,57 +69,36 @@
             >
               <div class="flex items-center space-x-4 min-w-0 flex-1">
                 <div class="w-10 h-10 bg-blue-100 flex items-center justify-center rounded-lg flex-shrink-0">
-                  <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
+                  <TerminalIcon class="w-5 h-5 text-blue-600" />
                 </div>
                 <div class="min-w-0 flex-1">
                   <h3 class="font-semibold text-slate-900 truncate">{{ config.title || `Configuration ${index + 1}` }}</h3>
                   <div class="flex items-center space-x-4 text-sm text-slate-500 mt-1 flex-wrap">
                     <span class="flex items-center space-x-1">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
+                      <TerminalIcon class="w-4 h-4" />
                       <span>{{ config.terminal }}</span>
                     </span>
                     <span class="flex items-center space-x-1">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
+                      <LightningIcon class="w-4 h-4" />
                       <span>{{ countAllCommands(config.commands) }} commands</span>
                     </span>
-                    <span v-if="config.menu_hotkey" class="flex items-center space-x-1">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                      <span>{{ config.menu_hotkey }}</span>
-                    </span>
-
                   </div>
                 </div>
               </div>
               
               <div class="flex items-center space-x-1 flex-shrink-0">
-                <Button @click="openConfig(config)" variant="ghost" size="sm" title="Open in editor">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                </Button>
-                <Button @click="editConfig(config)" variant="ghost" size="sm" title="Edit">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                </Button>
-                <Button @click="duplicateConfig(config)" variant="ghost" size="sm" title="Duplicate">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                </Button>
-                <Button @click="deleteConfig(config)" variant="danger" size="sm" title="Delete">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </Button>
+                <CustomButton variant="ghost" size="sm" title="Open in editor" @click="openConfig(config)">
+                  <ExternalLinkIcon />
+                </CustomButton>
+                <CustomButton variant="ghost" size="sm" title="Edit" @click="editConfig(config)">
+                  <EditIcon />
+                </CustomButton>
+                <CustomButton variant="ghost" size="sm" title="Duplicate" @click="duplicateConfig(config)">
+                  <DuplicateIcon />
+                </CustomButton>
+                <CustomButton variant="danger" size="sm" title="Delete" @click="deleteConfig(config)">
+                  <TrashIcon />
+                </CustomButton>
               </div>
             </div>
           </div>
@@ -156,18 +125,14 @@
       
       <template #footer>
         <div class="flex items-center justify-end space-x-2">
-          <Button @click="closeEditor" variant="ghost" size="sm" :disabled="saving">
+          <CustomButton variant="ghost" size="sm" :disabled="saving" @click="closeEditor">
             Cancel
-          </Button>
-          <Button @click="validateAndSave" variant="primary" size="sm" :disabled="saving">
-            <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-            </svg>
+          </CustomButton>
+          <CustomButton variant="primary" size="sm" :disabled="saving" @click="validateAndSave">
+            <SpinnerIcon v-if="saving" class="w-4 h-4 animate-spin" />
+            <CheckIcon v-else class="w-4 h-4" />
             {{ saving ? 'Saving...' : 'Save' }}
-          </Button>
+          </CustomButton>
         </div>
       </template>
     </Modal>
@@ -175,63 +140,40 @@
 
 
     <!-- Delete Confirmation Modal -->
-    <Modal :is-open="showDeleteConfirm" @close="closeDeleteConfirm">
-      <template #header>
-        <h2 class="text-xl font-semibold text-slate-900">Confirm Deletion</h2>
-      </template>
-      
-      <div class="space-y-4">
-        <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 bg-red-100 flex items-center justify-center rounded-full">
-            <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
-          </div>
-          <div>
-            <p class="text-slate-900 font-medium">Delete configuration?</p>
-            <p class="text-slate-600 text-sm">This action cannot be undone</p>
-          </div>
-        </div>
-        
-        <div class="bg-slate-50 p-3 rounded-lg">
-          <p class="text-slate-700">
-            <span class="font-medium">Title:</span> {{ configToDelete?.title }}
-          </p>
-          <p class="text-slate-700">
-            <span class="font-medium">Terminal:</span> {{ configToDelete?.terminal }}
-          </p>
-          <p class="text-slate-700">
-            <span class="font-medium">Theme:</span> {{ configToDelete?.theme }}
-          </p>
-        </div>
-      </div>
-      
-      <template #footer>
-        <div class="flex items-center justify-end space-x-2">
-          <Button @click="closeDeleteConfirm" variant="ghost" size="sm" :disabled="deleting">
-            Cancel
-          </Button>
-          <Button @click="confirmDelete" variant="danger" size="sm" :disabled="deleting">
-            <svg v-if="deleting" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-            {{ deleting ? 'Deleting...' : 'Delete' }}
-          </Button>
-        </div>
-      </template>
-    </Modal>
+    <ConfirmModal
+      :is-open="showDeleteConfirm"
+      @close="closeDeleteConfirm"
+      @confirm="confirmDelete"
+      title="Confirm Deletion"
+      message="Delete configuration?"
+      description="This action cannot be undone"
+      :details="deleteConfigDetails"
+      :loading="deleting"
+      confirm-text="Delete"
+      loading-text="Deleting..."
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, computed, onMounted, inject } from 'vue';
-import Card from '../components/Card.vue';
-import Button from '../components/Button.vue';
-import Modal from '../components/Modal.vue';
-import ConfigEditor from '../components/ConfigEditor.vue';
+import Card from '../components/ui/Card.vue';
+import CustomButton from '../components/ui/CustomButton.vue';
+import Modal from '../components/ui/Modal.vue';
+import ConfigEditor from '../components/config/ConfigEditor.vue';
+import ExternalLinkIcon from '../components/icons/ExternalLinkIcon.vue';
+import EditIcon from '../components/icons/EditIcon.vue';
+import DuplicateIcon from '../components/icons/DuplicateIcon.vue';
+import TrashIcon from '../components/icons/TrashIcon.vue';
+import SpinnerIcon from '../components/icons/SpinnerIcon.vue';
+import CheckIcon from '../components/icons/CheckIcon.vue';
+import AddIcon from '../components/icons/AddIcon.vue';
+import SearchIcon from '../components/icons/SearchIcon.vue';
+import FolderIcon from '../components/icons/FolderIcon.vue';
+import DocumentIcon from '../components/icons/DocumentIcon.vue';
+import TerminalIcon from '../components/icons/TerminalIcon.vue';
+import LightningIcon from '../components/icons/LightningIcon.vue';
+import ConfirmModal from '../components/modals/ConfirmModal.vue';
 import type { TauriInjectionKey } from '../lib/tauri-commands-plugin';
 import { SwitchShuttleCommands, TerminalConfig } from '../lib/tauri-commands';
 
@@ -277,6 +219,16 @@ const filteredConfigurations = computed(() => {
     config.terminal.toLowerCase().includes(query) ||
     config.theme.toLowerCase().includes(query)
   );
+});
+
+const deleteConfigDetails = computed(() => {
+  if (!configToDelete.value) return undefined;
+  
+  return {
+    title: configToDelete.value.title,
+    terminal: configToDelete.value.terminal,
+    theme: configToDelete.value.theme
+  };
 });
 
 const loadTerminals = async () => {

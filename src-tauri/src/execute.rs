@@ -2,6 +2,7 @@ use crate::config::CommandConfig;
 use serde::Serialize;
 use std::collections::HashMap;
 use std::process::Command;
+use log::{error, info};
 
 static SCRIPTS_DIR: include_dir::Dir = include_dir::include_dir!("scripts");
 
@@ -18,6 +19,7 @@ pub struct TerminalConfig {
 }
 
 #[derive(Debug, Clone, Serialize)]
+#[allow(dead_code)]
 pub struct TerminalInfo {
     pub value: String,
     pub label: String,
@@ -449,10 +451,18 @@ fn execute_command_impl(
     theme: &str,
     title: &str,
 ) {
+    info!("=== execute_command_impl called ===");
+    info!("Commands to execute: {:?}", commands_to_execute);
+    info!("Terminal: '{}'", terminal);
+    info!("Launch in: '{}'", launch_in);
+    info!("Theme: '{}'", theme);
+    info!("Title: '{}'", title);
+    info!("================================");
+
     let terminals = get_terminals();
 
     for command in commands_to_execute {
-        println!("Executing command: {}", command);
+        info!("Executing command: {}", command);
 
         #[cfg(target_os = "macos")]
         {
@@ -460,7 +470,7 @@ fn execute_command_impl(
             let terminal_config = match terminals.get(terminal) {
                 Some(config) => config,
                 None => {
-                    println!("Unsupported terminal: {}", terminal);
+                    error!("Unsupported terminal: {}", terminal);
                     return;
                 }
             };
@@ -469,7 +479,7 @@ fn execute_command_impl(
                 let script_content = match read_script(&script_path) {
                     Some(content) => content,
                     None => {
-                        println!("Failed to read script: {}", script_path);
+                        error!("Failed to read script: {}", script_path);
                         continue;
                     }
                 };
@@ -486,14 +496,14 @@ fn execute_command_impl(
                     .expect("Failed to execute command");
 
                 if output.status.success() {
-                    println!("Command succeeded: {}", command);
+                    info!("Command succeeded: {}", command);
                 } else {
-                    println!("Command failed: {}", command);
-                    println!("Error: {}", String::from_utf8_lossy(&output.stderr));
+                    error!("Command failed: {}", command);
+                    error!("Error: {}", String::from_utf8_lossy(&output.stderr));
                     break;
                 }
             } else {
-                println!(
+                error!(
                     "No script found for terminal: {} with launch_in: {}",
                     terminal, launch_in
                 );
@@ -507,7 +517,7 @@ fn execute_command_impl(
             let terminal_config = match terminals.get(terminal) {
                 Some(config) => config,
                 None => {
-                    println!("Unsupported terminal: {}", terminal);
+                    error!("Unsupported terminal: {}", terminal);
                     return;
                 }
             };
@@ -517,7 +527,7 @@ fn execute_command_impl(
                 "new_tab" => &terminal_config.new_tab_args,
                 "new_window" => &terminal_config.new_window_args,
                 _ => {
-                    println!("Unsupported launch_in option: {}", launch_in);
+                    error!("Unsupported launch_in option: {}", launch_in);
                     return;
                 }
             };
@@ -533,13 +543,15 @@ fn execute_command_impl(
                 .expect("Failed to execute command");
 
             if status.success() {
-                println!("Command succeeded: {}", command);
+                info!("Command succeeded: {}", command);
             } else {
-                println!("Command failed: {}", command);
+                error!("Command failed: {}", command);
                 break;
             }
         }
     }
+    
+    info!("=== execute_command_impl completed ===");
 }
 
 /// Получает список доступных терминалов для текущей операционной системы
@@ -570,11 +582,19 @@ pub fn execute_command(
     theme: &String,
     title: &String,
 ) {
+    info!("=== execute_command called ===");
+    info!("Command config: {:?}", command_config);
+    info!("Terminal: '{}'", terminal);
+    info!("Launch in: '{}'", launch_in);
+    info!("Theme: '{}'", theme);
+    info!("Title: '{}'", title);
+    info!("=============================");
+
     let mut commands_to_execute = Vec::new();
 
     // Собираем команды для выполнения
     if let Some(commands) = &command_config.commands {
-        println!("Adding commands: {:?}", commands);
+        info!("Adding commands: {:?}", commands);
         for cmd in commands {
             if !cmd.trim().is_empty() {
                 commands_to_execute.push(cmd.clone());
@@ -584,32 +604,34 @@ pub fn execute_command(
 
     // Проверяем, что есть команды для выполнения
     if commands_to_execute.is_empty() {
-        println!("No commands to execute, skipping");
+        info!("No commands to execute, skipping");
         return;
     }
 
-    println!("Commands to execute: {:?}", commands_to_execute);
+    info!("Commands to execute: {:?}", commands_to_execute);
 
     let terminal = terminal.to_lowercase();
     let launch_in = launch_in.to_lowercase();
 
     // Проверяем поддержку терминала и опции запуска
     if !is_terminal_supported(&terminal) {
-        println!("Unsupported terminal: {}", terminal);
-        println!("Available terminals: {:?}", get_available_terminals());
+        error!("Unsupported terminal: {}", terminal);
+        error!("Available terminals: {:?}", get_available_terminals());
         return;
     }
 
     if !is_launch_option_supported(&launch_in) {
-        println!("Unsupported launch option: {}", launch_in);
-        println!(
+        error!("Unsupported launch option: {}", launch_in);
+        error!(
             "Available launch options: {:?}",
             get_available_launch_options()
         );
         return;
     }
 
+    info!("=== Calling execute_command_impl ===");
     execute_command_impl(&commands_to_execute, &terminal, &launch_in, theme, title);
+    info!("=== execute_command completed ===");
 }
 
 #[cfg(test)]

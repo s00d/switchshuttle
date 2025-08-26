@@ -12,11 +12,11 @@ mod settings;
 
 use crate::cli::handle_cli_commands;
 use crate::commands::{
-    check_for_updates, create_new_config, create_new_configuration, delete_configuration,
-    duplicate_configuration, execute, execute_command_with_inputs, fetch_input_data,
-    get_config_files, get_configurations, get_settings, get_settings_schema, get_terminals_list,
-    get_unique_config_title, get_version, load_config, open_config_folder, open_configuration,
-    refresh_configurations, save_configuration_by_id, save_or_update_configuration, save_settings,
+    check_for_updates, create_new_config, create_new_configuration, delete_configuration, duplicate_configuration, execute, execute_command_with_inputs, execute_raw_command,
+    fetch_input_data, get_command_info, get_config_files, get_configurations,
+    get_security_settings, get_settings, get_settings_schema, get_terminals_list, get_unique_config_title, get_version,
+    load_config, open_config_folder, open_configuration, refresh_configurations,
+    save_configuration_by_id, save_or_update_configuration, save_settings,
     show_notification, validate_configuration,
 };
 use crate::console::ConsolePool;
@@ -29,6 +29,7 @@ use tauri::Manager;
 use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
 use tauri_plugin_cli::CliExt;
 use tauri_plugin_global_shortcut::ShortcutState;
+use log::{error, info};
 
 pub fn run() {
     let config_manager = Arc::new(Mutex::new(ConfigManager::new()));
@@ -43,7 +44,7 @@ pub fn run() {
     let settings = match AppSettings::load() {
         Ok(settings) => Arc::new(Mutex::new(settings)),
         Err(e) => {
-            eprintln!("Failed to load settings: {}", e);
+            error!("Failed to load settings: {}", e);
             Arc::new(Mutex::new(AppSettings::default()))
         }
     };
@@ -59,7 +60,7 @@ pub fn run() {
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
                 .with_handler(move |app, shortcut, event| {
-                    println!(
+                    info!(
                         "[Hotkeys] Global shortcut event: {:?}, state: {:?}",
                         shortcut,
                         event.state()
@@ -85,7 +86,7 @@ pub fn run() {
                                 .find_command_by_hotkey(hotkey_str, &config_manager.configs)
                             {
                                 if let Some(id) = &command.id {
-                                    println!(
+                                    info!(
                                         "[Hotkeys] Executing command: {} (id: {})",
                                         command.name, id
                                     );
@@ -93,12 +94,12 @@ pub fn run() {
                                     // Выполняем команду напрямую через единую функцию
                                     if let Err(e) = execute_command_by_id(&app, id, &config_manager)
                                     {
-                                        eprintln!("[Hotkeys] Failed to execute command: {}", e);
+                                        error!("[Hotkeys] Failed to execute command: {}", e);
                                     } else {
-                                        println!("[Hotkeys] Successfully executed command: {}", id);
+                                        info!("[Hotkeys] Successfully executed command: {}", id);
                                     }
                                 } else {
-                                    eprintln!("[Hotkeys] Command has no ID: {}", command.name);
+                                    error!("[Hotkeys] Command has no ID: {}", command.name);
                                 }
                             }
                         }
@@ -128,13 +129,19 @@ pub fn run() {
 
             // Инициализируем постоянный инстанс консоли
             if let Err(e) = ConsolePool::init_console() {
-                eprintln!("Failed to initialize console: {}", e);
+                error!("Failed to initialize console: {}", e);
+            }
+
+            // Инициализируем состояние трея как неактивное при запуске
+            if let Ok(mut tray_active) = crate::menu_structure::TRAY_ACTIVE.lock() {
+                *tray_active = false;
+                info!("[Monitor] Initialized tray state as inactive");
             }
 
             // Загружаем и применяем настройки при запуске
             if let Ok(settings) = AppSettings::load() {
                 if let Err(e) = settings.apply(&app.handle()) {
-                    eprintln!("Failed to apply settings: {}", e);
+                    error!("Failed to apply settings: {}", e);
                 }
             }
 
@@ -171,11 +178,11 @@ pub fn run() {
                 use tauri::tray::{MouseButton, MouseButtonState, TrayIconEvent};
                 match event {
                     TrayIconEvent::Enter { .. } => {
-                        eprintln!("[Tray] Mouse entered tray icon - resuming timers");
+                        info!("[Tray] Mouse entered tray icon - resuming timers");
                         crate::menu::resume_monitor_timers();
                     }
                     TrayIconEvent::Leave { .. } => {
-                        eprintln!("[Tray] Mouse left tray icon - pausing timers");
+                        info!("[Tray] Mouse left tray icon - pausing timers");
                         crate::menu::pause_monitor_timers();
                     }
                     TrayIconEvent::Click {
@@ -183,9 +190,8 @@ pub fn run() {
                         button_state: MouseButtonState::Up,
                         ..
                     } => {
-                        eprintln!("[Tray] Mouse click left tray icon - pausing timers");
-                        // in this example, let's show and focus the main window when the tray is clicked
-                        crate::menu::resume_monitor_timers();
+                        info!("[Tray] Mouse click left tray icon - showing menu");
+                        // Клик показывает меню, не влияет на таймеры
                     }
                     _ => {
                         // Игнорируем другие события
@@ -201,7 +207,7 @@ pub fn run() {
             let settings_clone = settings.clone();
 
             // ПЕРВИЧНАЯ РЕГИСТРАЦИЯ ГЛОБАЛЬНЫХ ХОТКЕЕВ ПРИ ЗАПУСКЕ
-            println!("[Hotkeys] PRIMARY registration of all hotkeys at app startup");
+            info!("[Hotkeys] PRIMARY registration of all hotkeys at app startup");
             {
                 let mut hotkey_manager = hotkey_manager_clone.lock().unwrap();
                 hotkey_manager.set_app_handle(app.handle().clone());
@@ -210,7 +216,7 @@ pub fn run() {
                 if let Err(e) =
                     hotkey_manager.register_all_hotkeys(&configs, &app.handle(), &settings_clone)
                 {
-                    eprintln!("Failed to register hotkeys: {}", e);
+                    error!("Failed to register hotkeys: {}", e);
                 }
             }
 
@@ -234,11 +240,14 @@ pub fn run() {
             get_terminals_list,
             execute_command_with_inputs,
             execute,
+            execute_raw_command,
             fetch_input_data,
+            get_command_info,
             refresh_configurations,
             open_config_folder,
             get_settings_schema,
             get_settings,
+            get_security_settings,
             save_settings,
             show_notification
         ])

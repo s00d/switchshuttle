@@ -4,11 +4,13 @@ use std::fs;
 use std::path::PathBuf;
 use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_notification::{NotificationExt, PermissionState};
+use log::{error, info};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AppSettings {
     pub general: GeneralSettings,
     pub notifications: NotificationSettings,
+    pub security: SecuritySettings,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -26,6 +28,15 @@ pub struct NotificationSettings {
     pub warning_notifications: bool,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct SecuritySettings {
+    pub enable_security_checks: bool,
+    pub max_command_length: u32,
+    pub max_input_length: u32,
+    pub blocked_commands: Vec<String>,
+    pub suspicious_patterns: Vec<String>,
+}
+
 impl Default for AppSettings {
     fn default() -> Self {
         AppSettings {
@@ -37,6 +48,41 @@ impl Default for AppSettings {
                 error_notifications: true,
                 info_notifications: true,
                 warning_notifications: true,
+            },
+            security: SecuritySettings {
+                enable_security_checks: true,
+                max_command_length: 1024,
+                max_input_length: 1024,
+                blocked_commands: vec![
+                    "rm -rf /".to_string(),
+                    "format c:".to_string(),
+                    "del /s /q".to_string(),
+                ],
+                suspicious_patterns: vec![
+                    r"rm\s+-rf".to_string(),
+                    r"del\s+/s".to_string(),
+                    r"format\s+c:".to_string(),
+                    r"shutdown".to_string(),
+                    r"halt".to_string(),
+                    r"reboot".to_string(),
+                    r"killall".to_string(),
+                    r"taskkill".to_string(),
+                    r"sudo\s+".to_string(),
+                    r"curl\s+".to_string(),
+                    r"wget\s+".to_string(),
+                    r"nc\s+".to_string(),
+                    r"ncat\s+".to_string(),
+                    r"scp\s+".to_string(),
+                    r"ftp\s+".to_string(),
+                    r"powershell".to_string(),
+                    r"chmod\s+777".to_string(),
+                    r"chown\s+".to_string(),
+                    r"dd\s+".to_string(),
+                    r"mkfs".to_string(),
+                    r"netcat".to_string(),
+                    r"base64\s+-d".to_string(),
+                    r"openssl\s+".to_string(),
+                ],
             },
         }
     }
@@ -108,29 +154,29 @@ impl AppSettings {
         body: &str,
         icon: Option<&str>,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        println!(
+        info!(
             "[Settings] Attempting to show notification: title='{}', body='{}', icon='{:?}'",
             title, body, icon
         );
 
         if !self.notifications.show_notifications {
-            println!("[Settings] Notifications are disabled in settings");
+            info!("[Settings] Notifications are disabled in settings");
             return Ok(());
         }
 
         // Проверяем права на уведомления
         let permission_state = app.notification().permission_state();
-        println!("[Settings] Permission state: {:?}", permission_state);
+        info!("[Settings] Permission state: {:?}", permission_state);
 
         match permission_state {
             Ok(state) if state == PermissionState::Granted => {
-                println!("[Settings] Permission granted, proceeding with notification");
+                info!("[Settings] Permission granted, proceeding with notification");
             }
             _ => {
-                println!("[Settings] Permission not granted, requesting permission");
+                info!("[Settings] Permission not granted, requesting permission");
                 // Запрашиваем права если не предоставлены
                 if let Err(e) = app.notification().request_permission() {
-                    println!("[Settings] Failed to request permission: {}", e);
+                    error!("[Settings] Failed to request permission: {}", e);
                     // Показываем уведомление об ошибке вместо вывода в консоль
                     let _ = self.show_error_notification(
                         app,
@@ -148,18 +194,18 @@ impl AppSettings {
             builder = builder.icon(icon);
         }
 
-        println!(
+        info!(
             "[Settings] Building notification with title='{}', body='{}'",
             title, body
         );
 
         match builder.show() {
             Ok(_) => {
-                println!("[Settings] Notification shown successfully");
+                info!("[Settings] Notification shown successfully");
                 Ok(())
             }
             Err(e) => {
-                println!("[Settings] Failed to show notification: {}", e);
+                error!("[Settings] Failed to show notification: {}", e);
                 Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, e)))
             }
         }
@@ -171,13 +217,13 @@ impl AppSettings {
         title: &str,
         body: &str,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        println!(
+        info!(
             "[Settings] show_success_notification called: title='{}', body='{}'",
             title, body
         );
 
         if !self.notifications.success_notifications {
-            println!("[Settings] Success notifications are disabled in settings");
+            info!("[Settings] Success notifications are disabled in settings");
             return Ok(());
         }
 
@@ -191,13 +237,13 @@ impl AppSettings {
         title: &str,
         body: &str,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        println!(
+        error!(
             "[Settings] show_error_notification called: title='{}', body='{}'",
             title, body
         );
 
         if !self.notifications.error_notifications {
-            println!("[Settings] Error notifications are disabled in settings");
+            info!("[Settings] Error notifications are disabled in settings");
             return Ok(());
         }
 
@@ -211,13 +257,13 @@ impl AppSettings {
         title: &str,
         body: &str,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        println!(
+        info!(
             "[Settings] show_info_notification called: title='{}', body='{}'",
             title, body
         );
 
         if !self.notifications.info_notifications {
-            println!("[Settings] Info notifications are disabled in settings");
+            info!("[Settings] Info notifications are disabled in settings");
             return Ok(());
         }
 
@@ -231,13 +277,13 @@ impl AppSettings {
         title: &str,
         body: &str,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        println!(
+        info!(
             "[Settings] show_warning_notification called: title='{}', body='{}'",
             title, body
         );
 
         if !self.notifications.warning_notifications {
-            println!("[Settings] Warning notifications are disabled in settings");
+            info!("[Settings] Warning notifications are disabled in settings");
             return Ok(());
         }
 
@@ -310,6 +356,54 @@ impl AppSettings {
                             "label": "Warning notifications",
                             "description": "Show warning notifications",
                             "default": true
+                        }
+                    ]
+                },
+                {
+                    "id": "security",
+                    "title": "Security",
+                    "description": "Security and safety settings for command execution",
+                    "fields": [
+                        {
+                            "id": "security.enable_security_checks",
+                            "type": "boolean",
+                            "label": "Enable security checks",
+                            "description": "Enable real-time security analysis of commands",
+                            "default": true
+                        },
+                        {
+                            "id": "security.max_command_length",
+                            "type": "number",
+                            "label": "Maximum command length",
+                            "description": "Maximum allowed length for commands",
+                            "min": 100,
+                            "max": 5000,
+                            "default": 1024
+                        },
+                        {
+                            "id": "security.max_input_length",
+                            "type": "number",
+                            "label": "Maximum input length",
+                            "description": "Maximum allowed length for user inputs",
+                            "min": 50,
+                            "max": 2000,
+                            "default": 1024
+                        },
+                        {
+                            "id": "security.blocked_commands",
+                            "type": "tag-editor",
+                            "label": "Blocked Commands",
+                            "description": "Commands that will be blocked from execution",
+                            "placeholder": "Enter command pattern (e.g., rm -rf /)",
+                            "default": ["rm -rf /", "format c:", "del /s /q"]
+                        },
+                        {
+                            "id": "security.suspicious_patterns",
+                            "type": "tag-editor",
+                            "label": "Suspicious Patterns",
+                            "description": "Regex patterns that will trigger security warnings",
+                            "placeholder": "Enter regex pattern (e.g., rm\\s+-rf)",
+                            "default": ["rm\\s+-rf", "del\\s+/s", "format\\s+c:", "shutdown", "halt", "reboot", "killall", "taskkill", "sudo\\s+", "curl\\s+", "wget\\s+", "nc\\s+", "ncat\\s+", "scp\\s+", "ftp\\s+", "powershell", "chmod\\s+777", "chown\\s+", "dd\\s+", "mkfs", "netcat", "base64\\s+-d", "openssl\\s+"]
                         }
                     ]
                 }

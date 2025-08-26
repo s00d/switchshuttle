@@ -33,5 +33,25 @@ export default defineConfig(({ mode }) => {
         ignored: ['**/src-tauri/**'],
       },
     },
+
+    // Test configuration
+    test: {
+      globals: true,
+      environment: 'jsdom',
+      setupFiles: ['./src/__tests__/setup.ts'],
+      include: ['src/**/*.{test,spec}.{js,ts,vue}'],
+      coverage: {
+        provider: 'v8',
+        reporter: ['text', 'json', 'html'],
+        exclude: [
+          'node_modules/',
+          'src-tauri/',
+          'src/__tests__/',
+          '**/*.d.ts',
+          '**/*.config.*',
+          '**/coverage/**'
+        ]
+      }
+    }
   };
 });

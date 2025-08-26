@@ -4,8 +4,8 @@
   [![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](https://github.com/s00d/switchshuttle/blob/main/LICENSE)
   [![GitHub release](https://img.shields.io/github/v/release/s00d/switchshuttle?style=for-the-badge)](https://github.com/s00d/switchshuttle/releases)
   [![GitHub downloads](https://img.shields.io/github/downloads/s00d/switchshuttle/total?style=for-the-badge)](https://github.com/s00d/switchshuttle/releases)
-  [![GitHub issues](https://img.shields.io/github/issues/s00d/switchshuttle?style=for-the-badge)](https://github.com/s00d/switchshuttle/issues)
-  [![GitHub stars](https://img.shields.io/github/stars/s00d/switchshuttle?style=for-the-badge)](https://github.com/s00d/switchshuttle/stargazers)
+  [![GitHub issues](https://img.shields.io/badge/github-issues-orange?style=for-the-badge)](https://github.com/s00d/switchshuttle/issues)
+  [![GitHub stars](https://img.shields.io/badge/github-stars-yellow?style=for-the-badge)](https://github.com/s00d/switchshuttle/stargazers)
   [![Donate](https://img.shields.io/badge/Donate-Donationalerts-ff4081?style=for-the-badge)](https://www.donationalerts.com/r/s00d88)
 
   <img src="https://raw.githubusercontent.com/s00d/switchshuttle/refs/heads/main/icons/logo-min.png" alt="SwitchShuttle Logo" width="600">
@@ -15,6 +15,7 @@
   **🚀 Cross-platform terminal command manager with global hotkeys**
 
   <img src="https://github.com/s00d/switchshuttle/blob/main/icons/intro.gif?raw=true" alt="SwitchShuttle Demo" width="600">
+  
   <div class="locale">
     <a href="README.md">🇺🇸 English</a> • 
     <a href="README_ZH.md">🇨🇳 中文</a> • 
@@ -44,6 +45,108 @@ SwitchShuttle is a powerful cross-platform system tray application that revoluti
 - **⚙️ Configuration Management** - Enable/disable configurations without deleting them
 - **🔄 Switch Commands** - Toggle system features with background execution
 - **📊 Monitor Commands** - Real-time system resource monitoring with visual indicators
+- **📅 Scheduled Commands** - Automate tasks with cron expressions
+- **🎯 Template System** - Pre-built command templates for common workflows
+
+## 🖥️ User Interface Overview
+
+SwitchShuttle provides a modern, intuitive interface with several key components:
+
+### 🎛️ Main Interface Components
+
+#### 1. **Configuration Editor**
+- **Visual JSON Editor** - Edit configurations with syntax highlighting and validation
+- **Template System** - Import pre-built command templates for common workflows
+- **Real-time Validation** - Instant feedback on configuration errors
+- **Auto-save** - Changes are automatically saved as you type
+- **Configuration Management** - Enable/disable configurations without deleting them
+- **Search and Filter** - Quickly find specific configurations
+- **Duplicate Configurations** - Create copies of existing configurations for testing
+
+#### 2. **Command Management**
+- **Command Builder** - Create commands with visual form interface
+- **Hotkey Configuration** - Set global shortcuts for instant command execution
+- **Icon Selector** - Choose emoji icons for better visual organization
+- **Input Fields** - Configure dynamic input prompts for interactive commands
+- **Nested Submenus** - Organize commands in hierarchical structures
+- **Command Validation** - Real-time validation of command syntax
+
+#### 3. **Settings Panel**
+- **Terminal Selection** - Choose your preferred terminal application
+- **Launch Mode** - Configure how commands are executed (current/new tab/new window)
+- **Theme Settings** - Customize the application appearance
+- **Auto-start Configuration** - Enable/disable system startup
+- **Global Hotkey Settings** - Configure system-wide menu shortcuts
+
+#### 4. **System Tray Menu**
+- **Quick Access** - Right-click tray icon for instant command access
+- **Status Indicators** - Visual feedback for switch commands and monitoring
+- **Nested Menus** - Organized command hierarchy for easy navigation
+- **Global Hotkeys** - Keyboard shortcuts for immediate command execution
+- **Real-time Monitoring** - Live system resource indicators
+
+### 🎨 Interface Features
+
+#### **Visual Command Builder**
+```json
+{
+  "name": "🚀 Start Development Server",
+  "command": "npm run dev",
+  "hotkey": "Ctrl+Shift+D",
+  "icon": "🚀",
+  "background": false,
+  "inputs": {
+    "port": "3000",
+    "host": "localhost"
+  }
+}
+```
+
+#### **Template System**
+SwitchShuttle includes pre-built templates for common development workflows:
+
+- **Development** - Git operations, build tools, testing
+- **DevOps** - Docker, Kubernetes, server management
+- **Database** - MySQL, PostgreSQL, MongoDB operations
+- **Cloud** - AWS, Azure, Google Cloud commands
+- **Security** - Network scanning, vulnerability assessment
+- **Monitoring** - System resources, logs, metrics
+- **Utility** - File operations, system tools
+- **Scheduler** - Cron jobs and automated tasks
+
+#### **Smart Organization**
+- **Nested Submenus** - Organize commands in logical groups
+- **Icon Support** - Visual identification with emoji icons
+- **Hotkey Management** - Global shortcuts for instant access
+- **Status Indicators** - Real-time feedback for switch commands
+- **Search Functionality** - Quick command discovery
+
+## 🔒 Security Manager
+
+SwitchShuttle includes a comprehensive Security Manager that protects your system from potentially harmful commands and provides fine-grained control over command execution.
+
+### 🛡️ Security Features
+
+#### **Command Validation**
+- **Length Limits**: Maximum command length (1000 characters) and input length (500 characters) prevent overly long commands
+- **Blocked Commands**: Define a list of dangerous commands that should never be executed
+- **Suspicious Patterns**: Use regex patterns to detect and block potentially harmful command patterns
+- **Real-time Validation**: Commands are validated during editing to ensure safety
+
+#### **Security Settings**
+- **Enable/Disable Security**: Toggle security features on or off as needed
+- **Custom Block Lists**: Add specific commands to the blocked commands list
+- **Pattern Matching**: Define regex patterns to catch suspicious command structures
+- **Length Restrictions**: Configure maximum lengths for commands and user inputs
+
+#### **How It Works**
+1. **Editor Validation**: SecurityManager validates commands in the configuration editor before saving
+2. **Pattern Matching**: Commands are checked against blocked patterns and suspicious regex patterns
+3. **Length Validation**: Commands and inputs are verified against maximum length limits
+4. **Block List Check**: Commands are compared against the user-defined blocked commands list
+5. **Safe Configuration**: Only validated configurations are allowed to be saved and used
+
+
 
 ## 🚀 Quick Start
 
@@ -64,10 +167,47 @@ brew install --cask switchshuttle
 
 ### First Configuration
 
-1. **Edit Config** → Opens your configuration file in your default editor
-2. **Add your commands** using the JSON format (see examples below)
-3. **Save and restart** the application
-4. **Enjoy** your organized command shortcuts!
+1. **Open Configuration Editor** - Click "Edit Config" in the system tray menu
+2. **Choose Terminal** - Select your preferred terminal application
+3. **Add Commands** - Use the visual editor or import templates
+4. **Set Hotkeys** - Configure global shortcuts for quick access
+5. **Save and Restart** - Your commands are now available in the tray menu
+
+### Interface Walkthrough
+
+#### **Step 1: Configuration Editor**
+- Open SwitchShuttle and navigate to the "Editor" tab
+- Choose your terminal application (iTerm, Terminal, Warp, etc.)
+- Set the launch mode (current window, new tab, or new window)
+- Configure global hotkeys for menu access
+
+#### **Step 2: Adding Commands**
+- Click "Add Command" to create a new command
+- Fill in the command details:
+  - **Name**: Display name for the command
+  - **Command**: The actual terminal command to execute
+  - **Hotkey**: Global shortcut (optional)
+  - **Icon**: Emoji icon for visual identification
+  - **Background**: Whether to run in background
+  - **Inputs**: Dynamic input fields for interactive commands
+
+#### **Step 3: Using Templates**
+- Click "Import Template" to access pre-built command collections
+- Browse categories like Development, DevOps, Database, etc.
+- Select and import the templates you need
+- Customize the imported commands as needed
+
+#### **Step 4: System Tray Access**
+- Right-click the SwitchShuttle tray icon
+- Browse your organized command menu
+- Use global hotkeys for instant command execution
+- Monitor system status with real-time indicators
+
+#### **Step 5: Advanced Features**
+- **Switch Commands**: Toggle system features with visual status indicators
+- **Monitor Commands**: Real-time system resource monitoring
+- **Scheduled Commands**: Automate tasks with cron expressions
+- **Nested Menus**: Organize commands in hierarchical structures
 
 ## 🖥️ Command Line Interface (CLI)
 
@@ -306,9 +446,6 @@ Control how commands are executed - in background using ConsolePool or normal te
 - `"background": true` - Execute using ConsolePool (background)
 - `"background": false` - Execute using normal terminal execution
 - `"background": null` or omit - Auto-detect based on command type
-  "hotkey": "Ctrl+Shift+F"
-}
-```
 
 #### 📁 Nested Submenus
 
@@ -507,17 +644,30 @@ You can enable or disable individual configuration files to control which comman
 - **Build and test workflows** - One-click development cycles
 - **Docker management** - Start/stop containers with hotkeys
 - **Git operations** - Common git commands at your fingertips
+- **Development server management** - Start/stop development servers
+- **Code quality tools** - Run linters, formatters, and tests
 
 ### 🛠️ DevOps Engineers
 - **Server management** - SSH connections and server commands
 - **Monitoring tools** - Quick access to logs and metrics
 - **Deployment scripts** - Automated deployment workflows
 - **Database operations** - Common database commands
+- **Container orchestration** - Docker and Kubernetes management
+- **Infrastructure monitoring** - System resource tracking
 
 ### 🎨 Designers
 - **Asset optimization** - Image processing and optimization
 - **Design system tools** - Component generation and updates
 - **Prototype servers** - Quick design server startup
+- **Design tool automation** - Batch processing and workflows
+
+### 🔧 System Administrators
+- **System monitoring** - Real-time resource monitoring
+- **Service management** - Start/stop system services
+- **Backup automation** - Scheduled backup operations
+- **Network tools** - Network diagnostics and configuration
+- **Security tools** - Vulnerability scanning and assessment
+- **Maintenance tasks** - System cleanup and optimization
 
 ## 🔧 Building from Source
 
@@ -525,6 +675,7 @@ You can enable or disable individual configuration files to control which comman
 
 - [Rust](https://www.rust-lang.org/tools/install) (latest stable)
 - [Node.js](https://nodejs.org/) (v16 or higher)
+- [pnpm](https://pnpm.io/) (recommended package manager)
 - [Tauri CLI](https://tauri.app/v1/guides/getting-started/prerequisites/)
 
 ### Build Steps
@@ -535,13 +686,13 @@ git clone https://github.com/s00d/switchshuttle.git
 cd switchshuttle
 
 # Install dependencies
-npm install
+pnpm install
 
 # Development mode
-npm run tauri dev
+pnpm run tauri dev
 
 # Build for production
-npm run tauri build
+pnpm run tauri build
 ```
 
 ### Platform-Specific Notes
@@ -552,6 +703,21 @@ npm run tauri build
 chmod +x /Applications/switch-shuttle.app
 xattr -cr /Applications/switch-shuttle.app
 codesign --force --deep --sign - /Applications/switch-shuttle.app
+```
+
+#### Windows
+```bash
+# Install Rust and Node.js
+# Then follow the build steps above
+```
+
+#### Linux
+```bash
+# Install system dependencies
+sudo apt-get update
+sudo apt-get install libwebkit2gtk-4.0-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+
+# Then follow the build steps above
 ```
 
 ## 🤝 Contributing
@@ -570,6 +736,23 @@ We welcome contributions! Here's how you can help:
 - Add tests for new features
 - Update documentation as needed
 - Ensure cross-platform compatibility
+- Use pnpm for package management
+
+### Development Setup
+
+```bash
+# Install dependencies
+pnpm install
+
+# Start development server
+pnpm run tauri dev
+
+# Run type checking
+pnpm run type-check
+
+# Build for production
+pnpm run tauri build
+```
 
 ## 📄 License
 
@@ -580,11 +763,13 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 - Inspired by the original [Shuttle](https://github.com/fitztrev/shuttle) project
 - Built with [Tauri](https://tauri.app/) for cross-platform desktop apps
 - UI powered by [Vue.js](https://vuejs.org/)
+- Styled with [Tailwind CSS](https://tailwindcss.com/)
 
 ## 📞 Support
 
 - **Issues**: [GitHub Issues](https://github.com/s00d/switchshuttle/issues)
 - **Releases**: [GitHub Releases](https://github.com/s00d/switchshuttle/releases)
+- **Documentation**: [GitHub Wiki](https://github.com/s00d/switchshuttle/wiki)
 
 ---
 

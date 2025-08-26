@@ -2,6 +2,7 @@ use crate::config::ConfigManager;
 use crate::execute::execute_command;
 use std::sync::{Arc, Mutex};
 use tauri_plugin_cli::Matches;
+use log::{error, info};
 
 pub fn handle_cli_commands(matches: &Matches, config_manager: &Arc<Mutex<ConfigManager>>) -> bool {
     // Handle command execution
@@ -48,7 +49,7 @@ pub fn handle_cli_commands(matches: &Matches, config_manager: &Arc<Mutex<ConfigM
                     }
                 }
                 if !found {
-                    eprintln!("Command '{}' not found", command_value);
+                    error!("Command '{}' not found", command_value);
                     std::process::exit(1);
                 }
             }
@@ -61,7 +62,7 @@ pub fn handle_cli_commands(matches: &Matches, config_manager: &Arc<Mutex<ConfigM
         if list.value == true {
             // List all commands
             let config_manager = config_manager.lock().unwrap();
-            println!("Available commands:");
+            info!("Available commands:");
             for config in &config_manager.configs {
                 // Пропускаем отключенные конфигурации
                 if let Some(enabled) = config.enabled {
@@ -72,9 +73,9 @@ pub fn handle_cli_commands(matches: &Matches, config_manager: &Arc<Mutex<ConfigM
 
                 for cmd in &config.commands {
                     if let Some(id) = &cmd.id {
-                        println!("  {} (ID: {})", cmd.name, id);
+                        info!("  {} (ID: {})", cmd.name, id);
                     } else {
-                        println!("  {}", cmd.name);
+                        info!("  {}", cmd.name);
                     }
                 }
             }
@@ -87,7 +88,7 @@ pub fn handle_cli_commands(matches: &Matches, config_manager: &Arc<Mutex<ConfigM
         if let Some(search_value) = search.value.as_str() {
             // Search commands by name
             let config_manager = config_manager.lock().unwrap();
-            println!("Searching for commands containing '{}':", search_value);
+            info!("Searching for commands containing '{}':", search_value);
             let mut found = false;
             for config in &config_manager.configs {
                 // Пропускаем отключенные конфигурации
@@ -104,16 +105,16 @@ pub fn handle_cli_commands(matches: &Matches, config_manager: &Arc<Mutex<ConfigM
                         .contains(&search_value.to_lowercase())
                     {
                         if let Some(id) = &cmd.id {
-                            println!("  {} (ID: {})", cmd.name, id);
+                            info!("  {} (ID: {})", cmd.name, id);
                         } else {
-                            println!("  {}", cmd.name);
+                            info!("  {}", cmd.name);
                         }
                         found = true;
                     }
                 }
             }
             if !found {
-                println!("No commands found matching '{}'", search_value);
+                info!("No commands found matching '{}'", search_value);
             }
             std::process::exit(0);
         }

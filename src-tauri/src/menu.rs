@@ -8,10 +8,11 @@ use crate::helpers::{
 use crate::menu_structure::SystemMenu;
 use once_cell::sync::Lazy;
 use std::sync::{Arc, Mutex};
-use tauri::{AppHandle, Wry};
+use tauri::{AppHandle, Wry, image::Image};
 use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_notification::NotificationExt;
 use tauri_plugin_opener::OpenerExt;
+use log::{error, info};
 
 /// Выполняет команду по ID через единую точку входа
 pub fn execute_command_by_id(
@@ -19,20 +20,20 @@ pub fn execute_command_by_id(
     command_id: &str,
     config_manager: &ConfigManager,
 ) -> Result<(), String> {
-    println!("[Execute] Looking for command with ID: '{}'", command_id);
+    info!("[Execute] Looking for command with ID: '{}'", command_id);
 
     // Приостанавливаем таймеры мониторинга перед выполнением команды
     pause_monitor_timers();
-    println!("[Execute] Paused monitor timers before command execution");
+    info!("[Execute] Paused monitor timers before command execution");
 
     match config_manager.find_command_by_id(command_id) {
         Some((command, config)) => {
-            println!(
+            info!(
                 "[Execute] Found command: '{}' (ID: {:?})",
                 command.name, command.id
             );
-            println!("[Execute] Command has switch: {:?}", command.switch);
-            println!("[Execute] Command has inputs: {:?}", command.inputs);
+            info!("[Execute] Command has switch: {:?}", command.switch);
+            info!("[Execute] Command has inputs: {:?}", command.inputs);
 
             // Проверяем, является ли это командой переключения
             if command.switch.is_some() {
@@ -58,7 +59,7 @@ pub fn execute_command_by_id(
                 } else {
                     // Выполняем команду переключения через execute_command_silent
                     if let Some(toggle_command) = &command.command {
-                        println!("[Monitor] spawn: toggle_command = '{}'", toggle_command);
+                        info!("[Monitor] spawn: toggle_command = '{}'", toggle_command);
                         match console::ConsoleInstance::execute_command_silent(toggle_command) {
                             Ok(_) => {
                                 // Показываем уведомление об успешном выполнении
@@ -78,7 +79,7 @@ pub fn execute_command_by_id(
                                 update_system_tray_menu(app, config_manager);
                             }
                             Err(e) => {
-                                eprintln!("Failed to execute switch command: {}", e);
+                                error!("Failed to execute switch command: {}", e);
                                 // Показываем уведомление об ошибке
                                 if let Ok(_) = app
                                     .notification()
@@ -131,17 +132,17 @@ pub fn execute_command_by_id(
             Ok(())
         }
         None => {
-            println!("[Execute] Command not found for ID: '{}'", command_id);
-            println!("[Execute] Available commands:");
+            info!("[Execute] Command not found for ID: '{}'", command_id);
+            info!("[Execute] Available commands:");
             for config in &config_manager.configs {
                 for command in &config.commands {
-                    println!("[Execute]   - '{}' (ID: {:?})", command.name, command.id);
+                    info!("[Execute]   - '{}' (ID: {:?})", command.name, command.id);
                 }
             }
 
             // Возобновляем таймеры мониторинга даже если команда не найдена
             resume_monitor_timers();
-            println!("[Execute] Resumed monitor timers after command not found");
+            info!("[Execute] Resumed monitor timers after command not found");
 
             Err(format!("Command not found for ID: '{}'", command_id))
         }
@@ -169,8 +170,7 @@ pub fn create_system_tray_menu(
     // Создаем Tauri меню из структуры (это сохранит tauri_icon_item)
     let tray_menu = system_menu.create_tauri_menu(app);
 
-    // Теперь запускаем индивидуальные таймеры для элементов с мониторингом и планировщики
-    system_menu.start_all_monitor_timers();
+    // Запускаем только планировщики (таймеры мониторинга запускаются при наведении мыши)
     system_menu.start_all_schedulers();
 
     // Запускаем периодическую очистку пула соединений
@@ -190,7 +190,11 @@ pub fn create_system_tray_menu(
     // Добавляем системные элементы меню
     tray_menu_builder = tray_menu_builder.separator();
 
-    let mut edit_config_submenu = tauri::menu::SubmenuBuilder::new(app, "🚀 Edit Config");
+    // Загружаем иконку для подменю Edit Config
+    let edit_config_icon = Image::from_bytes(include_bytes!("../icons/edit.png")).unwrap();
+
+    let mut edit_config_submenu = tauri::menu::SubmenuBuilder::new(app, "Edit Config")
+        .submenu_icon(edit_config_icon);
 
     for path in &config_manager.config_paths {
         let file_name = path.file_name().unwrap().to_string_lossy().to_string();
@@ -290,14 +294,14 @@ pub fn handle_system_tray_event(
     config_manager: Arc<Mutex<ConfigManager>>,
 ) {
     let event_id = event.id().0.as_str();
-    println!("[Tray Event] Received menu event with ID: '{}'", event_id);
-    println!("[Tray Event] Event type: {:?}", event);
+    info!("[Tray Event] Received menu event with ID: '{}'", event_id);
+    info!("[Tray Event] Event type: {:?}", event);
 
     let config_path = get_config_path();
 
     match event_id {
         "settings" => {
-            println!("[Tray Event] Handling settings event");
+            info!("[Tray Event] Handling settings event");
             if let Err(e) = create_window(
                 &app,
                 "settings",
@@ -307,7 +311,7 @@ pub fn handle_system_tray_event(
                 700.0,
                 true,
             ) {
-                eprintln!("Failed to create settings window: {}", e);
+                error!("Failed to create settings window: {}", e);
             }
         }
         "about" => {
@@ -320,7 +324,7 @@ pub fn handle_system_tray_event(
                 600.0,
                 true,
             ) {
-                eprintln!("Failed to create about window: {}", e);
+                error!("Failed to create about window: {}", e);
             }
         }
         "help" => {
@@ -333,7 +337,7 @@ pub fn handle_system_tray_event(
                 800.0,
                 true,
             ) {
-                eprintln!("Failed to create help window: {}", e);
+                error!("Failed to create help window: {}", e);
             }
         }
         "quit" => std::process::exit(0),
@@ -361,7 +365,7 @@ pub fn handle_system_tray_event(
                 600.0,
                 true,
             ) {
-                eprintln!("Failed to create config editor window: {}", e);
+                error!("Failed to create config editor window: {}", e);
             }
         }
         "toggle_launch_at_login" => {
@@ -385,17 +389,17 @@ pub fn handle_system_tray_event(
             }
         }
         _ => {
-            println!("[Tray Event] Handling unknown event ID: '{}'", event_id);
+            info!("[Tray Event] Handling unknown event ID: '{}'", event_id);
             if event_id.starts_with("edit_") {
-                println!("[Tray Event] Handling edit config event for: {}", event_id);
+                info!("[Tray Event] Handling edit config event for: {}", event_id);
                 let config_file_name = event_id.replacen("edit_", "", 1);
                 let config_file_path = config_path.parent().unwrap().join(&config_file_name);
                 open_in_default_editor(&config_file_path);
             } else {
-                println!("[Tray Event] Looking for command with ID: '{}'", event_id);
+                info!("[Tray Event] Looking for command with ID: '{}'", event_id);
                 let config_manager = config_manager.lock().unwrap();
                 if let Err(e) = execute_command_by_id(&app, event_id, &config_manager) {
-                    eprintln!("[Tray Event] Failed to execute command: {}", e);
+                    error!("[Tray Event] Failed to execute command: {}", e);
                 }
             }
         }
@@ -411,21 +415,41 @@ pub fn update_system_tray_menu(app: &AppHandle<Wry>, config_manager: &ConfigMana
         config_manager,
     );
 
+    if let Some(status_item) = new_menu.get("status") {
+        if let Some(menuitem) = status_item.as_menuitem() {
+            if let Err(e) = menuitem.set_text("Status: Ready") {
+                eprintln!("Failed to update menu text: {}", e);
+            }
+        }
+    }
+
     // Обновляем меню в трее
     if let Some(tray) = app.tray_by_id("switch-shuttle-tray") {
         if let Err(e) = tray.set_menu(Some(new_menu)) {
-            eprintln!("Failed to update tray menu: {}", e);
+            error!("Failed to update tray menu: {}", e);
         }
     }
 }
 
 pub fn resume_monitor_timers() {
+    // Устанавливаем состояние трея как активное
+    if let Ok(mut tray_active) = crate::menu_structure::TRAY_ACTIVE.lock() {
+        *tray_active = true;
+        info!("[Monitor] Tray state set to active");
+    }
+    
     if let Some(current_menu) = CURRENT_MENU.lock().unwrap().as_mut() {
         current_menu.start_all_monitor_timers();
     }
 }
 
 pub fn pause_monitor_timers() {
+    // Устанавливаем состояние трея как неактивное
+    if let Ok(mut tray_active) = crate::menu_structure::TRAY_ACTIVE.lock() {
+        *tray_active = false;
+        info!("[Monitor] Tray state set to inactive");
+    }
+    
     if let Some(current_menu) = CURRENT_MENU.lock().unwrap().as_mut() {
         current_menu.stop_all_monitor_timers();
     }

@@ -9,13 +9,13 @@ export const TauriCommandsPlugin = {
   install(app: App) {
     // Добавляем команды в глобальные свойства приложения
     app.config.globalProperties.$tauri = SwitchShuttleCommands;
-    
+
     // Добавляем команды в provide/inject для Composition API
     app.provide('tauri', SwitchShuttleCommands);
-    
+
     // Добавляем команды в глобальные свойства для Options API
     app.config.globalProperties.$commands = SwitchShuttleCommands;
-  }
+  },
 };
 
 // Экспортируем для использования в main.ts
@@ -35,5 +35,5 @@ export interface TauriInjectionKey {
 }
 
 export const TAURI_KEY: TauriInjectionKey = {
-  tauri: SwitchShuttleCommands
-} as TauriInjectionKey; 
+  tauri: SwitchShuttleCommands,
+} as TauriInjectionKey;

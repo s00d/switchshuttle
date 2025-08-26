@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use tauri::AppHandle;
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut};
+use log::{error, info};
 
 /// Структура для хранения информации о конфликте хоткеев
 #[derive(Debug, Clone)]
@@ -146,7 +147,7 @@ impl HotkeyManager {
         hotkey: &str,
         command_id: &str,
     ) -> Result<(), String> {
-        println!("[Hotkeys] Registering command hotkey: {}", hotkey);
+        info!("[Hotkeys] Registering command hotkey: {}", hotkey);
 
         // Проверяем, не зарегистрирован ли уже этот хоткей
         if self.registered_hotkeys.contains_key(hotkey) {
@@ -163,7 +164,7 @@ impl HotkeyManager {
                 .register(shortcut.clone())
                 .map_err(|e| e.to_string())?;
             self.registered_hotkeys.insert(hotkey.to_string(), shortcut);
-            println!(
+            info!(
                 "[Hotkeys] Successfully registered command hotkey: {} for command: {}",
                 hotkey, command_id
             );
@@ -173,18 +174,18 @@ impl HotkeyManager {
 
     /// Отменяет регистрацию всех хоткеев
     pub fn unregister_all(&mut self) {
-        println!("[Hotkeys] Unregistering all hotkeys");
+        info!("[Hotkeys] Unregistering all hotkeys");
         if let Some(app_handle) = &self.app_handle {
             for (hotkey, shortcut) in &self.registered_hotkeys {
                 if let Err(e) = app_handle.global_shortcut().unregister(shortcut.clone()) {
-                    eprintln!("[Hotkeys] Failed to unregister hotkey {}: {}", hotkey, e);
+                    error!("[Hotkeys] Failed to unregister hotkey {}: {}", hotkey, e);
                 } else {
-                    println!("[Hotkeys] Successfully unregistered hotkey: {}", hotkey);
+                    info!("[Hotkeys] Successfully unregistered hotkey: {}", hotkey);
                 }
             }
         }
         self.registered_hotkeys.clear();
-        println!("[Hotkeys] All hotkeys unregistered");
+        info!("[Hotkeys] All hotkeys unregistered");
     }
 
     /// Регистрирует все хоткеи из конфигураций
@@ -194,15 +195,15 @@ impl HotkeyManager {
         app: &AppHandle,
         settings_state: &Arc<Mutex<AppSettings>>,
     ) -> Result<(), String> {
-        println!("[Hotkeys] Starting registration of all hotkeys");
+        info!("[Hotkeys] Starting registration of all hotkeys");
         // Сначала отменяем все существующие регистрации
         self.unregister_all();
 
         // Проверяем конфликты
-        println!("[Hotkeys] Checking for hotkey conflicts");
+        info!("[Hotkeys] Checking for hotkey conflicts");
         let conflicts = check_hotkey_conflicts(configs);
         if !conflicts.is_empty() {
-            println!("[Hotkeys] Found {} conflicts", conflicts.len());
+            info!("[Hotkeys] Found {} conflicts", conflicts.len());
             let message = format_conflict_message(&conflicts);
 
             // Показываем уведомление об ошибке
@@ -213,29 +214,29 @@ impl HotkeyManager {
                 .ok();
 
             // Продолжаем регистрацию хоткеев без конфликтов
-            println!("[Hotkeys] Continuing registration for non-conflicting hotkeys");
+            info!("[Hotkeys] Continuing registration for non-conflicting hotkeys");
         } else {
-            println!("[Hotkeys] No conflicts found");
+            info!("[Hotkeys] No conflicts found");
         }
 
         for config in configs {
             // Пропускаем отключенные конфигурации
             if let Some(enabled) = config.enabled {
                 if !enabled {
-                    println!("[Hotkeys] Skipping disabled config: {}", config.title);
+                    info!("[Hotkeys] Skipping disabled config: {}", config.title);
                     continue;
                 }
             }
 
             // Регистрируем хоткеи для команд
-            println!(
+            info!(
                 "[Hotkeys] Registering command hotkeys for config: {}",
                 config.title
             );
             self.register_commands_hotkeys(&config.commands, &config.title)?;
         }
 
-        println!("[Hotkeys] All hotkeys registered successfully");
+        info!("[Hotkeys] All hotkeys registered successfully");
         Ok(())
     }
 
@@ -249,12 +250,12 @@ impl HotkeyManager {
             if let Some(hotkey) = &command.hotkey {
                 if !hotkey.trim().is_empty() {
                     if let Some(id) = &command.id {
-                        println!(
+                        info!(
                             "[Hotkeys] Registering hotkey {} for command {} in {}",
                             hotkey, command.name, config_title
                         );
                         if let Err(e) = self.register_command_hotkey(hotkey, id) {
-                            eprintln!(
+                            error!(
                                 "[Hotkeys] Failed to register hotkey {} for command {} in {}: {}",
                                 hotkey, command.name, config_title, e
                             );

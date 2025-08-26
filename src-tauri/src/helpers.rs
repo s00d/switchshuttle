@@ -5,6 +5,8 @@ use tauri::image::Image;
 use tauri::menu::{CheckMenuItem, IconMenuItem, IconMenuItemBuilder};
 use tauri::path::BaseDirectory;
 use tauri::{AppHandle, Manager, WebviewWindowBuilder, Wry};
+use log::{error, info};
+
 pub fn open_in_default_editor(path: &PathBuf) {
     #[cfg(target_os = "macos")]
     {
@@ -84,7 +86,7 @@ pub fn create_window(
             if current_url.as_str() != target_url {
                 if let Err(e) = existing_window.eval(&format!("window.location.href = '{}'", route))
                 {
-                    println!("Failed to change route in existing window: {:?}", e);
+                    error!("Failed to change route in existing window: {:?}", e);
                 }
             }
         }
@@ -93,23 +95,23 @@ pub fn create_window(
         if let Err(e) =
             existing_window.set_size(tauri::Size::Logical(tauri::LogicalSize::new(width, height)))
         {
-            println!("Failed to resize existing window: {:?}", e);
+                    error!("Failed to resize existing window: {:?}", e);
         }
 
         // Центрируем окно если нужно
         if center {
             if let Err(e) = existing_window.center() {
-                println!("Failed to center existing window: {:?}", e);
+                error!("Failed to center existing window: {:?}", e);
             }
         }
 
         // Показываем окно и устанавливаем фокус
         existing_window
             .show()
-            .unwrap_or_else(|e| println!("Failed to show existing window: {:?}", e));
+            .unwrap_or_else(|e| error!("Failed to show existing window: {:?}", e));
         existing_window
             .set_focus()
-            .unwrap_or_else(|e| println!("Failed to focus existing window: {:?}", e));
+            .unwrap_or_else(|e| error!("Failed to focus existing window: {:?}", e));
         return Ok(());
     }
 
@@ -129,27 +131,27 @@ pub fn create_window(
     {
         if let Ok(image) = Image::from_path(icon_path) {
             if let Err(e) = window.set_icon(image) {
-                println!("Failed to set window icon: {:?}", e);
+                error!("Failed to set window icon: {:?}", e);
             }
         }
     }
 
     if let Err(e) = window.set_focus() {
-        println!("Failed to set window focus: {:?}", e);
+        error!("Failed to set window focus: {:?}", e);
     }
 
     if center {
         if let Err(e) = window.center() {
-            println!("Failed to center window: {:?}", e);
+            error!("Failed to center window: {:?}", e);
         }
     }
 
     window
         .show()
-        .unwrap_or_else(|e| println!("Failed to show existing window: {:?}", e));
+        .unwrap_or_else(|e| error!("Failed to show existing window: {:?}", e));
     window
         .set_focus()
-        .unwrap_or_else(|e| println!("Failed to focus existing window: {:?}", e));
+        .unwrap_or_else(|e| error!("Failed to focus existing window: {:?}", e));
 
     Ok(())
 }
@@ -176,7 +178,7 @@ pub fn create_menu_item(
     hotkey: Option<String>,
     icon: Option<&str>,
 ) -> IconMenuItem<Wry> {
-    println!(
+    info!(
         "[Menu Item] Creating menu item with ID: '{}', text: '{}'",
         id, text
     );
@@ -219,7 +221,7 @@ pub fn create_check_menu_item(
     hotkey: Option<String>,
     icon: Option<&str>,
 ) -> CheckMenuItem<Wry> {
-    println!(
+    info!(
         "[Menu Item] Creating check menu item with ID: '{}', text: '{}', checked: {}",
         id, text, checked
     );

@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/s00d/switchshuttle/compare/v1.13.0...v2.0.0) (2025-01-27)
+
+### ✨ Features
+* **interface:** completely redesigned and modernized user interface
+* **security:** enhanced security features and improvements
+* **notifications:** added comprehensive notification system
+* **code:** optimized codebase for better performance and maintainability
+
+### 🔧 Chores
+* **deps:** updated dependencies for improved compatibility and security
+
+### ♻️ Code Refactoring
+* **interface:** redesigned and modernized user interface
+* **code:** optimized codebase structure and performance
+
+### 🐛 Bug Fixes
+* **general:** fixed various bugs and issues throughout the application
+
 ## [1.13.0](https://github.com/s00d/switchshuttle/compare/v1.12.0...v1.13.0) (2025-07-15)
 
 ### ✨ Features

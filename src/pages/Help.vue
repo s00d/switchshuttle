@@ -2,20 +2,18 @@
   <div class="container mx-auto px-6 py-8 max-w-4xl">
     <div class="bg-white rounded-lg shadow-lg p-8">
       <h1 class="text-3xl font-bold text-slate-900 mb-8">Help & FAQ</h1>
-      
+
       <!-- Search -->
       <div class="mb-8">
         <div class="relative">
           <input
-            v-model="searchQuery"
-            type="text"
-            placeholder="Search FAQ..."
-            class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              v-model="searchQuery"
+              type="text"
+              placeholder="Search FAQ..."
+              class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
           <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-            <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+            <SearchIcon class="h-5 w-5 text-slate-400" />
           </div>
         </div>
       </div>
@@ -24,25 +22,34 @@
       <div class="space-y-6">
         <!-- Getting Started -->
         <div class="bg-slate-50 rounded-lg p-6">
-          <h2 class="text-xl font-bold text-slate-900 mb-4">🚀 Getting Started</h2>
+          <h2 class="text-xl font-bold text-slate-900 mb-4">
+            🚀 Getting Started
+          </h2>
           <div class="space-y-3">
-            <div v-for="item in filteredFaqs.gettingStarted" :key="item.id" class="bg-white rounded-lg border border-slate-200">
-              <button
-                @click="toggleFaq(item.id)"
-                class="w-full px-4 py-3 text-left flex justify-between items-center hover:bg-slate-50 transition-colors"
+            <div
+                v-for="item in filteredFaqs.gettingStarted"
+                :key="item.id"
+                class="bg-white rounded-lg border border-slate-200"
+            >
+              <CustomButton
+                  class="w-full px-4 py-3 text-left flex justify-between items-center hover:bg-slate-50 transition-colors"
+                  @click="toggleFaq(item.id)"
               >
-                <span class="font-medium text-slate-900">{{ item.question }}</span>
-                <svg
-                  :class="['w-5 h-5 text-slate-500 transition-transform', { 'rotate-180': openFaqs.includes(item.id) }]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
+                <span class="font-medium text-slate-900">{{
+                    item.question
+                  }}</span>
+                <ChevronDownIcon
+                    :class="[
+                    'w-5 h-5 text-slate-500 transition-transform',
+                    { 'rotate-180': openFaqs.includes(item.id) },
+                  ]"
+                />
+              </CustomButton>
               <div v-show="openFaqs.includes(item.id)" class="px-4 pb-4">
-                <div class="text-sm text-slate-700 leading-relaxed" v-html="item.answer"></div>
+                <div
+                    class="text-sm text-slate-700 leading-relaxed"
+                    v-html="item.answer"
+                ></div>
               </div>
             </div>
           </div>
@@ -50,25 +57,34 @@
 
         <!-- Configuration -->
         <div class="bg-slate-50 rounded-lg p-6">
-          <h2 class="text-xl font-bold text-slate-900 mb-4">⚙️ Configuration</h2>
+          <h2 class="text-xl font-bold text-slate-900 mb-4">
+            ⚙️ Configuration
+          </h2>
           <div class="space-y-3">
-            <div v-for="item in filteredFaqs.configuration" :key="item.id" class="bg-white rounded-lg border border-slate-200">
-              <button
-                @click="toggleFaq(item.id)"
-                class="w-full px-4 py-3 text-left flex justify-between items-center hover:bg-slate-50 transition-colors"
+            <div
+                v-for="item in filteredFaqs.configuration"
+                :key="item.id"
+                class="bg-white rounded-lg border border-slate-200"
+            >
+              <CustomButton
+                  class="w-full px-4 py-3 text-left flex justify-between items-center hover:bg-slate-50 transition-colors"
+                  @click="toggleFaq(item.id)"
               >
-                <span class="font-medium text-slate-900">{{ item.question }}</span>
-                <svg
-                  :class="['w-5 h-5 text-slate-500 transition-transform', { 'rotate-180': openFaqs.includes(item.id) }]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
+                <span class="font-medium text-slate-900">{{
+                    item.question
+                  }}</span>
+                <ChevronDownIcon
+                    :class="[
+                    'w-5 h-5 text-slate-500 transition-transform',
+                    { 'rotate-180': openFaqs.includes(item.id) },
+                  ]"
+                />
+              </CustomButton>
               <div v-show="openFaqs.includes(item.id)" class="px-4 pb-4">
-                <div class="text-sm text-slate-700 leading-relaxed" v-html="item.answer"></div>
+                <div
+                    class="text-sm text-slate-700 leading-relaxed"
+                    v-html="item.answer"
+                ></div>
               </div>
             </div>
           </div>
@@ -76,25 +92,34 @@
 
         <!-- Command Types -->
         <div class="bg-slate-50 rounded-lg p-6">
-          <h2 class="text-xl font-bold text-slate-900 mb-4">🔧 Command Types</h2>
+          <h2 class="text-xl font-bold text-slate-900 mb-4">
+            🔧 Command Types
+          </h2>
           <div class="space-y-3">
-            <div v-for="item in filteredFaqs.commandTypes" :key="item.id" class="bg-white rounded-lg border border-slate-200">
-              <button
-                @click="toggleFaq(item.id)"
-                class="w-full px-4 py-3 text-left flex justify-between items-center hover:bg-slate-50 transition-colors"
+            <div
+                v-for="item in filteredFaqs.commandTypes"
+                :key="item.id"
+                class="bg-white rounded-lg border border-slate-200"
+            >
+              <CustomButton
+                  class="w-full px-4 py-3 text-left flex justify-between items-center hover:bg-slate-50 transition-colors"
+                  @click="toggleFaq(item.id)"
               >
-                <span class="font-medium text-slate-900">{{ item.question }}</span>
-                <svg
-                  :class="['w-5 h-5 text-slate-500 transition-transform', { 'rotate-180': openFaqs.includes(item.id) }]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
+                <span class="font-medium text-slate-900">{{
+                    item.question
+                  }}</span>
+                <ChevronDownIcon
+                    :class="[
+                    'w-5 h-5 text-slate-500 transition-transform',
+                    { 'rotate-180': openFaqs.includes(item.id) },
+                  ]"
+                />
+              </CustomButton>
               <div v-show="openFaqs.includes(item.id)" class="px-4 pb-4">
-                <div class="text-sm text-slate-700 leading-relaxed" v-html="item.answer"></div>
+                <div
+                    class="text-sm text-slate-700 leading-relaxed"
+                    v-html="item.answer"
+                ></div>
               </div>
             </div>
           </div>
@@ -102,25 +127,34 @@
 
         <!-- Advanced Features -->
         <div class="bg-slate-50 rounded-lg p-6">
-          <h2 class="text-xl font-bold text-slate-900 mb-4">🚀 Advanced Features</h2>
+          <h2 class="text-xl font-bold text-slate-900 mb-4">
+            🚀 Advanced Features
+          </h2>
           <div class="space-y-3">
-            <div v-for="item in filteredFaqs.advancedFeatures" :key="item.id" class="bg-white rounded-lg border border-slate-200">
-              <button
-                @click="toggleFaq(item.id)"
-                class="w-full px-4 py-3 text-left flex justify-between items-center hover:bg-slate-50 transition-colors"
+            <div
+                v-for="item in filteredFaqs.advancedFeatures"
+                :key="item.id"
+                class="bg-white rounded-lg border border-slate-200"
+            >
+              <CustomButton
+                  class="w-full px-4 py-3 text-left flex justify-between items-center hover:bg-slate-50 transition-colors"
+                  @click="toggleFaq(item.id)"
               >
-                <span class="font-medium text-slate-900">{{ item.question }}</span>
-                <svg
-                  :class="['w-5 h-5 text-slate-500 transition-transform', { 'rotate-180': openFaqs.includes(item.id) }]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
+                <span class="font-medium text-slate-900">{{
+                    item.question
+                  }}</span>
+                <ChevronDownIcon
+                    :class="[
+                    'w-5 h-5 text-slate-500 transition-transform',
+                    { 'rotate-180': openFaqs.includes(item.id) },
+                  ]"
+                />
+              </CustomButton>
               <div v-show="openFaqs.includes(item.id)" class="px-4 pb-4">
-                <div class="text-sm text-slate-700 leading-relaxed" v-html="item.answer"></div>
+                <div
+                    class="text-sm text-slate-700 leading-relaxed"
+                    v-html="item.answer"
+                ></div>
               </div>
             </div>
           </div>
@@ -128,25 +162,34 @@
 
         <!-- Troubleshooting -->
         <div class="bg-slate-50 rounded-lg p-6">
-          <h2 class="text-xl font-bold text-slate-900 mb-4">🔧 Troubleshooting</h2>
+          <h2 class="text-xl font-bold text-slate-900 mb-4">
+            🔧 Troubleshooting
+          </h2>
           <div class="space-y-3">
-            <div v-for="item in filteredFaqs.troubleshooting" :key="item.id" class="bg-white rounded-lg border border-slate-200">
+            <div
+                v-for="item in filteredFaqs.troubleshooting"
+                :key="item.id"
+                class="bg-white rounded-lg border border-slate-200"
+            >
               <button
-                @click="toggleFaq(item.id)"
-                class="w-full px-4 py-3 text-left flex justify-between items-center hover:bg-slate-50 transition-colors"
+                  class="w-full px-4 py-3 text-left flex justify-between items-center hover:bg-slate-50 transition-colors"
+                  @click="toggleFaq(item.id)"
               >
-                <span class="font-medium text-slate-900">{{ item.question }}</span>
-                <svg
-                  :class="['w-5 h-5 text-slate-500 transition-transform', { 'rotate-180': openFaqs.includes(item.id) }]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
+                <span class="font-medium text-slate-900">{{
+                    item.question
+                  }}</span>
+                <ChevronDownIcon
+                    :class="[
+                    'w-5 h-5 text-slate-500 transition-transform',
+                    { 'rotate-180': openFaqs.includes(item.id) },
+                  ]"
+                />
               </button>
               <div v-show="openFaqs.includes(item.id)" class="px-4 pb-4">
-                <div class="text-sm text-slate-700 leading-relaxed" v-html="item.answer"></div>
+                <div
+                    class="text-sm text-slate-700 leading-relaxed"
+                    v-html="item.answer"
+                ></div>
               </div>
             </div>
           </div>
@@ -156,7 +199,13 @@
       <!-- Footer -->
       <div class="mt-12 pt-8 border-t border-slate-200">
         <p class="text-sm text-slate-500 text-center">
-          Can't find what you're looking for? Visit our <a href="https://github.com/s00d/switchshuttle" class="text-blue-600 hover:text-blue-800">GitHub repository</a> for additional resources.
+          Can't find what you're looking for? Visit our
+          <a
+              href="https://github.com/s00d/switchshuttle"
+              class="text-blue-600 hover:text-blue-800"
+          >GitHub repository</a
+          >
+          for additional resources.
         </p>
       </div>
     </div>
@@ -164,10 +213,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed } from 'vue';
+import SearchIcon from '../components/icons/SearchIcon.vue';
+import ChevronDownIcon from '../components/icons/ChevronDownIcon.vue';
 
-const searchQuery = ref('')
-const openFaqs = ref<string[]>([])
+const searchQuery = ref('');
+const openFaqs = ref<string[]>([]);
 
 const faqData = {
   gettingStarted: [
@@ -180,7 +231,7 @@ const faqData = {
         
         <p class="mb-3"><strong>Manual Download:</strong></p>
         <p>Download the latest release from <a href="https://github.com/s00d/switchshuttle/releases" class="text-blue-600 hover:text-blue-800">GitHub Releases</a> for your platform.</p>
-      `
+      `,
     },
     {
       id: 'gs-2',
@@ -193,7 +244,7 @@ const faqData = {
           <li>Add your first command or import an existing configuration</li>
           <li>Save and restart the application</li>
         </ol>
-      `
+      `,
     },
     {
       id: 'gs-3',
@@ -209,8 +260,8 @@ const faqData = {
             <code class="block bg-slate-200 p-2 rounded text-sm mt-1">C:\\Users\\&lt;Username&gt;\\AppData\\Roaming\\switch-shuttle\\</code>
           </div>
         </div>
-      `
-    }
+      `,
+    },
   ],
   configuration: [
     {
@@ -231,7 +282,7 @@ const faqData = {
     }
   ]
 }</code></pre>
-      `
+      `,
     },
     {
       id: 'cfg-2',
@@ -265,7 +316,7 @@ const faqData = {
             </tbody>
           </table>
         </div>
-      `
+      `,
     },
     {
       id: 'cfg-3',
@@ -282,8 +333,8 @@ const faqData = {
         
         <p class="mb-3"><strong>JSON Method:</strong></p>
         <code class="block bg-slate-200 p-2 rounded text-sm">"enabled": true  // Set to false to disable</code>
-      `
-    }
+      `,
+    },
   ],
   commandTypes: [
     {
@@ -341,7 +392,7 @@ const faqData = {
 }</code></pre>
           </div>
         </div>
-      `
+      `,
     },
     {
       id: 'ct-2',
@@ -366,8 +417,8 @@ const faqData = {
             <strong>Note:</strong> Ensure no other applications are using the same hotkey combination to avoid conflicts.
           </p>
         </div>
-      `
-    }
+      `,
+    },
   ],
   advancedFeatures: [
     {
@@ -390,7 +441,7 @@ const faqData = {
   "command": "networksetup -setairportpower en0 toggle",
   "switch": "networksetup -getairportpower en0 | grep -q 'On' && echo 'true' || echo 'false'"
 }</code></pre>
-      `
+      `,
     },
     {
       id: 'af-2',
@@ -420,7 +471,7 @@ const faqData = {
           <li>Add appropriate units (%, MB, GB, etc.) to the output</li>
           <li>Handle errors gracefully</li>
         </ul>
-      `
+      `,
     },
     {
       id: 'af-3',
@@ -441,7 +492,7 @@ const faqData = {
           <code class="block bg-slate-200 p-2 rounded text-sm">switch-shuttle list --filter "server"</code>
           <code class="block bg-slate-200 p-2 rounded text-sm">switch-shuttle export &gt; config.json</code>
         </div>
-      `
+      `,
     },
     {
       id: 'af-4',
@@ -493,7 +544,7 @@ const faqData = {
             <strong>Tip:</strong> Use <code class="bg-blue-100 px-1 rounded">"background": true</code> for scheduled commands to run silently without opening terminal windows.
           </p>
         </div>
-      `
+      `,
     },
     {
       id: 'af-5',
@@ -548,8 +599,8 @@ const faqData = {
             <strong>Note:</strong> Switch commands and monitor commands always use background execution regardless of the background setting.
           </p>
         </div>
-      `
-    }
+      `,
+    },
   ],
   troubleshooting: [
     {
@@ -570,7 +621,7 @@ const faqData = {
             <strong>Tip:</strong> On macOS, you may need to grant accessibility permissions to SwitchShuttle in System Preferences > Security & Privacy > Privacy > Accessibility.
           </p>
         </div>
-      `
+      `,
     },
     {
       id: 'ts-2',
@@ -592,11 +643,12 @@ const faqData = {
           <li>Invalid string escaping</li>
           <li>Trailing commas in arrays or objects</li>
         </ul>
-      `
+      `,
     },
     {
       id: 'ts-3',
-      question: 'The terminal is not opening or commands are not executing. What is wrong?',
+      question:
+          'The terminal is not opening or commands are not executing. What is wrong?',
       answer: `
         <p class="mb-3">Terminal execution issues can be resolved by checking these common causes:</p>
         
@@ -626,7 +678,7 @@ const faqData = {
           <li>Windows: Command Prompt, PowerShell, Windows Terminal</li>
           <li>Linux: gnome-terminal, konsole, xterm, alacritty</li>
         </ul>
-      `
+      `,
     },
     {
       id: 'ts-4',
@@ -654,42 +706,43 @@ const faqData = {
             </ul>
           </div>
         </div>
-      `
-    }
-  ]
-}
+      `,
+    },
+  ],
+};
 
 const filteredFaqs = computed(() => {
-  const query = searchQuery.value.toLowerCase()
-  
+  const query = searchQuery.value.toLowerCase();
+
   if (!query) {
-    return faqData
+    return faqData;
   }
-  
+
   const filterCategory = (category: any[]) => {
-    return category.filter(item => 
-      item.question.toLowerCase().includes(query) || 
-      item.answer.toLowerCase().includes(query)
-    )
-  }
-  
+    return category.filter(
+        item =>
+            item.question.toLowerCase().includes(query) ||
+            item.answer.toLowerCase().includes(query)
+    );
+  };
+
   return {
     gettingStarted: filterCategory(faqData.gettingStarted),
     configuration: filterCategory(faqData.configuration),
     commandTypes: filterCategory(faqData.commandTypes),
     advancedFeatures: filterCategory(faqData.advancedFeatures),
-    troubleshooting: filterCategory(faqData.troubleshooting)
-  }
-})
+    troubleshooting: filterCategory(faqData.troubleshooting),
+  };
+});
 
 const toggleFaq = (id: string) => {
-  const index = openFaqs.value.indexOf(id)
+  const index = openFaqs.value.indexOf(id);
   if (index > -1) {
-    openFaqs.value.splice(index, 1)
+    openFaqs.value.splice(index, 1);
   } else {
-    openFaqs.value.push(id)
+    openFaqs.value.push(id);
   }
-}
+};
 </script>
 
 <style scoped>

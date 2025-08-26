@@ -1,10 +1,11 @@
 use reqwest::blocking::Client;
 use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
-use serde::Deserialize;
+use serde::{Deserialize};
 use serde_json::json;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use tauri::{Manager, State};
+use log::{error, info, warn};
 
 use crate::config::{CommandConfig, Config, ConfigManager};
 use crate::console;
@@ -106,44 +107,119 @@ pub fn get_terminals_list() -> HashMap<String, TerminalConfig> {
 }
 
 #[tauri::command]
-pub fn execute(
+pub async fn execute(
     state: State<'_, Arc<Mutex<ConfigManager>>>,
     command: String,
 ) -> Result<String, String> {
-    println!("Executing command: {}", command);
+    info!("Executing command: {}", command);
 
-    let config_manager = state.lock().unwrap();
-
-    match config_manager.find_command_by_id(&command) {
-        Some((command, config)) => {
-            execute_command(
-                command,
-                &config.terminal,
-                &config.launch_in,
-                &config.theme,
-                &config.title,
-            );
-            Ok("Ok".to_string())
+    let (command_config, config) = {
+        let config_manager = state.lock().unwrap();
+        match config_manager.find_command_by_id(&command) {
+            Some((cmd, cfg)) => (cmd.clone(), cfg.clone()),
+            None => return Err(format!("Command '{}' not found", command)),
         }
-        None => Err(format!("Command '{}' not found", command)),
+    };
+
+    // Если команда не найдена, возвращаем ошибку
+    if command_config.name.is_empty() {
+        return Err(format!("Command '{}' not found", command));
     }
+    
+    // Выполняем команду
+    execute_command(
+        &command_config,
+        &config.terminal,
+        &config.launch_in,
+        &config.theme,
+        &config.title,
+    );
+    
+    Ok("Ok".to_string())
 }
 
 #[tauri::command]
-pub fn execute_command_with_inputs(
+pub async fn execute_raw_command(
+    command: String,
+    config_id: Option<String>,
+    state: State<'_, Arc<Mutex<ConfigManager>>>,
+) -> Result<String, String> {
+    info!("=== execute_raw_command called ===");
+    info!("Command: '{}'", command);
+    info!("Config ID: {:?}", config_id);
+    info!("================================");
+
+    let (terminal, launch_in, theme, title) = {
+        let config_manager = state.lock().unwrap();
+        
+        // Если передан ID конфигурации, используем её параметры
+        if let Some(id) = config_id {
+            // Ищем конфигурацию по ID
+            let config = config_manager.configs.iter()
+                .find(|c| c.title == id)
+                .ok_or_else(|| format!("Configuration '{}' not found", id))?;
+            
+            info!("Found configuration: {:?}", config);
+            
+            (config.terminal.clone(), config.launch_in.clone(), config.theme.clone(), config.title.clone())
+        } else {
+            // Используем значения по умолчанию
+            ("terminal".to_string(), "current".to_string(), "default".to_string(), "Raw Command".to_string())
+        }
+    };
+
+    info!("Using parameters:");
+    info!("  Terminal: '{}'", terminal);
+    info!("  Launch in: '{}'", launch_in);
+    info!("  Theme: '{}'", theme);
+    info!("  Title: '{}'", title);
+
+    // Создаем временную конфигурацию команды
+    let command_config = CommandConfig {
+        id: None,
+        name: "Raw Command".to_string(),
+        inputs: None,
+        command: None,
+        commands: Some(vec![command.clone()]),
+        hotkey: None,
+        submenu: None,
+        switch: None,
+        monitor: None,
+        icon: None,
+        scheduler: None,
+        background: None,
+    };
+
+    info!("Created command config: {:?}", command_config);
+    
+    execute_command(
+        &command_config,
+        &terminal,
+        &launch_in,
+        &theme,
+        &title,
+    );
+    
+    info!("=== execute_raw_command completed ===");
+    Ok("Command executed successfully".to_string())
+}
+
+#[tauri::command]
+pub async fn execute_command_with_inputs(
     state: State<'_, Arc<Mutex<ConfigManager>>>,
     settings_state: State<'_, Arc<Mutex<AppSettings>>>,
     inputs: HashMap<String, String>,
     command: String,
     app: tauri::AppHandle,
 ) -> Result<String, String> {
-    println!("execute_command_with_inputs {:?} {:?}", inputs, command);
+    info!("execute_command_with_inputs {:?} {:?}", inputs, command);
 
-    let config_manager = state.lock().unwrap();
-
-    let (command, config) = match config_manager.find_command_by_id(&command) {
-        Some((cmd, cfg)) => (cmd, cfg),
-        None => return Err("Command not found".to_string()),
+    let (command, config) = {
+        let config_manager = state.lock().unwrap();
+        match config_manager.find_command_by_id(&command) {
+            Some((cmd, cfg)) => (cmd.clone(), cfg.clone()),
+            None => return Err("Command not found".to_string()),
+        }
     };
 
     let mut cmd = command.command.clone();
@@ -184,38 +260,36 @@ pub fn execute_command_with_inputs(
         scheduler: command.scheduler.clone(),
         background: command.background.clone(),
     };
-
+    
     // Проверяем, является ли это switch командой
     if command.switch.is_some() {
         // Для switch команд используем execute_command_silent
         if let Some(toggle_command) = &updated_command.command {
-            println!("[Monitor] switch: toggle_command = '{}'", toggle_command);
+            info!("[Monitor] switch: toggle_command = '{}'", toggle_command);
             match console::ConsoleInstance::execute_command_silent(toggle_command) {
                 Ok(_) => {
-                    println!("Switch command executed successfully");
+                    info!("Switch command executed successfully");
                     // Показываем уведомление об успешном выполнении
-                    settings_state
-                        .lock()
-                        .unwrap()
-                        .show_success_notification(
+                    {
+                        let settings = settings_state.lock().unwrap();
+                        settings.show_success_notification(
                             &app,
                             "SwitchShuttle Success",
                             &format!("Switch command '{}' executed successfully", command.name),
-                        )
-                        .ok();
+                        ).ok();
+                    }
                 }
                 Err(e) => {
-                    eprintln!("Failed to execute switch command: {}", e);
+                    error!("Failed to execute switch command: {}", e);
                     // Показываем уведомление об ошибке
-                    settings_state
-                        .lock()
-                        .unwrap()
-                        .show_error_notification(
+                    {
+                        let settings = settings_state.lock().unwrap();
+                        settings.show_error_notification(
                             &app,
                             "SwitchShuttle Error",
                             &format!("Failed to execute switch command: {}", e),
-                        )
-                        .ok();
+                        ).ok();
+                    }
                 }
             }
         }
@@ -229,6 +303,7 @@ pub fn execute_command_with_inputs(
             &config.title,
         );
     }
+    
     Ok("Ok".to_string())
 }
 
@@ -237,7 +312,7 @@ pub fn fetch_input_data(
     state: State<'_, Arc<Mutex<ConfigManager>>>,
     command: String,
 ) -> Result<String, String> {
-    println!("get_inputs_data {:?}", command);
+    info!("get_inputs_data {:?}", command);
 
     let config_manager = state.lock().unwrap();
 
@@ -250,6 +325,38 @@ pub fn fetch_input_data(
         Some(inputs) => Ok(json!(inputs).to_string()),
         None => return Err("Inputs not found".to_string()),
     }
+}
+
+#[tauri::command]
+pub fn get_command_info(
+    state: State<'_, Arc<Mutex<ConfigManager>>>,
+    command: String,
+) -> Result<String, String> {
+    info!("get_command_info {:?}", command);
+
+    let config_manager = state.lock().unwrap();
+
+    let (command, _config) = match config_manager.find_command_by_id(&command) {
+        Some((cmd, cfg)) => (cmd, cfg),
+        None => return Err("Command not found".to_string()),
+    };
+
+    // Возвращаем информацию о команде в JSON формате
+    let command_info = json!({
+        "id": command.id,
+        "name": command.name,
+        "commands": command.commands,
+        "command": command.command,
+        "inputs": command.inputs,
+        "switch": command.switch,
+        "monitor": command.monitor,
+        "scheduler": command.scheduler,
+        "hotkey": command.hotkey,
+        "icon": command.icon,
+        "background": command.background
+    });
+
+    Ok(command_info.to_string())
 }
 
 #[tauri::command]
@@ -345,7 +452,7 @@ pub fn save_or_update_configuration(
     let config_path = get_config_path();
     let config_dir = config_path.parent().unwrap().to_path_buf();
 
-    println!(
+    info!(
         "[Save] original_title: {:?}, config.title: {}",
         original_title, config.title
     );
@@ -366,7 +473,7 @@ pub fn save_or_update_configuration(
         .as_ref()
         .map_or(false, |orig| config.title != *orig);
 
-    println!(
+    info!(
         "[Save] title_changed: {}, original_title.is_some(): {}",
         title_changed,
         original_title.is_some()
@@ -376,7 +483,7 @@ pub fn save_or_update_configuration(
         // Заголовок не изменился при обновлении - сохраняем в тот же файл
         let original_title = original_title.unwrap(); // Safe unwrap, так как мы знаем что original_title.is_some()
         let config_file = config_dir.join(format!("{}.json", original_title));
-        println!("[Save] Saving to existing file: {}", config_file.display());
+        info!("[Save] Saving to existing file: {}", config_file.display());
         config
             .save(&config_file)
             .map_err(|e| format!("Failed to save configuration: {}", e))?;
@@ -384,15 +491,15 @@ pub fn save_or_update_configuration(
         // Это новая конфигурация или изменилось название - генерируем уникальное имя
         let unique_title =
             generate_unique_title(&config_dir, &config.title, original_title.as_deref());
-        println!("[Save] Generated unique title: {}", unique_title);
+        info!("[Save] Generated unique title: {}", unique_title);
         config.title = unique_title.clone();
 
         let new_config_file = config_dir.join(format!("{}.json", unique_title));
-        println!("[Save] Saving to new file: {}", new_config_file.display());
+        info!("[Save] Saving to new file: {}", new_config_file.display());
 
         // Если новый файл уже существует, удаляем его
         if new_config_file.exists() {
-            println!(
+            info!(
                 "[Save] Removing existing file: {}",
                 new_config_file.display()
             );
@@ -409,7 +516,7 @@ pub fn save_or_update_configuration(
         if let Some(original_title) = original_title {
             let original_config_file = config_dir.join(format!("{}.json", original_title));
             if original_config_file.exists() {
-                println!(
+                info!(
                     "[Save] Removing old file: {}",
                     original_config_file.display()
                 );
@@ -436,7 +543,7 @@ pub fn save_or_update_configuration(
     if let Err(e) =
         hotkey_manager.register_all_hotkeys(&config_manager.configs, &app, &settings_state)
     {
-        eprintln!("Failed to reregister hotkeys after save: {}", e);
+        error!("Failed to reregister hotkeys after save: {}", e);
     }
 
     Ok(())
@@ -450,7 +557,7 @@ fn generate_unique_title(
     let mut counter = 1;
     let mut title = base_title.trim().to_string();
 
-    println!(
+    info!(
         "[Generate] base_title: '{}', original_title: {:?}",
         base_title, original_title
     );
@@ -469,20 +576,20 @@ fn generate_unique_title(
 
     // Проверяем, существует ли файл с таким именем
     while config_dir.join(format!("{}.json", title)).exists() {
-        println!("[Generate] File exists: {}.json", title);
+        info!("[Generate] File exists: {}.json", title);
 
         // Если это тот же файл (original_title совпадает с текущим title),
         // то возвращаем текущее название без изменений
         if let Some(orig_title) = original_title {
             if title == orig_title {
-                println!("[Generate] Same file, returning: {}", title);
+                info!("[Generate] Same file, returning: {}", title);
                 return title;
             }
         }
 
         counter += 1;
         title = format!("{} ({})", original_title_name, counter);
-        println!("[Generate] Trying: {}", title);
+        info!("[Generate] Trying: {}", title);
 
         attempts += 1;
         if attempts >= MAX_ATTEMPTS {
@@ -499,7 +606,7 @@ fn generate_unique_title(
         }
     }
 
-    println!("[Generate] Final title: {}", title);
+    info!("[Generate] Final title: {}", title);
     title
 }
 
@@ -749,6 +856,14 @@ pub fn save_settings(
     Ok(())
 }
 
+#[tauri::command]
+pub fn get_security_settings(
+    state: State<'_, Arc<Mutex<AppSettings>>>,
+) -> Result<crate::settings::SecuritySettings, String> {
+    let settings = state.lock().unwrap();
+    Ok(settings.security.clone())
+}
+
 #[derive(Debug, Deserialize)]
 pub enum NotificationType {
     #[serde(rename = "default")]
@@ -771,7 +886,7 @@ pub fn show_notification(
     body: String,
     notification_type: NotificationType,
 ) -> Result<(), String> {
-    println!(
+    info!(
         "[Commands] show_notification called: title='{}', body='{}', type='{:?}'",
         title, body, notification_type
     );
@@ -780,31 +895,31 @@ pub fn show_notification(
 
     match notification_type {
         NotificationType::Default => {
-            println!("[Commands] Showing default notification");
+            info!("[Commands] Showing default notification");
             settings
                 .show_notification(&app, &title, &body)
                 .map_err(|e| format!("Failed to show notification: {}", e))
         }
         NotificationType::Success => {
-            println!("[Commands] Showing success notification");
+            info!("[Commands] Showing success notification");
             settings
                 .show_success_notification(&app, &title, &body)
                 .map_err(|e| format!("Failed to show success notification: {}", e))
         }
         NotificationType::Error => {
-            println!("[Commands] Showing error notification");
+            error!("[Commands] Showing error notification");
             settings
                 .show_error_notification(&app, &title, &body)
                 .map_err(|e| format!("Failed to show error notification: {}", e))
         }
         NotificationType::Info => {
-            println!("[Commands] Showing info notification");
+            info!("[Commands] Showing info notification");
             settings
                 .show_info_notification(&app, &title, &body)
                 .map_err(|e| format!("Failed to show info notification: {}", e))
         }
         NotificationType::Warning => {
-            println!("[Commands] Showing warning notification");
+            warn!("[Commands] Showing warning notification");
             settings
                 .show_warning_notification(&app, &title, &body)
                 .map_err(|e| format!("Failed to show warning notification: {}", e))

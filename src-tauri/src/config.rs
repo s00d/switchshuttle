@@ -6,6 +6,7 @@ use std::sync::Arc;
 use std::{fs, io};
 use tauri::{AppHandle, Wry};
 use tauri_plugin_dialog::DialogExt;
+use log::{error, warn};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Config {
@@ -100,7 +101,7 @@ impl ConfigManager {
                         has_configs = true;
                     }
                     Err(err) => {
-                        eprintln!("Failed to load config from {}: {}", path.display(), err);
+                        error!("Failed to load config from {}: {}", path.display(), err);
                         if let Some(w) = app {
                             w.dialog()
                                 .message(&format!(
@@ -183,7 +184,7 @@ impl Config {
                 Ok(config)
             }
             Err(err) => {
-                eprintln!("Failed to parse config from {}: {}", path.display(), err);
+                error!("Failed to parse config from {}: {}", path.display(), err);
                 Err(io::Error::new(io::ErrorKind::InvalidData, err))
             }
         }
@@ -352,7 +353,7 @@ impl CommandConfig {
         // Migrate self
         if let Some(command) = self.command.take() {
             if !command.trim().is_empty() {
-                println!("Warning: 'command' field is deprecated. Use 'commands' array instead.");
+                warn!("'command' field is deprecated. Use 'commands' array instead.");
                 if self.commands.is_none() {
                     self.commands = Some(vec![command]);
                 } else if let Some(ref mut commands) = self.commands {

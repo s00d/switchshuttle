@@ -6,6 +6,7 @@ use std::sync::{Arc, Mutex};
 use std::thread::{self, JoinHandle};
 use std::time::Duration;
 use tauri::{AppHandle, Wry};
+use log::{error, info};
 
 // Глобальный пул консольных соединений
 static CONSOLE_POOL: Lazy<Arc<Mutex<ConsolePool>>> =
@@ -31,14 +32,14 @@ impl ConsolePool {
 
     /// Инициализирует постоянный инстанс консоли
     pub fn init_console() -> Result<(), String> {
-        println!("[Console] Initializing console instance...");
+        info!("[Console] Initializing console instance...");
         let mut console_guard = CONSOLE_INSTANCE.lock().unwrap();
         if console_guard.is_none() {
-            println!("[Console] Creating new console instance...");
+            info!("[Console] Creating new console instance...");
             *console_guard = Some(ConsoleInstance::new()?);
-            println!("[Console] Console instance created successfully");
+            info!("[Console] Console instance created successfully");
         } else {
-            println!("[Console] Console instance already exists");
+            info!("[Console] Console instance already exists");
         }
         Ok(())
     }
@@ -127,7 +128,7 @@ pub struct ConsoleInstance {
 
 impl ConsoleInstance {
     pub fn new() -> Result<Self, String> {
-        println!("[Console] Creating new console instance...");
+        info!("[Console] Creating new console instance...");
 
         let (stdin_tx, stdin_rx) = std::sync::mpsc::channel();
         let response = Arc::new(Mutex::new(None));
@@ -202,21 +203,21 @@ impl ConsoleInstance {
             // Поток для записи команд в stdin
             let stdin_thread = thread::spawn(move || {
                 let mut stdin_writer = stdin;
-                println!("[Console] Stdin thread started");
+                info!("[Console] Stdin thread started");
 
                 while let Ok(command) = stdin_rx.recv() {
-                    println!("[Console] Stdin thread received command: {:?}", command);
+                    info!("[Console] Stdin thread received command: {:?}", command);
                     if command == "exit" {
-                        println!("[Console] Stdin thread received exit command");
+                        info!("[Console] Stdin thread received exit command");
                         break;
                     }
                     if let Err(e) = writeln!(stdin_writer, "{}", command) {
-                        println!("[Console] Error writing to stdin: {}", e);
+                        error!("[Console] Error writing to stdin: {}", e);
                         break;
                     }
-                    println!("[Console] Stdin thread wrote command to process");
+                    info!("[Console] Stdin thread wrote command to process");
                 }
-                println!("[Console] Stdin thread finished");
+                info!("[Console] Stdin thread finished");
             });
 
             // Клонируем response для потоков
@@ -226,24 +227,24 @@ impl ConsoleInstance {
             // Поток для чтения stdout
             let stdout_thread = thread::spawn(move || {
                 let mut stdout_reader = BufReader::new(stdout);
-                println!("[Console] Stdout thread started");
+                info!("[Console] Stdout thread started");
                 loop {
                     // Читаем из stdout
                     let mut line = String::new();
                     match stdout_reader.read_line(&mut line) {
                         Ok(0) => {
                             // EOF - поток закрыт
-                            println!("[Console] Stdout EOF reached");
+                            info!("[Console] Stdout EOF reached");
                             break;
                         }
                         Ok(_) => {
                             if !line.trim().is_empty() {
-                                println!("[Console] Got stdout: {:?}", line.trim());
+                                info!("[Console] Got stdout: {:?}", line.trim());
                                 *response_stdout.lock().unwrap() = Some(line.trim().to_string());
                             }
                         }
                         Err(e) => {
-                            println!("[Console] Error reading stdout: {}", e);
+                            error!("[Console] Error reading stdout: {}", e);
                             break;
                         }
                     }
@@ -251,13 +252,13 @@ impl ConsoleInstance {
                     // Небольшая пауза
                     std::thread::sleep(Duration::from_millis(10));
                 }
-                println!("[Console] Stdout thread finished");
+                info!("[Console] Stdout thread finished");
             });
 
             // Поток для чтения stderr
             let stderr_thread = thread::spawn(move || {
                 let mut stderr_reader = BufReader::new(stderr);
-                println!("[Console] Stderr thread started");
+                info!("[Console] Stderr thread started");
 
                 loop {
                     // Читаем из stderr
@@ -265,7 +266,7 @@ impl ConsoleInstance {
                     match stderr_reader.read_line(&mut err_line) {
                         Ok(0) => {
                             // EOF - поток закрыт
-                            println!("[Console] Stderr EOF reached");
+                            info!("[Console] Stderr EOF reached");
                             break;
                         }
                         Ok(_) => {
@@ -276,11 +277,11 @@ impl ConsoleInstance {
                                     && !trimmed.contains("$")
                                     && !trimmed.contains("PS1")
                                 {
-                                    println!("[Console] Got stderr: {:?}", trimmed);
+                                    info!("[Console] Got stderr: {:?}", trimmed);
                                     *response_stderr.lock().unwrap() =
                                         Some(format!("stderr: {}", trimmed));
                                 } else {
-                                    println!(
+                                    info!(
                                         "[Console] Filtered stderr (echo/prompt): {:?}",
                                         trimmed
                                     );
@@ -288,7 +289,7 @@ impl ConsoleInstance {
                             }
                         }
                         Err(e) => {
-                            println!("[Console] Error reading stderr: {}", e);
+                            error!("[Console] Error reading stderr: {}", e);
                             break;
                         }
                     }
@@ -296,7 +297,7 @@ impl ConsoleInstance {
                     // Небольшая пауза
                     std::thread::sleep(Duration::from_millis(10));
                 }
-                println!("[Console] Stderr thread finished");
+                info!("[Console] Stderr thread finished");
             });
 
             Ok((
@@ -311,7 +312,7 @@ impl ConsoleInstance {
     }
 
     pub fn execute_command(&mut self, command: &str) -> Result<String, String> {
-        println!("[Console] Executing command: {}", command);
+        info!("[Console] Executing command: {}", command);
         if command.trim().is_empty() {
             return Ok("".to_string());
         }
@@ -323,43 +324,43 @@ impl ConsoleInstance {
         if let Some(ref mut process) = self.process {
             match process.try_wait() {
                 Ok(Some(exit_status)) => {
-                    println!(
+                    error!(
                         "[Console] ERROR: Process has exited with status: {:?}",
                         exit_status
                     );
                     return Err("Process has exited".to_string());
                 }
                 Ok(None) => {
-                    println!("[Console] Process is still running");
+                    info!("[Console] Process is still running");
                 }
                 Err(e) => {
-                    println!("[Console] ERROR: Failed to check process status: {}", e);
+                    error!("[Console] ERROR: Failed to check process status: {}", e);
                     return Err("Failed to check process status".to_string());
                 }
             }
         } else {
-            println!("[Console] ERROR: No process available");
+            error!("[Console] ERROR: No process available");
             return Err("No process available".to_string());
         }
 
         // Проверяем состояние потоков
         if let Some(ref _stdin_sender) = self.stdin_sender {
-            println!("[Console] Stdin sender is available");
+            info!("[Console] Stdin sender is available");
         } else {
-            println!("[Console] ERROR: No stdin sender available");
+            error!("[Console] ERROR: No stdin sender available");
             return Err("No stdin sender available".to_string());
         }
 
         // Очищаем старый ответ
         *self.response.lock().unwrap() = None;
-        println!("[Console] Cleared old response");
+        info!("[Console] Cleared old response");
 
         // Отправляем команду в stdin поток
         if let Some(ref stdin_sender) = self.stdin_sender {
             match stdin_sender.send(command.to_string()) {
-                Ok(_) => println!("[Console] Command sent to stdin thread successfully"),
+                Ok(_) => info!("[Console] Command sent to stdin thread successfully"),
                 Err(e) => {
-                    println!("[Console] ERROR: Failed to send command: {}", e);
+                    error!("[Console] ERROR: Failed to send command: {}", e);
                     return Err(format!("Failed to send command: {}", e));
                 }
             }
@@ -370,12 +371,12 @@ impl ConsoleInstance {
         // Ждем ответ с таймаутом 3 секунды
         let timeout = Duration::from_secs(3);
         let start = std::time::Instant::now();
-        println!("[Console] Starting to wait for response...");
+        info!("[Console] Starting to wait for response...");
 
         while start.elapsed() < timeout {
             let response_guard = self.response.lock().unwrap();
             if let Some(response) = response_guard.as_ref() {
-                println!("[Console] Got response: {:?}", response);
+                info!("[Console] Got response: {:?}", response);
                 return Ok(response.clone());
             }
             drop(response_guard); // Освобождаем блокировку
@@ -383,7 +384,7 @@ impl ConsoleInstance {
             std::thread::sleep(Duration::from_millis(100));
         }
 
-        println!("[Console] ERROR: Timeout - no response received in 3 seconds");
+        error!("[Console] ERROR: Timeout - no response received in 3 seconds");
         Err("Timeout: no response received in 3 seconds".to_string())
     }
 
@@ -415,7 +416,7 @@ impl Drop for ConsoleInstance {
 impl ConsoleInstance {
     /// Выполняет команду в постоянном инстансе консоли
     pub fn execute_command_silent(command: &str) -> Result<String, String> {
-        println!("[Console] execute_command_silent: {}", command);
+        info!("[Console] execute_command_silent: {}", command);
         let mut console_guard = CONSOLE_INSTANCE.lock().unwrap();
         if let Some(ref mut console) = *console_guard {
             console.execute_command(command)
@@ -426,7 +427,7 @@ impl ConsoleInstance {
 
     /// Выполняет команду через пул соединений
     pub fn execute_command_via_pool(command_id: &str, command: &str) -> Result<String, String> {
-        println!(
+        info!(
             "[Console] execute_command_via_pool: {} -> {}",
             command_id, command
         );
@@ -442,15 +443,15 @@ impl ConsoleInstance {
 
     /// Проверяет, включен ли переключатель
     pub fn is_switch_enabled(switch_command: &str, _app: Option<&AppHandle<Wry>>) -> bool {
-        println!("[Switch] is_switch_enabled: {}", switch_command);
+        info!("[Switch] is_switch_enabled: {}", switch_command);
         match Self::execute_command_silent(switch_command) {
             Ok(output) => {
                 let result = output.trim().to_lowercase();
-                println!("[Switch] is_switch_enabled result: '{}'", result);
+                info!("[Switch] is_switch_enabled result: '{}'", result);
                 result == "true" || result == "1" || result == "on" || result == "enabled"
             }
             Err(e) => {
-                println!("[Switch] is_switch_enabled error: {}", e);
+                error!("[Switch] is_switch_enabled error: {}", e);
                 false
             }
         }
