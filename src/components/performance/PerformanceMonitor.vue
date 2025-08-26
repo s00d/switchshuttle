@@ -141,12 +141,6 @@ const statusColorClass = computed(() => {
   return 'bg-green-100 text-green-800';
 });
 
-const monitoringButtonClass = computed(() => {
-  return isMonitoring.value
-    ? 'bg-red-100 hover:bg-red-200 text-red-700'
-    : 'bg-green-100 hover:bg-green-200 text-green-700';
-});
-
 // Methods
 const toggleMonitor = () => {
   showMonitor.value = !showMonitor.value;
