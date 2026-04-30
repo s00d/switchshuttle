@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.1](https://github.com/s00d/switchshuttle/compare/v2.1.0...v2.1.1) (2026-04-30)
+
+### Patch
+
+- Release 2.1.1 (version bump).
+
 ## [2.1.0](https://github.com/s00d/switchshuttle/compare/v1.7.0...v2.1.0) (2025-09-29)
 
 
