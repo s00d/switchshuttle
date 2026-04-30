@@ -1,0 +1,23 @@
+src-tauri/tauri.conf.json
+  3273772bdf8dbf65 23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "4e3eb8d7fcb392199c0b24751da36f6373256afa",
+  "prompts": {
+    "3273772bdf8dbf65": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "1f638e2c-0820-4d01-b9a8-bafb9412aadd",
+        "model": "composer-2-fast"
+      },
+      "human_author": "Pavel Kuzmin",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 2,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
