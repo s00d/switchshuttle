@@ -87,12 +87,22 @@ jobs:
           p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
           keychain: build
 
+      # Identity must match the .p12 exactly. Derive from the keychain after import so it cannot drift from the APPLE_SIGNING_IDENTITY secret (e.g. "Mac Developer ID..." vs "Developer ID ... (TEAM)").
+      - name: Set APPLE_SIGNING_IDENTITY from imported certificate
+        if: matrix.platform == 'macos-latest'
+        run: |
+          security find-identity -v -p codesigning
+          ID=$(security find-identity -v -p codesigning | grep "Developer ID Application" | head -1 | awk -F'"' '{print $2}')
+          if [ -z "$ID" ]; then
+            echo "No Developer ID Application identity found after import."
+            exit 1
+          fi
+          echo "APPLE_SIGNING_IDENTITY=$ID" >> "$GITHUB_ENV"
+
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_SIGNING_IDENTITY: ${{ env.APPLE_SIGNING_IDENTITY }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
