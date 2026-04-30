@@ -20,8 +20,7 @@
     ],
     "macOS": {
       "files": {
-        "README.md": "../README.md",
-        "post_install.sh": "../post_install.sh"
+        "README.md": "../README.md"
       }
     },
     "createUpdaterArtifacts": true
