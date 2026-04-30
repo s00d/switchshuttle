@@ -20,7 +20,7 @@
     ],
     "macOS": {
       "files": {
-        "README.md": "../README.md"
+        "Resources/README.md": "../README.md"
       }
     },
     "createUpdaterArtifacts": true
