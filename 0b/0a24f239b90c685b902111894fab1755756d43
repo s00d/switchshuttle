@@ -1,0 +1,19 @@
+CHANGELOG.md
+  s_b49737ddd12122::t_16c1f54454f37e 5-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "0b0a24f239b90c685b902111894fab1755756d43",
+  "prompts": {},
+  "sessions": {
+    "s_b49737ddd12122": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "1e9fcc57-cbaf-4eb1-9778-ab993190af3c",
+        "model": "default"
+      },
+      "human_author": "Pavel Kuzmin <Virus191288@gmail.com>"
+    }
+  }
+}
