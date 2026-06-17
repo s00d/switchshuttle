@@ -1,0 +1,24 @@
+package-lock.json
+  s_b49737ddd12122::t_ef6e66a33358fa 3,9
+src-tauri/src/execute.rs
+  s_b49737ddd12122::t_6418e6bd46a5ad 423-436,441-443,445,453
+  s_b49737ddd12122::t_bb4bd137304f9a 1000-1044
+package.json
+  s_b49737ddd12122::t_db3bb0d6744056 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "a845a70f9dfbf5bbba8081ee6c96fde4c1ec40b3",
+  "prompts": {},
+  "sessions": {
+    "s_b49737ddd12122": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "1e9fcc57-cbaf-4eb1-9778-ab993190af3c",
+        "model": "default"
+      },
+      "human_author": "Pavel Kuzmin <Virus191288@gmail.com>"
+    }
+  }
+}
