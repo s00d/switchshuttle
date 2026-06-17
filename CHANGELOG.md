@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.2](https://github.com/s00d/switchshuttle/compare/v2.1.1...v2.1.2) (2026-06-17)
+
+### Patch
+
+- fix(macos): correct terminal AppleScript filename mapping for `Terminal.app` and `vscode-terminal`.
+- test(execute): validate script-path mapping and embedded script presence for all macOS terminals and launch modes.
+- chore(release): bump application version from 2.1.1 to 2.1.2.
+
 ## [2.1.1](https://github.com/s00d/switchshuttle/compare/v2.1.0...v2.1.1) (2026-04-30)
 
 ### Patch
