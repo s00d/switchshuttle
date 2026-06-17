@@ -420,16 +420,29 @@ fn read_script(script_path: &str) -> Option<String> {
         .map(|file| file.contents_utf8().unwrap().to_string())
 }
 
+/// Базовое имя AppleScript-файла для macOS-терминала (без суффикса режима запуска).
+#[cfg(target_os = "macos")]
+fn macos_script_basename(terminal: &str) -> Option<&'static str> {
+    match terminal {
+        "iterm" => Some("iTerm2"),
+        "terminal" => Some("Terminal"),
+        "warp" => Some("Warp"),
+        "hyper" => Some("Hyper"),
+        "alacritty" => Some("Alacritty"),
+        "vscode-terminal" => Some("VSCode"),
+        _ => None,
+    }
+}
+
 /// Получает путь к скрипту для macOS
 #[cfg(target_os = "macos")]
 fn get_script_path(terminal: &str, launch_in: &str) -> Option<String> {
     let terminals = get_terminals();
+    if !terminals.contains_key(terminal) {
+        return None;
+    }
 
-    // Получаем конфигурацию терминала
-    let terminal_config = terminals.get(terminal)?;
-
-    // Формируем название скрипта на основе имени терминала и опции запуска
-    let terminal_name = terminal_config.name;
+    let script_basename = macos_script_basename(terminal)?;
     let launch_suffix = match launch_in {
         "current" => "Current",
         "new_tab" => "Tab",
@@ -437,10 +450,7 @@ fn get_script_path(terminal: &str, launch_in: &str) -> Option<String> {
         _ => return None,
     };
 
-    // Формируем название скрипта
-    let script_name = format!("{}-{}.scpt", terminal_name, launch_suffix);
-
-    Some(script_name)
+    Some(format!("{script_basename}-{launch_suffix}.scpt"))
 }
 
 /// Выполняет команду в терминале
@@ -987,30 +997,53 @@ mod tests {
     fn test_get_script_path() {
         #[cfg(target_os = "macos")]
         {
-            // Проверяем, что функция возвращает правильные пути для поддерживаемых комбинаций
-            // Используем динамические названия на основе конфигурации терминалов
-            assert_eq!(
-                get_script_path("iterm", "current"),
-                Some("iTerm2-Current.scpt".to_string())
-            );
-            assert_eq!(
-                get_script_path("terminal", "new_tab"),
-                Some("Terminal.app-Tab.scpt".to_string())
-            );
-            assert_eq!(
-                get_script_path("warp", "new_window"),
-                Some("Warp-Window.scpt".to_string())
-            );
+            let expected_mappings = [
+                ("iterm", "current", "iTerm2-Current.scpt"),
+                ("iterm", "new_tab", "iTerm2-Tab.scpt"),
+                ("iterm", "new_window", "iTerm2-Window.scpt"),
+                ("terminal", "current", "Terminal-Current.scpt"),
+                ("terminal", "new_tab", "Terminal-Tab.scpt"),
+                ("terminal", "new_window", "Terminal-Window.scpt"),
+                ("warp", "current", "Warp-Current.scpt"),
+                ("warp", "new_tab", "Warp-Tab.scpt"),
+                ("warp", "new_window", "Warp-Window.scpt"),
+                ("hyper", "current", "Hyper-Current.scpt"),
+                ("hyper", "new_tab", "Hyper-Tab.scpt"),
+                ("hyper", "new_window", "Hyper-Window.scpt"),
+                ("alacritty", "current", "Alacritty-Current.scpt"),
+                ("alacritty", "new_tab", "Alacritty-Tab.scpt"),
+                ("alacritty", "new_window", "Alacritty-Window.scpt"),
+                ("vscode-terminal", "current", "VSCode-Current.scpt"),
+                ("vscode-terminal", "new_tab", "VSCode-Tab.scpt"),
+                ("vscode-terminal", "new_window", "VSCode-Window.scpt"),
+            ];
 
-            // Проверяем, что функция возвращает None для неподдерживаемых комбинаций
+            for (terminal, launch_in, expected) in expected_mappings {
+                assert_eq!(
+                    get_script_path(terminal, launch_in),
+                    Some(expected.to_string()),
+                    "unexpected script path for {terminal}/{launch_in}"
+                );
+            }
+
+            let terminals = get_terminals();
+            for terminal_key in terminals.keys() {
+                for launch_in in ["current", "new_tab", "new_window"] {
+                    let script_path = get_script_path(terminal_key, launch_in).unwrap_or_else(|| {
+                        panic!("missing script path mapping for {terminal_key}/{launch_in}")
+                    });
+                    let script_content = read_script(&script_path).unwrap_or_else(|| {
+                        panic!("embedded script not found: {script_path}")
+                    });
+                    assert!(
+                        !script_content.is_empty(),
+                        "embedded script is empty: {script_path}"
+                    );
+                }
+            }
+
             assert_eq!(get_script_path("unsupported", "current"), None);
             assert_eq!(get_script_path("iterm", "unsupported"), None);
-        }
-
-        #[cfg(not(target_os = "macos"))]
-        {
-            // На других ОС функция не должна быть доступна
-            // Этот тест будет пропущен
         }
     }
 
