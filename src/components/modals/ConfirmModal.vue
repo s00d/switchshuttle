@@ -41,7 +41,7 @@
           @click="$emit('confirm')"
         >
           <SpinnerIcon v-if="loading" class="w-4 h-4 animate-spin" />
-          <component v-else :is="confirmIcon" class="w-4 h-4" />
+          <component :is="confirmIcon" v-else class="w-4 h-4" />
           {{ loading ? loadingText : confirmText }}
         </CustomButton>
       </div>

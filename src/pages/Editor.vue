@@ -142,8 +142,6 @@
     <!-- Delete Confirmation Modal -->
     <ConfirmModal
       :is-open="showDeleteConfirm"
-      @close="closeDeleteConfirm"
-      @confirm="confirmDelete"
       title="Confirm Deletion"
       message="Delete configuration?"
       description="This action cannot be undone"
@@ -151,6 +149,8 @@
       :loading="deleting"
       confirm-text="Delete"
       loading-text="Deleting..."
+      @close="closeDeleteConfirm"
+      @confirm="confirmDelete"
     />
   </div>
 </template>

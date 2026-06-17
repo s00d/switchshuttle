@@ -28,8 +28,8 @@
             <button
               type="button"
               class="flex-shrink-0 w-6 h-6 text-red-600 hover:text-red-800 hover:bg-red-100 rounded transition-colors flex items-center justify-center cursor-pointer"
-              @click="removeTag(index)"
               title="Remove"
+              @click="removeTag(index)"
             >
               <XIcon class="w-4 h-4" />
             </button>

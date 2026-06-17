@@ -9,6 +9,9 @@ All notable changes to this project will be documented in this file. See [standa
 - fix(macos): correct terminal AppleScript filename mapping for `Terminal.app` and `vscode-terminal`.
 - test(execute): validate script-path mapping and embedded script presence for all macOS terminals and launch modes.
 - chore(release): bump application version from 2.1.1 to 2.1.2.
+- chore(deps): update JavaScript dependencies in root project and docs workspace to latest versions.
+- chore(deps): refresh Rust lockfile via `cargo update`, including Tauri 2.11.x and plugin updates.
+- chore(lint): align ESLint Vue preset resolution for newer `eslint-plugin-vue` config format.
 
 ## [2.1.1](https://github.com/s00d/switchshuttle/compare/v2.1.0...v2.1.1) (2026-04-30)
 

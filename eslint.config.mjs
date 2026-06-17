@@ -3,6 +3,11 @@ import typescript from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import vueParser from 'vue-eslint-parser';
 
+const vueRecommendedRules =
+  vue.configs['vue3-recommended']?.rules ??
+  vue.configs.recommended?.rules ??
+  {};
+
 export default [
   {
     files: ['**/*.{js,ts,vue}'],
@@ -51,7 +56,7 @@ export default [
     },
     processor: vue.processors['.vue'],
     rules: {
-      ...vue.configs['vue3-recommended'].rules,
+      ...vueRecommendedRules,
       ...typescript.configs.recommended.rules,
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
