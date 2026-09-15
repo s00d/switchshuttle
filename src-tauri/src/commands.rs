@@ -8,7 +8,6 @@ use tauri::{Manager, State};
 use log::{error, info, warn};
 
 use crate::config::{CommandConfig, Config, ConfigManager};
-use crate::console;
 use crate::execute::{execute_command, get_terminals, TerminalConfig};
 use crate::helpers::{get_config_path, open_folder_in_default_explorer, open_in_default_editor};
 use crate::hotkeys::HotkeyManager;
@@ -110,6 +109,7 @@ pub fn get_terminals_list() -> HashMap<String, TerminalConfig> {
 pub async fn execute(
     state: State<'_, Arc<Mutex<ConfigManager>>>,
     command: String,
+    app: tauri::AppHandle,
 ) -> Result<String, String> {
     info!("Executing command: {}", command);
 
@@ -121,20 +121,12 @@ pub async fn execute(
         }
     };
 
-    // Если команда не найдена, возвращаем ошибку
     if command_config.name.is_empty() {
         return Err(format!("Command '{}' not found", command));
     }
-    
-    // Выполняем команду
-    execute_command(
-        &command_config,
-        &config.terminal,
-        &config.launch_in,
-        &config.theme,
-        &config.title,
-    );
-    
+
+    let config_manager = state.lock().unwrap();
+    crate::menu::dispatch_user_command(&app, &command_config, &config, &config_manager)?;
     Ok("Ok".to_string())
 }
 
@@ -222,89 +214,19 @@ pub async fn execute_command_with_inputs(
         }
     };
 
-    let mut cmd = command.command.clone();
-    let mut cmds = command.commands.clone();
-    let mut switch_cmd = command.switch.clone();
-
-    if let Some(ref mut cmd) = cmd {
-        for (key, value) in &inputs {
-            *cmd = cmd.replace(&format!("[{}]", key), value);
+    let updated_command = crate::config::apply_inputs_to_command(&command, &inputs);
+    let config_manager = state.lock().unwrap();
+    match crate::menu::dispatch_user_command(&app, &updated_command, &config, &config_manager) {
+        Ok(()) => Ok("Ok".to_string()),
+        Err(e) => {
+            let _ = settings_state.lock().unwrap().show_error_notification(
+                &app,
+                "SwitchShuttle Error",
+                &e,
+            );
+            Err(e)
         }
     }
-
-    if let Some(ref mut cmds) = cmds {
-        for cmd in cmds {
-            for (key, value) in &inputs {
-                *cmd = cmd.replace(&format!("[{}]", key), value);
-            }
-        }
-    }
-
-    if let Some(ref mut switch_cmd) = switch_cmd {
-        for (key, value) in &inputs {
-            *switch_cmd = switch_cmd.replace(&format!("[{}]", key), value);
-        }
-    }
-
-    let updated_command = CommandConfig {
-        id: command.id.clone(),
-        name: command.name.clone(),
-        inputs: command.inputs.clone(),
-        command: None, // Legacy field, not used
-        commands: cmds,
-        submenu: command.submenu.clone(),
-        hotkey: command.hotkey.clone(),
-        switch: switch_cmd,
-        monitor: command.monitor.clone(),
-        icon: command.icon.clone(),
-        scheduler: command.scheduler.clone(),
-        background: command.background.clone(),
-    };
-    
-    // Проверяем, является ли это switch командой
-    if command.switch.is_some() {
-        // Для switch команд используем execute_command_silent
-        if let Some(toggle_command) = &updated_command.command {
-            info!("[Monitor] switch: toggle_command = '{}'", toggle_command);
-            match console::ConsoleInstance::execute_command_silent(toggle_command) {
-                Ok(_) => {
-                    info!("Switch command executed successfully");
-                    // Показываем уведомление об успешном выполнении
-                    {
-                        let settings = settings_state.lock().unwrap();
-                        settings.show_success_notification(
-                            &app,
-                            "SwitchShuttle Success",
-                            &format!("Switch command '{}' executed successfully", command.name),
-                        ).ok();
-                    }
-                }
-                Err(e) => {
-                    error!("Failed to execute switch command: {}", e);
-                    // Показываем уведомление об ошибке
-                    {
-                        let settings = settings_state.lock().unwrap();
-                        settings.show_error_notification(
-                            &app,
-                            "SwitchShuttle Error",
-                            &format!("Failed to execute switch command: {}", e),
-                        ).ok();
-                    }
-                }
-            }
-        }
-    } else {
-        // Для обычных команд используем execute_command
-        execute_command(
-            &updated_command,
-            &config.terminal,
-            &config.launch_in,
-            &config.theme,
-            &config.title,
-        );
-    }
-    
-    Ok("Ok".to_string())
 }
 
 #[tauri::command]
@@ -795,22 +717,9 @@ fn update_tray_menu_from_commands(
     app: &tauri::AppHandle,
     config_manager: &ConfigManager,
 ) -> Result<(), String> {
-    use crate::menu::create_system_tray_menu;
-    use tauri_plugin_autostart::ManagerExt;
+    use crate::menu::{update_system_tray_menu, TrayRefresh};
 
-    // Получаем состояние автозапуска
-    let autostart_manager = app.autolaunch();
-    let autostart_enabled = autostart_manager.is_enabled().unwrap_or(false);
-
-    // Создаем новое меню
-    let new_menu = create_system_tray_menu(app, autostart_enabled, config_manager);
-
-    // Обновляем меню в трее
-    if let Some(tray) = app.tray_by_id("switch-shuttle-tray") {
-        tray.set_menu(Some(new_menu))
-            .map_err(|e| format!("Failed to update tray menu: {}", e))?;
-    }
-
+    update_system_tray_menu(app, config_manager, TrayRefresh::Full);
     Ok(())
 }
 

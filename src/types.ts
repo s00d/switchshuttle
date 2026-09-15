@@ -16,7 +16,7 @@ export interface Command {
   monitor?: string | undefined;
   icon?: string | null;
   scheduler?: string | undefined; // cron expression
-  background?: boolean | undefined; // true = ConsolePool, false = execute, undefined = auto
+  background?: boolean | undefined; // true = tray Running/Stop job, false/omit = terminal
 }
 
 export interface Template {

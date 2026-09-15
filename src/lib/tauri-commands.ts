@@ -13,6 +13,7 @@ export interface CommandConfig {
   monitor?: string;
   icon?: string;
   scheduler?: string;
+  /** true = app-managed job in tray Running; false/omit = terminal */
   background?: boolean;
 }
 

@@ -32,7 +32,96 @@ pub struct CommandConfig {
     pub monitor: Option<String>,
     pub icon: Option<String>,
     pub scheduler: Option<String>, // cron expression
-    pub background: Option<bool>, // true = ConsolePool, false = execute, None = auto
+    /// `true` = app-managed background job (ProcessRegistry / tray Running).
+    /// `false` = terminal launcher. `None` / omit = terminal for normal commands;
+    /// switch/monitor always use silent/pool regardless of this flag.
+    pub background: Option<bool>,
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum ExecutionTarget {
+    SwitchSilent,
+    OpenInputs,
+    BackgroundJob,
+    Terminal,
+}
+
+/// Pure routing used by dispatch (testable without Tauri).
+pub fn execution_target(command: &CommandConfig) -> ExecutionTarget {
+    let needs_inputs = command
+        .inputs
+        .as_ref()
+        .map(|inputs| !inputs.is_empty())
+        .unwrap_or(false)
+        && command.id.is_some();
+
+    if command.switch.is_some() {
+        if needs_inputs {
+            ExecutionTarget::OpenInputs
+        } else {
+            ExecutionTarget::SwitchSilent
+        }
+    } else if needs_inputs {
+        ExecutionTarget::OpenInputs
+    } else if command.background == Some(true) {
+        ExecutionTarget::BackgroundJob
+    } else {
+        ExecutionTarget::Terminal
+    }
+}
+
+/// Command line used to toggle a switch (first of `commands`, else legacy `command`).
+pub fn switch_toggle_command(cmd: &CommandConfig) -> Option<&str> {
+    cmd.commands
+        .as_ref()
+        .and_then(|commands| commands.iter().find(|c| !c.trim().is_empty()))
+        .map(|s| s.as_str())
+        .or_else(|| {
+            cmd.command
+                .as_deref()
+                .filter(|s| !s.trim().is_empty())
+        })
+}
+
+/// Replace `[key]` placeholders in a string.
+pub fn apply_input_placeholders(template: &str, inputs: &HashMap<String, String>) -> String {
+    let mut result = template.to_string();
+    for (key, value) in inputs {
+        result = result.replace(&format!("[{}]", key), value);
+    }
+    result
+}
+
+/// Apply placeholders to all command lines and switch probe of a config.
+pub fn apply_inputs_to_command(cmd: &CommandConfig, inputs: &HashMap<String, String>) -> CommandConfig {
+    let commands = cmd.commands.as_ref().map(|list| {
+        list.iter()
+            .map(|line| apply_input_placeholders(line, inputs))
+            .collect()
+    });
+    let command = cmd
+        .command
+        .as_ref()
+        .map(|line| apply_input_placeholders(line, inputs));
+    let switch = cmd
+        .switch
+        .as_ref()
+        .map(|line| apply_input_placeholders(line, inputs));
+
+    CommandConfig {
+        id: cmd.id.clone(),
+        name: cmd.name.clone(),
+        inputs: cmd.inputs.clone(),
+        command,
+        commands,
+        submenu: cmd.submenu.clone(),
+        hotkey: cmd.hotkey.clone(),
+        switch,
+        monitor: cmd.monitor.clone(),
+        icon: cmd.icon.clone(),
+        scheduler: cmd.scheduler.clone(),
+        background: cmd.background,
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -413,4 +502,81 @@ pub fn get_config_path() -> PathBuf {
     fs::create_dir_all(&config_path).unwrap();
     config_path.push("config.json");
     config_path
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn base_cmd(name: &str) -> CommandConfig {
+        CommandConfig {
+            id: Some("cmd_0".into()),
+            name: name.into(),
+            inputs: None,
+            command: None,
+            commands: None,
+            hotkey: None,
+            submenu: None,
+            switch: None,
+            monitor: None,
+            icon: None,
+            scheduler: None,
+            background: None,
+        }
+    }
+
+    #[test]
+    fn switch_toggle_uses_commands_after_migrate() {
+        let mut cmd = base_cmd("Toggle");
+        cmd.command = Some("echo on".into());
+        cmd.switch = Some("echo true".into());
+        cmd.migrate_command_to_commands();
+        assert!(cmd.command.is_none());
+        assert_eq!(switch_toggle_command(&cmd), Some("echo on"));
+    }
+
+    #[test]
+    fn switch_toggle_prefers_first_nonempty_commands_entry() {
+        let mut cmd = base_cmd("Toggle");
+        cmd.commands = Some(vec!["".into(), "wifi toggle".into()]);
+        assert_eq!(switch_toggle_command(&cmd), Some("wifi toggle"));
+    }
+
+    #[test]
+    fn switch_toggle_falls_back_to_legacy_command() {
+        let mut cmd = base_cmd("Toggle");
+        cmd.command = Some("legacy toggle".into());
+        assert_eq!(switch_toggle_command(&cmd), Some("legacy toggle"));
+    }
+
+    #[test]
+    fn execution_target_background_true_is_job() {
+        let mut cmd = base_cmd("Server");
+        cmd.commands = Some(vec!["npm run dev".into()]);
+        cmd.background = Some(true);
+        assert_eq!(execution_target(&cmd), ExecutionTarget::BackgroundJob);
+    }
+
+    #[test]
+    fn execution_target_omit_background_is_terminal() {
+        let mut cmd = base_cmd("Server");
+        cmd.commands = Some(vec!["npm run dev".into()]);
+        assert_eq!(execution_target(&cmd), ExecutionTarget::Terminal);
+    }
+
+    #[test]
+    fn apply_inputs_updates_commands_and_switch() {
+        let mut cmd = base_cmd("Run");
+        cmd.commands = Some(vec!["echo [name]".into()]);
+        cmd.switch = Some("test [name]".into());
+        let mut inputs = HashMap::new();
+        inputs.insert("name".into(), "world".into());
+        let updated = apply_inputs_to_command(&cmd, &inputs);
+        assert_eq!(
+            updated.commands.as_ref().unwrap()[0],
+            "echo world"
+        );
+        assert_eq!(updated.switch.as_deref(), Some("test world"));
+        assert_eq!(switch_toggle_command(&updated), Some("echo world"));
+    }
 }

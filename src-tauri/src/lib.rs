@@ -8,6 +8,7 @@ mod helpers;
 mod hotkeys;
 mod menu;
 mod menu_structure;
+mod running;
 mod settings;
 
 use crate::cli::handle_cli_commands;
@@ -132,6 +133,8 @@ pub fn run() {
                 error!("Failed to initialize console: {}", e);
             }
 
+            crate::menu::set_running_app_handle(app.handle().clone());
+
             // Инициализируем состояние трея как неактивное при запуске
             if let Ok(mut tray_active) = crate::menu_structure::TRAY_ACTIVE.lock() {
                 *tray_active = false;
@@ -163,8 +166,12 @@ pub fn run() {
 
             let autostart_manager = app.autolaunch();
             let enabled = autostart_manager.is_enabled().unwrap();
-            let system_tray_menu =
-                create_system_tray_menu(app.handle(), enabled, &config_manager.lock().unwrap());
+            let system_tray_menu = create_system_tray_menu(
+                app.handle(),
+                enabled,
+                &config_manager.lock().unwrap(),
+                crate::menu::TrayRefresh::Full,
+            );
 
             let tray = app.tray_by_id("switch-shuttle-tray").unwrap();
             let config_manager_clone = config_manager.clone();

@@ -148,13 +148,13 @@
               class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
             />
             <label for="background" class="text-sm font-medium text-slate-700">
-              Execute in background (ConsolePool)
+              Execute in background (tracked in tray)
             </label>
           </div>
           <p class="text-xs text-slate-500">
-            When enabled, commands will be executed in background using
-            ConsolePool. When disabled, commands will be executed through normal
-            terminal execution.
+            When enabled, commands run as app-managed processes and appear under
+            Running in the system tray (Stop to kill). When disabled, commands
+            open in your configured terminal (not stoppable from the tray).
           </p>
         </div>
 

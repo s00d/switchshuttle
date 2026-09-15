@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_notification::{NotificationExt, PermissionState};
 use log::{error, info};
+use regex::Regex;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AppSettings {
@@ -420,6 +421,36 @@ pub fn get_settings_path() -> PathBuf {
     config_dir.join("settings.json")
 }
 
+/// Returns true when security checks are enabled and the command matches a blocklist or pattern.
+pub fn command_is_blocked(command: &str, security: &SecuritySettings) -> bool {
+    if !security.enable_security_checks {
+        return false;
+    }
+
+    if command.len() as u32 > security.max_command_length {
+        return true;
+    }
+
+    let lower = command.to_lowercase();
+    for blocked in &security.blocked_commands {
+        if !blocked.is_empty() && lower.contains(&blocked.to_lowercase()) {
+            return true;
+        }
+    }
+
+    for pattern in &security.suspicious_patterns {
+        if pattern.is_empty() {
+            continue;
+        }
+        match Regex::new(pattern) {
+            Ok(re) if re.is_match(command) => return true,
+            _ => {}
+        }
+    }
+
+    false
+}
+
 fn merge_defaults(current: &mut Value, default: &Value) {
     match (current, default) {
         (Value::Object(cur_map), Value::Object(def_map)) => {
@@ -446,5 +477,47 @@ fn remove_extra_fields(current: &mut Value, default: &Value) {
                 remove_extra_fields(cur_map.get_mut(&k).unwrap(), &def_map[&k]);
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn blocked_when_checks_enabled_and_literal_match() {
+        let security = SecuritySettings {
+            enable_security_checks: true,
+            max_command_length: 1024,
+            max_input_length: 1024,
+            blocked_commands: vec!["rm -rf /".into()],
+            suspicious_patterns: vec![],
+        };
+        assert!(command_is_blocked("sudo rm -rf /", &security));
+        assert!(!command_is_blocked("echo hello", &security));
+    }
+
+    #[test]
+    fn not_blocked_when_checks_disabled() {
+        let security = SecuritySettings {
+            enable_security_checks: false,
+            max_command_length: 1024,
+            max_input_length: 1024,
+            blocked_commands: vec!["rm -rf /".into()],
+            suspicious_patterns: vec![r"rm\s+-rf".into()],
+        };
+        assert!(!command_is_blocked("rm -rf /tmp", &security));
+    }
+
+    #[test]
+    fn blocked_by_suspicious_pattern() {
+        let security = SecuritySettings {
+            enable_security_checks: true,
+            max_command_length: 1024,
+            max_input_length: 1024,
+            blocked_commands: vec![],
+            suspicious_patterns: vec![r"rm\s+-rf".into()],
+        };
+        assert!(command_is_blocked("rm -rf /tmp/foo", &security));
     }
 }

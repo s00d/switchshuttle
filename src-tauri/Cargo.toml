@@ -30,6 +30,7 @@ tokio = { version = "1.0", features = ["full"] }
 openssl = { version = "0.10.73", features = ["vendored"] }
 cron = "0.15.0"
 chrono = { version = "0.4.42", features = ["serde"] }
+regex = "1"
 
 [lib]
 name = "app_lib"
@@ -37,6 +38,9 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.55.0"
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
 
 [build-dependencies]
 tauri-build = { version = "^2.4.0", features = [] }

@@ -45,6 +45,8 @@ pub struct Submenu {
 pub struct SystemMenu {
     pub items: Vec<MenuItem>,
     pub submenus: Vec<Submenu>,
+    /// All scheduled commands at any nesting depth (for start/stop/reconcile).
+    pub scheduler_items: Vec<MenuItem>,
 }
 
 impl MenuItem {
@@ -292,7 +294,9 @@ impl MenuItem {
                     .id
                     .clone()
                     .unwrap_or_else(|| self.config.name.clone());
-                
+                let display_name = self.config.name.clone();
+                let background = self.config.background;
+
                 // Останавливаем предыдущий планировщик, если был
                 self.stop_scheduler();
                 let stop_flag = Arc::new(AtomicBool::new(false));
@@ -302,45 +306,73 @@ impl MenuItem {
 
                 thread::spawn(move || {
                     error!("[Scheduler] Starting scheduler for item: {}", id);
-                    
-                    // Парсим cron выражение
+
                     let cron_expr = match cron::Schedule::from_str(&schedule) {
                         Ok(schedule) => schedule,
                         Err(e) => {
                             error!("[Scheduler] Failed to parse cron expression '{}': {}", schedule, e);
-                            // Используем fallback - каждую минуту
                             cron::Schedule::from_str("0 * * * * *").unwrap()
                         }
                     };
-                    
+
                     info!("[Scheduler] Parsed cron expression: {}", schedule);
-                    
+
                     while !stop_flag.load(Ordering::Relaxed) {
-                        // Получаем следующее время выполнения
                         let now = chrono::Utc::now();
                         let next = cron_expr.after(&now).next();
-                        
+
                         if let Some(next_time) = next {
                             let wait_duration = next_time.signed_duration_since(now);
-                            let wait_seconds = wait_duration.num_seconds() as u64;
-                            
+                            let wait_seconds = wait_duration.num_seconds().max(0) as u64;
+
                             info!("[Scheduler] Next execution at: {}, waiting {} seconds", next_time, wait_seconds);
-                            
-                            // Ждем до следующего выполнения
+
                             thread::sleep(Duration::from_secs(wait_seconds));
-                            
-                            // Выполняем команды по расписанию
+                            if stop_flag.load(Ordering::Relaxed) {
+                                break;
+                            }
+
                             if let Some(cmds) = &commands {
-                                for cmd in cmds {
-                                    info!("[Scheduler] Executing scheduled command: {}", cmd);
-                                    match console::ConsoleInstance::execute_command_silent(cmd) {
-                                        Ok(_) => info!("[Scheduler] Command executed successfully"),
-                                        Err(e) => error!("[Scheduler] Failed to execute command: {}", e),
+                                if background == Some(true) {
+                                    let already = crate::running::with_registry(|reg| {
+                                        reg.has_alive_for_command(&id)
+                                    });
+                                    if already {
+                                        info!(
+                                            "[Scheduler] Skipping {} — already running",
+                                            id
+                                        );
+                                    } else {
+                                        match crate::running::with_registry(|reg| {
+                                            reg.start(&id, &display_name, cmds)
+                                        }) {
+                                            Ok(run_id) => info!(
+                                                "[Scheduler] Background job started run_id={}",
+                                                run_id
+                                            ),
+                                            Err(e) => error!(
+                                                "[Scheduler] Failed to start background job: {}",
+                                                e
+                                            ),
+                                        }
+                                    }
+                                } else {
+                                    for cmd in cmds {
+                                        info!("[Scheduler] Executing scheduled command: {}", cmd);
+                                        match console::ConsoleInstance::execute_command_silent(cmd)
+                                        {
+                                            Ok(_) => {
+                                                info!("[Scheduler] Command executed successfully")
+                                            }
+                                            Err(e) => error!(
+                                                "[Scheduler] Failed to execute command: {}",
+                                                e
+                                            ),
+                                        }
                                     }
                                 }
                             }
                         } else {
-                            // Если не удалось получить следующее время, ждем минуту
                             thread::sleep(Duration::from_secs(60));
                         }
                     }
@@ -553,6 +585,7 @@ impl SystemMenu {
         Self {
             items: Vec::new(),
             submenus: Vec::new(),
+            scheduler_items: Vec::new(),
         }
     }
 
@@ -604,6 +637,8 @@ impl SystemMenu {
                     // Иначе добавляем как обычный элемент
                     system_menu = system_menu.add_item(menu_item);
                 }
+
+                collect_scheduled_menu_items(command, &mut system_menu.scheduler_items);
             }
         }
 
@@ -668,63 +703,87 @@ impl SystemMenu {
     /// Запускает планировщики для всех элементов
     pub fn start_all_schedulers(&mut self) {
         info!("[Scheduler] start_all_schedulers called");
-        error!("[Scheduler] Starting schedulers for all scheduled items");
-
-        // Запускаем планировщики для основных элементов
-        for item in &mut self.items {
+        for item in &mut self.scheduler_items {
             if item.has_scheduler() {
                 error!(
-                    "[Scheduler] Found scheduled item in main items: {}",
+                    "[Scheduler] Starting scheduled item: {}",
                     item.config.id.as_ref().unwrap_or(&item.config.name)
                 );
                 item.start_scheduler();
             }
         }
-
-        // Запускаем планировщики для элементов в подменю
-        for submenu in &mut self.submenus {
-            for item in &mut submenu.items {
-                if item.has_scheduler() {
-                    error!(
-                        "[Scheduler] Found scheduled item in submenu: {}",
-                        item.config.id.as_ref().unwrap_or(&item.config.name)
-                    );
-                    item.start_scheduler();
-                }
-            }
-        }
-
         error!("[Scheduler] Finished starting schedulers");
     }
 
     /// Останавливает все планировщики
     pub fn stop_all_schedulers(&mut self) {
         error!("[Scheduler] Stopping all schedulers");
-
-        // Останавливаем планировщики для основных элементов
-        for item in &mut self.items {
+        for item in &mut self.scheduler_items {
             if item.has_scheduler() {
                 item.stop_scheduler();
             }
         }
-
-        // Останавливаем планировщики для элементов в подменю
-        for submenu in &mut self.submenus {
-            for item in &mut submenu.items {
-                if item.has_scheduler() {
-                    item.stop_scheduler();
-                }
-            }
-        }
-
         error!("[Scheduler] Finished stopping schedulers");
     }
 
-    /// Периодически очищает неактивные соединения в пуле
+    pub fn scheduler_command_ids(&self) -> Vec<String> {
+        self.scheduler_items
+            .iter()
+            .filter_map(|item| item.config.id.clone())
+            .collect()
+    }
+
+    /// Soft refresh: keep running schedulers for overlapping ids, start new, stop removed.
+    pub fn reconcile_schedulers_from(&mut self, old: &mut SystemMenu) {
+        use crate::running::reconcile_scheduler_ids;
+
+        let old_ids = old.scheduler_command_ids();
+        let new_ids = self.scheduler_command_ids();
+        let plan = reconcile_scheduler_ids(&old_ids, &new_ids);
+
+        for id in &plan.stop {
+            if let Some(item) = old
+                .scheduler_items
+                .iter_mut()
+                .find(|i| i.config.id.as_deref() == Some(id.as_str()))
+            {
+                item.stop_scheduler();
+            }
+        }
+
+        for id in &plan.keep {
+            if let (Some(old_item), Some(new_item)) = (
+                old.scheduler_items
+                    .iter_mut()
+                    .find(|i| i.config.id.as_deref() == Some(id.as_str())),
+                self.scheduler_items
+                    .iter_mut()
+                    .find(|i| i.config.id.as_deref() == Some(id.as_str())),
+            ) {
+                new_item.scheduler_stop_flag = old_item.scheduler_stop_flag.take();
+            }
+        }
+
+        for id in &plan.start {
+            if let Some(item) = self
+                .scheduler_items
+                .iter_mut()
+                .find(|i| i.config.id.as_deref() == Some(id.as_str()))
+            {
+                item.start_scheduler();
+            }
+        }
+    }
+
+    /// Периодически очищает неактивные соединения в пуле (один раз на процесс)
     pub fn cleanup_console_pool_periodically() {
+        static STARTED: AtomicBool = AtomicBool::new(false);
+        if !claim_periodic_cleanup_start(&STARTED) {
+            return;
+        }
         thread::spawn(|| {
             loop {
-                thread::sleep(Duration::from_secs(60)); // Очистка каждую минуту
+                thread::sleep(Duration::from_secs(60));
                 console::ConsoleInstance::cleanup_console_pool();
             }
         });
@@ -777,9 +836,89 @@ impl Default for SystemMenu {
     }
 }
 
+/// Claim the right to start the periodic cleanup thread. First call true, later false.
+pub fn claim_periodic_cleanup_start(started: &AtomicBool) -> bool {
+    !started.swap(true, Ordering::SeqCst)
+}
+
+/// DFS: collect every command that has a scheduler (any nesting depth).
+pub fn collect_scheduled_menu_items(
+    command: &crate::config::CommandConfig,
+    out: &mut Vec<MenuItem>,
+) {
+    if command
+        .scheduler
+        .as_ref()
+        .map(|s| !s.is_empty())
+        .unwrap_or(false)
+    {
+        out.push(MenuItem::from_command_config(command));
+    }
+    if let Some(submenu) = &command.submenu {
+        for child in submenu {
+            collect_scheduled_menu_items(child, out);
+        }
+    }
+}
+
+/// Scheduler command ids from a command tree (testable without Tauri menu).
+pub fn collect_scheduler_command_ids(commands: &[crate::config::CommandConfig]) -> Vec<String> {
+    let mut items = Vec::new();
+    for command in commands {
+        collect_scheduled_menu_items(command, &mut items);
+    }
+    items
+        .into_iter()
+        .filter_map(|item| item.config.id.clone())
+        .collect()
+}
+
 /// Enum для представления различных типов элементов меню
 pub enum MenuItemOrSubmenu {
     Submenu(TauriSubmenu<Wry>),
     IconItem(IconMenuItem<Wry>),
     CheckItem(CheckMenuItem<Wry>),
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::config::CommandConfig;
+
+    fn cmd(name: &str, id: &str) -> CommandConfig {
+        CommandConfig {
+            id: Some(id.into()),
+            name: name.into(),
+            inputs: None,
+            command: None,
+            commands: Some(vec!["echo hi".into()]),
+            hotkey: None,
+            submenu: None,
+            switch: None,
+            monitor: None,
+            icon: None,
+            scheduler: None,
+            background: None,
+        }
+    }
+
+    #[test]
+    fn collect_scheduler_ids_includes_nested() {
+        let mut nested = cmd("Nested", "cmd_nested");
+        nested.scheduler = Some("0 * * * * *".into());
+        let mut mid = cmd("Mid", "cmd_mid");
+        mid.submenu = Some(vec![nested]);
+        let mut root = cmd("Root", "cmd_root");
+        root.submenu = Some(vec![mid]);
+        let ids = collect_scheduler_command_ids(&[root]);
+        assert_eq!(ids, vec!["cmd_nested".to_string()]);
+    }
+
+    #[test]
+    fn claim_periodic_cleanup_only_once() {
+        let flag = AtomicBool::new(false);
+        assert!(claim_periodic_cleanup_start(&flag));
+        assert!(!claim_periodic_cleanup_start(&flag));
+        assert!(!claim_periodic_cleanup_start(&flag));
+    }
 }

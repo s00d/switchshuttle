@@ -6,6 +6,60 @@ use log::{error, info};
 
 static SCRIPTS_DIR: include_dir::Dir = include_dir::include_dir!("scripts");
 
+/// Recorded (or real) terminal process invocation.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TerminalLaunch {
+    pub executable: String,
+    pub args: Vec<String>,
+}
+
+/// Runs a terminal helper (`osascript`, `cmd`, …). In unit tests this is mocked
+/// via [`with_mocked_terminal_launches`] so real apps never open.
+fn run_terminal_process(executable: &str, args: &[String]) -> Result<bool, String> {
+    #[cfg(test)]
+    {
+        let mocked = TEST_LAUNCH_HOOK.with(|hook| {
+            if let Some(launches) = hook.borrow_mut().as_mut() {
+                launches.push(TerminalLaunch {
+                    executable: executable.to_string(),
+                    args: args.to_vec(),
+                });
+                true
+            } else {
+                false
+            }
+        });
+        if mocked {
+            return Ok(true);
+        }
+    }
+
+    let status = Command::new(executable)
+        .args(args)
+        .status()
+        .map_err(|e| format!("Failed to execute {}: {}", executable, e))?;
+    Ok(status.success())
+}
+
+#[cfg(test)]
+thread_local! {
+    static TEST_LAUNCH_HOOK: std::cell::RefCell<Option<Vec<TerminalLaunch>>> =
+        const { std::cell::RefCell::new(None) };
+}
+
+/// Install a per-thread mock for [`run_terminal_process`] for the duration of `f`.
+#[cfg(test)]
+pub fn with_mocked_terminal_launches<F, R>(f: F) -> (R, Vec<TerminalLaunch>)
+where
+    F: FnOnce() -> R,
+{
+    TEST_LAUNCH_HOOK.with(|hook| {
+        *hook.borrow_mut() = Some(Vec::new());
+    });
+    let result = f();
+    let launches = TEST_LAUNCH_HOOK.with(|hook| hook.borrow_mut().take().unwrap_or_default());
+    (result, launches)
+}
 /// Доступные терминалы для каждой операционной системы
 #[derive(Debug, Clone, Serialize)]
 #[allow(dead_code)]
@@ -499,18 +553,17 @@ fn execute_command_impl(
                     .replace("{theme}", theme)
                     .replace("{title}", title);
 
-                let output = Command::new(terminal_config.executable)
-                    .arg("-e")
-                    .arg(&script)
-                    .output()
-                    .expect("Failed to execute command");
-
-                if output.status.success() {
-                    info!("Command succeeded: {}", command);
-                } else {
-                    error!("Command failed: {}", command);
-                    error!("Error: {}", String::from_utf8_lossy(&output.stderr));
-                    break;
+                let args = vec!["-e".to_string(), script];
+                match run_terminal_process(terminal_config.executable, &args) {
+                    Ok(true) => info!("Command succeeded: {}", command),
+                    Ok(false) => {
+                        error!("Command failed: {}", command);
+                        break;
+                    }
+                    Err(e) => {
+                        error!("{}", e);
+                        break;
+                    }
                 }
             } else {
                 error!(
@@ -553,16 +606,16 @@ fn execute_command_impl(
                 cmd_args.push(processed_arg);
             }
 
-            let status = Command::new(terminal_config.executable)
-                .args(&cmd_args)
-                .status()
-                .expect("Failed to execute command");
-
-            if status.success() {
-                info!("Command succeeded: {}", command);
-            } else {
-                error!("Command failed: {}", command);
-                break;
+            match run_terminal_process(terminal_config.executable, &cmd_args) {
+                Ok(true) => info!("Command succeeded: {}", command),
+                Ok(false) => {
+                    error!("Command failed: {}", command);
+                    break;
+                }
+                Err(e) => {
+                    error!("{}", e);
+                    break;
+                }
             }
         }
     }
@@ -773,14 +826,16 @@ mod tests {
             background: None
         };
 
-        // Функция должна завершиться без ошибок
-        execute_command(
-            &config,
-            "terminal",
-            "current",
-            &"default".to_string(),
-            &"Test".to_string(),
-        );
+        let (_, launches) = with_mocked_terminal_launches(|| {
+            execute_command(
+                &config,
+                "terminal",
+                "current",
+                &"default".to_string(),
+                &"Test".to_string(),
+            );
+        });
+        assert!(launches.is_empty());
     }
 
     #[test]
@@ -789,8 +844,8 @@ mod tests {
             id: None,
             name: "test".to_string(),
             inputs: None,
-            command: Some("echo 'test'".to_string()),
-            commands: None,
+            command: None,
+            commands: Some(vec!["echo 'test'".to_string()]),
             hotkey: None,
             submenu: None,
             switch: None,
@@ -800,14 +855,22 @@ mod tests {
             background: None
         };
 
-        // Функция должна завершиться без ошибок
-        execute_command(
-            &config,
-            "terminal",
-            "current",
-            &"default".to_string(),
-            &"Test".to_string(),
-        );
+        let (_, launches) = with_mocked_terminal_launches(|| {
+            execute_command(
+                &config,
+                "terminal",
+                "current",
+                &"default".to_string(),
+                &"Test".to_string(),
+            );
+        });
+        assert_eq!(launches.len(), 1);
+        #[cfg(target_os = "macos")]
+        {
+            assert_eq!(launches[0].executable, "osascript");
+            assert_eq!(launches[0].args[0], "-e");
+            assert!(launches[0].args[1].contains("echo 'test'"));
+        }
     }
 
     #[test]
@@ -830,14 +893,16 @@ mod tests {
             background: None
         };
 
-        // Функция должна завершиться без ошибок
-        execute_command(
-            &config,
-            "terminal",
-            "current",
-            &"default".to_string(),
-            &"Test".to_string(),
-        );
+        let (_, launches) = with_mocked_terminal_launches(|| {
+            execute_command(
+                &config,
+                "terminal",
+                "current",
+                &"default".to_string(),
+                &"Test".to_string(),
+            );
+        });
+        assert_eq!(launches.len(), 2);
     }
 
     #[test]
@@ -846,8 +911,8 @@ mod tests {
             id: None,
             name: "test".to_string(),
             inputs: None,
-            command: Some("echo 'test'".to_string()),
-            commands: None,
+            command: None,
+            commands: Some(vec!["echo 'test'".to_string()]),
             hotkey: None,
             submenu: None,
             switch: None,
@@ -857,14 +922,16 @@ mod tests {
             background: None
         };
 
-        // Функция должна завершиться без ошибок при неподдерживаемом терминале
-        execute_command(
-            &config,
-            "unsupported-terminal",
-            "current",
-            &"default".to_string(),
-            &"Test".to_string(),
-        );
+        let (_, launches) = with_mocked_terminal_launches(|| {
+            execute_command(
+                &config,
+                "unsupported-terminal",
+                "current",
+                &"default".to_string(),
+                &"Test".to_string(),
+            );
+        });
+        assert!(launches.is_empty());
     }
 
     #[test]
@@ -873,8 +940,8 @@ mod tests {
             id: None,
             name: "test".to_string(),
             inputs: None,
-            command: Some("echo 'test'".to_string()),
-            commands: None,
+            command: None,
+            commands: Some(vec!["echo 'test'".to_string()]),
             hotkey: None,
             submenu: None,
             switch: None,
@@ -884,14 +951,17 @@ mod tests {
             background: None
         };
 
-        // Функция должна завершиться без ошибок при неподдерживаемой опции запуска
-        execute_command(
-            &config,
-            "terminal",
-            "unsupported",
-            &"default".to_string(),
-            &"Test".to_string(),
-        );
+        let (_, launches) = with_mocked_terminal_launches(|| {
+            execute_command(
+                &config,
+                "terminal",
+                "unsupported",
+                &"default".to_string(),
+                &"Test".to_string(),
+            );
+        });
+        // Unsupported launch_in is rejected before spawn (or no script on macOS)
+        assert!(launches.is_empty());
     }
 
     #[test]

@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.0](https://github.com/s00d/switchshuttle/compare/v2.1.2...v2.2.0) (2026-09-15)
+
+### Features
+
+- tray **Running** section for `background: true` commands with Stop / Stop All (process-group kill).
+- wire `background` through tray, hotkey, invoke, inputs, and scheduler paths via unified dispatch.
+
+### Fixes
+
+- switch toggle after `command` → `commands` migration.
+- resume monitor timers after command dispatch.
+- start nested submenu schedulers; Soft tray refresh reconciles schedulers without full restart.
+- apply security `blocked_commands` / suspicious patterns before spawn.
+- mock terminal launches in unit tests (no real Terminal.app windows).
+
+### Docs
+
+- README / Help / editor copy: background jobs tracked in tray (not ConsolePool).
+
 ## [2.1.2](https://github.com/s00d/switchshuttle/compare/v2.1.1...v2.1.2) (2026-06-17)
 
 ### Patch

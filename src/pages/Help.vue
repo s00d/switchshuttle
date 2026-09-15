@@ -541,7 +541,7 @@ const faqData = {
         
         <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mt-4">
           <p class="text-sm text-blue-700">
-            <strong>Tip:</strong> Use <code class="bg-blue-100 px-1 rounded">"background": true</code> for scheduled commands to run silently without opening terminal windows.
+            <strong>Tip:</strong> Use <code class="bg-blue-100 px-1 rounded">"background": true</code> for scheduled long-running jobs so they appear under Running and can be stopped from the tray.
           </p>
         </div>
       `,
@@ -550,26 +550,26 @@ const faqData = {
       id: 'af-5',
       question: 'How do I control background execution?',
       answer: `
-        <p class="mb-3">SwitchShuttle provides flexible control over how commands are executed - either in the background using ConsolePool or through normal terminal execution.</p>
+        <p class="mb-3">SwitchShuttle can run commands as app-managed background jobs (shown under <strong>Running</strong> in the tray) or open them in your terminal.</p>
         
         <p class="mb-3"><strong>Background Execution Options:</strong></p>
         <div class="space-y-3">
           <div class="bg-slate-50 p-4 rounded-lg">
-            <h4 class="font-medium text-slate-700 mb-2">ConsolePool (Background)</h4>
-            <p class="text-sm text-slate-600 mb-2">Commands run silently without opening terminal windows. Perfect for scheduled tasks and system operations.</p>
+            <h4 class="font-medium text-slate-700 mb-2">Background job (tracked)</h4>
+            <p class="text-sm text-slate-600 mb-2">No terminal window. The job appears under Running; choose Stop to kill the process group.</p>
             <pre class="bg-slate-900 text-slate-100 p-2 rounded text-xs"><code>"background": true</code></pre>
           </div>
           
           <div class="bg-slate-50 p-4 rounded-lg">
             <h4 class="font-medium text-slate-700 mb-2">Normal Terminal</h4>
-            <p class="text-sm text-slate-600 mb-2">Commands open in visible terminal windows. Best for interactive commands and development work.</p>
+            <p class="text-sm text-slate-600 mb-2">Commands open in visible terminal windows. Not stoppable from the tray.</p>
             <pre class="bg-slate-900 text-slate-100 p-2 rounded text-xs"><code>"background": false</code></pre>
           </div>
           
           <div class="bg-slate-50 p-4 rounded-lg">
-            <h4 class="font-medium text-slate-700 mb-2">Auto-Detect</h4>
-            <p class="text-sm text-slate-600 mb-2">SwitchShuttle automatically chooses the best execution method based on command type.</p>
-            <pre class="bg-slate-900 text-slate-100 p-2 rounded text-xs"><code>"background": null  // or omit the field</code></pre>
+            <h4 class="font-medium text-slate-700 mb-2">Omit the field</h4>
+            <p class="text-sm text-slate-600 mb-2">Same as terminal for normal commands.</p>
+            <pre class="bg-slate-900 text-slate-100 p-2 rounded text-xs"><code>// omit "background"</code></pre>
           </div>
         </div>
         
@@ -596,7 +596,7 @@ const faqData = {
         
         <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mt-4">
           <p class="text-sm text-yellow-700">
-            <strong>Note:</strong> Switch commands and monitor commands always use background execution regardless of the background setting.
+            <strong>Note:</strong> Switch and monitor commands always use silent/pool execution. CLI ignores <code>background</code> and always uses the terminal. Processes started inside Terminal.app/iTerm cannot be stopped from the tray.
           </p>
         </div>
       `,

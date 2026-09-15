@@ -429,7 +429,7 @@ The scheduler uses standard cron expressions with 6 fields: `second minute hour 
 
 #### 🖥️ Background Execution
 
-Control how commands are executed - in background using ConsolePool or normal terminal execution:
+Control how commands are executed — as app-managed background jobs (tracked in the tray) or in a normal terminal:
 
 ```json
 {
@@ -443,10 +443,14 @@ Control how commands are executed - in background using ConsolePool or normal te
 ```
 
 **Background Execution Options:**
-- `"background": true` - Execute using ConsolePool (background)
-- `"background": false` - Execute using normal terminal execution
-- `"background": null` or omit - Auto-detect based on command type
+- `"background": true` — App-managed process; appears under **Running** in the system tray; **Stop** kills the process group
+- `"background": false` — Open in your configured terminal (not stoppable from the tray)
+- omit the field — Same as terminal for normal commands
 
+**Notes:**
+- Switch and monitor commands always use silent/pool execution regardless of `background`
+- CLI launches always use the terminal path (ignores `background`)
+- Processes started in Terminal.app / iTerm cannot be stopped from the tray
 #### 📁 Nested Submenus
 
 Organize commands in hierarchical menus:
@@ -596,7 +600,7 @@ Monitor system resources and services with real-time information:
 | `inputs` | Object | ❌ | Dynamic input fields |
 | `hotkey` | String | ❌ | Global hotkey shortcut |
 | `icon` | String | ❌ | Emoji icon for visual identification |
-| `background` | Boolean | ❌ | Execute in background (ConsolePool) or normal terminal |
+| `background` | Boolean | ❌ | App-managed background job (tray Running / Stop) or terminal |
 | `scheduler` | String | ❌ | Cron expression for scheduled execution |
 
 ### Configuration Management
