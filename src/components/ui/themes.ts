@@ -170,7 +170,7 @@ export const validatedFieldTv = tv({
 
 export const pageShellTv = tv({
   slots: {
-    root: 'min-h-screen bg-slate-50 text-sm',
+    root: 'min-h-full bg-slate-50 text-sm',
     main: 'mx-auto px-4 py-4',
     content: 'mx-auto space-y-4',
   },

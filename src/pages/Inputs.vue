@@ -78,7 +78,7 @@ const commandTemplate = ref('');
 
 const inputsTv = tv({
   slots: {
-    root: 'min-h-screen bg-slate-50 flex items-start justify-center pt-3 p-3',
+    root: 'min-h-full bg-slate-50 flex items-start justify-center pt-3 p-3',
     wrap: 'w-full max-w-sm',
     preview: 'mb-2.5 px-3 py-2 bg-blue-50 border border-blue-200 rounded-md',
     previewCode:

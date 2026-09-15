@@ -4,77 +4,201 @@
       <div :class="shell.content()">
         <header :class="header.root()">
           <div :class="header.titleBlock()">
-            <h1 :class="header.title()">Help & FAQ</h1>
+            <h1 :class="header.title()">Help</h1>
             <p :class="header.subtitle()">
-              Answers for setup, configuration, and troubleshooting
+              Short reference for tray, configs, and common fixes
             </p>
           </div>
         </header>
 
-        <div :class="callout.root({ tone: 'info' })">
-          <p :class="callout.title({ tone: 'info' })">Tip</p>
-          <p :class="callout.body()">
-            Use the search box to filter questions. Expand an item to see the
-            full answer with examples.
-          </p>
-        </div>
-
-        <div :class="ui.panel()">
+        <div :class="ui.layout()">
           <div :class="ui.searchWrap()">
             <input
               v-model="searchQuery"
-              type="text"
-              placeholder="Search FAQ..."
+              type="search"
+              placeholder="Filter sections…"
               :class="ui.searchInput()"
             />
             <SearchIcon :class="ui.searchIcon()" />
           </div>
 
-          <div :class="ui.categories()">
-            <div
-              v-for="category in categories"
-              :key="category.key"
-              :class="ui.category()"
+          <nav :class="ui.nav()" aria-label="Help sections">
+            <button
+              v-for="section in visibleSections"
+              :key="section.id"
+              type="button"
+              :class="[
+                ui.navBtn(),
+                { [ui.navBtnActive()]: activeSection === section.id },
+              ]"
+              @click="scrollTo(section.id)"
             >
-              <h2 :class="ui.categoryTitle()">{{ category.title }}</h2>
-              <div :class="ui.items()">
-                <div
-                  v-for="item in filteredFaqs[category.key]"
-                  :key="item.id"
-                  :class="ui.item()"
-                >
-                  <button
-                    type="button"
-                    :class="ui.itemTrigger()"
-                    @click="toggleFaq(item.id)"
-                  >
-                    <span>{{ item.question }}</span>
-                    <ChevronDownIcon
-                      :class="[
-                        ui.chevron(),
-                        { [ui.chevronOpen()]: openFaqs.includes(item.id) },
-                      ]"
-                    />
-                  </button>
-                  <div v-show="openFaqs.includes(item.id)" :class="ui.answer()">
-                    <div v-html="item.answer" />
-                  </div>
-                </div>
+              {{ section.title }}
+            </button>
+          </nav>
+
+          <p v-if="visibleSections.length === 0" :class="ui.empty()">
+            Nothing matched “{{ searchQuery }}”.
+          </p>
+
+          <section
+            v-if="isVisible('start')"
+            id="help-start"
+            :class="ui.section()"
+          >
+            <h2 :class="ui.sectionTitle()">Quick start</h2>
+            <ol :class="ui.steps()">
+              <li>Open the tray icon → <strong>Edit Config</strong> → Visual Editor.</li>
+              <li>Create or enable a config, add a command, save.</li>
+              <li>Tray → <strong>Refresh Configurations</strong> (or restart the app).</li>
+            </ol>
+            <div :class="ui.grid()">
+              <div :class="ui.item()">
+                <p :class="ui.itemTitle()">Config folder</p>
+                <p :class="ui.itemBody()">
+                  macOS / Linux:
+                  <code :class="ui.inlineCode()">~/.config/switch-shuttle/</code>
+                </p>
+                <p :class="ui.itemBody()">
+                  Windows:
+                  <code :class="ui.inlineCode()">%APPDATA%\switch-shuttle\</code>
+                </p>
+              </div>
+              <div :class="ui.item()">
+                <p :class="ui.itemTitle()">Tray essentials</p>
+                <p :class="ui.itemBody()">
+                  Commands live in the tray menu. Background jobs show under
+                  <strong>Running</strong> with Stop / Stop All.
+                </p>
               </div>
             </div>
-          </div>
+          </section>
 
-          <div :class="ui.footer()">
-            <p :class="ui.footerText()">
-              Can't find what you're looking for? Visit our
-              <a
-                href="https://github.com/s00d/switchshuttle"
-                :class="ui.footerLink()"
-                >GitHub repository</a
-              >
-              for additional resources.
+          <section
+            v-if="isVisible('config')"
+            id="help-config"
+            :class="ui.section()"
+          >
+            <h2 :class="ui.sectionTitle()">Config fields</h2>
+            <p :class="ui.sectionLead()">
+              Top-level settings for each JSON file in the config folder.
             </p>
-          </div>
+            <div :class="ui.list()">
+              <div
+                v-for="row in configFields"
+                :key="row.key"
+                :class="ui.listRow()"
+              >
+                <code :class="ui.listKey()">{{ row.key }}</code>
+                <p :class="ui.listVal()">{{ row.desc }}</p>
+              </div>
+            </div>
+            <pre :class="ui.code()"><code>{{ configExample }}</code></pre>
+          </section>
+
+          <section
+            v-if="isVisible('commands')"
+            id="help-commands"
+            :class="ui.section()"
+          >
+            <h2 :class="ui.sectionTitle()">Command recipes</h2>
+            <p :class="ui.sectionLead()">
+              Put these objects inside <code :class="ui.inlineCode()">commands</code>.
+            </p>
+            <div :class="ui.grid()">
+              <div
+                v-for="recipe in commandRecipes"
+                :key="recipe.title"
+                :class="ui.item()"
+              >
+                <p :class="ui.itemTitle()">{{ recipe.title }}</p>
+                <p :class="ui.itemBody()">{{ recipe.desc }}</p>
+                <pre :class="[ui.code(), 'mt-2']"><code>{{ recipe.sample }}</code></pre>
+              </div>
+            </div>
+          </section>
+
+          <section
+            v-if="isVisible('hotkeys')"
+            id="help-hotkeys"
+            :class="ui.section()"
+          >
+            <h2 :class="ui.sectionTitle()">Hotkeys</h2>
+            <div :class="ui.list()">
+              <div :class="ui.listRow()">
+                <span :class="ui.listKey()">Format</span>
+                <p :class="ui.listVal()">
+                  <code :class="ui.inlineCode()">Ctrl+Shift+D</code>,
+                  <code :class="ui.inlineCode()">Cmd+Option+S</code>,
+                  <code :class="ui.inlineCode()">Alt+F1</code>
+                </p>
+              </div>
+              <div :class="ui.listRow()">
+                <span :class="ui.listKey()">macOS</span>
+                <p :class="ui.listVal()">
+                  Grant Accessibility to SwitchShuttle if global hotkeys do not
+                  fire (System Settings → Privacy &amp; Security → Accessibility).
+                </p>
+              </div>
+              <div :class="ui.listRow()">
+                <span :class="ui.listKey()">Conflicts</span>
+                <p :class="ui.listVal()">
+                  Pick an unused combo, save the config, then Refresh
+                  Configurations.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section
+            v-if="isVisible('cli')"
+            id="help-cli"
+            :class="ui.section()"
+          >
+            <h2 :class="ui.sectionTitle()">CLI</h2>
+            <p :class="ui.sectionLead()">
+              Run the app binary with these flags (exact path depends on install).
+            </p>
+            <div :class="ui.list()">
+              <div
+                v-for="row in cliRows"
+                :key="row.key"
+                :class="ui.listRow()"
+              >
+                <code :class="ui.listKey()">{{ row.key }}</code>
+                <p :class="ui.listVal()">{{ row.desc }}</p>
+              </div>
+            </div>
+          </section>
+
+          <section
+            v-if="isVisible('fix')"
+            id="help-fix"
+            :class="ui.section()"
+          >
+            <h2 :class="ui.sectionTitle()">Fix common issues</h2>
+            <div :class="ui.grid()">
+              <div
+                v-for="issue in issues"
+                :key="issue.title"
+                :class="ui.item()"
+              >
+                <p :class="ui.itemTitle()">{{ issue.title }}</p>
+                <p :class="ui.itemBody()">{{ issue.fix }}</p>
+              </div>
+            </div>
+          </section>
+
+          <p :class="ui.footer()">
+            More docs and issues:
+            <a
+              href="https://github.com/s00d/switchshuttle"
+              :class="ui.footerLink()"
+              target="_blank"
+              rel="noopener noreferrer"
+              >github.com/s00d/switchshuttle</a
+            >
+          </p>
         </div>
       </div>
     </main>
@@ -82,588 +206,185 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import {
-  pageShellTv,
-  pageHeaderTv,
-  calloutTv,
-} from '@/components/ui/themes';
+import { computed, ref } from 'vue';
+import { pageShellTv, pageHeaderTv } from '@/components/ui/themes';
 import { helpTv } from './helpTheme';
 import SearchIcon from '../components/icons/SearchIcon.vue';
-import ChevronDownIcon from '../components/icons/ChevronDownIcon.vue';
 
 defineOptions({ name: 'Help' });
 
-const searchQuery = ref('');
-const openFaqs = ref<string[]>([]);
-
 const shell = pageShellTv({ width: 'md' });
 const header = pageHeaderTv();
-const callout = calloutTv();
 const ui = helpTv();
 
-type FaqItem = { id: string; question: string; answer: string };
-type FaqKey =
-  | 'gettingStarted'
-  | 'configuration'
-  | 'commandTypes'
-  | 'advancedFeatures'
-  | 'troubleshooting';
+const searchQuery = ref('');
+const activeSection = ref('start');
 
-const categories: { key: FaqKey; title: string }[] = [
-  { key: 'gettingStarted', title: 'Getting Started' },
-  { key: 'configuration', title: 'Configuration' },
-  { key: 'commandTypes', title: 'Command Types' },
-  { key: 'advancedFeatures', title: 'Advanced Features' },
-  { key: 'troubleshooting', title: 'Troubleshooting' },
+type SectionId = 'start' | 'config' | 'commands' | 'hotkeys' | 'cli' | 'fix';
+
+const sections: { id: SectionId; title: string; keywords: string }[] = [
+  {
+    id: 'start',
+    title: 'Quick start',
+    keywords: 'install tray editor refresh folder config path',
+  },
+  {
+    id: 'config',
+    title: 'Config fields',
+    keywords: 'terminal launch_in title enabled theme json',
+  },
+  {
+    id: 'commands',
+    title: 'Commands',
+    keywords:
+      'submenu inputs switch monitor scheduler background hotkey commands',
+  },
+  {
+    id: 'hotkeys',
+    title: 'Hotkeys',
+    keywords: 'shortcut accessibility conflict cmd ctrl',
+  },
+  {
+    id: 'cli',
+    title: 'CLI',
+    keywords: 'command list search cli terminal',
+  },
+  {
+    id: 'fix',
+    title: 'Fixes',
+    keywords: 'troubleshoot hotkey terminal json not loading running stop',
+  },
 ];
 
-const faqData: Record<FaqKey, FaqItem[]> = {
-  gettingStarted: [
-    {
-      id: 'gs-1',
-      question: 'How do I install SwitchShuttle?',
-      answer: `
-        <p class="mb-3"><strong>macOS (Recommended):</strong></p>
-        <code class="block bg-slate-200 p-2 rounded text-sm mb-3">brew tap s00d/switchshuttle && brew install --cask switchshuttle</code>
-        
-        <p class="mb-3"><strong>Manual Download:</strong></p>
-        <p>Download the latest release from <a href="https://github.com/s00d/switchshuttle/releases" class="text-blue-600 hover:text-blue-800">GitHub Releases</a> for your platform.</p>
-      `,
-    },
-    {
-      id: 'gs-2',
-      question: 'How do I get started after installation?',
-      answer: `
-        <ol class="list-decimal list-inside space-y-2">
-          <li>Launch SwitchShuttle - it will appear in your system tray</li>
-          <li>Right-click the tray icon to access the menu</li>
-          <li>Click "Edit Configuration" to open the visual editor</li>
-          <li>Add your first command or import an existing configuration</li>
-          <li>Save and restart the application</li>
-        </ol>
-      `,
-    },
-    {
-      id: 'gs-3',
-      question: 'Where are configuration files stored?',
-      answer: `
-        <div class="grid md:grid-cols-2 gap-4">
-          <div>
-            <strong class="text-slate-700">macOS/Linux:</strong>
-            <code class="block bg-slate-200 p-2 rounded text-sm mt-1">~/.config/switch-shuttle/</code>
-          </div>
-          <div>
-            <strong class="text-slate-700">Windows:</strong>
-            <code class="block bg-slate-200 p-2 rounded text-sm mt-1">C:\\Users\\&lt;Username&gt;\\AppData\\Roaming\\switch-shuttle\\</code>
-          </div>
-        </div>
-      `,
-    },
-  ],
-  configuration: [
-    {
-      id: 'cfg-1',
-      question: 'How do I create a basic configuration?',
-      answer: `
-        <p class="mb-3">Here's a simple configuration example:</p>
-        <pre class="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm"><code>{
-  "terminal": "iterm",
-  "launch_in": "new_tab",
-  "title": "My Commands",
-  "enabled": true,
-  "commands": [
-    {
-      "name": "🚀 Start Dev Server",
-      "command": "npm run dev",
-      "hotkey": "Ctrl+Shift+D"
-    }
-  ]
-}</code></pre>
-      `,
-    },
-    {
-      id: 'cfg-2',
-      question: 'What are the main configuration parameters?',
-      answer: `
-        <div class="overflow-x-auto">
-          <table class="min-w-full bg-white border border-slate-200 rounded-lg">
-            <thead class="bg-slate-50">
-              <tr>
-                <th class="px-4 py-2 text-left text-xs font-medium text-slate-500 uppercase">Parameter</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-slate-500 uppercase">Description</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-200">
-              <tr>
-                <td class="px-4 py-2 text-sm font-medium text-slate-900">terminal</td>
-                <td class="px-4 py-2 text-sm text-slate-600">Terminal application to use (iterm, terminal, alacritty, etc.)</td>
-              </tr>
-              <tr>
-                <td class="px-4 py-2 text-sm font-medium text-slate-900">launch_in</td>
-                <td class="px-4 py-2 text-sm text-slate-600">Where to launch commands (current, new_tab, new_window)</td>
-              </tr>
-              <tr>
-                <td class="px-4 py-2 text-sm font-medium text-slate-900">title</td>
-                <td class="px-4 py-2 text-sm text-slate-600">Window/tab title for the terminal</td>
-              </tr>
-              <tr>
-                <td class="px-4 py-2 text-sm font-medium text-slate-900">enabled</td>
-                <td class="px-4 py-2 text-sm text-slate-600">Whether to load this configuration</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      `,
-    },
-    {
-      id: 'cfg-3',
-      question: 'How do I enable/disable configurations?',
-      answer: `
-        <p class="mb-3">You can enable or disable individual configuration files to control which commands are available in the system tray menu.</p>
-        
-        <p class="mb-3"><strong>Visual Editor Method:</strong></p>
-        <ol class="list-decimal list-inside space-y-1 mb-3">
-          <li>Open the configuration editor</li>
-          <li>Use the toggle switch in the "Configuration Status" section</li>
-          <li>Enabled configurations will be loaded and available in the menu</li>
-        </ol>
-        
-        <p class="mb-3"><strong>JSON Method:</strong></p>
-        <code class="block bg-slate-200 p-2 rounded text-sm">"enabled": true  // Set to false to disable</code>
-      `,
-    },
-  ],
-  commandTypes: [
-    {
-      id: 'ct-1',
-      question: 'What types of commands are supported?',
-      answer: `
-        <div class="grid md:grid-cols-2 gap-4">
-          <div class="bg-slate-50 p-4 rounded-lg">
-            <h4 class="font-medium text-slate-700 mb-2">Basic Commands</h4>
-            <p class="text-sm text-slate-600">Simple commands that execute in the terminal.</p>
-            <pre class="bg-slate-900 text-slate-100 p-2 rounded text-xs mt-2"><code>{
-  "name": "Start Server",
-  "command": "npm run dev"
-}</code></pre>
-          </div>
-          
-          <div class="bg-slate-50 p-4 rounded-lg">
-            <h4 class="font-medium text-slate-700 mb-2">Multiple Commands</h4>
-            <p class="text-sm text-slate-600">Execute a sequence of commands.</p>
-            <pre class="bg-slate-900 text-slate-100 p-2 rounded text-xs mt-2"><code>{
-  "name": "Full Dev Cycle",
-  "commands": [
-    "git pull origin main",
-    "npm install",
-    "npm run build"
-  ]
-}</code></pre>
-          </div>
-          
-          <div class="bg-slate-50 p-4 rounded-lg">
-            <h4 class="font-medium text-slate-700 mb-2">Submenus</h4>
-            <p class="text-sm text-slate-600">Organize commands in hierarchical menus.</p>
-            <pre class="bg-slate-900 text-slate-100 p-2 rounded text-xs mt-2"><code>{
-  "name": "Docker Operations",
-  "submenu": [
-    {
-      "name": "Start Services",
-      "command": "docker-compose up -d"
-    }
-  ]
-}</code></pre>
-          </div>
-          
-          <div class="bg-slate-50 p-4 rounded-lg">
-            <h4 class="font-medium text-slate-700 mb-2">Dynamic Inputs</h4>
-            <p class="text-sm text-slate-600">Commands with user input prompts.</p>
-            <pre class="bg-slate-900 text-slate-100 p-2 rounded text-xs mt-2"><code>{
-  "name": "Create Component",
-  "inputs": {
-    "componentName": "MyComponent"
-  },
-  "commands": [
-    "mkdir -p src/components/[componentName]"
-  ]
-}</code></pre>
-          </div>
-        </div>
-      `,
-    },
-    {
-      id: 'ct-2',
-      question: 'How do I add hotkeys to commands?',
-      answer: `
-        <p class="mb-3">You can assign global hotkeys to your commands for quick access:</p>
-        <pre class="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm"><code>{
-  "name": "Start Dev Server",
-  "command": "npm run dev",
-  "hotkey": "Ctrl+Shift+D"
-}</code></pre>
-        
-        <p class="mb-3"><strong>Supported hotkey formats:</strong></p>
-        <ul class="list-disc list-inside space-y-1 text-sm">
-          <li><code class="bg-slate-200 px-1 rounded">Ctrl+Shift+D</code> - Standard combination</li>
-          <li><code class="bg-slate-200 px-1 rounded">Cmd+Option+S</code> - macOS specific</li>
-          <li><code class="bg-slate-200 px-1 rounded">Alt+F1</code> - Function keys</li>
-        </ul>
-        
-        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mt-4">
-          <p class="text-sm text-yellow-700">
-            <strong>Note:</strong> Ensure no other applications are using the same hotkey combination to avoid conflicts.
-          </p>
-        </div>
-      `,
-    },
-  ],
-  advancedFeatures: [
-    {
-      id: 'af-1',
-      question: 'What are Switch Commands?',
-      answer: `
-        <p class="mb-3">Switch commands allow you to toggle system functions with background execution. They provide visual feedback in the menu and automatically detect current status.</p>
-        
-        <p class="mb-3"><strong>Features:</strong></p>
-        <ul class="list-disc list-inside space-y-1 mb-3">
-          <li>Background execution without opening terminal windows</li>
-          <li>Automatic status detection</li>
-          <li>Visual feedback showing enabled/disabled status</li>
-          <li>Cross-platform support</li>
-        </ul>
-        
-        <p class="mb-3"><strong>Example:</strong></p>
-        <pre class="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm"><code>{
-  "name": "📶 Toggle WiFi",
-  "command": "networksetup -setairportpower en0 toggle",
-  "switch": "networksetup -getairportpower en0 | grep -q 'On' && echo 'true' || echo 'false'"
-}</code></pre>
-      `,
-    },
-    {
-      id: 'af-2',
-      question: 'What are Monitoring Commands?',
-      answer: `
-        <p class="mb-3">Monitoring commands display real-time system information directly in the menu. They execute silently in the background and show the results in the menu item name.</p>
-        
-        <p class="mb-3"><strong>Features:</strong></p>
-        <ul class="list-disc list-inside space-y-1 mb-3">
-          <li>Real-time display of system metrics</li>
-          <li>Background execution without terminal windows</li>
-          <li>Click to execute additional commands</li>
-          <li>Cross-platform support</li>
-        </ul>
-        
-        <p class="mb-3"><strong>Example:</strong></p>
-        <pre class="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm"><code>{
-  "name": "CPU Usage",
-  "monitor": "top -l 1 | grep 'CPU usage' | awk '{print $3}'",
-  "command": "top -o cpu"
-}</code></pre>
-        
-        <p class="mb-3"><strong>Best Practices:</strong></p>
-        <ul class="list-disc list-inside space-y-1">
-          <li>Keep monitor commands fast and lightweight</li>
-          <li>Use simple output formats (single values work best)</li>
-          <li>Add appropriate units (%, MB, GB, etc.) to the output</li>
-          <li>Handle errors gracefully</li>
-        </ul>
-      `,
-    },
-    {
-      id: 'af-3',
-      question: 'How do I use the CLI interface?',
-      answer: `
-        <p class="mb-3">SwitchShuttle provides a command-line interface for executing commands directly from the terminal.</p>
-        
-        <p class="mb-3"><strong>Basic Usage:</strong></p>
-        <div class="space-y-2">
-          <code class="block bg-slate-200 p-2 rounded text-sm">switch-shuttle execute &lt;command-id&gt;</code>
-          <code class="block bg-slate-200 p-2 rounded text-sm">switch-shuttle list</code>
-          <code class="block bg-slate-200 p-2 rounded text-sm">switch-shuttle show &lt;command-id&gt;</code>
-        </div>
-        
-        <p class="mb-3"><strong>Advanced Usage:</strong></p>
-        <div class="space-y-2">
-          <code class="block bg-slate-200 p-2 rounded text-sm">switch-shuttle execute &lt;command-id&gt; --param value</code>
-          <code class="block bg-slate-200 p-2 rounded text-sm">switch-shuttle list --filter "server"</code>
-          <code class="block bg-slate-200 p-2 rounded text-sm">switch-shuttle export &gt; config.json</code>
-        </div>
-      `,
-    },
-    {
-      id: 'af-4',
-      question: 'How do I schedule commands with cron?',
-      answer: `
-        <p class="mb-3">SwitchShuttle supports scheduled command execution using standard cron expressions. This allows you to automate repetitive tasks.</p>
-        
-        <p class="mb-3"><strong>Features:</strong></p>
-        <ul class="list-disc list-inside space-y-1 mb-3">
-          <li>Standard cron format support</li>
-          <li>Background execution without terminal windows</li>
-          <li>Persistent scheduling (continues when menu is closed)</li>
-          <li>Cross-platform compatibility</li>
-        </ul>
-        
-        <p class="mb-3"><strong>Example:</strong></p>
-        <pre class="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm"><code>{
-  "name": "🔄 Auto Backup",
-  "commands": [
-    "rsync -av /source/ /backup/"
-  ],
-  "scheduler": "0 2 * * *",
-  "background": true,
-  "hotkey": "Ctrl+Shift+B"
-}</code></pre>
-        
-        <p class="mb-3"><strong>Common cron patterns:</strong></p>
-        <div class="grid md:grid-cols-2 gap-4">
-          <div class="bg-slate-50 p-3 rounded-lg">
-            <code class="text-sm font-medium">* * * * *</code>
-            <p class="text-xs text-slate-600 mt-1">Every minute</p>
-          </div>
-          <div class="bg-slate-50 p-3 rounded-lg">
-            <code class="text-sm font-medium">0 */2 * * *</code>
-            <p class="text-xs text-slate-600 mt-1">Every 2 hours</p>
-          </div>
-          <div class="bg-slate-50 p-3 rounded-lg">
-            <code class="text-sm font-medium">0 9 * * 1-5</code>
-            <p class="text-xs text-slate-600 mt-1">Weekdays at 9 AM</p>
-          </div>
-          <div class="bg-slate-50 p-3 rounded-lg">
-            <code class="text-sm font-medium">0 0 1 * *</code>
-            <p class="text-xs text-slate-600 mt-1">First day of month</p>
-          </div>
-        </div>
-        
-        <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mt-4">
-          <p class="text-sm text-blue-700">
-            <strong>Tip:</strong> Use <code class="bg-blue-100 px-1 rounded">"background": true</code> for scheduled long-running jobs so they appear under Running and can be stopped from the tray.
-          </p>
-        </div>
-      `,
-    },
-    {
-      id: 'af-5',
-      question: 'How do I control background execution?',
-      answer: `
-        <p class="mb-3">SwitchShuttle can run commands as app-managed background jobs (shown under <strong>Running</strong> in the tray) or open them in your terminal.</p>
-        
-        <p class="mb-3"><strong>Background Execution Options:</strong></p>
-        <div class="space-y-3">
-          <div class="bg-slate-50 p-4 rounded-lg">
-            <h4 class="font-medium text-slate-700 mb-2">Background job (tracked)</h4>
-            <p class="text-sm text-slate-600 mb-2">No terminal window. The job appears under Running; choose Stop to kill the process group.</p>
-            <pre class="bg-slate-900 text-slate-100 p-2 rounded text-xs"><code>"background": true</code></pre>
-          </div>
-          
-          <div class="bg-slate-50 p-4 rounded-lg">
-            <h4 class="font-medium text-slate-700 mb-2">Normal Terminal</h4>
-            <p class="text-sm text-slate-600 mb-2">Commands open in visible terminal windows. Not stoppable from the tray.</p>
-            <pre class="bg-slate-900 text-slate-100 p-2 rounded text-xs"><code>"background": false</code></pre>
-          </div>
-          
-          <div class="bg-slate-50 p-4 rounded-lg">
-            <h4 class="font-medium text-slate-700 mb-2">Omit the field</h4>
-            <p class="text-sm text-slate-600 mb-2">Same as terminal for normal commands.</p>
-            <pre class="bg-slate-900 text-slate-100 p-2 rounded text-xs"><code>// omit "background"</code></pre>
-          </div>
-        </div>
-        
-        <p class="mb-3"><strong>Example configurations:</strong></p>
-        <div class="grid md:grid-cols-2 gap-4">
-          <div class="bg-slate-50 p-4 rounded-lg">
-            <h4 class="font-medium text-slate-700 mb-2">Background Server</h4>
-            <pre class="bg-slate-900 text-slate-100 p-2 rounded text-xs"><code>{
-  "name": "🚀 Start Server",
-  "commands": ["npm run dev"],
-  "background": true
-}</code></pre>
-          </div>
-          
-          <div class="bg-slate-50 p-4 rounded-lg">
-            <h4 class="font-medium text-slate-700 mb-2">Interactive Terminal</h4>
-            <pre class="bg-slate-900 text-slate-100 p-2 rounded text-xs"><code>{
-  "name": "🔧 Debug Mode",
-  "commands": ["node --inspect app.js"],
-  "background": false
-}</code></pre>
-          </div>
-        </div>
-        
-        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mt-4">
-          <p class="text-sm text-yellow-700">
-            <strong>Note:</strong> Switch and monitor commands always use silent/pool execution. CLI ignores <code>background</code> and always uses the terminal. Processes started inside Terminal.app/iTerm cannot be stopped from the tray.
-          </p>
-        </div>
-      `,
-    },
-  ],
-  troubleshooting: [
-    {
-      id: 'ts-1',
-      question: 'My hotkeys are not working. What should I do?',
-      answer: `
-        <p class="mb-3">Hotkey conflicts are a common issue. Here's how to resolve them:</p>
-        
-        <ol class="list-decimal list-inside space-y-2 mb-3">
-          <li>Check if other applications are using the same hotkey combination</li>
-          <li>Try a different hotkey combination (e.g., Ctrl+Shift+Alt+D)</li>
-          <li>Restart SwitchShuttle after changing hotkeys</li>
-          <li>Check system permissions for accessibility features</li>
-        </ol>
-        
-        <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
-          <p class="text-sm text-blue-700">
-            <strong>Tip:</strong> On macOS, you may need to grant accessibility permissions to SwitchShuttle in System Preferences > Security & Privacy > Privacy > Accessibility.
-          </p>
-        </div>
-      `,
-    },
-    {
-      id: 'ts-2',
-      question: 'My configuration is not loading. How do I fix this?',
-      answer: `
-        <p class="mb-3">Configuration loading issues can be caused by several factors:</p>
-        
-        <ul class="list-disc list-inside space-y-2 mb-3">
-          <li><strong>JSON Syntax Errors:</strong> Use a JSON validator to check your configuration file syntax</li>
-          <li><strong>File Location:</strong> Ensure configuration files are in the correct directory</li>
-          <li><strong>File Permissions:</strong> Check that the application can read the configuration files</li>
-          <li><strong>Application Restart:</strong> Restart SwitchShuttle after making configuration changes</li>
-        </ul>
-        
-        <p class="mb-3"><strong>Common JSON errors:</strong></p>
-        <ul class="list-disc list-inside space-y-1 text-sm">
-          <li>Missing commas between objects</li>
-          <li>Unclosed brackets or braces</li>
-          <li>Invalid string escaping</li>
-          <li>Trailing commas in arrays or objects</li>
-        </ul>
-      `,
-    },
-    {
-      id: 'ts-3',
-      question:
-        'The terminal is not opening or commands are not executing. What is wrong?',
-      answer: `
-        <p class="mb-3">Terminal execution issues can be resolved by checking these common causes:</p>
-        
-        <div class="grid md:grid-cols-2 gap-4 mb-3">
-          <div class="bg-slate-50 p-4 rounded-lg">
-            <h4 class="font-medium text-slate-700 mb-2">Terminal Application</h4>
-            <ul class="list-disc list-inside space-y-1 text-sm text-slate-600">
-              <li>Verify the terminal application is installed</li>
-              <li>Check the terminal path in configuration</li>
-              <li>Try different terminal applications</li>
-            </ul>
-          </div>
-          
-          <div class="bg-slate-50 p-4 rounded-lg">
-            <h4 class="font-medium text-slate-700 mb-2">Command Path</h4>
-            <ul class="list-disc list-inside space-y-1 text-sm text-slate-600">
-              <li>Ensure commands are in system PATH</li>
-              <li>Use absolute paths for custom scripts</li>
-              <li>Check command syntax and parameters</li>
-            </ul>
-          </div>
-        </div>
-        
-        <p class="mb-3"><strong>Supported terminals:</strong></p>
-        <ul class="list-disc list-inside space-y-1 text-sm">
-          <li>macOS: Terminal, iTerm2, Alacritty, Hyper</li>
-          <li>Windows: Command Prompt, PowerShell, Windows Terminal</li>
-          <li>Linux: gnome-terminal, konsole, xterm, alacritty</li>
-        </ul>
-      `,
-    },
-    {
-      id: 'ts-4',
-      question: 'How do I get help or report issues?',
-      answer: `
-        <p class="mb-3">There are several ways to get help and support:</p>
-        
-        <div class="space-y-3">
-          <div class="bg-slate-50 p-4 rounded-lg">
-            <h4 class="font-medium text-slate-700 mb-2">GitHub Resources</h4>
-            <ul class="space-y-2 text-sm text-slate-600">
-              <li><strong>Issues:</strong> <a href="https://github.com/s00d/switchshuttle/issues" class="text-blue-600 hover:text-blue-800">Report bugs and request features</a></li>
-              <li><strong>Documentation:</strong> <a href="https://github.com/s00d/switchshuttle#readme" class="text-blue-600 hover:text-blue-800">Complete documentation</a></li>
-              <li><strong>Discussions:</strong> <a href="https://github.com/s00d/switchshuttle/discussions" class="text-blue-600 hover:text-blue-800">Community discussions</a></li>
-            </ul>
-          </div>
-          
-          <div class="bg-slate-50 p-4 rounded-lg">
-            <h4 class="font-medium text-slate-700 mb-2">Debugging</h4>
-            <ul class="space-y-2 text-sm text-slate-600">
-              <li>Check application logs for error messages</li>
-              <li>Enable debug mode if available</li>
-              <li>Test commands manually in terminal</li>
-              <li>Validate JSON configuration syntax</li>
-            </ul>
-          </div>
-        </div>
-      `,
-    },
-  ],
-};
-
-const filteredFaqs = computed(() => {
-  const query = searchQuery.value.toLowerCase();
-
-  if (!query) {
-    return faqData;
-  }
-
-  const filterCategory = (category: FaqItem[]) => {
-    return category.filter(
-      (item) =>
-        item.question.toLowerCase().includes(query) ||
-        item.answer.toLowerCase().includes(query),
-    );
-  };
-
-  return {
-    gettingStarted: filterCategory(faqData.gettingStarted),
-    configuration: filterCategory(faqData.configuration),
-    commandTypes: filterCategory(faqData.commandTypes),
-    advancedFeatures: filterCategory(faqData.advancedFeatures),
-    troubleshooting: filterCategory(faqData.troubleshooting),
-  };
+const visibleSections = computed(() => {
+  const q = searchQuery.value.trim().toLowerCase();
+  if (!q) return sections;
+  return sections.filter(
+    (s) =>
+      s.title.toLowerCase().includes(q) ||
+      s.keywords.includes(q) ||
+      s.keywords.split(' ').some((w) => w.includes(q) || q.includes(w)),
+  );
 });
 
-const toggleFaq = (id: string) => {
-  const index = openFaqs.value.indexOf(id);
-  if (index > -1) {
-    openFaqs.value.splice(index, 1);
-  } else {
-    openFaqs.value.push(id);
-  }
+const isVisible = (id: SectionId) =>
+  visibleSections.value.some((s) => s.id === id);
+
+const scrollTo = (id: SectionId) => {
+  activeSection.value = id;
+  document.getElementById(`help-${id}`)?.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start',
+  });
 };
+
+const configFields = [
+  {
+    key: 'terminal',
+    desc: 'App to open: iterm, terminal, alacritty, warp, hyper, …',
+  },
+  {
+    key: 'launch_in',
+    desc: 'current | new_tab | new_window',
+  },
+  { key: 'title', desc: 'Optional window/tab title.' },
+  {
+    key: 'enabled',
+    desc: 'false hides the whole file from the tray without deleting it.',
+  },
+  { key: 'theme', desc: 'Optional terminal theme name (where supported).' },
+];
+
+const configExample = `{
+  "terminal": "iterm",
+  "launch_in": "new_tab",
+  "title": "Dev",
+  "enabled": true,
+  "commands": [
+    { "name": "Start", "command": "npm run dev", "hotkey": "Ctrl+Shift+D" }
+  ]
+}`;
+
+const commandRecipes = [
+  {
+    title: 'Single / multi command',
+    desc: 'Use command or commands[].',
+    sample: `{
+  "name": "Bootstrap",
+  "commands": ["git pull", "npm i", "npm run build"]
+}`,
+  },
+  {
+    title: 'Submenu',
+    desc: 'Nest related actions.',
+    sample: `{
+  "name": "Docker",
+  "submenu": [
+    { "name": "Up", "command": "docker compose up -d" }
+  ]
+}`,
+  },
+  {
+    title: 'Inputs',
+    desc: 'Prompts before run; use [name] in the command.',
+    sample: `{
+  "name": "New component",
+  "inputs": { "name": "Button" },
+  "command": "mkdir -p src/[name]"
+}`,
+  },
+  {
+    title: 'Switch',
+    desc: 'Toggle with a status probe (checkbox in tray).',
+    sample: `{
+  "name": "Wi‑Fi",
+  "command": "networksetup -setairportpower en0 on",
+  "switch": "networksetup -getairportpower en0 | grep -q On"
+}`,
+  },
+  {
+    title: 'Monitor',
+    desc: 'Live label from monitor; click runs command.',
+    sample: `{
+  "name": "Load",
+  "monitor": "uptime",
+  "command": "top"
+}`,
+  },
+  {
+    title: 'Background + schedule',
+    desc: 'Tracked under Running; cron keeps firing.',
+    sample: `{
+  "name": "Backup",
+  "commands": ["rsync -a ~/work/ ~/Backup/"],
+  "background": true,
+  "scheduler": "0 2 * * *"
+}`,
+  },
+];
+
+const cliRows = [
+  { key: '--command', desc: 'Run by command id or name.' },
+  { key: '--list', desc: 'Print enabled commands.' },
+  { key: '--search', desc: 'Filter commands by name substring.' },
+];
+
+const issues = [
+  {
+    title: 'Hotkeys silent',
+    fix: 'Check Accessibility (macOS), pick a free combo, Refresh Configurations.',
+  },
+  {
+    title: 'Config missing in tray',
+    fix: 'Validate JSON, set "enabled": true, confirm the file is in the config folder, then refresh.',
+  },
+  {
+    title: 'Terminal does not open',
+    fix: 'Install the configured terminal, or change "terminal" to one you have.',
+  },
+  {
+    title: 'Cannot Stop a job',
+    fix: 'Only background: true jobs appear under Running. Terminal.app/iTerm sessions are not stoppable from the tray.',
+  },
+];
 </script>
-
-<style scoped>
-pre code {
-  scrollbar-width: thin;
-  scrollbar-color: #64748b #1e293b;
-}
-
-pre code::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-pre code::-webkit-scrollbar-track {
-  background: #1e293b;
-}
-
-pre code::-webkit-scrollbar-thumb {
-  background: #64748b;
-  border-radius: 3px;
-}
-
-pre code::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-</style>

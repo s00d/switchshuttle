@@ -443,8 +443,8 @@ pub fn handle_system_tray_event(
                 "about",
                 "SwitchShuttle - About",
                 "/about",
-                800.0,
-                600.0,
+                440.0,
+                420.0,
                 true,
             ) {
                 error!("Failed to create about window: {}", e);

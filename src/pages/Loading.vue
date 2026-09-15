@@ -16,7 +16,7 @@ defineOptions({ name: 'Loading' });
 
 const loadingTv = tv({
   slots: {
-    root: 'flex flex-col items-center justify-center h-screen w-screen bg-slate-50',
+    root: 'flex flex-col items-center justify-center h-full w-full bg-slate-50',
     spinner:
       'w-12 h-12 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin mb-4',
     title: 'text-lg text-slate-700 font-medium',

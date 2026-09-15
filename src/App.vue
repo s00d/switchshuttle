@@ -23,8 +23,8 @@ const showPerformanceMonitor = ref(false);
 
 const appTv = tv({
   slots: {
-    root: 'h-screen w-screen bg-slate-50 text-sm font-sans antialiased',
-    main: 'h-full overflow-auto',
+    root: 'h-full w-full overflow-hidden bg-slate-50 text-sm font-sans antialiased',
+    main: 'h-full overflow-y-auto overscroll-none',
   },
 });
 
