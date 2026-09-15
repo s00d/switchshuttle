@@ -7,20 +7,36 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies & builds
 node_modules
 dist
 dist-ssr
 *.local
 
-# Editor directories and files
+# Env / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.p8
+*.p12
+*.key
+
+# Editor / OS
 .vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Cursor (local IDE state & agents)
+.cursor/
 .cursorrules
-.cargo
+
+# Rust / Cargo local config
+.cargo/
