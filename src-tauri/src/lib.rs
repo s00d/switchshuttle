@@ -6,6 +6,8 @@ mod console;
 mod execute;
 mod helpers;
 mod hotkeys;
+#[cfg(target_os = "macos")]
+mod macos_menu_icons;
 mod menu;
 mod menu_structure;
 mod running;
@@ -207,6 +209,8 @@ pub fn run() {
             });
 
             tray.set_menu(Some(system_tray_menu)).unwrap();
+            #[cfg(target_os = "macos")]
+            crate::macos_menu_icons::mark_tray_menu_icons_as_templates(&tray);
 
             // Инициализируем глобальные хоткеи
             let hotkey_manager_clone = hotkey_manager.clone();

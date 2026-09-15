@@ -1,22 +1,15 @@
 <template>
-  <div
-    class="border border-slate-200 rounded-xl p-6 space-y-6 bg-white shadow-md hover:shadow-lg transition-shadow duration-200"
-  >
-    <!-- Command Header -->
-    <div
-      class="flex items-center justify-between pb-4 border-b border-slate-200 -mx-6 px-6"
-    >
-      <div class="flex items-center space-x-3">
-        <div
-          class="w-8 h-8 bg-blue-100 flex items-center justify-center rounded-lg"
-        >
+  <div :class="ui.root()">
+    <div :class="ui.header()">
+      <div :class="ui.headerLeft()">
+        <div :class="ui.iconWrap()">
           <LightningSmallIcon />
         </div>
-        <h4 class="font-semibold text-slate-900">
+        <h4 :class="ui.title()">
           Command {{ index + 1 }}{{ command.name ? ` - ${command.name}` : '' }}
         </h4>
       </div>
-      <div class="flex items-center space-x-1">
+      <div :class="ui.actions()">
         <CustomButton
           variant="ghost"
           size="sm"
@@ -43,10 +36,9 @@
       </div>
     </div>
 
-    <!-- Basic Command Fields -->
-    <div class="grid gap-6 grid-cols-1 md:grid-cols-2">
-      <div class="flex items-start gap-3">
-        <div class="w-16">
+    <div :class="ui.fieldsGrid()">
+      <div :class="ui.fieldsRow()">
+        <div :class="ui.iconField()">
           <IconSelector
             v-model="commandIcon"
             label="Icon"
@@ -55,7 +47,7 @@
             @update:modelValue="handleIconChange"
           />
         </div>
-        <div class="flex-1">
+        <div :class="ui.nameField()">
           <ValidatedField
             :model-value="command.name"
             :rules="fieldRules.commandName"
@@ -83,13 +75,10 @@
       />
     </div>
 
-    <!-- Commands Section -->
-    <div class="space-y-6">
-      <div class="space-y-4">
-        <div class="flex items-center justify-between">
-          <label class="block text-sm font-semibold text-slate-700"
-            >Commands</label
-          >
+    <div :class="ui.section()">
+      <div :class="ui.sectionInner()">
+        <div :class="ui.sectionHeader()">
+          <label :class="ui.sectionLabel()">Commands</label>
           <CustomButton
             variant="ghost"
             size="sm"
@@ -102,15 +91,14 @@
 
         <div
           v-if="command.commands && command.commands.length > 0"
-          class="space-y-3"
+          :class="ui.commandList()"
         >
           <div
             v-for="(_, cmdIndex) in command.commands"
             :key="cmdIndex"
-            class="group"
           >
-            <div class="flex items-start gap-2">
-              <div class="flex-1">
+            <div :class="ui.commandRow()">
+              <div :class="ui.commandField()">
                 <CommandInput
                   v-model="command.commands[cmdIndex]"
                   :placeholder="`Enter command ${cmdIndex + 1}`"
@@ -121,7 +109,7 @@
               <CustomButton
                 variant="danger"
                 size="sm"
-                class="flex-shrink-0"
+                :class="ui.shrinkBtn()"
                 @click="handleRemoveMultipleCommand(cmdIndex)"
               >
                 <XIcon />
@@ -131,40 +119,33 @@
         </div>
       </div>
 
-
-
-      <!-- Advanced Options Spoiler -->
       <CollapsibleSection
         title="Advanced Options"
         :summary="getAdvancedOptionsSummary()"
       >
-        <!-- Background Execution Option -->
-        <div class="space-y-4">
-          <div class="flex items-center space-x-3">
+        <div :class="ui.sectionInner()">
+          <div :class="ui.checkboxRow()">
             <input
               id="background"
               v-model="command.background"
               type="checkbox"
-              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+              :class="ui.checkbox()"
             />
-            <label for="background" class="text-sm font-medium text-slate-700">
+            <label for="background" :class="ui.checkboxLabel()">
               Execute in background (tracked in tray)
             </label>
           </div>
-          <p class="text-xs text-slate-500">
+          <p :class="ui.hint()">
             When enabled, commands run as app-managed processes and appear under
             Running in the system tray (Stop to kill). When disabled, commands
             open in your configured terminal (not stoppable from the tray).
           </p>
         </div>
 
-        <!-- Divider -->
-        <div class="border-t-2 border-slate-200/70 my-8 -mx-6"></div>
-        <!-- Monitor Field -->
-        <div class="space-y-1">
-          <label class="block text-sm font-medium text-slate-700"
-            >Monitor Command (optional)</label
-          >
+        <div :class="ui.divider()"></div>
+
+        <div :class="ui.fieldStack()">
+          <label :class="ui.fieldLabel()">Monitor Command (optional)</label>
           <CommandInput
             :model-value="command.monitor || ''"
             placeholder="Command to get display value for monitoring (e.g., echo 'CPU: 45%')"
@@ -173,19 +154,15 @@
           />
         </div>
 
-        <!-- Divider -->
-        <div class="border-t-2 border-slate-200/70 my-8 -mx-6"></div>
+        <div :class="ui.divider()"></div>
 
-        <!-- Inputs Section -->
-        <div class="space-y-4">
-          <div class="flex items-center justify-between">
-            <label class="block text-sm font-semibold text-slate-700"
-              >Inputs</label
-            >
+        <div :class="ui.sectionInner()">
+          <div :class="ui.sectionHeader()">
+            <label :class="ui.sectionLabel()">Inputs</label>
             <CustomButton
               variant="ghost"
               size="sm"
-              class="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+              :class="ui.ghostAccent()"
               @click="handleAddInput"
             >
               <AddIcon />
@@ -195,31 +172,23 @@
 
           <div
             v-if="command.inputs && Object.keys(command.inputs).length > 0"
-            class="space-y-2"
+            :class="ui.inputsList()"
           >
-            <!-- Table Headers -->
-            <div class="flex items-center gap-2 py-1 px-1 rounded-lg">
-              <div class="flex-1">
-                <span
-                  class="text-xs font-semibold text-slate-700 uppercase tracking-wide"
-                  >Key</span
-                >
+            <div :class="ui.inputsHeader()">
+              <div :class="ui.inputsCol()">
+                <span :class="ui.inputsColLabel()">Key</span>
               </div>
-              <div class="flex-1">
-                <span
-                  class="text-xs font-semibold text-slate-700 uppercase tracking-wide"
-                  >Default Value</span
-                >
+              <div :class="ui.inputsCol()">
+                <span :class="ui.inputsColLabel()">Default Value</span>
               </div>
-              <div class="w-8"></div>
+              <div :class="ui.inputsSpacer()"></div>
             </div>
-            <!-- Table Rows -->
             <div
               v-for="(_, key) in command.inputs"
               :key="key"
-              class="flex items-center gap-2 py-1"
+              :class="ui.inputsRow()"
             >
-              <div class="flex-1">
+              <div :class="ui.inputsCol()">
                 <ValidatedField
                   :model-value="isRootLevel && inputKeys[index] ? inputKeys[index][key] : key"
                   :rules="fieldRules.inputKey"
@@ -231,14 +200,14 @@
                       :model-value="value"
                       placeholder="Key"
                       size="sm"
-                      input-class="border border-slate-300 bg-white rounded px-2 py-1 focus:border-blue-400 focus:ring-0"
+                      :input-class="ui.inputCompact()"
                       :error="error"
                       @update:model-value="updateValue"
                     />
                   </template>
                 </ValidatedField>
               </div>
-              <div class="flex-1">
+              <div :class="ui.inputsCol()">
                 <ValidatedField
                   :model-value="command.inputs?.[key] || ''"
                   :rules="fieldRules.inputValue"
@@ -250,7 +219,7 @@
                       :model-value="value"
                       placeholder="Default value"
                       size="sm"
-                      input-class="border border-slate-300 bg-white rounded px-2 py-1 focus:border-blue-400 focus:ring-0"
+                      :input-class="ui.inputCompact()"
                       :error="error"
                       @update:model-value="updateValue"
                     />
@@ -260,7 +229,7 @@
               <CustomButton
                 variant="danger"
                 size="sm"
-                class="flex-shrink-0 w-8"
+                :class="ui.removeBtn()"
                 @click="() => handleRemoveInput(key)"
               >
                 <XIcon />
@@ -269,7 +238,6 @@
           </div>
         </div>
 
-        <!-- Scheduler Configuration -->
         <SchedulerInput v-model="command.scheduler" />
       </CollapsibleSection>
     </div>
@@ -295,6 +263,9 @@ import AddIcon from '../icons/AddIcon.vue';
 import XIcon from '../icons/XIcon.vue';
 import ValidatedField from '../ui/ValidatedField.vue';
 import { fieldRules } from '../../lib/validation-rules';
+import { commandCardTv } from './commandCardTheme';
+
+defineOptions({ name: 'CommandItem' });
 
 const props = defineProps({
   command: {
@@ -323,8 +294,6 @@ const props = defineProps({
   },
 });
 
-
-
 const emit = defineEmits<{
   (e: 'update:command', value: Command): void;
   (e: 'remove', index: number): void;
@@ -336,7 +305,8 @@ const emit = defineEmits<{
   (e: 'remove-multiple-command', index: number, cmdIndex: number): void;
 }>();
 
-// Initialize commands if they don't exist
+const ui = commandCardTv({ tone: 'command' });
+
 onMounted(() => {
   if (!props.command.commands) {
     props.command.commands = [''];
@@ -344,12 +314,8 @@ onMounted(() => {
   }
 });
 
-
-
-// Computed properties for determining logic
 const isRootLevel = computed(() => props.level === 0);
 
-// Computed property for icon handling
 const commandIcon = computed({
   get: () => props.command.icon || '',
   set: (value: string) => {
@@ -362,7 +328,6 @@ const commandIcon = computed({
   },
 });
 
-// Method for handling icon changes
 const handleIconChange = (value: string) => {
   if (value.trim() === '') {
     props.command.icon = null;
@@ -372,13 +337,11 @@ const handleIconChange = (value: string) => {
   emit('update:command', props.command);
 };
 
-// Method for handling name changes
 const handleNameChange = (value: string) => {
   props.command.name = value;
   emit('update:command', props.command);
 };
 
-// Functions for handling inputs
 const handleAddInput = () => {
   if (isRootLevel.value) {
     emit('add-input', props.index);
@@ -404,7 +367,6 @@ const handleInputValueChange = (key: string, value: string) => {
   }
 };
 
-// Functions for handling multiple commands
 const handleAddMultipleCommand = () => {
   if (isRootLevel.value) {
     emit('add-multiple-command', props.index);
@@ -417,7 +379,6 @@ const handleRemoveMultipleCommand = (cmdIndex: number) => {
   }
 };
 
-// Function to get brief information about extended options
 const getAdvancedOptionsSummary = () => {
   const cmd = props.command;
   const parts = [];

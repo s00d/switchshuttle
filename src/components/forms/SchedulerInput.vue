@@ -1,34 +1,32 @@
 <template>
-  <div class="space-y-4">
-    <div class="flex items-center justify-between">
-      <label class="block text-sm font-semibold text-slate-700"
-        >Scheduler</label
-      >
-      <div class="flex items-center space-x-2">
+  <div :class="ui.root()">
+    <div :class="ui.header()">
+      <label :class="ui.title()">Scheduler</label>
+      <div :class="ui.actions()">
         <CustomButton
           variant="ghost"
           size="sm"
-          :class="editMode ? 'text-blue-600' : 'text-slate-600'"
+          :class="ui.modeBtn()"
           @click="toggleEditMode"
         >
-          <EditIcon class="w-4 h-4 mr-1" />
+          <EditIcon :class="ui.actionIcon()" />
           {{ editMode ? 'Visual Editor' : 'Text Editor' }}
         </CustomButton>
         <CustomButton
           variant="ghost"
           size="sm"
-          :class="schedulerEnabled ? 'text-green-600' : 'text-slate-600'"
+          :class="ui.enableBtn()"
           @click="toggleScheduler"
         >
-          <ClockIcon class="w-4 h-4 mr-1" />
+          <ClockIcon :class="ui.actionIcon()" />
           {{ schedulerEnabled ? 'Enabled' : 'Disabled' }}
         </CustomButton>
       </div>
     </div>
 
-    <div v-if="schedulerEnabled" class="space-y-4 p-4 bg-slate-50 rounded-lg">
+    <div v-if="schedulerEnabled" :class="ui.panel()">
       <!-- Text Editor Mode -->
-      <div v-if="editMode" class="space-y-4">
+      <div v-if="editMode" :class="ui.section()">
         <Input
           v-model="cronExpression"
           label="Cron Expression"
@@ -36,15 +34,12 @@
           required
         />
 
-        <!-- Cron Expression Help -->
-        <div class="bg-blue-50 p-3 rounded-lg">
-          <h4 class="text-sm font-semibold text-blue-900 mb-2">
-            Cron Expression Format
-          </h4>
-          <div class="text-xs text-blue-800 space-y-1">
+        <div :class="ui.help()">
+          <h4 :class="ui.helpTitle()">Cron Expression Format</h4>
+          <div :class="ui.helpBody()">
             <p><strong>Format:</strong> second minute hour day month weekday</p>
             <p><strong>Examples:</strong></p>
-            <ul class="list-disc list-inside space-y-1 ml-2">
+            <ul :class="ui.helpList()">
               <li><code>* * * * * *</code> - Every second</li>
               <li><code>0 * * * * *</code> - Every minute</li>
               <li><code>0 0 * * * *</code> - Every hour</li>
@@ -58,13 +53,10 @@
       </div>
 
       <!-- Visual Editor Mode -->
-      <div v-else class="space-y-4">
-        <div class="grid grid-cols-6 gap-1">
-          <!-- Second -->
-          <div class="space-y-1">
-            <label class="block text-xs font-medium text-slate-700"
-              >Second</label
-            >
+      <div v-else :class="ui.section()">
+        <div :class="ui.fieldsGrid()">
+          <div :class="ui.field()">
+            <label :class="ui.fieldLabel()">Second</label>
             <SchedulerSelect
               v-model="cronFields.second"
               :options="secondOptions"
@@ -78,11 +70,8 @@
             />
           </div>
 
-          <!-- Minute -->
-          <div class="space-y-1">
-            <label class="block text-xs font-medium text-slate-700"
-              >Minute</label
-            >
+          <div :class="ui.field()">
+            <label :class="ui.fieldLabel()">Minute</label>
             <SchedulerSelect
               v-model="cronFields.minute"
               :options="minuteOptions"
@@ -96,9 +85,8 @@
             />
           </div>
 
-          <!-- Hour -->
-          <div class="space-y-1">
-            <label class="block text-xs font-medium text-slate-700">Hour</label>
+          <div :class="ui.field()">
+            <label :class="ui.fieldLabel()">Hour</label>
             <SchedulerSelect
               v-model="cronFields.hour"
               :options="hourOptions"
@@ -112,9 +100,8 @@
             />
           </div>
 
-          <!-- Day -->
-          <div class="space-y-1">
-            <label class="block text-xs font-medium text-slate-700">Day</label>
+          <div :class="ui.field()">
+            <label :class="ui.fieldLabel()">Day</label>
             <SchedulerSelect
               v-model="cronFields.day"
               :options="dayOptions"
@@ -128,11 +115,8 @@
             />
           </div>
 
-          <!-- Month -->
-          <div class="space-y-1">
-            <label class="block text-xs font-medium text-slate-700"
-              >Month</label
-            >
+          <div :class="ui.field()">
+            <label :class="ui.fieldLabel()">Month</label>
             <SchedulerSelect
               v-model="cronFields.month"
               :options="monthOptions"
@@ -146,11 +130,8 @@
             />
           </div>
 
-          <!-- Weekday -->
-          <div class="space-y-1">
-            <label class="block text-xs font-medium text-slate-700"
-              >Weekday</label
-            >
+          <div :class="ui.field()">
+            <label :class="ui.fieldLabel()">Weekday</label>
             <SchedulerSelect
               v-model="cronFields.weekday"
               :options="weekdayOptions"
@@ -165,16 +146,13 @@
           </div>
         </div>
 
-        <!-- Preset Buttons -->
-        <div class="space-y-2">
-          <label class="block text-xs font-medium text-slate-700"
-            >Quick Presets</label
-          >
-          <div class="flex flex-wrap gap-2">
+        <div :class="ui.presets()">
+          <label :class="ui.fieldLabel()">Quick Presets</label>
+          <div :class="ui.presetRow()">
             <CustomButton
               variant="ghost"
               size="sm"
-              class="text-xs"
+              :class="ui.presetBtn()"
               @click="setPreset('0 * * * * *')"
             >
               Every Minute
@@ -182,7 +160,7 @@
             <CustomButton
               variant="ghost"
               size="sm"
-              class="text-xs"
+              :class="ui.presetBtn()"
               @click="setPreset('0 0 * * * *')"
             >
               Every Hour
@@ -190,7 +168,7 @@
             <CustomButton
               variant="ghost"
               size="sm"
-              class="text-xs"
+              :class="ui.presetBtn()"
               @click="setPreset('0 0 0 * * *')"
             >
               Daily
@@ -198,7 +176,7 @@
             <CustomButton
               variant="ghost"
               size="sm"
-              class="text-xs"
+              :class="ui.presetBtn()"
               @click="setPreset('0 0 0 * * 0')"
             >
               Weekly
@@ -206,7 +184,7 @@
             <CustomButton
               variant="ghost"
               size="sm"
-              class="text-xs"
+              :class="ui.presetBtn()"
               @click="setPreset('0 0 0 1 * *')"
             >
               Monthly
@@ -214,7 +192,7 @@
             <CustomButton
               variant="ghost"
               size="sm"
-              class="text-xs"
+              :class="ui.presetBtn()"
               @click="setPreset('0 0 9 * * 1-5')"
             >
               Weekdays 9AM
@@ -222,14 +200,9 @@
           </div>
         </div>
 
-        <!-- Current Expression Display -->
-        <div class="bg-white p-3 rounded border">
-          <label class="block text-xs font-medium text-slate-700 mb-1"
-            >Current Expression</label
-          >
-          <code class="text-sm bg-slate-100 px-2 py-1 rounded">{{
-            cronExpression
-          }}</code>
+        <div :class="ui.expression()">
+          <label :class="ui.expressionLabel()">Current Expression</label>
+          <code :class="ui.expressionCode()">{{ cronExpression }}</code>
         </div>
       </div>
     </div>
@@ -238,11 +211,14 @@
 
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue';
+import { tv } from '@/lib/tv';
 import Input from '../ui/Input.vue';
 import CustomButton from '../ui/CustomButton.vue';
 import SchedulerSelect from './SchedulerSelect.vue';
 import EditIcon from '../icons/EditIcon.vue';
 import ClockIcon from '../icons/ClockIcon.vue';
+
+defineOptions({ name: 'SchedulerInput' });
 
 const props = defineProps<{
   modelValue?: string;
@@ -336,6 +312,50 @@ const weekdayOptions = [
   { value: '0,6', label: 'Weekends' },
   { value: 'custom', label: 'Custom' },
 ];
+
+const schedulerTv = tv({
+  slots: {
+    root: 'space-y-3',
+    header: 'flex items-center justify-between',
+    title: 'block text-sm font-semibold text-slate-700',
+    actions: 'flex items-center gap-2',
+    modeBtn: 'text-slate-600',
+    enableBtn: 'text-slate-600',
+    actionIcon: 'w-4 h-4 mr-1',
+    panel: 'space-y-3 p-3 bg-slate-50 rounded-md',
+    section: 'space-y-3',
+    help: 'bg-blue-50 p-2.5 rounded-md',
+    helpTitle: 'text-sm font-semibold text-blue-900 mb-1.5',
+    helpBody: 'text-xs text-blue-800 space-y-1',
+    helpList: 'list-disc list-inside space-y-1 ml-2',
+    fieldsGrid: 'grid grid-cols-6 gap-1.5',
+    field: 'space-y-1',
+    fieldLabel: 'block text-xs font-medium text-slate-700',
+    presets: 'space-y-2',
+    presetRow: 'flex flex-wrap gap-1.5',
+    presetBtn: 'text-xs',
+    expression: 'bg-white p-2.5 rounded-md border border-slate-200',
+    expressionLabel: 'block text-xs font-medium text-slate-700 mb-1',
+    expressionCode: 'text-sm bg-slate-100 px-2 py-1 rounded-md',
+  },
+  variants: {
+    editMode: {
+      true: { modeBtn: 'text-blue-600' },
+      false: { modeBtn: 'text-slate-600' },
+    },
+    schedulerEnabled: {
+      true: { enableBtn: 'text-green-600' },
+      false: { enableBtn: 'text-slate-600' },
+    },
+  },
+});
+
+const ui = computed(() =>
+  schedulerTv({
+    editMode: editMode.value,
+    schedulerEnabled: !!schedulerEnabled.value,
+  }),
+);
 
 // Функция для парсинга cron выражения
 const parseCronExpression = () => {

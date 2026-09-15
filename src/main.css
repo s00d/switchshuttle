@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 
+@source "./**/*.{vue,ts}";
+@source not "./**/*.{test,spec}.*";
+
 @theme {
   --color-slate-50: #f8fafc;
   --color-slate-100: #f1f5f9;
@@ -51,8 +54,13 @@
 @layer base {
   html {
     font-family:
-      -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
-      Arial, sans-serif;
+      'SF Pro Text',
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      'Helvetica Neue',
+      Arial,
+      sans-serif;
   }
 
   body {
@@ -66,14 +74,12 @@
     border-color: var(--color-slate-200);
   }
 
-  /* Стили для перетаскивания окна */
   [data-tauri-drag-region] {
     -webkit-user-select: none;
     user-select: none;
     -webkit-app-region: drag;
   }
 
-  /* Элементы, которые не должны перетаскивать окно */
   button,
   input,
   textarea,
@@ -85,7 +91,6 @@
     -webkit-app-region: no-drag;
   }
 
-  /* Улучшенные стили для скроллбаров */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -97,6 +102,7 @@
 
   ::-webkit-scrollbar-thumb {
     background-color: var(--color-slate-300);
+    border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
@@ -104,282 +110,7 @@
   }
 }
 
-@layer components {
-  /* Убираем все закругления по умолчанию */
-  .rounded,
-  .rounded-lg,
-  .rounded-xl,
-  .rounded-2xl,
-  .rounded-full {
-    border-radius: 0 !important;
-  }
-
-  /* Стили для фокуса */
-  .focus-ring {
-    outline: none;
-    box-shadow:
-      0 0 0 2px var(--color-blue-500),
-      0 0 0 1px white;
-  }
-
-  /* Стили для кнопок */
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    font-weight: 500;
-    transition: all 0.2s;
-    border: 1px solid;
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-    background-color: white;
-    border-color: var(--color-slate-300);
-    color: var(--color-slate-700);
-    cursor: pointer;
-  }
-
-  .btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  .btn:not(:disabled):hover {
-    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    border-color: var(--color-slate-400);
-  }
-
-  .btn:not(:disabled):active {
-    transform: scale(0.98);
-  }
-
-  .btn-sm {
-    font-size: 0.75rem;
-    padding: 0.375rem 0.75rem;
-  }
-
-  .btn-danger {
-    background-color: var(--color-red-500);
-    border-color: var(--color-red-500);
-    color: white;
-  }
-
-  .btn-danger:hover {
-    background-color: var(--color-red-600);
-    border-color: var(--color-red-600);
-  }
-
-  /* Стили для инпутов */
-  .input {
-    width: 100%;
-    border: 1px solid var(--color-slate-300);
-    font-size: 0.875rem;
-    transition: all 0.2s;
-  }
-
-  .input:focus {
-    outline: none;
-    box-shadow:
-      0 0 0 2px var(--color-blue-500),
-      0 0 0 1px var(--color-blue-500);
-  }
-
-  .input:disabled {
-    background-color: var(--color-slate-100);
-    color: var(--color-slate-500);
-    cursor: not-allowed;
-  }
-
-  .input.error {
-    border-color: var(--color-red-500);
-  }
-
-  .input.error:focus {
-    box-shadow:
-      0 0 0 2px var(--color-red-500),
-      0 0 0 1px var(--color-red-500);
-  }
-
-  /* Стили для карточек */
-  .card {
-    background-color: white;
-    border: 1px solid var(--color-slate-300);
-    transition: all 0.2s;
-  }
-
-  .card:hover {
-    border-color: var(--color-slate-400);
-    box-shadow:
-      0 4px 6px -1px rgb(0 0 0 / 0.1),
-      0 2px 4px -2px rgb(0 0 0 / 0.1);
-  }
-
-  /* Стили для модальных окон */
-  .modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background-color: rgb(0 0 0 / 0.5);
-    backdrop-filter: blur(4px);
-  }
-
-  .modal-content {
-    position: relative;
-    background-color: white;
-    border: 1px solid var(--color-slate-300);
-    box-shadow:
-      0 20px 25px -5px rgb(0 0 0 / 0.1),
-      0 10px 10px -5px rgb(0 0 0 / 0.04);
-  }
-
-  /* Стили для таблиц */
-  .table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .table th {
-    background-color: var(--color-slate-50);
-    text-align: left;
-    font-weight: 600;
-    color: var(--color-slate-900);
-    padding: 0.75rem;
-    border-bottom: 1px solid var(--color-slate-200);
-  }
-
-  .table td {
-    padding: 0.75rem;
-    border-bottom: 1px solid var(--color-slate-100);
-  }
-
-  .table tr:hover {
-    background-color: var(--color-slate-50);
-  }
-
-  /* Стили для списков */
-  .list-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.75rem;
-    border: 1px solid var(--color-slate-200);
-    transition: border-color 0.2s;
-  }
-
-  .list-item:hover {
-    border-color: var(--color-slate-300);
-  }
-
-  /* Стили для иконок */
-  .icon {
-    width: 1.25rem;
-    height: 1.25rem;
-  }
-
-  .icon-sm {
-    width: 1rem;
-    height: 1rem;
-  }
-
-  .icon-lg {
-    width: 1.5rem;
-    height: 1.5rem;
-  }
-
-  /* Стили для заголовков */
-  .heading-1 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--color-slate-900);
-  }
-
-  .heading-2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--color-slate-900);
-  }
-
-  .heading-3 {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: var(--color-slate-900);
-  }
-
-  /* Стили для текста */
-  .text-body {
-    color: var(--color-slate-600);
-  }
-
-  .text-muted {
-    color: var(--color-slate-500);
-    font-size: 0.875rem;
-  }
-
-  /* Стили для состояний */
-  .loading {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-
-  .spinner {
-    animation: spin 1s linear infinite;
-  }
-
-  /* Стили для уведомлений */
-  .notification {
-    padding: 1rem;
-    border: 1px solid;
-    font-size: 0.875rem;
-    font-weight: 500;
-  }
-
-  .notification-success {
-    background-color: var(--color-green-50);
-    color: var(--color-green-800);
-    border-color: var(--color-green-200);
-  }
-
-  .notification-error {
-    background-color: var(--color-red-50);
-    color: var(--color-red-800);
-    border-color: var(--color-red-200);
-  }
-
-  .notification-info {
-    background-color: var(--color-blue-50);
-    color: var(--color-blue-800);
-    border-color: var(--color-blue-200);
-  }
-
-  .notification-warning {
-    background-color: var(--color-yellow-50);
-    color: var(--color-yellow-800);
-    border-color: var(--color-yellow-200);
-  }
-}
-
 @layer utilities {
-  /* Утилиты для отступов */
-  .space-y-6 > * + * {
-    margin-top: 1.5rem;
-  }
-
-  .space-y-4 > * + * {
-    margin-top: 1rem;
-  }
-
-  .space-y-3 > * + * {
-    margin-top: 0.75rem;
-  }
-
-  .space-y-2 > * + * {
-    margin-top: 0.5rem;
-  }
-
-  /* Утилиты для сетки */
-  .grid-cols-auto-fit {
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  }
-
-  /* Утилиты для анимаций */
   .fade-in {
     animation: fadeIn 0.2s ease-in-out;
   }
@@ -421,24 +152,5 @@
   to {
     opacity: 1;
     transform: scale(1);
-  }
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
   }
 }

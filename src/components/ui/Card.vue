@@ -1,43 +1,33 @@
 <template>
-  <div
-    :class="[
-      'card',
-      hover && 'card-hover',
-      padding && padding,
-      !padding && 'card-padding',
-    ]"
-  >
+  <div :class="rootClass">
     <slot />
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+import { cardTv } from './themes';
+
+defineOptions({ name: 'Card' });
+
 interface Props {
   hover?: boolean;
+  /** Extra class merge (legacy padding override) */
   padding?: string;
+  paddingSize?: 'none' | 'sm' | 'md' | 'lg';
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   hover: true,
   padding: '',
+  paddingSize: 'md',
 });
+
+const rootClass = computed(() =>
+  cardTv({
+    hover: props.hover,
+    padding: props.padding ? 'none' : props.paddingSize,
+    class: props.padding || undefined,
+  }),
+);
 </script>
-
-<style scoped>
-.card {
-  background-color: white;
-  border: 1px solid var(--color-slate-300);
-  transition: all 0.2s;
-}
-
-.card-hover:hover {
-  border-color: var(--color-slate-400);
-  box-shadow:
-    0 4px 6px -1px rgb(0 0 0 / 0.1),
-    0 2px 4px -2px rgb(0 0 0 / 0.1);
-}
-
-.card-padding {
-  padding: 1rem;
-}
-</style>

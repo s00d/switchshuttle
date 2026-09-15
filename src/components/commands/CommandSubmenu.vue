@@ -1,27 +1,20 @@
 <template>
-  <div
-    class="border border-slate-200 rounded-xl p-6 space-y-6 bg-blue-50/50 shadow-md hover:shadow-lg transition-shadow duration-200"
-  >
-    <!-- Command Header -->
-    <div
-      class="flex items-center justify-between pb-4 border-b border-slate-200 -mx-6 px-6"
-    >
-      <div class="flex items-center space-x-3">
-        <div
-          class="w-8 h-8 bg-blue-100 flex items-center justify-center rounded-lg"
-        >
-          <FolderOpenIcon class="w-4 h-4 text-blue-600" />
+  <div :class="ui.root()">
+    <div :class="ui.header()">
+      <div :class="ui.headerLeft()">
+        <div :class="ui.iconWrap()">
+          <FolderOpenIcon :class="ui.icon()" />
         </div>
-        <h4 class="font-semibold text-blue-900">
+        <h4 :class="ui.title()">
           Group {{ index + 1 }}{{ command.name ? ` - ${command.name}` : '' }}
         </h4>
       </div>
-      <div class="flex items-center space-x-1">
+      <div :class="ui.actions()">
         <CustomButton
           variant="ghost"
           size="sm"
           :disabled="index === 0"
-          class="text-blue-600 hover:text-blue-700 hover:bg-blue-100"
+          :class="ui.ghostAccentStrong()"
           @click="$emit('move', index, -1)"
         >
           <ChevronUpIcon />
@@ -30,7 +23,7 @@
           variant="ghost"
           size="sm"
           :disabled="index === (parentCommands?.length || 0) - 1"
-          class="text-blue-600 hover:text-blue-700 hover:bg-blue-100"
+          :class="ui.ghostAccentStrong()"
           @click="$emit('move', index, 1)"
         >
           <ChevronDownIcon />
@@ -38,7 +31,7 @@
         <CustomButton
           variant="danger"
           size="sm"
-          class="text-red-600 hover:text-red-700 hover:bg-red-50"
+          :class="ui.dangerGhost()"
           @click="$emit('remove', index)"
         >
           <TrashIcon />
@@ -46,50 +39,42 @@
       </div>
     </div>
 
-    <!-- Basic Command Fields -->
-    <div class="grid gap-6 grid-cols-1">
-      <div class="flex items-start gap-3">
-        <div class="w-16">
+    <div :class="ui.fieldsGrid()">
+      <div :class="ui.fieldsRow()">
+        <div :class="ui.iconField()">
           <IconSelector
             v-model="commandIcon"
             label="Icon"
             placeholder="emoji"
-            input-class="bg-white h-10 px-2 py-1"
+            input-class="bg-white h-8 px-2 py-1"
             @update:modelValue="handleIconChange"
           />
         </div>
-        <div class="flex-1">
+        <div :class="ui.nameField()">
           <Input
             v-model="command.name"
             label="Name"
             placeholder="Group name"
             required
-            input-class="bg-white h-10"
+            input-class="bg-white h-8"
           />
         </div>
       </div>
     </div>
 
-    <!-- Submenu -->
-    <div class="space-y-4">
-      <div class="space-y-4">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <CustomButton
-              variant="ghost"
-              class="focus:outline-none"
-              @click="toggleSubmenu"
-            >
+    <div :class="ui.section()">
+      <div :class="ui.sectionInner()">
+        <div :class="ui.sectionHeader()">
+          <div :class="ui.sectionHeaderLeft()">
+            <CustomButton variant="ghost" @click="toggleSubmenu">
               <ChevronRightIcon :collapsed="submenuCollapsed" />
             </CustomButton>
-            <label class="block text-sm font-semibold text-blue-700"
-              >Submenu</label
-            >
+            <label :class="ui.sectionLabel()">Submenu</label>
           </div>
           <CustomButton
             variant="ghost"
             size="sm"
-            class="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+            :class="ui.ghostAccent()"
             @click="addSubmenuCommand"
           >
             <AddIcon />
@@ -100,7 +85,7 @@
           v-if="
             command.submenu && command.submenu.length > 0 && !submenuCollapsed
           "
-          class="space-y-4"
+          :class="ui.section()"
         >
           <CommandItem
             v-for="(subCmd, subIndex) in command.submenu"
@@ -141,6 +126,9 @@ import ChevronRightIcon from '../icons/ChevronRightIcon.vue';
 import TrashIcon from '../icons/TrashIcon.vue';
 import AddIcon from '../icons/AddIcon.vue';
 import FolderOpenIcon from '../icons/FolderOpenIcon.vue';
+import { commandCardTv } from './commandCardTheme';
+
+defineOptions({ name: 'CommandSubmenu' });
 
 const props = defineProps({
   command: {
@@ -167,7 +155,8 @@ const emit = defineEmits<{
   (e: 'move', index: number, direction: number): void;
 }>();
 
-// Инициализируем submenu если его нет
+const ui = commandCardTv({ tone: 'group' });
+
 onMounted(() => {
   if (!props.command.submenu) {
     props.command.submenu = [];
@@ -175,7 +164,6 @@ onMounted(() => {
   }
 });
 
-// Computed property for icon handling
 const commandIcon = computed({
   get: () => props.command.icon || '',
   set: (value: string) => {
@@ -188,7 +176,6 @@ const commandIcon = computed({
   },
 });
 
-// Method for handling icon changes
 const handleIconChange = (value: string) => {
   if (value.trim() === '') {
     props.command.icon = null;
@@ -198,7 +185,6 @@ const handleIconChange = (value: string) => {
   emit('update:command', props.command);
 };
 
-// Submenu functions
 const updateSubmenuCommand = (subIndex: number, subCommand: Command) => {
   if (props.command.submenu) {
     props.command.submenu[subIndex] = subCommand;
@@ -290,7 +276,6 @@ const removeSubmenuMultipleCommand = (cmdIndex: number) => {
   }
 };
 
-// Сворачивание секции Submenu
 const submenuCollapsed = ref(false);
 const toggleSubmenu = () => {
   submenuCollapsed.value = !submenuCollapsed.value;

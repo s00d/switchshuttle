@@ -1,14 +1,9 @@
 <template>
-  <div class="space-y-6">
-    <!-- Basic Settings -->
-    <div class="space-y-4">
-      <h2
-        class="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-2"
-      >
-        Basic Settings
-      </h2>
+  <div :class="ui.root()">
+    <div :class="ui.section()">
+      <h2 :class="ui.sectionTitle()">Basic Settings</h2>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div :class="ui.grid()">
         <ValidatedField
           v-model="config.terminal"
           :rules="fieldRules.terminal"
@@ -16,7 +11,7 @@
         >
           <template #default="{ value, error, updateValue }">
             <div>
-              <label class="block text-sm font-medium text-slate-700 mb-2">Terminal</label>
+              <label :class="ui.label()">Terminal</label>
               <CustomSelect
                 :model-value="value"
                 :options="terminalOptionsArray"
@@ -37,7 +32,7 @@
         >
           <template #default="{ value, error, updateValue }">
             <div>
-              <label class="block text-sm font-medium text-slate-700 mb-2">Launch in</label>
+              <label :class="ui.label()">Launch in</label>
               <CustomSelect
                 :model-value="value"
                 :options="launchOptions"
@@ -51,7 +46,7 @@
         </ValidatedField>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div :class="ui.grid()">
         <ValidatedField
           v-model="config.title"
           :rules="fieldRules.title"
@@ -87,8 +82,7 @@
         </ValidatedField>
       </div>
 
-      <!-- Enable/Disable Configuration -->
-      <div class="p-4 bg-slate-50 rounded-lg">
+      <div :class="ui.toggleWrap()">
         <Toggle
           :model-value="config.enabled ?? true"
           label="Configuration Status"
@@ -98,17 +92,16 @@
       </div>
     </div>
 
-    <!-- Commands Section -->
-    <div class="space-y-4">
-      <div class="flex items-center justify-between">
-        <h3 class="text-md font-medium text-slate-900">Commands</h3>
+    <div :class="ui.section()">
+      <div :class="ui.commandsHeader()">
+        <h3 :class="ui.commandsTitle()">Commands</h3>
         <ValidatedField
           v-model="config.commands"
           :rules="fieldRules.commands"
           :hide-error="true"
         >
           <template #default="{ error }">
-            <div v-if="error" class="text-red-500 text-sm">{{ error }}</div>
+            <div v-if="error" :class="ui.error()">{{ error }}</div>
           </template>
         </ValidatedField>
       </div>
@@ -123,6 +116,7 @@
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
+import { tv } from '@/lib/tv';
 import CommandsTable from '../commands/CommandsTable.vue';
 import Input from '../ui/Input.vue';
 import HotkeyInput from '../forms/HotkeyInput.vue';
@@ -133,7 +127,8 @@ import { fieldRules } from '../../lib/validation-rules';
 import { Command, Config } from '../../types';
 import { TerminalConfig } from '../../lib/tauri-commands';
 
-// Опции запуска (одинаковые для всех ОС)
+defineOptions({ name: 'ConfigEditor' });
+
 const launchOptions = [
   { value: 'current', label: 'Current Window', icon: '📍' },
   { value: 'new_tab', label: 'New Tab', icon: '📑' },
@@ -149,17 +144,32 @@ const props = defineProps<{
 
 const config = ref<Config>(props.config);
 
-// Убеждаемся, что enabled имеет значение по умолчанию
 if (config.value.enabled === undefined) {
   config.value.enabled = true;
 }
 
-// Преобразуем Record<string, TerminalConfig> в массив для CustomSelect
+const configEditorTv = tv({
+  slots: {
+    root: 'space-y-3',
+    section: 'space-y-2.5',
+    sectionTitle:
+      'text-base font-semibold text-slate-900 border-b border-slate-200 pb-1.5',
+    grid: 'grid grid-cols-1 md:grid-cols-2 gap-3',
+    label: 'block text-sm font-medium text-slate-700 mb-1',
+    toggleWrap: 'p-3 bg-slate-50 rounded-md',
+    commandsHeader: 'flex items-center justify-between gap-2',
+    commandsTitle: 'text-sm font-medium text-slate-900',
+    error: 'text-red-500 text-xs',
+  },
+});
+
+const ui = configEditorTv();
+
 const terminalOptionsArray = computed(() => {
-  return Object.entries(props.terminalOptions).map(([key, config]) => ({
+  return Object.entries(props.terminalOptions).map(([key, terminalConfig]) => ({
     value: key,
-    label: config.name,
-    icon: config.icon,
+    label: terminalConfig.name,
+    icon: terminalConfig.icon,
   }));
 });
 </script>

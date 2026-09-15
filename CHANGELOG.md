@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0](https://github.com/s00d/switchshuttle/compare/v2.2.0...v2.3.0) (2026-09-15)
+
+### Features
+
+- migrate Vue UI to `tailwind-variants` with denser chrome and shared themes.
+- regenerate tray menu icons from SF Symbols; mark PNG images as macOS templates.
+
+### Fixes
+
+- macOS Dark Mode menu icons (template `NSImage` after tray `set_menu`).
+- semantic menu icons (document for configs, stop for running jobs, etc.).
+
+### Chore
+
+- dependency updates (JS + Cargo).
+- script to regenerate menu icons: `scripts/render-menu-icons.swift`.
+
 ## [2.2.0](https://github.com/s00d/switchshuttle/compare/v2.1.2...v2.2.0) (2026-09-15)
 
 ### Features

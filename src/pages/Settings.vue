@@ -1,199 +1,153 @@
 <template>
-  <div class="min-h-screen bg-slate-50">
-    <main class="container mx-auto px-4 py-6">
-      <div class="max-w-4xl mx-auto space-y-6">
-        <!-- Header -->
-        <Card>
-          <div class="flex items-center space-x-3">
-            <SettingsIcon size="lg" class="text-blue-600" />
-            <div>
-              <h1 class="text-2xl font-bold text-slate-900">Settings</h1>
-              <p class="text-slate-600">
-                Configure SwitchShuttle application settings
-              </p>
+  <div :class="shell.root()">
+    <main :class="shell.main()">
+      <div :class="shell.content()">
+        <header :class="header.root()">
+          <div :class="header.titleBlock()">
+            <div :class="ui.headerRow()">
+              <SettingsIcon size="md" :class="ui.headerIcon()" />
+              <div>
+                <h1 :class="header.title()">Settings</h1>
+                <p :class="header.subtitle()">
+                  Configure SwitchShuttle application settings
+                </p>
+              </div>
             </div>
           </div>
-        </Card>
+        </header>
 
-        <!-- Loading State -->
-        <div v-if="loading" class="flex justify-center py-8">
-          <div
-            class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
-          ></div>
+        <div v-if="loading" :class="ui.loading()">
+          <div :class="ui.spinner()" />
         </div>
 
-        <!-- Settings Form -->
-        <div v-else-if="settingsSchema && settings" class="space-y-6">
+        <div v-else-if="settingsSchema && settings" :class="ui.formWrap()">
           <form @submit.prevent>
-            <div class="space-y-6">
-              <!-- Sections -->
+            <div :class="ui.sections()">
               <div
                 v-for="section in settingsSchema.sections"
                 :key="section.id"
-                class="space-y-4"
+                :class="ui.sectionCard()"
               >
-                <Card>
-                  <div class="space-y-4">
-                    <div>
-                      <h2 class="text-lg font-semibold text-slate-900">
-                        {{ section.title }}
-                      </h2>
-                      <p class="text-sm text-slate-600">
-                        {{ section.description }}
-                      </p>
-                    </div>
+                <div :class="ui.sectionInner()">
+                  <div>
+                    <h2 :class="ui.sectionTitle()">{{ section.title }}</h2>
+                    <p :class="ui.sectionDesc()">{{ section.description }}</p>
+                  </div>
 
-                    <div class="space-y-4">
+                  <div :class="ui.fields()">
+                    <div
+                      v-for="field in section.fields"
+                      :key="field.id"
+                      :class="ui.field()"
+                    >
+                      <Toggle
+                        v-if="field.type === 'boolean'"
+                        :id="field.id"
+                        :model-value="getFieldValue(field.id) as boolean"
+                        :label="field.label"
+                        :description="field.description"
+                        @update:model-value="updateFieldValue(field.id, $event)"
+                      />
+
                       <div
-                        v-for="field in section.fields"
-                        :key="field.id"
-                        class="space-y-2"
+                        v-else-if="field.type === 'custom-select'"
+                        :class="ui.field()"
                       >
-                        <!-- Boolean Field -->
-                        <Toggle
-                          v-if="field.type === 'boolean'"
-                          :id="field.id"
-                          :model-value="getFieldValue(field.id) as boolean"
-                          :label="field.label"
-                          :description="field.description"
-                          @update:model-value="
-                            updateFieldValue(field.id, $event)
-                          "
-                        />
-
-                        <!-- Custom Select Field (for Security Level) -->
-                        <div
-                          v-else-if="field.type === 'custom-select'"
-                          class="space-y-2"
-                        >
-                          <label
-                            :for="field.id"
-                            class="block text-sm font-medium text-slate-700"
-                          >
-                            {{ field.label }}
-                          </label>
-                          <CustomSelect
-                            :id="field.id"
-                            :model-value="getFieldValue(field.id) as string"
-                            :options="field.options || []"
-                            :placeholder="field.description"
-                            @update:model-value="
-                              updateFieldValue(field.id, $event)
-                            "
-                          />
-                          <p
-                            v-if="field.description"
-                            class="text-xs text-slate-500"
-                          >
-                            {{ field.description }}
-                          </p>
-                        </div>
-
-                        <!-- Tag Editor Field -->
-                        <div
-                          v-else-if="field.type === 'tag-editor'"
-                          class="space-y-2"
-                        >
-                          <TagEditor
-                            :id="field.id"
-                            :model-value="(getFieldValue(field.id) as unknown as string[]) || []"
-                            :label="field.label"
-                            :description="field.description"
-                            :placeholder="field.placeholder"
-                            @update:model-value="
-                              updateFieldValue(field.id, $event)
-                            "
-                          />
-                        </div>
-
-                        <!-- Regular Select Field -->
-                        <Input
-                          v-else-if="field.type === 'select'"
+                        <label :for="field.id" :class="ui.fieldLabel()">
+                          {{ field.label }}
+                        </label>
+                        <CustomSelect
                           :id="field.id"
                           :model-value="getFieldValue(field.id) as string"
-                          :label="field.label"
-                          :hint="field.description"
-                          type="select"
-                          :options="field.options"
+                          :options="field.options || []"
+                          :placeholder="field.description"
                           @update:model-value="
                             updateFieldValue(field.id, $event)
                           "
                         />
+                        <p v-if="field.description" :class="ui.fieldHint()">
+                          {{ field.description }}
+                        </p>
+                      </div>
 
-                        <!-- Number Field -->
-                        <Input
-                          v-else-if="field.type === 'number'"
+                      <div v-else-if="field.type === 'tag-editor'" :class="ui.field()">
+                        <TagEditor
                           :id="field.id"
                           :model-value="
-                            (
-                              (getFieldValue(field.id) as number) || 0
-                            ).toString()
+                            (getFieldValue(field.id) as unknown as string[]) ||
+                            []
                           "
                           :label="field.label"
-                          :hint="field.description"
-                          type="number"
-                          :min="field.min"
-                          :max="field.max"
+                          :description="field.description"
+                          :placeholder="field.placeholder"
                           @update:model-value="
-                            updateFieldValue(field.id, parseInt($event) || 0)
+                            updateFieldValue(field.id, $event)
                           "
                         />
                       </div>
+
+                      <Input
+                        v-else-if="field.type === 'select'"
+                        :id="field.id"
+                        :model-value="getFieldValue(field.id) as string"
+                        :label="field.label"
+                        :hint="field.description"
+                        type="select"
+                        :options="field.options"
+                        @update:model-value="updateFieldValue(field.id, $event)"
+                      />
+
+                      <Input
+                        v-else-if="field.type === 'number'"
+                        :id="field.id"
+                        :model-value="
+                          ((getFieldValue(field.id) as number) || 0).toString()
+                        "
+                        :label="field.label"
+                        :hint="field.description"
+                        type="number"
+                        :min="field.min"
+                        :max="field.max"
+                        @update:model-value="
+                          updateFieldValue(field.id, parseInt($event) || 0)
+                        "
+                      />
                     </div>
                   </div>
-                </Card>
+                </div>
               </div>
             </div>
 
-            <!-- Status -->
-            <div class="flex justify-end space-x-3 pt-6">
-              <div
-                v-if="saving"
-                class="flex items-center space-x-2 text-sm text-blue-600"
-              >
-                <span
-                  class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"
-                ></span>
+            <div :class="ui.statusBar()">
+              <div v-if="saving" :class="ui.statusSaving()">
+                <span :class="ui.statusSpinner()" />
                 <span>Saving...</span>
               </div>
-              <div
-                v-else-if="lastSaved"
-                class="flex items-center space-x-2 text-sm text-green-600"
-              >
-                <CheckIcon class="w-4 h-4" />
+              <div v-else-if="lastSaved" :class="ui.statusSaved()">
+                <CheckIcon :class="ui.checkIcon()" />
                 <span>Settings saved</span>
               </div>
             </div>
           </form>
 
-          <!-- Updates Section -->
-          <Card>
-            <div class="space-y-4">
+          <div :class="ui.sectionCard()">
+            <div :class="ui.sectionInner()">
               <div>
-                <h2 class="text-lg font-semibold text-slate-900">Updates</h2>
-                <p class="text-sm text-slate-600">
-                  Check for application updates
-                </p>
+                <h2 :class="ui.sectionTitle()">Updates</h2>
+                <p :class="ui.sectionDesc()">Check for application updates</p>
               </div>
 
-              <div class="space-y-4">
-                <!-- Update Status -->
-                <div
-                  v-if="updateLoading"
-                  class="flex items-center space-x-3 text-sm text-blue-600"
-                >
-                  <span
-                    class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"
-                  ></span>
+              <div :class="ui.fields()">
+                <div v-if="updateLoading" :class="ui.statusSaving()">
+                  <span :class="ui.statusSpinner()" />
                   <span>Checking for updates...</span>
                 </div>
 
-                <div v-else-if="updateMessage" class="text-sm text-slate-700">
+                <div v-else-if="updateMessage" :class="ui.updateMsg()">
                   {{ updateMessage }}
                 </div>
 
-                <!-- Update Button -->
-                <div class="flex justify-start">
+                <div :class="ui.updateActions()">
                   <CustomButton
                     variant="primary"
                     :disabled="updateLoading"
@@ -205,7 +159,6 @@
                   <CustomButton
                     v-if="updateUrl"
                     variant="secondary"
-                    class="ml-3"
                     @click="downloadUpdate"
                   >
                     Download Update
@@ -213,21 +166,18 @@
                 </div>
               </div>
             </div>
-          </Card>
+          </div>
         </div>
 
-        <!-- Error State -->
-        <Card v-else-if="error" class="border-red-200 bg-red-50">
-          <div class="text-center">
-            <h3 class="text-lg font-semibold text-red-800">
-              Error Loading Settings
-            </h3>
-            <p class="text-red-600 mt-2">{{ error }}</p>
-            <CustomButton variant="secondary" class="mt-4" @click="loadSettings">
+        <div v-else-if="error" :class="ui.errorCard()">
+          <div :class="ui.errorInner()">
+            <h3 :class="ui.errorTitle()">Error Loading Settings</h3>
+            <p :class="ui.errorText()">{{ error }}</p>
+            <CustomButton variant="secondary" @click="loadSettings">
               Try Again
             </CustomButton>
           </div>
-        </Card>
+        </div>
       </div>
     </main>
   </div>
@@ -236,7 +186,8 @@
 <script setup lang="ts">
 import { ref, onMounted, inject } from 'vue';
 import { open } from '@tauri-apps/plugin-shell';
-import Card from '../components/ui/Card.vue';
+import { tv } from '@/lib/tv';
+import { pageShellTv, pageHeaderTv, cardTv } from '@/components/ui/themes';
 import CustomButton from '../components/ui/CustomButton.vue';
 import Input from '../components/ui/Input.vue';
 import Toggle from '../components/ui/Toggle.vue';
@@ -247,7 +198,8 @@ import type { TauriInjectionKey } from '../lib/tauri-commands-plugin';
 import type { AppSettings, SettingsSchema } from '../lib/tauri-commands';
 import TagEditor from '../components/forms/TagEditor.vue';
 
-// Get access to commands through plugin
+defineOptions({ name: 'Settings' });
+
 const tauri = inject('tauri') as TauriInjectionKey['tauri'];
 
 const loading = ref(true);
@@ -259,12 +211,53 @@ const originalSettings = ref<AppSettings | null>(null);
 const saveTimeout = ref<any | null>(null);
 const lastSaved = ref(false);
 
-// Update variables
 const updateLoading = ref(false);
 const updateMessage = ref('');
 const updateUrl = ref('');
 
-const getFieldValue = (fieldId: string): string | number | boolean | string[] | null => {
+const shell = pageShellTv({ width: 'md' });
+const header = pageHeaderTv();
+
+const settingsTv = tv({
+  slots: {
+    headerRow: 'flex items-center gap-2',
+    headerIcon: 'text-blue-600 flex-shrink-0',
+    loading: 'flex justify-center py-8',
+    spinner:
+      'animate-spin rounded-full h-7 w-7 border-b-2 border-blue-600',
+    formWrap: 'space-y-3',
+    sections: 'space-y-3',
+    sectionCard: cardTv({ hover: false, padding: 'none' }),
+    sectionInner: 'space-y-3 p-3',
+    sectionTitle: 'text-sm font-semibold text-slate-900',
+    sectionDesc: 'text-xs text-slate-500 mt-0.5',
+    fields: 'space-y-3',
+    field: 'space-y-1.5',
+    fieldLabel: 'block text-sm font-medium text-slate-700',
+    fieldHint: 'text-xs text-slate-500',
+    statusBar: 'flex justify-end gap-2 pt-2',
+    statusSaving: 'flex items-center gap-1.5 text-xs text-blue-600',
+    statusSpinner:
+      'animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-blue-600',
+    statusSaved: 'flex items-center gap-1.5 text-xs text-green-600',
+    checkIcon: 'w-3.5 h-3.5',
+    updateMsg: 'text-sm text-slate-700',
+    updateActions: 'flex justify-start gap-2',
+    errorCard: [
+      cardTv({ hover: false, padding: 'md' }),
+      'border-red-200 bg-red-50',
+    ].join(' '),
+    errorInner: 'text-center space-y-2',
+    errorTitle: 'text-sm font-semibold text-red-800',
+    errorText: 'text-xs text-red-600',
+  },
+});
+
+const ui = settingsTv();
+
+const getFieldValue = (
+  fieldId: string,
+): string | number | boolean | string[] | null => {
   if (!settings.value) return null;
 
   const [section, field] = fieldId.split('.');
@@ -277,7 +270,7 @@ const getFieldValue = (fieldId: string): string | number | boolean | string[] | 
 
 const updateFieldValue = (
   fieldId: string,
-  value: string | number | boolean | string[]
+  value: string | number | boolean | string[],
 ) => {
   if (!settings.value) return;
 
@@ -286,18 +279,15 @@ const updateFieldValue = (
     const sectionData = settings.value[section];
     sectionData[field] = value;
 
-    // Auto-save with delay
     autoSaveSettings();
   }
 };
 
 const autoSaveSettings = () => {
-  // Clear previous timeout
   if (saveTimeout.value) {
     clearTimeout(saveTimeout.value);
   }
 
-  // Set new timeout for saving after 1 second
   saveTimeout.value = setTimeout(async () => {
     if (settings.value) {
       try {
@@ -307,7 +297,6 @@ const autoSaveSettings = () => {
         originalSettings.value = JSON.parse(JSON.stringify(settings.value));
         lastSaved.value = true;
 
-        // Hide save message after 3 seconds
         setTimeout(() => {
           lastSaved.value = false;
         }, 3000);
@@ -342,7 +331,6 @@ const loadSettings = async () => {
   }
 };
 
-// Update functions
 const checkForUpdates = async () => {
   try {
     updateLoading.value = true;

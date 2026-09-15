@@ -9,33 +9,42 @@ describe('Button', () => {
     });
 
     expect(wrapper.text()).toContain('Click me');
-    expect(wrapper.classes()).toContain('btn');
-    expect(wrapper.classes()).toContain('btn-primary');
+    expect(wrapper.classes()).toContain('bg-blue-600');
+    expect(wrapper.classes()).toContain('h-8');
   });
 
   it('renders with different variants', () => {
-    const variants = ['primary', 'secondary', 'danger', 'ghost'] as const;
+    const variants = {
+      primary: 'bg-blue-600',
+      secondary: 'bg-white',
+      danger: 'bg-red-600',
+      ghost: 'bg-transparent',
+    } as const;
 
-    variants.forEach(variant => {
+    (Object.keys(variants) as Array<keyof typeof variants>).forEach((variant) => {
       const wrapper = mount(CustomButton, {
         props: { variant },
         slots: { default: 'Test' },
       });
 
-      expect(wrapper.classes()).toContain(`btn-${variant}`);
+      expect(wrapper.classes()).toContain(variants[variant]);
     });
   });
 
   it('renders with different sizes', () => {
-    const sizes = ['sm', 'md', 'lg'] as const;
+    const sizes = {
+      sm: 'h-7',
+      md: 'h-8',
+      lg: 'h-9',
+    } as const;
 
-    sizes.forEach(size => {
+    (Object.keys(sizes) as Array<keyof typeof sizes>).forEach((size) => {
       const wrapper = mount(CustomButton, {
         props: { size },
         slots: { default: 'Test' },
       });
 
-      expect(wrapper.classes()).toContain(`btn-${size}`);
+      expect(wrapper.classes()).toContain(sizes[size]);
     });
   });
 
@@ -57,12 +66,11 @@ describe('Button', () => {
     });
 
     expect(wrapper.attributes('disabled')).toBeDefined();
-    expect(wrapper.classes()).toContain('btn-disabled');
   });
 
   it('renders with custom class', () => {
     const wrapper = mount(CustomButton, {
-      props: { class: 'custom-class' },
+      attrs: { class: 'custom-class' },
       slots: { default: 'Custom' },
     });
 
@@ -78,4 +86,3 @@ describe('Button', () => {
     expect(wrapper.attributes('title')).toBe('Tooltip text');
   });
 });
- 

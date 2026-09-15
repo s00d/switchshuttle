@@ -1,226 +1,124 @@
 <template>
-  <div class="container mx-auto px-6 py-8 max-w-4xl">
-    <div class="bg-white rounded-lg shadow-lg p-8">
-      <h1 class="text-3xl font-bold text-slate-900 mb-8">Help & FAQ</h1>
+  <div :class="shell.root()">
+    <main :class="shell.main()">
+      <div :class="shell.content()">
+        <header :class="header.root()">
+          <div :class="header.titleBlock()">
+            <h1 :class="header.title()">Help & FAQ</h1>
+            <p :class="header.subtitle()">
+              Answers for setup, configuration, and troubleshooting
+            </p>
+          </div>
+        </header>
 
-      <!-- Search -->
-      <div class="mb-8">
-        <div class="relative">
-          <input
+        <div :class="callout.root({ tone: 'info' })">
+          <p :class="callout.title({ tone: 'info' })">Tip</p>
+          <p :class="callout.body()">
+            Use the search box to filter questions. Expand an item to see the
+            full answer with examples.
+          </p>
+        </div>
+
+        <div :class="ui.panel()">
+          <div :class="ui.searchWrap()">
+            <input
               v-model="searchQuery"
               type="text"
               placeholder="Search FAQ..."
-              class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-          <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-            <SearchIcon class="h-5 w-5 text-slate-400" />
+              :class="ui.searchInput()"
+            />
+            <SearchIcon :class="ui.searchIcon()" />
+          </div>
+
+          <div :class="ui.categories()">
+            <div
+              v-for="category in categories"
+              :key="category.key"
+              :class="ui.category()"
+            >
+              <h2 :class="ui.categoryTitle()">{{ category.title }}</h2>
+              <div :class="ui.items()">
+                <div
+                  v-for="item in filteredFaqs[category.key]"
+                  :key="item.id"
+                  :class="ui.item()"
+                >
+                  <button
+                    type="button"
+                    :class="ui.itemTrigger()"
+                    @click="toggleFaq(item.id)"
+                  >
+                    <span>{{ item.question }}</span>
+                    <ChevronDownIcon
+                      :class="[
+                        ui.chevron(),
+                        { [ui.chevronOpen()]: openFaqs.includes(item.id) },
+                      ]"
+                    />
+                  </button>
+                  <div v-show="openFaqs.includes(item.id)" :class="ui.answer()">
+                    <div v-html="item.answer" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div :class="ui.footer()">
+            <p :class="ui.footerText()">
+              Can't find what you're looking for? Visit our
+              <a
+                href="https://github.com/s00d/switchshuttle"
+                :class="ui.footerLink()"
+                >GitHub repository</a
+              >
+              for additional resources.
+            </p>
           </div>
         </div>
       </div>
-
-      <!-- FAQ Categories -->
-      <div class="space-y-6">
-        <!-- Getting Started -->
-        <div class="bg-slate-50 rounded-lg p-6">
-          <h2 class="text-xl font-bold text-slate-900 mb-4">
-            🚀 Getting Started
-          </h2>
-          <div class="space-y-3">
-            <div
-                v-for="item in filteredFaqs.gettingStarted"
-                :key="item.id"
-                class="bg-white rounded-lg border border-slate-200"
-            >
-              <CustomButton
-                  class="w-full px-4 py-3 text-left flex justify-between items-center hover:bg-slate-50 transition-colors"
-                  @click="toggleFaq(item.id)"
-              >
-                <span class="font-medium text-slate-900">{{
-                    item.question
-                  }}</span>
-                <ChevronDownIcon
-                    :class="[
-                    'w-5 h-5 text-slate-500 transition-transform',
-                    { 'rotate-180': openFaqs.includes(item.id) },
-                  ]"
-                />
-              </CustomButton>
-              <div v-show="openFaqs.includes(item.id)" class="px-4 pb-4">
-                <div
-                    class="text-sm text-slate-700 leading-relaxed"
-                    v-html="item.answer"
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Configuration -->
-        <div class="bg-slate-50 rounded-lg p-6">
-          <h2 class="text-xl font-bold text-slate-900 mb-4">
-            ⚙️ Configuration
-          </h2>
-          <div class="space-y-3">
-            <div
-                v-for="item in filteredFaqs.configuration"
-                :key="item.id"
-                class="bg-white rounded-lg border border-slate-200"
-            >
-              <CustomButton
-                  class="w-full px-4 py-3 text-left flex justify-between items-center hover:bg-slate-50 transition-colors"
-                  @click="toggleFaq(item.id)"
-              >
-                <span class="font-medium text-slate-900">{{
-                    item.question
-                  }}</span>
-                <ChevronDownIcon
-                    :class="[
-                    'w-5 h-5 text-slate-500 transition-transform',
-                    { 'rotate-180': openFaqs.includes(item.id) },
-                  ]"
-                />
-              </CustomButton>
-              <div v-show="openFaqs.includes(item.id)" class="px-4 pb-4">
-                <div
-                    class="text-sm text-slate-700 leading-relaxed"
-                    v-html="item.answer"
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Command Types -->
-        <div class="bg-slate-50 rounded-lg p-6">
-          <h2 class="text-xl font-bold text-slate-900 mb-4">
-            🔧 Command Types
-          </h2>
-          <div class="space-y-3">
-            <div
-                v-for="item in filteredFaqs.commandTypes"
-                :key="item.id"
-                class="bg-white rounded-lg border border-slate-200"
-            >
-              <CustomButton
-                  class="w-full px-4 py-3 text-left flex justify-between items-center hover:bg-slate-50 transition-colors"
-                  @click="toggleFaq(item.id)"
-              >
-                <span class="font-medium text-slate-900">{{
-                    item.question
-                  }}</span>
-                <ChevronDownIcon
-                    :class="[
-                    'w-5 h-5 text-slate-500 transition-transform',
-                    { 'rotate-180': openFaqs.includes(item.id) },
-                  ]"
-                />
-              </CustomButton>
-              <div v-show="openFaqs.includes(item.id)" class="px-4 pb-4">
-                <div
-                    class="text-sm text-slate-700 leading-relaxed"
-                    v-html="item.answer"
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Advanced Features -->
-        <div class="bg-slate-50 rounded-lg p-6">
-          <h2 class="text-xl font-bold text-slate-900 mb-4">
-            🚀 Advanced Features
-          </h2>
-          <div class="space-y-3">
-            <div
-                v-for="item in filteredFaqs.advancedFeatures"
-                :key="item.id"
-                class="bg-white rounded-lg border border-slate-200"
-            >
-              <CustomButton
-                  class="w-full px-4 py-3 text-left flex justify-between items-center hover:bg-slate-50 transition-colors"
-                  @click="toggleFaq(item.id)"
-              >
-                <span class="font-medium text-slate-900">{{
-                    item.question
-                  }}</span>
-                <ChevronDownIcon
-                    :class="[
-                    'w-5 h-5 text-slate-500 transition-transform',
-                    { 'rotate-180': openFaqs.includes(item.id) },
-                  ]"
-                />
-              </CustomButton>
-              <div v-show="openFaqs.includes(item.id)" class="px-4 pb-4">
-                <div
-                    class="text-sm text-slate-700 leading-relaxed"
-                    v-html="item.answer"
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Troubleshooting -->
-        <div class="bg-slate-50 rounded-lg p-6">
-          <h2 class="text-xl font-bold text-slate-900 mb-4">
-            🔧 Troubleshooting
-          </h2>
-          <div class="space-y-3">
-            <div
-                v-for="item in filteredFaqs.troubleshooting"
-                :key="item.id"
-                class="bg-white rounded-lg border border-slate-200"
-            >
-              <button
-                  class="w-full px-4 py-3 text-left flex justify-between items-center hover:bg-slate-50 transition-colors"
-                  @click="toggleFaq(item.id)"
-              >
-                <span class="font-medium text-slate-900">{{
-                    item.question
-                  }}</span>
-                <ChevronDownIcon
-                    :class="[
-                    'w-5 h-5 text-slate-500 transition-transform',
-                    { 'rotate-180': openFaqs.includes(item.id) },
-                  ]"
-                />
-              </button>
-              <div v-show="openFaqs.includes(item.id)" class="px-4 pb-4">
-                <div
-                    class="text-sm text-slate-700 leading-relaxed"
-                    v-html="item.answer"
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Footer -->
-      <div class="mt-12 pt-8 border-t border-slate-200">
-        <p class="text-sm text-slate-500 text-center">
-          Can't find what you're looking for? Visit our
-          <a
-              href="https://github.com/s00d/switchshuttle"
-              class="text-blue-600 hover:text-blue-800"
-          >GitHub repository</a
-          >
-          for additional resources.
-        </p>
-      </div>
-    </div>
+    </main>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import {
+  pageShellTv,
+  pageHeaderTv,
+  calloutTv,
+} from '@/components/ui/themes';
+import { helpTv } from './helpTheme';
 import SearchIcon from '../components/icons/SearchIcon.vue';
 import ChevronDownIcon from '../components/icons/ChevronDownIcon.vue';
+
+defineOptions({ name: 'Help' });
 
 const searchQuery = ref('');
 const openFaqs = ref<string[]>([]);
 
-const faqData = {
+const shell = pageShellTv({ width: 'md' });
+const header = pageHeaderTv();
+const callout = calloutTv();
+const ui = helpTv();
+
+type FaqItem = { id: string; question: string; answer: string };
+type FaqKey =
+  | 'gettingStarted'
+  | 'configuration'
+  | 'commandTypes'
+  | 'advancedFeatures'
+  | 'troubleshooting';
+
+const categories: { key: FaqKey; title: string }[] = [
+  { key: 'gettingStarted', title: 'Getting Started' },
+  { key: 'configuration', title: 'Configuration' },
+  { key: 'commandTypes', title: 'Command Types' },
+  { key: 'advancedFeatures', title: 'Advanced Features' },
+  { key: 'troubleshooting', title: 'Troubleshooting' },
+];
+
+const faqData: Record<FaqKey, FaqItem[]> = {
   gettingStarted: [
     {
       id: 'gs-1',
@@ -648,7 +546,7 @@ const faqData = {
     {
       id: 'ts-3',
       question:
-          'The terminal is not opening or commands are not executing. What is wrong?',
+        'The terminal is not opening or commands are not executing. What is wrong?',
       answer: `
         <p class="mb-3">Terminal execution issues can be resolved by checking these common causes:</p>
         
@@ -718,11 +616,11 @@ const filteredFaqs = computed(() => {
     return faqData;
   }
 
-  const filterCategory = (category: any[]) => {
+  const filterCategory = (category: FaqItem[]) => {
     return category.filter(
-        item =>
-            item.question.toLowerCase().includes(query) ||
-            item.answer.toLowerCase().includes(query)
+      (item) =>
+        item.question.toLowerCase().includes(query) ||
+        item.answer.toLowerCase().includes(query),
     );
   };
 
@@ -746,12 +644,6 @@ const toggleFaq = (id: string) => {
 </script>
 
 <style scoped>
-/* Smooth transitions for FAQ toggles */
-.faq-content {
-  transition: all 0.3s ease-in-out;
-}
-
-/* Custom scrollbar for code blocks */
 pre code {
   scrollbar-width: thin;
   scrollbar-color: #64748b #1e293b;

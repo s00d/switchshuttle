@@ -1,77 +1,51 @@
 <template>
-  <div
-    v-if="showMonitor"
-    class="fixed bottom-4 right-4 bg-white border border-slate-200 rounded-lg shadow-lg p-4 w-80 z-50"
-  >
-    <div class="flex items-center justify-between mb-3">
-      <h3 class="text-sm font-semibold text-slate-900">Performance Monitor</h3>
-      <CustomButton
-        class="text-slate-400 hover:text-slate-600"
-        title="Toggle monitor"
-        @click="toggleMonitor"
-      >
-        <XIcon class="w-4 h-4" />
+  <div v-if="showMonitor" :class="ui.panel()">
+    <div :class="ui.header()">
+      <h3 :class="ui.title()">Performance Monitor</h3>
+      <CustomButton title="Toggle monitor" @click="toggleMonitor">
+        <XIcon :class="ui.icon()" />
       </CustomButton>
     </div>
 
-    <div class="space-y-2">
-      <!-- Memory Usage -->
-      <div class="flex items-center justify-between">
-        <span class="text-xs text-slate-600">Memory:</span>
-        <div class="flex items-center space-x-2">
-          <div class="w-16 h-2 bg-slate-200 rounded-full overflow-hidden">
+    <div :class="ui.metrics()">
+      <div :class="ui.row()">
+        <span :class="ui.label()">Memory:</span>
+        <div :class="ui.memoryWrap()">
+          <div :class="ui.barTrack()">
             <div
-              :class="memoryColorClass"
-              class="h-full transition-all duration-300"
+              :class="ui.barFill({ tone: memoryTone })"
               :style="{ width: `${memoryUsage * 100}%` }"
-            ></div>
+            />
           </div>
-          <span class="text-xs font-mono text-slate-700"
+          <span :class="ui.value()"
             >{{ (memoryUsage * 100).toFixed(1) }}%</span
           >
         </div>
       </div>
 
-      <!-- Render Time -->
-      <div class="flex items-center justify-between">
-        <span class="text-xs text-slate-600">Render:</span>
-        <span class="text-xs font-mono text-slate-700"
-          >{{ lastRenderTime.toFixed(2) }}ms</span
-        >
+      <div :class="ui.row()">
+        <span :class="ui.label()">Render:</span>
+        <span :class="ui.value()">{{ lastRenderTime.toFixed(2) }}ms</span>
       </div>
 
-      <!-- Performance Status -->
-      <div class="flex items-center justify-between">
-        <span class="text-xs text-slate-600">Status:</span>
-        <span
-          :class="statusColorClass"
-          class="text-xs font-medium px-2 py-1 rounded"
-        >
+      <div :class="ui.row()">
+        <span :class="ui.label()">Status:</span>
+        <span :class="ui.status({ status: performanceStatus })">
           {{ performanceStatus }}
         </span>
       </div>
 
-      <!-- Metrics Count -->
-      <div class="flex items-center justify-between">
-        <span class="text-xs text-slate-600">Metrics:</span>
-        <span class="text-xs font-mono text-slate-700">{{ metricsCount }}</span>
+      <div :class="ui.row()">
+        <span :class="ui.label()">Metrics:</span>
+        <span :class="ui.value()">{{ metricsCount }}</span>
       </div>
     </div>
 
-    <!-- Actions -->
-    <div class="flex space-x-2 mt-3 pt-3 border-t border-slate-200">
-      <CustomButton
-        variant="secondary"
-        size="sm"
-        @click="clearMetrics"
-      >
+    <div :class="ui.actions()">
+      <CustomButton variant="secondary" size="sm" @click="clearMetrics">
         Clear
       </CustomButton>
-      <CustomButton
-        variant="primary"
-        size="sm"
-        @click="exportMetrics"
-      >
+      <CustomButton variant="primary" size="sm" @click="exportMetrics">
         Export
       </CustomButton>
       <CustomButton
@@ -84,25 +58,27 @@
     </div>
   </div>
 
-  <!-- Toggle Button -->
   <CustomButton
     v-else
     variant="primary"
     size="sm"
-    class="fixed bottom-4 right-4 p-2 rounded-full shadow-lg z-50"
+    :class="ui.fab()"
     title="Show performance monitor"
     @click="toggleMonitor"
   >
-    <ChartIcon class="w-4 h-4" />
+    <ChartIcon :class="ui.icon()" />
   </CustomButton>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { tv } from '@/lib/tv';
 import { usePerformance } from '../../composables/usePerformance';
 import XIcon from '../icons/XIcon.vue';
 import ChartIcon from '../icons/ChartIcon.vue';
 import CustomButton from '../ui/CustomButton.vue';
+
+defineOptions({ name: 'PerformanceMonitor' });
 
 const props = defineProps<{
   enabled?: boolean;
@@ -122,26 +98,51 @@ const {
   checkPerformance,
 } = usePerformance();
 
-// Computed properties
 const memoryUsage = computed(() => getMemoryUsage());
 const metricsCount = computed(() => metrics.length);
 const performanceStatus = computed(() => checkPerformance());
 
-const memoryColorClass = computed(() => {
+const memoryTone = computed(() => {
   const usage = memoryUsage.value;
-  if (usage > 0.8) return 'bg-red-500';
-  if (usage > 0.6) return 'bg-yellow-500';
-  return 'bg-green-500';
+  if (usage > 0.8) return 'danger' as const;
+  if (usage > 0.6) return 'warning' as const;
+  return 'ok' as const;
 });
 
-const statusColorClass = computed(() => {
-  const status = performanceStatus.value;
-  if (status === 'poor') return 'bg-red-100 text-red-800';
-  if (status === 'warning') return 'bg-yellow-100 text-yellow-800';
-  return 'bg-green-100 text-green-800';
+const performanceMonitorTv = tv({
+  slots: {
+    panel:
+      'fixed bottom-4 right-4 bg-white border border-slate-200 rounded-md shadow-lg p-3 w-72 z-50',
+    header: 'flex items-center justify-between mb-2',
+    title: 'text-sm font-semibold text-slate-900',
+    icon: 'w-4 h-4',
+    metrics: 'space-y-1.5',
+    row: 'flex items-center justify-between',
+    label: 'text-xs text-slate-600',
+    memoryWrap: 'flex items-center gap-2',
+    barTrack: 'w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden',
+    barFill: 'h-full transition-all duration-300',
+    value: 'text-xs font-mono text-slate-700',
+    status: 'text-xs font-medium px-1.5 py-0.5 rounded-md',
+    actions: 'flex gap-1.5 mt-2.5 pt-2.5 border-t border-slate-200',
+    fab: 'fixed bottom-4 right-4 !p-2 !rounded-full shadow-lg z-50',
+  },
+  variants: {
+    tone: {
+      danger: { barFill: 'bg-red-500' },
+      warning: { barFill: 'bg-yellow-500' },
+      ok: { barFill: 'bg-green-500' },
+    },
+    status: {
+      poor: { status: 'bg-red-100 text-red-800' },
+      warning: { status: 'bg-yellow-100 text-yellow-800' },
+      good: { status: 'bg-green-100 text-green-800' },
+    },
+  },
 });
 
-// Methods
+const ui = performanceMonitorTv();
+
 const toggleMonitor = () => {
   showMonitor.value = !showMonitor.value;
 };
@@ -182,7 +183,6 @@ const exportMetrics = () => {
   URL.revokeObjectURL(url);
 };
 
-// Measure render time
 const measureRender = () => {
   const start = performance.now();
   requestAnimationFrame(() => {
@@ -192,19 +192,16 @@ const measureRender = () => {
   });
 };
 
-// Lifecycle
 onMounted(() => {
   if (props.enabled) {
     showMonitor.value = true;
   }
 
-  // Start monitoring if enabled
   if (props.enabled) {
     startMonitoring();
     isMonitoring.value = true;
   }
 
-  // Measure initial render
   measureRender();
 });
 
@@ -214,7 +211,6 @@ onUnmounted(() => {
   }
 });
 
-// Expose methods for parent components
 defineExpose({
   toggleMonitor,
   toggleMonitoring,

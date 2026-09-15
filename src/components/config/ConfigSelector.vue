@@ -1,19 +1,17 @@
 <template>
-  <div class="space-y-4">
-    <div class="flex items-center justify-between">
-      <h3 class="text-lg font-semibold text-slate-900">
-        Configuration Selection
-      </h3>
-      <div class="flex items-center space-x-2">
+  <div :class="ui.root()">
+    <div :class="ui.header()">
+      <h3 :class="ui.title()">Configuration Selection</h3>
+      <div :class="ui.actions()">
         <CustomButton variant="ghost" size="sm" @click="refreshConfigs">
-          <SpinnerIcon class="w-4 h-4" />
+          <SpinnerIcon :class="ui.iconSm()" />
         </CustomButton>
         <CustomButton
           variant="secondary"
           size="sm"
           @click="$emit('showAddConfigModal')"
         >
-          <AddIcon class="w-4 h-4" />
+          <AddIcon :class="ui.iconSm()" />
           Add
         </CustomButton>
         <CustomButton
@@ -21,50 +19,42 @@
           size="sm"
           @click="$emit('showDeleteConfigModal')"
         >
-          <TrashIcon class="w-4 h-4" />
+          <TrashIcon :class="ui.iconSm()" />
           Delete
         </CustomButton>
       </div>
     </div>
 
-    <div v-if="configFiles.length === 0" class="text-center py-8">
-      <div
-        class="w-16 h-16 bg-slate-100 flex items-center justify-center mx-auto mb-4"
-      >
-        <DocumentIcon class="w-8 h-8 text-slate-400" />
+    <div v-if="configFiles.length === 0" :class="ui.empty()">
+      <div :class="ui.emptyIcon()">
+        <DocumentIcon :class="ui.emptyIconInner()" />
       </div>
-      <p class="text-slate-500 mb-2">No configurations found</p>
-      <p class="text-sm text-slate-400">
+      <p :class="ui.emptyTitle()">No configurations found</p>
+      <p :class="ui.emptyHint()">
         Create your first configuration to get started
       </p>
     </div>
 
-    <div v-else class="space-y-2">
+    <div v-else :class="ui.list()">
       <div
         v-for="file in configFiles"
         :key="file.path"
-        class="flex items-center justify-between p-3 border border-slate-200 hover:border-slate-300 transition-colors"
-        :class="[
-          currentConfig === file.path
-            ? 'bg-blue-50 border-blue-300'
-            : 'bg-white',
-        ]"
+        :class="rowUi(currentConfig === file.path).row()"
       >
-        <div class="flex items-center space-x-3">
-          <div class="w-8 h-8 bg-blue-100 flex items-center justify-center">
-            <DocumentIcon class="w-4 h-4 text-blue-600" />
+        <div :class="ui.rowLeft()">
+          <div :class="ui.rowIcon()">
+            <DocumentIcon :class="ui.rowIconInner()" />
           </div>
           <div>
-            <h4 class="font-medium text-slate-900">{{ file.name }}</h4>
-            <p class="text-sm text-slate-500">{{ file.path }}</p>
+            <h4 :class="ui.rowName()">{{ file.name }}</h4>
+            <p :class="ui.rowPath()">{{ file.path }}</p>
           </div>
         </div>
 
-        <div class="flex items-center space-x-2">
+        <div :class="ui.rowActions()">
           <CustomButton
             variant="ghost"
             size="sm"
-            :class="[currentConfig === file.path ? 'selected' : '']"
             @click="selectConfig(file.path)"
           >
             {{ currentConfig === file.path ? 'Selected' : 'Select' }}
@@ -78,12 +68,15 @@
 <script lang="ts" setup>
 import { ref, onMounted, watch } from 'vue';
 import { invoke } from '@tauri-apps/api/core';
+import { tv } from '@/lib/tv';
 import { ConfigFile, Config } from '../../types';
 import CustomButton from '../ui/CustomButton.vue';
 import SpinnerIcon from '../icons/SpinnerIcon.vue';
 import AddIcon from '../icons/AddIcon.vue';
 import TrashIcon from '../icons/TrashIcon.vue';
 import DocumentIcon from '../icons/DocumentIcon.vue';
+
+defineOptions({ name: 'ConfigSelector' });
 
 const configFiles = ref<ConfigFile[]>([]);
 const currentConfig = ref<string>('');
@@ -98,9 +91,48 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: Config): void;
 }>();
 
+const configSelectorTv = tv({
+  slots: {
+    root: 'space-y-3',
+    header: 'flex items-center justify-between gap-2',
+    title: 'text-base font-semibold text-slate-900',
+    actions: 'flex items-center gap-1.5',
+    iconSm: 'w-4 h-4',
+    empty: 'text-center py-6',
+    emptyIcon:
+      'w-12 h-12 bg-slate-100 flex items-center justify-center mx-auto mb-3 rounded-md',
+    emptyIconInner: 'w-6 h-6 text-slate-400',
+    emptyTitle: 'text-sm text-slate-500 mb-1',
+    emptyHint: 'text-xs text-slate-400',
+    list: 'space-y-1.5',
+    row: [
+      'flex items-center justify-between p-2.5 border border-slate-200 rounded-md',
+      'hover:border-slate-300 transition-colors',
+    ],
+    rowLeft: 'flex items-center gap-2.5 min-w-0',
+    rowIcon: 'w-7 h-7 bg-blue-100 flex items-center justify-center rounded-md',
+    rowIconInner: 'w-4 h-4 text-blue-600',
+    rowName: 'font-medium text-sm text-slate-900 truncate',
+    rowPath: 'text-xs text-slate-500 truncate',
+    rowActions: 'flex items-center gap-1.5 flex-shrink-0',
+  },
+  variants: {
+    selected: {
+      true: { row: 'bg-blue-50 border-blue-300' },
+      false: { row: 'bg-white' },
+    },
+  },
+  defaultVariants: {
+    selected: false,
+  },
+});
+
+const ui = configSelectorTv();
+
+const rowUi = (selected: boolean) => configSelectorTv({ selected });
+
 async function loadConfigs() {
   try {
-    // Trying to load configurations via Tauri API
     const configs = (await invoke('get_config_files')) as ConfigFile[];
     configFiles.value = configs;
 
@@ -110,7 +142,6 @@ async function loadConfigs() {
     }
   } catch (error) {
     console.error('Failed to load configs:', error);
-    // If API is unavailable, create test data
     configFiles.value = [
       {
         path: '/test/config1.json',
@@ -137,7 +168,6 @@ async function loadConfig() {
     emit('update:modelValue', config);
   } catch (error) {
     console.error('Failed to load config:', error);
-    // Create a test configuration
     const testConfig: Config = {
       terminal: 'iterm',
       launch_in: 'current',

@@ -13,10 +13,18 @@ use std::time::Duration;
 use tauri::menu::{
     CheckMenuItem, IconMenuItem, MenuBuilder, Submenu as TauriSubmenu, SubmenuBuilder,
 };
-use tauri::{AppHandle, Wry, image::Image};
+use tauri::{AppHandle, Wry};
+use tauri::image::Image;
 use log::{error, info};
 
 use crate::helpers::{create_check_menu_item, create_menu_item};
+
+fn apply_default_submenu_icon(
+    builder: SubmenuBuilder<'_, Wry, AppHandle<Wry>>,
+) -> SubmenuBuilder<'_, Wry, AppHandle<Wry>> {
+    let folder_icon = Image::from_bytes(include_bytes!("../icons/folder.png")).unwrap();
+    builder.submenu_icon(folder_icon)
+}
 
 // Глобальная переменная для отслеживания активности трея
 pub static TRAY_ACTIVE: Lazy<Arc<Mutex<bool>>> = Lazy::new(|| Arc::new(Mutex::new(false)));
@@ -475,8 +483,7 @@ impl MenuItem {
         let mut submenu_builder = SubmenuBuilder::new(app, &display_name);
 
         if self.config.icon.is_none() {
-            let folder_icon = Image::from_bytes(include_bytes!("../icons/folder.png")).unwrap();
-            submenu_builder = submenu_builder.submenu_icon(folder_icon);
+            submenu_builder = apply_default_submenu_icon(submenu_builder);
         }
 
         if let Some(submenu_items) = &self.config.submenu {
@@ -550,8 +557,7 @@ impl Submenu {
         let mut submenu_builder = SubmenuBuilder::new(app, &display_name);
 
         if self.icon.is_none() {
-            let folder_icon = Image::from_bytes(include_bytes!("../icons/folder.png")).unwrap();
-            submenu_builder = submenu_builder.submenu_icon(folder_icon);
+            submenu_builder = apply_default_submenu_icon(submenu_builder);
         }
 
         for item in self.items.iter_mut() {
@@ -862,7 +868,8 @@ pub fn collect_scheduled_menu_items(
 }
 
 /// Scheduler command ids from a command tree (testable without Tauri menu).
-pub fn collect_scheduler_command_ids(commands: &[crate::config::CommandConfig]) -> Vec<String> {
+#[cfg(test)]
+fn collect_scheduler_command_ids(commands: &[crate::config::CommandConfig]) -> Vec<String> {
     let mut items = Vec::new();
     for command in commands {
         collect_scheduled_menu_items(command, &mut items);

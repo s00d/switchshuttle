@@ -26,20 +26,20 @@ jobs:
 
     runs-on: ${{ matrix.platform }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           version: 9.15.4
           run_install: false
 
       - name: Install Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/bin/
@@ -51,7 +51,7 @@ jobs:
             C:\Users\runneradmin\.cargo\registry\index\
             C:\Users\runneradmin\.cargo\registry\cache\
             C:\Users\runneradmin\.cargo\git\db\
-          key: ${{ runner.os }}-${{ matrix.args }}-${{ hashFiles('Cargo.lock') }}
+          key: ${{ runner.os }}-${{ matrix.args }}-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Export variable (unix)
         if: matrix.platform != 'windows-latest'
@@ -81,7 +81,7 @@ jobs:
 
       - name: Import Apple code signing certificates
         if: matrix.platform == 'macos-latest'
-        uses: apple-actions/import-codesign-certs@v3
+        uses: apple-actions/import-codesign-certs@v7
         with:
           p12-file-base64: ${{ secrets.APPLE_CERTIFICATE }}
           p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
@@ -99,7 +99,7 @@ jobs:
           fi
           echo "APPLE_SIGNING_IDENTITY=$ID" >> "$GITHUB_ENV"
 
-      - uses: tauri-apps/tauri-action@v0
+      - uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           APPLE_SIGNING_IDENTITY: ${{ env.APPLE_SIGNING_IDENTITY }}

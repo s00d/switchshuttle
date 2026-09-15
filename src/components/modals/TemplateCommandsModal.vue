@@ -1,31 +1,24 @@
 <template>
   <Modal :is-open="isOpen" @close="$emit('close')">
     <template #header>
-      <h2 class="text-xl font-semibold text-slate-900">
-        Choose Commands from Templates
-      </h2>
+      <h2 :class="ui.modalTitle()">Choose Commands from Templates</h2>
     </template>
 
-    <div class="space-y-6">
-      <!-- Search and Filters -->
-      <div
-        class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4"
-      >
-        <!-- Search -->
-        <div class="flex-1">
-          <div class="relative">
+    <div :class="ui.root()">
+      <div :class="ui.filters()">
+        <div :class="ui.searchWrap()">
+          <div :class="ui.searchInner()">
             <input
               v-model="searchQuery"
               type="text"
               placeholder="Search commands..."
-              class="w-full h-10 px-3 py-2 pl-10 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              :class="ui.searchInput()"
             />
-            <SearchIcon class="w-5 h-5 text-slate-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+            <SearchIcon :class="ui.searchIcon()" />
           </div>
         </div>
 
-        <!-- Category Filter -->
-        <div class="w-48 flex-shrink-0" style="margin: 0">
+        <div :class="ui.filterSelect()">
           <CustomSelect
             v-model="selectedCategory"
             :options="categoryOptions"
@@ -33,8 +26,7 @@
           />
         </div>
 
-        <!-- Tags Filter -->
-        <div class="w-48 flex-shrink-0" style="margin: 0">
+        <div :class="ui.filterSelect()">
           <CustomSelect
             v-model="selectedTag"
             :options="tagOptions"
@@ -43,14 +35,11 @@
         </div>
       </div>
 
-      <!-- Commands List -->
-      <div v-if="groupedCommands.length === 0" class="text-center py-12">
-        <div
-          class="w-16 h-16 bg-slate-100 flex items-center justify-center mx-auto mb-4 rounded-lg"
-        >
-          <DocumentIcon class="w-8 h-8 text-slate-400" />
+      <div v-if="groupedCommands.length === 0" :class="ui.empty()">
+        <div :class="ui.emptyIcon()">
+          <DocumentIcon :class="ui.emptyIconInner()" />
         </div>
-        <p class="text-slate-500 mb-2">
+        <p :class="ui.emptyTitle()">
           {{
             searchQuery || selectedCategory || selectedTag
               ? 'No commands found'
@@ -65,36 +54,32 @@
         </CustomButton>
       </div>
 
-      <div v-else class="space-y-6">
-        <!-- Group by Template -->
+      <div v-else :class="ui.groups()">
         <div
           v-for="template in groupedCommands"
           :key="template.id"
-          class="space-y-4"
+          :class="ui.group()"
         >
-          <!-- Template Header -->
-          <div
-            class="bg-gradient-to-r from-slate-50 to-blue-50 border border-slate-200 rounded-xl p-4"
-          >
-            <div class="flex items-center space-x-4">
-              <div class="text-3xl bg-white p-3 rounded-lg shadow-sm">
+          <div :class="ui.templateHeader()">
+            <div :class="ui.templateHeaderInner()">
+              <div :class="ui.templateEmoji()">
                 {{ template.icon }}
               </div>
-              <div class="flex-1">
-                <h3 class="font-bold text-slate-900 text-lg">
+              <div :class="ui.templateMeta()">
+                <h3 :class="ui.templateName()">
                   {{ template.name }}
                 </h3>
-                <p class="text-sm text-slate-600">{{ template.category }}</p>
-                <div class="flex items-center space-x-2 mt-1">
-                  <span class="text-xs text-slate-500">{{
+                <p :class="ui.templateCategory()">{{ template.category }}</p>
+                <div :class="ui.templateDescRow()">
+                  <span :class="ui.templateDesc()">{{
                     template.description
                   }}</span>
                 </div>
-                <div class="flex flex-wrap gap-1 mt-2">
+                <div :class="ui.tags()">
                   <span
                     v-for="tag in template.tags"
                     :key="tag"
-                    class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium"
+                    :class="ui.tag()"
                   >
                     {{ tag }}
                   </span>
@@ -103,149 +88,117 @@
             </div>
           </div>
 
-          <!-- Commands in this template -->
-          <div
-            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 ml-4"
-          >
+          <div :class="ui.commandGrid()">
             <div
               v-for="command in template.commands"
               :key="command.id"
-              class="bg-white border-2 border-slate-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all duration-200 group relative flex flex-col"
+              :class="ui.commandCard()"
             >
-              <!-- Command Header -->
-              <div class="flex items-start justify-between mb-3">
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center justify-between mb-1">
-                    <div class="flex items-center space-x-2 flex-1 min-w-0">
-                      <span v-if="command.icon" class="text-lg flex-shrink-0">{{
-                        command.icon
-                      }}</span>
-                      <h4 class="font-semibold text-slate-900 text-sm truncate">
+              <div :class="ui.commandCardHeader()">
+                <div :class="ui.commandCardHeaderInner()">
+                  <div :class="ui.commandTitleRow()">
+                    <div :class="ui.commandTitleLeft()">
+                      <span
+                        v-if="command.icon"
+                        :class="ui.commandEmoji()"
+                        >{{ command.icon }}</span
+                      >
+                      <h4 :class="ui.commandName()">
                         {{ command.name }}
                       </h4>
                     </div>
                     <span
                       v-if="command.hotkey"
-                      class="px-2 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs rounded-md font-medium flex-shrink-0 shadow-sm"
+                      :class="ui.hotkey()"
                     >
                       {{ command.hotkey }}
                     </span>
                   </div>
-                  <div
-                    class="flex items-center space-x-1 text-xs text-slate-500 mb-1"
-                  >
-                    <span class="text-slate-500 truncate">{{
+                  <div :class="ui.commandMeta()">
+                    <span :class="ui.commandMetaText()">{{
                       template.name
                     }}</span>
-                    <span
-                      class="w-1 h-1 bg-slate-300 rounded-full flex-shrink-0"
-                    ></span>
-                    <span class="flex items-center space-x-1">
-                      <CheckIcon class="w-3 h-3" />
-                      <span class="truncate">{{ template.category }}</span>
+                    <span :class="ui.metaDot()"></span>
+                    <span :class="ui.metaCheck()">
+                      <CheckIcon :class="ui.metaCheckIcon()" />
+                      <span :class="ui.metaCheckText()">{{
+                        template.category
+                      }}</span>
                     </span>
                   </div>
-                  <!-- Command Description -->
-                  <div v-if="command.description" class="mb-2">
-                    <div
-                      class="text-xs text-slate-600 line-clamp-2 leading-relaxed"
-                    >
+                  <div v-if="command.description" :class="ui.commandDescWrap()">
+                    <div :class="ui.commandDesc()">
                       {{ command.description }}
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Command Content -->
-              <div class="space-y-2 flex-1">
-                <div
-                  v-if="command.command"
-                  class="bg-slate-100 p-2 rounded text-xs"
-                >
-                  <div class="text-xs text-slate-500 mb-1 font-medium">
-                    Command:
-                  </div>
-                  <div
-                    class="text-xs font-mono text-slate-800 break-all line-clamp-2"
-                  >
+              <div :class="ui.commandBody()">
+                <div v-if="command.command" :class="ui.codeBlock()">
+                  <div :class="ui.codeLabel()">Command:</div>
+                  <div :class="ui.codeText()">
                     {{ command.command }}
                   </div>
                 </div>
 
-                <div v-if="command.commands" class="space-y-1">
-                  <div class="text-xs text-slate-500 font-medium">
-                    Multiple Commands:
-                  </div>
+                <div v-if="command.commands" :class="ui.multiCmds()">
+                  <div :class="ui.codeLabel()">Multiple Commands:</div>
                   <div
                     v-for="(cmd, index) in command.commands.slice(0, 2)"
                     :key="index"
-                    class="bg-slate-100 p-2 rounded text-xs font-mono text-slate-800 line-clamp-1"
+                    :class="ui.multiCmdLine()"
                   >
                     {{ cmd }}
                   </div>
                   <div
                     v-if="command.commands.length > 2"
-                    class="text-xs text-slate-500"
+                    :class="ui.moreCmds()"
                   >
                     +{{ command.commands.length - 2 }} more commands
                   </div>
                 </div>
 
-                <div
-                  v-if="command.switch"
-                  class="bg-green-50 border border-green-200 p-2 rounded text-xs"
-                >
-                  <div
-                    class="text-xs text-green-700 mb-1 font-medium flex items-center"
-                  >
-                    <CheckIcon class="w-3 h-3 mr-1" />
+                <div v-if="command.switch" :class="ui.switchBlock()">
+                  <div :class="ui.switchLabel()">
+                    <CheckIcon :class="ui.inlineIcon()" />
                     Switch Command:
                   </div>
-                  <div
-                    class="text-xs font-mono text-green-800 break-all line-clamp-2"
-                  >
+                  <div :class="ui.switchText()">
                     {{ command.switch }}
                   </div>
                 </div>
 
-                <div
-                  v-if="command.monitor"
-                  class="bg-blue-50 border border-blue-200 p-2 rounded text-xs"
-                >
-                  <div
-                    class="text-xs text-blue-700 mb-1 font-medium flex items-center"
-                  >
-                    <ChartIcon class="w-3 h-3 mr-1" />
+                <div v-if="command.monitor" :class="ui.monitorBlock()">
+                  <div :class="ui.monitorLabel()">
+                    <ChartIcon :class="ui.inlineIcon()" />
                     Monitor Command:
                   </div>
-                  <div
-                    class="text-xs font-mono text-blue-800 break-all line-clamp-2"
-                  >
+                  <div :class="ui.monitorText()">
                     {{ command.monitor }}
                   </div>
                 </div>
 
-                <div v-if="command.inputs" class="space-y-1">
-                  <div class="text-xs text-slate-500 font-medium">Inputs</div>
-                  <div class="space-y-1">
+                <div v-if="command.inputs" :class="ui.inputsBlock()">
+                  <div :class="ui.codeLabel()">Inputs</div>
+                  <div :class="ui.inputsList()">
                     <div
                       v-for="(default_value, key) in command.inputs"
                       :key="key"
-                      class="bg-blue-50 border border-blue-200 text-blue-800 px-2 py-1 rounded text-xs line-clamp-1"
+                      :class="ui.inputChip()"
                     >
-                      <span class="font-medium">{{ key }}</span> -
+                      <span :class="ui.inputKey()">{{ key }}</span> -
                       {{ default_value }}
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Action Button -->
-              <div class="mt-3 pt-2 border-t border-slate-200">
+              <div :class="ui.commandFooter()">
                 <CustomButton
                   variant="primary"
                   size="sm"
-                  class="w-full text-xs py-1"
+                  :class="ui.selectBtn()"
                   @click="selectCommand(command)"
                 >
                   Select Command
@@ -257,9 +210,8 @@
       </div>
     </div>
 
-    <!-- Actions -->
     <template #footer>
-      <div class="flex items-center justify-end space-x-3">
+      <div :class="ui.modalFooter()">
         <CustomButton variant="ghost" size="sm" @click="$emit('close')">
           Cancel
         </CustomButton>
@@ -270,6 +222,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { tv } from '@/lib/tv';
 import CustomButton from '../ui/CustomButton.vue';
 import Modal from '../ui/Modal.vue';
 import CustomSelect from '../forms/CustomSelect.vue';
@@ -284,18 +237,105 @@ import {
 } from '../../lib/templates';
 import type { Command } from '../../types';
 
+defineOptions({ name: 'TemplateCommandsModal' });
+
 interface Props {
   isOpen: boolean;
 }
 
 defineProps<Props>();
 
-// State
 const searchQuery = ref('');
 const selectedCategory = ref('');
 const selectedTag = ref('');
 
-// Computed
+const templateCommandsModalTv = tv({
+  slots: {
+    modalTitle: 'text-base font-semibold text-slate-900',
+    root: 'space-y-3',
+    filters:
+      'flex flex-col md:flex-row items-stretch md:items-center gap-2.5',
+    searchWrap: 'flex-1',
+    searchInner: 'relative',
+    searchInput: [
+      'w-full h-8 px-2.5 py-1.5 pl-9 border border-slate-300 rounded-md text-sm',
+      'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
+    ],
+    searchIcon:
+      'w-4 h-4 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2',
+    filterSelect: 'w-full md:w-44 flex-shrink-0',
+    empty: 'text-center py-8',
+    emptyIcon:
+      'w-12 h-12 bg-slate-100 flex items-center justify-center mx-auto mb-3 rounded-md',
+    emptyIconInner: 'w-6 h-6 text-slate-400',
+    emptyTitle: 'text-sm text-slate-500 mb-1',
+    groups: 'space-y-3',
+    group: 'space-y-2.5',
+    templateHeader:
+      'bg-gradient-to-r from-slate-50 to-blue-50 border border-slate-200 rounded-md p-3',
+    templateHeaderInner: 'flex items-center gap-3',
+    templateEmoji: 'text-2xl bg-white p-2 rounded-md shadow-sm',
+    templateMeta: 'flex-1 min-w-0',
+    templateName: 'font-semibold text-slate-900 text-sm',
+    templateCategory: 'text-xs text-slate-600',
+    templateDescRow: 'flex items-center gap-2 mt-0.5',
+    templateDesc: 'text-xs text-slate-500',
+    tags: 'flex flex-wrap gap-1 mt-1.5',
+    tag: 'px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-md font-medium',
+    commandGrid: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 ml-2',
+    commandCard: [
+      'bg-white border border-slate-200 rounded-md p-3',
+      'hover:border-blue-300 hover:shadow-sm transition-all duration-200',
+      'group relative flex flex-col',
+    ],
+    commandCardHeader: 'flex items-start justify-between mb-2',
+    commandCardHeaderInner: 'flex-1 min-w-0',
+    commandTitleRow: 'flex items-center justify-between mb-1 gap-1.5',
+    commandTitleLeft: 'flex items-center gap-1.5 flex-1 min-w-0',
+    commandEmoji: 'text-base flex-shrink-0',
+    commandName: 'font-semibold text-slate-900 text-sm truncate',
+    hotkey: [
+      'px-1.5 py-0.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white',
+      'text-xs rounded-md font-medium flex-shrink-0 shadow-sm',
+    ],
+    commandMeta: 'flex items-center gap-1 text-xs text-slate-500 mb-1',
+    commandMetaText: 'text-slate-500 truncate',
+    metaDot: 'w-1 h-1 bg-slate-300 rounded-full flex-shrink-0',
+    metaCheck: 'flex items-center gap-1',
+    metaCheckIcon: 'w-3 h-3',
+    metaCheckText: 'truncate',
+    commandDescWrap: 'mb-1.5',
+    commandDesc: 'text-xs text-slate-600 line-clamp-2 leading-relaxed',
+    commandBody: 'space-y-1.5 flex-1',
+    codeBlock: 'bg-slate-100 p-1.5 rounded-md text-xs',
+    codeLabel: 'text-xs text-slate-500 mb-0.5 font-medium',
+    codeText: 'text-xs font-mono text-slate-800 break-all line-clamp-2',
+    multiCmds: 'space-y-1',
+    multiCmdLine:
+      'bg-slate-100 p-1.5 rounded-md text-xs font-mono text-slate-800 line-clamp-1',
+    moreCmds: 'text-xs text-slate-500',
+    switchBlock: 'bg-green-50 border border-green-200 p-1.5 rounded-md text-xs',
+    switchLabel:
+      'text-xs text-green-700 mb-0.5 font-medium flex items-center',
+    switchText: 'text-xs font-mono text-green-800 break-all line-clamp-2',
+    monitorBlock: 'bg-blue-50 border border-blue-200 p-1.5 rounded-md text-xs',
+    monitorLabel:
+      'text-xs text-blue-700 mb-0.5 font-medium flex items-center',
+    monitorText: 'text-xs font-mono text-blue-800 break-all line-clamp-2',
+    inlineIcon: 'w-3 h-3 mr-1',
+    inputsBlock: 'space-y-1',
+    inputsList: 'space-y-1',
+    inputChip:
+      'bg-blue-50 border border-blue-200 text-blue-800 px-1.5 py-0.5 rounded-md text-xs line-clamp-1',
+    inputKey: 'font-medium',
+    commandFooter: 'mt-2 pt-1.5 border-t border-slate-200',
+    selectBtn: 'w-full text-xs',
+    modalFooter: 'flex items-center justify-end gap-1.5',
+  },
+});
+
+const ui = templateCommandsModalTv();
+
 const filteredTemplates = computed(() => {
   let filtered = templates;
 
@@ -317,7 +357,6 @@ const filteredTemplates = computed(() => {
 });
 
 const categoryOptions = computed(() => {
-  // Get unique categories from templates
   const uniqueCategories = [
     ...new Set(templates.map(template => template.category)),
   ];
@@ -333,7 +372,6 @@ const categoryOptions = computed(() => {
 });
 
 const tagOptions = computed(() => {
-  // Get unique tags from templates
   const allTags = templates.flatMap(template => template.tags);
   const uniqueTags = [...new Set(allTags)];
 
@@ -370,9 +408,7 @@ const groupedCommands = computed(() => {
     .filter(template => template.commands.length > 0);
 });
 
-// Methods
 function selectCommand(command: Command) {
-  // Add command immediately and close modal
   emit('commandsSelected', [command]);
 }
 

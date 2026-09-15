@@ -1,23 +1,20 @@
 <template>
-  <div class="space-y-4">
+  <div :class="ui.root()">
     <CustomButton
       variant="ghost"
-      class="flex items-center justify-between w-full p-3 text-left"
+      :class="ui.trigger()"
       @click="toggleCollapsed"
     >
-      <div class="flex items-center space-x-2">
+      <div :class="ui.triggerInner()">
         <ChevronRightIcon :collapsed="!collapsed" />
-        <span class="font-medium text-slate-700">{{ title }}</span>
+        <span :class="ui.title()">{{ title }}</span>
       </div>
-      <div class="text-sm text-slate-500">
+      <div :class="ui.summary()">
         {{ summary }}
       </div>
     </CustomButton>
 
-    <div
-      v-if="!collapsed"
-      class="space-y-6 p-4 bg-slate-50 rounded-lg border border-slate-200"
-    >
+    <div v-if="!collapsed" :class="ui.panel()">
       <slot />
     </div>
   </div>
@@ -27,6 +24,9 @@
 import { ref } from 'vue';
 import ChevronRightIcon from '../icons/ChevronRightIcon.vue';
 import CustomButton from './CustomButton.vue';
+import { collapsibleTv } from './themes';
+
+defineOptions({ name: 'CollapsibleSection' });
 
 interface Props {
   title: string;
@@ -39,6 +39,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const collapsed = ref(props.defaultCollapsed);
+const ui = collapsibleTv();
 
 const toggleCollapsed = () => {
   collapsed.value = !collapsed.value;

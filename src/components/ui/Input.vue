@@ -1,31 +1,30 @@
 <template>
-  <div class="space-y-1">
-    <label v-if="label" :for="id" class="block text-sm font-medium text-slate-700">
+  <div :class="ui.root()">
+    <label v-if="label" :for="id" :class="ui.label()">
       {{ label }}
     </label>
-    <div class="relative">
+    <div :class="ui.controlWrap()">
       <select
         v-if="type === 'select'"
         :id="id"
         :value="modelValue"
         :disabled="disabled"
-        :class="[
-          'w-full border border-slate-300 text-sm transition-all duration-200',
-          'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
-          'disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed',
-          sizeClasses[size],
-          error && 'border-red-500 focus:ring-red-500 focus:border-red-500',
-          inputClass
-        ]"
-        @change="$emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
+        :class="ui.control({ class: inputClass })"
+        @change="
+          $emit('update:modelValue', ($event.target as HTMLSelectElement).value)
+        "
         @blur="$emit('blur')"
         @focus="$emit('focus')"
       >
-        <option v-for="option in options" :key="option.value" :value="option.value">
+        <option
+          v-for="option in options"
+          :key="option.value"
+          :value="option.value"
+        >
           {{ option.label }}
         </option>
       </select>
-      
+
       <input
         v-else
         :id="id"
@@ -33,29 +32,29 @@
         :value="modelValue"
         :placeholder="placeholder"
         :disabled="disabled"
-          :min="min"
-          :max="max"
-        :class="[
-          'w-full border border-slate-300 text-sm transition-all duration-200',
-          'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
-          'disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed',
-          sizeClasses[size],
-          error && 'border-red-500 focus:ring-red-500 focus:border-red-500',
-          inputClass
-        ]"
-        @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+        :min="min"
+        :max="max"
+        :class="ui.control({ class: inputClass })"
+        @input="
+          $emit('update:modelValue', ($event.target as HTMLInputElement).value)
+        "
         @blur="$emit('blur')"
         @focus="$emit('focus')"
         @keydown="$emit('keydown', $event)"
       />
       <slot name="suffix" />
     </div>
-    <p v-if="error" class="text-xs text-red-600">{{ error }}</p>
-    <p v-else-if="hint" class="text-xs text-slate-500">{{ hint }}</p>
+    <p v-if="error" :class="ui.error()">{{ error }}</p>
+    <p v-else-if="hint" :class="ui.hint()">{{ hint }}</p>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+import { inputTv } from './themes';
+
+defineOptions({ name: 'Input' });
+
 interface Option {
   value: string;
   label: string;
@@ -77,13 +76,13 @@ interface Props {
   max?: number;
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
   type: 'text',
   disabled: false,
   size: 'md',
   options: () => [],
-  inputClass: ''
+  inputClass: '',
 });
 
 defineEmits<{
@@ -93,9 +92,10 @@ defineEmits<{
   (e: 'keydown', event: KeyboardEvent): void;
 }>();
 
-const sizeClasses = {
-  sm: 'px-3 py-1.5',
-  md: 'px-3 py-2',
-  lg: 'px-4 py-2.5'
-};
-</script> 
+const ui = computed(() =>
+  inputTv({
+    size: props.size,
+    isError: !!props.error,
+  }),
+);
+</script>

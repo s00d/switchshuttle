@@ -4,9 +4,11 @@ use std::collections::HashMap;
 use std::process::Command;
 use log::{error, info};
 
+#[cfg(target_os = "macos")]
 static SCRIPTS_DIR: include_dir::Dir = include_dir::include_dir!("scripts");
 
 /// Recorded (or real) terminal process invocation.
+#[cfg(test)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TerminalLaunch {
     pub executable: String,

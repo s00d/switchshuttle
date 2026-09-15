@@ -169,6 +169,23 @@ pub fn change_devtools(app: &AppHandle) {
 #[cfg(not(debug_assertions))]
 pub fn change_devtools(_app: &AppHandle) {}
 
+fn attach_menu_icon<'a>(
+    mut builder: IconMenuItemBuilder<'a>,
+    app: &AppHandle<Wry>,
+    icon_name: &str,
+) -> IconMenuItemBuilder<'a> {
+    if let Ok(icon_path) = app
+        .path()
+        .resolve(&format!("icons/{}.png", icon_name), BaseDirectory::Resource)
+    {
+        if let Ok(image) = Image::from_path(icon_path) {
+            builder = builder.icon(image);
+        }
+    }
+
+    builder
+}
+
 /// Создает пункт меню с иконкой и опциональной горячей клавишей
 pub fn create_menu_item(
     app: &AppHandle<Wry>,
@@ -191,20 +208,12 @@ pub fn create_menu_item(
 
     let mut builder = IconMenuItemBuilder::with_id(id, &display_text);
 
-    // Пытаемся загрузить иконку, но не падаем если её нет
-    // Добавляем иконку только если нет пользовательской иконки
+    // Custom PNGs when there is no user emoji/symbol icon.
+    // On macOS they are marked as NSImage templates after tray.set_menu.
     if icon.is_none() {
-        if let Ok(icon_path) = app
-            .path()
-            .resolve(&format!("icons/{}.png", icon_name), BaseDirectory::Resource)
-        {
-            if let Ok(image) = Image::from_path(icon_path) {
-                builder = builder.icon(image);
-            }
-        }
+        builder = attach_menu_icon(builder, app, icon_name);
     }
 
-    // Добавляем горячую клавишу если указана
     if let Some(hotkey) = hotkey {
         builder = builder.accelerator(&hotkey);
     }

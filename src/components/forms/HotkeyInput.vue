@@ -1,79 +1,66 @@
 <template>
-  <div class="space-y-1">
-    <label v-if="label" class="block text-sm font-medium text-slate-700">
+  <div :class="ui.root()">
+    <label v-if="label" :class="ui.label()">
       {{ label }}
     </label>
-    <div class="relative">
+    <div :class="ui.field()">
       <input
         ref="inputRef"
         :value="displayValue"
         :placeholder="placeholder"
         :disabled="disabled"
-        :class="[
-          'w-full border border-slate-300 text-sm transition-all duration-200',
-          'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
-          'disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed',
-          sizeClasses[size],
-          error && 'border-red-500 focus:ring-red-500 focus:border-red-500',
-          isRecording && 'ring-2 ring-blue-500 border-blue-500',
-        ]"
+        :class="ui.input()"
         readonly
         @focus="startRecording"
         @blur="stopRecording"
         @keydown="handleKeyDown"
         @keyup="handleKeyUp"
       />
-      <div
-        v-if="isRecording"
-        class="absolute inset-0 bg-blue-50 border-2 border-blue-500 rounded flex items-center justify-center"
-      >
-        <span class="text-blue-600 text-sm font-medium">Press keys...</span>
+      <div v-if="isRecording" :class="ui.recordingOverlay()">
+        <span :class="ui.recordingText()">Press keys...</span>
       </div>
       <CustomButton
         v-if="modelValue"
         variant="ghost"
-        class="absolute right-2 top-1/2 transform -translate-y-1/2 p-1"
+        :class="ui.clearBtn()"
         @click="clearHotkey"
       >
-        <XIcon class="w-4 h-4" />
+        <XIcon :class="ui.icon()" />
       </CustomButton>
 
-      <!-- Dropdown for available keys -->
       <CustomButton
         variant="ghost"
-        class="absolute right-8 top-1/2 transform -translate-y-1/2 p-1"
+        :class="ui.dropdownToggle()"
         title="Select from available keys"
         @click="toggleDropdown"
       >
-        <ChevronDownIcon class="w-4 h-4" />
+        <ChevronDownIcon :class="ui.icon()" />
       </CustomButton>
 
       <!-- Teleported Dropdown -->
       <Teleport to="body">
         <div
           v-if="showDropdown"
-          class="hotkey-dropdown bg-white border border-slate-200 rounded-lg shadow-lg"
+          :class="ui.dropdown()"
           :style="dropdownStyle"
         >
-          <div class="p-2 flex-1 overflow-y-auto" style="max-height: 350px">
-            <div class="space-y-2">
+          <div :class="ui.dropdownBody()">
+            <div :class="ui.sections()">
               <!-- Modifiers -->
               <div>
-                <h4
-                  class="text-xs font-semibold text-slate-700 uppercase tracking-wide mb-2"
-                >
-                  Modifiers
-                </h4>
-                <div class="grid grid-cols-2 gap-1">
+                <h4 :class="ui.sectionTitle()">Modifiers</h4>
+                <div :class="ui.gridModifiers()">
                   <CustomButton
                     v-for="modifier in modifiers"
                     :key="modifier.value"
                     variant="ghost"
-                    class="px-2 py-1 text-xs border border-slate-200 rounded"
-                    :class="{
-                      'bg-blue-100 text-blue-700 border-blue-300':
-                        selectedModifiers.includes(modifier.value),
-                    }"
+                    :class="
+                      ui.keyBtn({
+                        class: selectedModifiers.includes(modifier.value)
+                          ? ui.keyBtnSelected()
+                          : undefined,
+                      })
+                    "
                     @click="selectModifier(modifier.value)"
                   >
                     {{ modifier.label }}
@@ -83,21 +70,20 @@
 
               <!-- Letters -->
               <div>
-                <h4
-                  class="text-xs font-semibold text-slate-700 uppercase tracking-wide mb-2"
-                >
-                  Letters
-                </h4>
-                <div class="grid grid-cols-8 gap-1">
+                <h4 :class="ui.sectionTitle()">Letters</h4>
+                <div :class="ui.gridLetters()">
                   <CustomButton
                     v-for="letter in letters"
                     :key="letter"
                     variant="ghost"
-                    class="px-2 py-1 text-xs border border-slate-200 rounded"
-                    :class="{
-                      'bg-blue-100 text-blue-700 border-blue-300':
-                        selectedKey === letter,
-                    }"
+                    :class="
+                      ui.keyBtn({
+                        class:
+                          selectedKey === letter
+                            ? ui.keyBtnSelected()
+                            : undefined,
+                      })
+                    "
                     @click="selectKey(letter)"
                   >
                     {{ letter.toUpperCase() }}
@@ -107,21 +93,20 @@
 
               <!-- Numbers -->
               <div>
-                <h4
-                  class="text-xs font-semibold text-slate-700 uppercase tracking-wide mb-2"
-                >
-                  Numbers
-                </h4>
-                <div class="grid grid-cols-10 gap-1">
+                <h4 :class="ui.sectionTitle()">Numbers</h4>
+                <div :class="ui.gridNumbers()">
                   <CustomButton
                     v-for="num in numbers"
                     :key="num"
                     variant="ghost"
-                    class="px-2 py-1 text-xs border border-slate-200 rounded"
-                    :class="{
-                      'bg-blue-100 text-blue-700 border-blue-300':
-                        selectedKey === num,
-                    }"
+                    :class="
+                      ui.keyBtn({
+                        class:
+                          selectedKey === num
+                            ? ui.keyBtnSelected()
+                            : undefined,
+                      })
+                    "
                     @click="selectKey(num)"
                   >
                     {{ num }}
@@ -131,21 +116,20 @@
 
               <!-- Function Keys -->
               <div>
-                <h4
-                  class="text-xs font-semibold text-slate-700 uppercase tracking-wide mb-2"
-                >
-                  Function Keys
-                </h4>
-                <div class="grid grid-cols-6 gap-1">
+                <h4 :class="ui.sectionTitle()">Function Keys</h4>
+                <div :class="ui.gridFunction()">
                   <CustomButton
                     v-for="fkey in functionKeys"
                     :key="fkey"
                     variant="ghost"
-                    class="px-2 py-1 text-xs border border-slate-200 rounded"
-                    :class="{
-                      'bg-blue-100 text-blue-700 border-blue-300':
-                        selectedKey === fkey,
-                    }"
+                    :class="
+                      ui.keyBtn({
+                        class:
+                          selectedKey === fkey
+                            ? ui.keyBtnSelected()
+                            : undefined,
+                      })
+                    "
                     @click="selectKey(fkey)"
                   >
                     {{ fkey.toUpperCase() }}
@@ -155,21 +139,22 @@
 
               <!-- Special Keys -->
               <div>
-                <h4
-                  class="text-xs font-semibold text-slate-700 uppercase tracking-wide mb-2"
-                >
-                  Special Keys
-                </h4>
-                <div class="grid grid-cols-3 gap-1">
+                <h4 :class="ui.sectionTitle()">Special Keys</h4>
+                <div :class="ui.gridSpecial()">
                   <CustomButton
                     v-for="special in specialKeys"
                     :key="special.value"
                     variant="ghost"
-                    class="px-1 py-1 text-xs border border-slate-200 rounded"
-                    :class="{
-                      'bg-blue-100 text-blue-700 border-blue-300':
-                        selectedKey === special.value,
-                    }"
+                    :class="
+                      ui.keyBtn({
+                        class: [
+                          ui.keyBtnCompact(),
+                          selectedKey === special.value
+                            ? ui.keyBtnSelected()
+                            : undefined,
+                        ],
+                      })
+                    "
                     @click="selectKey(special.value)"
                   >
                     {{ special.label }}
@@ -179,21 +164,20 @@
 
               <!-- Navigation Keys -->
               <div>
-                <h4
-                  class="text-xs font-semibold text-slate-700 uppercase tracking-wide mb-2"
-                >
-                  Navigation
-                </h4>
-                <div class="grid grid-cols-4 gap-1">
+                <h4 :class="ui.sectionTitle()">Navigation</h4>
+                <div :class="ui.gridNav()">
                   <CustomButton
                     v-for="nav in navigationKeys"
                     :key="nav.value"
                     variant="ghost"
-                    class="px-2 py-1 text-xs border border-slate-200 rounded"
-                    :class="{
-                      'bg-blue-100 text-blue-700 border-blue-300':
-                        selectedKey === nav.value,
-                    }"
+                    :class="
+                      ui.keyBtn({
+                        class:
+                          selectedKey === nav.value
+                            ? ui.keyBtnSelected()
+                            : undefined,
+                      })
+                    "
                     @click="selectKey(nav.value)"
                   >
                     {{ nav.label }}
@@ -203,10 +187,9 @@
             </div>
           </div>
 
-          <!-- Apply Button - Fixed at bottom -->
-          <div class="p-2 border-t border-slate-200 bg-white rounded-b-lg">
+          <div :class="ui.footer()">
             <CustomButton
-              class="w-full text-sm py-2"
+              :class="ui.applyBtn()"
               variant="primary"
               :disabled="selectedModifiers.length === 0 && !selectedKey"
               @click="applyCombination"
@@ -218,16 +201,19 @@
       </Teleport>
     </div>
 
-    <p v-if="error" class="text-xs text-red-600">{{ error }}</p>
-    <p v-else-if="hint" class="text-xs text-slate-500">{{ hint }}</p>
+    <p v-if="error" :class="ui.error()">{{ error }}</p>
+    <p v-else-if="hint" :class="ui.hint()">{{ hint }}</p>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
+import { tv } from '@/lib/tv';
 import XIcon from '../icons/XIcon.vue';
 import ChevronDownIcon from '../icons/ChevronDownIcon.vue';
 import CustomButton from '../ui/CustomButton.vue';
+
+defineOptions({ name: 'HotkeyInput' });
 
 interface Props {
   modelValue?: string | null | undefined;
@@ -258,6 +244,81 @@ const selectedKey = ref<string>('');
 const dropdownPosition = ref({ top: 0, left: 0, width: 300 });
 const isDropdownOpen = ref(false);
 
+const hotkeyTv = tv({
+  slots: {
+    root: 'space-y-1',
+    label: 'block text-sm font-medium text-slate-700',
+    field: 'relative',
+    input: [
+      'w-full border border-slate-300 text-sm rounded-md transition-all duration-200',
+      'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
+      'disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed',
+    ],
+    recordingOverlay:
+      'absolute inset-0 bg-blue-50 border-2 border-blue-500 rounded-md flex items-center justify-center',
+    recordingText: 'text-blue-600 text-sm font-medium',
+    clearBtn: 'absolute right-2 top-1/2 -translate-y-1/2 p-1',
+    dropdownToggle: 'absolute right-8 top-1/2 -translate-y-1/2 p-1',
+    icon: 'w-4 h-4',
+    dropdown:
+      'hotkey-dropdown bg-white border border-slate-200 rounded-md shadow-lg',
+    dropdownBody: 'p-2.5 flex-1 overflow-y-auto max-h-[350px]',
+    sections: 'space-y-2',
+    sectionTitle:
+      'text-xs font-semibold text-slate-700 uppercase tracking-wide mb-1.5',
+    gridModifiers: 'grid grid-cols-2 gap-1',
+    gridLetters: 'grid grid-cols-8 gap-1',
+    gridNumbers: 'grid grid-cols-10 gap-1',
+    gridFunction: 'grid grid-cols-6 gap-1',
+    gridSpecial: 'grid grid-cols-3 gap-1',
+    gridNav: 'grid grid-cols-4 gap-1',
+    keyBtn: 'px-2 py-1 text-xs border border-slate-200 rounded-md',
+    keyBtnSelected: 'bg-blue-100 text-blue-700 border-blue-300',
+    keyBtnCompact: 'px-1 py-1',
+    footer: 'p-2 border-t border-slate-200 bg-white rounded-b-md',
+    applyBtn: 'w-full text-sm py-2',
+    error: 'text-xs text-red-600',
+    hint: 'text-xs text-slate-500',
+  },
+  variants: {
+    size: {
+      sm: { input: 'px-2.5 py-1.5 h-8' },
+      md: { input: 'px-2.5 py-2 h-8' },
+      lg: { input: 'px-3 py-2.5 h-9' },
+    },
+    error: {
+      true: {
+        input: 'border-red-500 focus:ring-red-500 focus:border-red-500',
+      },
+    },
+    isRecording: {
+      true: {
+        input: 'ring-2 ring-blue-500 border-blue-500',
+      },
+    },
+  },
+  compoundVariants: [
+    {
+      error: true,
+      isRecording: true,
+      class: {
+        input: 'border-red-500 ring-2 ring-red-500',
+      },
+    },
+  ],
+  defaultVariants: {
+    size: 'md',
+  },
+});
+
+const ui = computed(() =>
+  hotkeyTv({
+    size: props.size,
+    error: !!props.error,
+    isRecording: isRecording.value,
+  }),
+);
+
 const displayValue = computed(() => {
   if (props.modelValue) {
     return props.modelValue;
@@ -272,12 +333,6 @@ const dropdownStyle = computed(() => ({
   width: `${dropdownPosition.value.width}px`,
   zIndex: 50,
 }));
-
-const sizeClasses = {
-  sm: 'px-3 py-1.5',
-  md: 'px-3 py-2',
-  lg: 'px-4 py-2.5',
-};
 
 // Available keys based on hotkeys.rs
 const modifiers = [

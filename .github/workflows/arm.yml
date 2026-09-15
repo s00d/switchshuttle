@@ -21,17 +21,17 @@ jobs:
             appimage: armv7l
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           version: 9.15.4
           run_install: false
 
       - name: Install Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
 
       - name: Install Rust
@@ -44,7 +44,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/bin/
@@ -53,7 +53,7 @@ jobs:
             ~/.cargo/git/db/
             target/
             src-tauri/target/
-          key: ${{ runner.os }}-arm-${{ matrix.target }}-${{ hashFiles('Cargo.lock') }}
+          key: ${{ runner.os }}-arm-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Install frontend dependencies
         run: pnpm install
@@ -70,19 +70,19 @@ jobs:
         run: echo "APP_VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
 
       - name: Upload deb bundle
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Debian Bundle ARM ${{ matrix.target }}
           path: ${{ github.workspace }}/src-tauri/target/${{ matrix.target }}/release/bundle/deb/switch-shuttle_${{ env.APP_VERSION }}_${{ matrix.deb }}.deb
 
       - name: Upload rpm bundle
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: RPM Bundle ARM ${{ matrix.target }}
           path: ${{ github.workspace }}/src-tauri/target/${{ matrix.target }}/release/bundle/rpm/switch-shuttle-${{ env.APP_VERSION }}-1.${{ matrix.rpm }}.rpm
 
       - name: Upload appimage bundle
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: AppImage Bundle ARM ${{ matrix.target }}
           path: ${{ github.workspace }}/src-tauri/target/${{ matrix.target }}/release/bundle/appimage/switch-shuttle_${{ env.APP_VERSION }}_${{ matrix.appimage }}.AppImage

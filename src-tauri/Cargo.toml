@@ -4,46 +4,62 @@ version = "0.0.0"
 edition = "2021"
 
 [dependencies]
-tauri = { version = "^2.8.5", features = ["wry", "tray-icon", "unstable", "image-png"] }
-tauri-plugin-fs = "^2.4.1"
-tauri-plugin-dialog = "2.4.0"
-tauri-plugin-log = { version = "2.7.0", features = ["colored"] }
-log = "0.4.27"
-tauri-plugin-notification = "2.3.0"
-tauri-plugin-shell = "2.3.1"
-tauri-plugin-store = "2.3.0"
-tauri-plugin-process = "2.3.0"
-tauri-plugin-opener = "2.4.0"
-tauri-plugin-autostart = "2.5.0"
-tauri-plugin-cli = "2.4.0"
-tauri-plugin-global-shortcut = "2.3.0"
-tauri-plugin-positioner = { version = "2.3.0", features = ["tray-icon"] }
-tauri-plugin-os = "2.3.1"
-tauri-plugin-updater = "2.9.0"
-serde = { version = "1.0.226", features = ["derive"] }
-serde_json = "1.0.145"
-dirs = "6.0.0"
+tauri = { version = "^2.11.5", features = ["wry", "tray-icon", "unstable", "image-png"] }
+tauri-plugin-fs = "^2.5.2"
+tauri-plugin-dialog = "2.7.3"
+tauri-plugin-log = { version = "2.9.1", features = ["colored"] }
+log = "0.4.34"
+tauri-plugin-notification = "2.4.0"
+tauri-plugin-shell = "2.3.6"
+tauri-plugin-store = "2.4.4"
+tauri-plugin-process = "2.3.1"
+tauri-plugin-opener = "2.5.5"
+tauri-plugin-autostart = "2.5.1"
+tauri-plugin-cli = "2.4.1"
+tauri-plugin-global-shortcut = "2.3.2"
+tauri-plugin-positioner = { version = "2.3.4", features = ["tray-icon"] }
+tauri-plugin-os = "2.3.2"
+tauri-plugin-updater = "2.11.0"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+dirs = "7.0.0"
 include_dir = "0.7"
-reqwest = { version = "0.12.23", features = ["json", "blocking"] }
+reqwest = { version = "0.13.5", features = ["json", "blocking"] }
 once_cell = "1.21.3"
-tokio = { version = "1.0", features = ["full"] }
-openssl = { version = "0.10.73", features = ["vendored"] }
-cron = "0.15.0"
+tokio = { version = "1.53.1", features = ["full"] }
+openssl = { version = "0.10.81", features = ["vendored"] }
+cron = "0.17.0"
 chrono = { version = "0.4.42", features = ["serde"] }
-regex = "1"
+regex = "1.13.1"
 
 [lib]
 name = "app_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [target.'cfg(windows)'.dependencies]
-winreg = "0.55.0"
+winreg = "0.56.0"
 
 [target.'cfg(unix)'.dependencies]
-libc = "0.2"
+libc = "0.2.189"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.6"
+objc2-app-kit = { version = "0.3", default-features = false, features = [
+    "std",
+    "NSImage",
+    "NSMenu",
+    "NSMenuItem",
+    "NSStatusItem",
+    "objc2-core-foundation",
+] }
+objc2-foundation = { version = "0.3", default-features = false, features = [
+    "std",
+    "NSArray",
+    "NSThread",
+] }
 
 [build-dependencies]
-tauri-build = { version = "^2.4.0", features = [] }
+tauri-build = { version = "^2.6.3", features = [] }
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!

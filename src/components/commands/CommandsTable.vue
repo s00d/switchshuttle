@@ -1,8 +1,8 @@
 <template>
-  <div class="space-y-4">
-    <div class="flex items-center justify-between">
-      <h3 class="text-lg font-semibold text-slate-900">Commands</h3>
-      <div class="flex items-center space-x-2">
+  <div :class="ui.root()">
+    <div :class="ui.header()">
+      <h3 :class="ui.title()">Commands</h3>
+      <div :class="ui.actions()">
         <CustomButton variant="primary" size="sm" @click="showTemplatesModal">
           <TemplatesIcon />
           Templates
@@ -18,19 +18,16 @@
       </div>
     </div>
 
-    <div v-if="commands.length === 0" class="text-center py-8">
-      <div
-        class="w-16 h-16 bg-slate-100 flex items-center justify-center mx-auto mb-4"
-      >
+    <div v-if="commands.length === 0" :class="ui.empty()">
+      <div :class="ui.emptyIconWrap()">
         <LightningIcon />
       </div>
-      <p class="text-slate-500 mb-2">No commands added</p>
-      <p class="text-sm text-slate-400">Add commands for quick access</p>
+      <p :class="ui.emptyTitle()">No commands added</p>
+      <p :class="ui.emptyHint()">Add commands for quick access</p>
     </div>
 
-    <div v-else class="space-y-6">
+    <div v-else :class="ui.list()">
       <template v-for="(command, index) in commands" :key="index">
-        <!-- Command Item for regular commands -->
         <CommandItem
           v-if="!command.submenu || command.submenu.length === 0"
           :command="command"
@@ -49,7 +46,6 @@
           @remove-multiple-command="removeMultipleCommand"
         />
 
-        <!-- Submenu Item for groups -->
         <CommandSubmenu
           v-else
           :command="command"
@@ -63,45 +59,29 @@
       </template>
     </div>
 
-    <!-- Add Command Button at Bottom -->
-    <div
-      class="flex items-center justify-between pt-6 pb-2 border-t border-slate-200 bg-slate-50/50 rounded-lg px-4 -mx-4"
-    >
+    <div :class="ui.footer()">
       <div>
-        <h4 class="text-sm font-semibold text-slate-800">Add New Command</h4>
-        <p class="text-xs text-slate-500 mt-0.5">
+        <h4 :class="ui.footerTitle()">Add New Command</h4>
+        <p :class="ui.footerHint()">
           Create additional commands for your configuration
         </p>
       </div>
-      <div class="flex items-center space-x-2">
-        <CustomButton
-          variant="primary"
-          size="sm"
-          @click="showTemplatesModal"
-        >
-          <TemplatesIcon class="mr-2" />
+      <div :class="ui.actions()">
+        <CustomButton variant="primary" size="sm" @click="showTemplatesModal">
+          <TemplatesIcon :class="ui.btnIcon()" />
           Templates
         </CustomButton>
-        <CustomButton
-          variant="secondary"
-          size="sm"
-          @click="addCommand"
-        >
-          <AddIcon class="mr-2" />
+        <CustomButton variant="secondary" size="sm" @click="addCommand">
+          <AddIcon :class="ui.btnIcon()" />
           Add Command
         </CustomButton>
-        <CustomButton
-          variant="secondary"
-          size="sm"
-          @click="addGroup"
-        >
-          <AddIcon class="mr-2" />
+        <CustomButton variant="secondary" size="sm" @click="addGroup">
+          <AddIcon :class="ui.btnIcon()" />
           Add Group
         </CustomButton>
       </div>
     </div>
 
-    <!-- Templates Modal -->
     <TemplateCommandsModal
       :is-open="isTemplatesModalOpen"
       @close="closeTemplatesModal"
@@ -113,6 +93,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue';
 import { PropType } from 'vue';
+import { tv } from '@/lib/tv';
 import { Command } from '../../types';
 import CustomButton from '../ui/CustomButton.vue';
 import CommandItem from './CommandItem.vue';
@@ -121,6 +102,8 @@ import TemplateCommandsModal from '../modals/TemplateCommandsModal.vue';
 import TemplatesIcon from '../icons/TemplatesIcon.vue';
 import AddIcon from '../icons/AddIcon.vue';
 import LightningIcon from '../icons/LightningIcon.vue';
+
+defineOptions({ name: 'CommandsTable' });
 
 const props = defineProps({
   commands: {
@@ -136,6 +119,28 @@ const props = defineProps({
 const emit = defineEmits<{
   (e: 'update:commands', value: Command[]): void;
 }>();
+
+const ui = tv({
+  slots: {
+    root: 'space-y-3',
+    header: 'flex items-center justify-between gap-2',
+    title: 'text-base font-semibold text-slate-900',
+    actions: 'flex items-center gap-1.5',
+    empty: 'text-center py-6',
+    emptyIconWrap:
+      'w-12 h-12 bg-slate-100 rounded-md flex items-center justify-center mx-auto mb-3',
+    emptyTitle: 'text-sm text-slate-500 mb-1',
+    emptyHint: 'text-xs text-slate-400',
+    list: 'space-y-3',
+    footer: [
+      'flex items-center justify-between gap-3 pt-3 pb-1.5 border-t border-slate-200',
+      'bg-slate-50/50 rounded-md px-3 -mx-1',
+    ],
+    footerTitle: 'text-sm font-semibold text-slate-800',
+    footerHint: 'text-xs text-slate-500 mt-0.5',
+    btnIcon: 'mr-1.5',
+  },
+})();
 
 const commands = computed({
   get: () => props.commands,

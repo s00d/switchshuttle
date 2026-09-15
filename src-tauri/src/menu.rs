@@ -15,7 +15,8 @@ use crate::settings::{command_is_blocked, AppSettings};
 use once_cell::sync::Lazy;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
-use tauri::{AppHandle, Manager, Wry, image::Image};
+use tauri::{AppHandle, Manager, Wry};
+use tauri::image::Image;
 use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_opener::OpenerExt;
 use log::{error, info};
@@ -295,7 +296,7 @@ pub fn create_system_tray_menu(
                 app,
                 &stop_menu_id(run_id),
                 &format!("⏹ {}", label),
-                "exit",
+                "stop",
                 None,
                 None,
             ));
@@ -305,7 +306,7 @@ pub fn create_system_tray_menu(
             app,
             STOP_ALL_MENU_ID,
             "Stop All",
-            "exit",
+            "stop",
             None,
             None,
         ));
@@ -315,9 +316,8 @@ pub fn create_system_tray_menu(
     tray_menu_builder = tray_menu_builder.separator();
 
     let edit_config_icon = Image::from_bytes(include_bytes!("../icons/edit.png")).unwrap();
-
-    let mut edit_config_submenu = tauri::menu::SubmenuBuilder::new(app, "Edit Config")
-        .submenu_icon(edit_config_icon);
+    let mut edit_config_submenu =
+        tauri::menu::SubmenuBuilder::new(app, "Edit Config").submenu_icon(edit_config_icon);
 
     for path in &config_manager.config_paths {
         let file_name = path.file_name().unwrap().to_string_lossy().to_string();
@@ -325,7 +325,7 @@ pub fn create_system_tray_menu(
             app,
             &format!("edit_{}", file_name),
             &file_name,
-            "edit",
+            "document",
             None,
             None,
         ));
@@ -568,6 +568,9 @@ pub fn update_system_tray_menu(
     if let Some(tray) = app.tray_by_id("switch-shuttle-tray") {
         if let Err(e) = tray.set_menu(Some(new_menu)) {
             error!("Failed to update tray menu: {}", e);
+        } else {
+            #[cfg(target_os = "macos")]
+            crate::macos_menu_icons::mark_tray_menu_icons_as_templates(&tray);
         }
     }
 }
