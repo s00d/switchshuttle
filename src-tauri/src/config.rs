@@ -1,8 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::PathBuf;
-use std::sync::atomic::{AtomicUsize, Ordering};
-use std::sync::Arc;
 use std::{fs, io};
 use tauri::{AppHandle, Wry};
 use tauri_plugin_dialog::DialogExt;
@@ -128,7 +126,6 @@ pub fn apply_inputs_to_command(cmd: &CommandConfig, inputs: &HashMap<String, Str
 pub struct ConfigManager {
     pub configs: Vec<Config>,
     pub config_paths: Vec<PathBuf>,
-    counter: Arc<AtomicUsize>,
 }
 
 impl ConfigManager {
@@ -136,13 +133,10 @@ impl ConfigManager {
         ConfigManager {
             configs: Vec::new(),
             config_paths: Vec::new(),
-            counter: Arc::new(AtomicUsize::new(0)),
         }
     }
 
     pub fn load_configs(&mut self, app: Option<&AppHandle<Wry>>) -> io::Result<()> {
-        self.counter = Arc::new(AtomicUsize::new(0));
-
         let config_path = get_config_path();
         let config_dir = config_path.parent().unwrap().to_path_buf();
 
@@ -187,7 +181,7 @@ impl ConfigManager {
                             config.enabled = Some(true);
                         }
 
-                        config.assign_ids(&self.counter);
+                        config.assign_ids();
                         self.config_paths.push(path);
                         self.configs.push(config);
                         has_configs = true;
@@ -218,7 +212,7 @@ impl ConfigManager {
             default_config.save(&default_config_path)?;
             default_config.title = "default_config".to_string();
             default_config.enabled.get_or_insert(true);
-            default_config.assign_ids(&self.counter);
+            default_config.assign_ids();
             self.config_paths.push(default_config_path);
             self.configs.push(default_config);
         }
@@ -420,9 +414,13 @@ impl Config {
         Ok(())
     }
 
-    pub fn assign_ids(&mut self, counter: &Arc<AtomicUsize>) {
-        for command in &mut self.commands {
-            command.assign_id(counter);
+    /// Id зависят только от файла конфига и позиции команды в нём: правка другого
+    /// конфига не перенумеровывает команды (открытое окно inputs, scheduler и фоновые
+    /// задачи продолжают указывать на ту же команду).
+    pub fn assign_ids(&mut self) {
+        let title = self.title.clone();
+        for (index, command) in self.commands.iter_mut().enumerate() {
+            command.assign_id(&title, &[index]);
         }
     }
 
@@ -465,12 +463,18 @@ impl CommandConfig {
         }
     }
 
-    fn assign_id(&mut self, counter: &Arc<AtomicUsize>) {
-        self.id = Some(format!("cmd_{}", counter.fetch_add(1, Ordering::SeqCst)));
+    fn assign_id(&mut self, config_title: &str, path: &[usize]) {
+        use std::hash::{Hash, Hasher};
+        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        config_title.hash(&mut hasher);
+        path.hash(&mut hasher);
+        self.id = Some(format!("cmd_{:016x}", hasher.finish()));
 
         if let Some(submenu) = &mut self.submenu {
-            for command in submenu {
-                command.assign_id(counter);
+            for (index, command) in submenu.iter_mut().enumerate() {
+                let mut child_path = path.to_vec();
+                child_path.push(index);
+                command.assign_id(config_title, &child_path);
             }
         }
     }
@@ -539,6 +543,35 @@ mod tests {
     }
 
     use super::*;
+
+    #[test]
+    fn ids_are_stable_and_unique_per_config() {
+        let mut nested = base_cmd("group");
+        nested.submenu = Some(vec![base_cmd("child1"), base_cmd("child2")]);
+        let mut config = Config::default_config();
+        config.title = "work".into();
+        config.commands = vec![base_cmd("a"), nested];
+        config.assign_ids();
+
+        let ids: Vec<String> = vec![
+            config.commands[0].id.clone().unwrap(),
+            config.commands[1].id.clone().unwrap(),
+            config.commands[1].submenu.as_ref().unwrap()[0].id.clone().unwrap(),
+            config.commands[1].submenu.as_ref().unwrap()[1].id.clone().unwrap(),
+        ];
+        let unique: std::collections::HashSet<_> = ids.iter().collect();
+        assert_eq!(unique.len(), ids.len());
+
+        // Тот же конфиг даёт те же id; другой файл — другие
+        let mut again = config.clone();
+        again.clear_ids();
+        again.assign_ids();
+        assert_eq!(again.commands[0].id, config.commands[0].id);
+        let mut other = config.clone();
+        other.title = "home".into();
+        other.assign_ids();
+        assert_ne!(other.commands[0].id, config.commands[0].id);
+    }
 
     fn base_cmd(name: &str) -> CommandConfig {
         CommandConfig {
