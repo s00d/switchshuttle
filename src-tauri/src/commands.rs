@@ -190,7 +190,7 @@ pub async fn execute_raw_command(
         &launch_in,
         &theme,
         &title,
-    );
+    )?;
     
     info!("=== execute_raw_command completed ===");
     Ok("Command executed successfully".to_string())

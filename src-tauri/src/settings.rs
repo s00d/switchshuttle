@@ -5,7 +5,54 @@ use std::path::PathBuf;
 use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_notification::{NotificationExt, PermissionState};
 use log::{error, info};
+use once_cell::sync::Lazy;
 use regex::Regex;
+use std::sync::RwLock;
+
+/// Последние загруженные/сохранённые настройки безопасности — для путей выполнения
+/// без доступа к Tauri state (консоль, планировщик, фоновые задачи, CLI).
+static SECURITY_CACHE: Lazy<RwLock<Option<SecuritySettings>>> = Lazy::new(|| RwLock::new(None));
+
+/// Шаблоны по умолчанию до v2.3.1: без границ слов (`dd\s+` ловил `git add .`).
+/// Если пользователь их не менял — заменяем на новые при загрузке.
+const LEGACY_SUSPICIOUS_PATTERNS: &[&str] = &[
+    r"rm\s+-rf", r"del\s+/s", r"format\s+c:", r"shutdown", r"halt", r"reboot", r"killall",
+    r"taskkill", r"sudo\s+", r"curl\s+", r"wget\s+", r"nc\s+", r"ncat\s+", r"scp\s+",
+    r"ftp\s+", r"powershell", r"chmod\s+777", r"chown\s+", r"dd\s+", r"mkfs", r"netcat",
+    r"base64\s+-d", r"openssl\s+",
+];
+
+fn default_suspicious_patterns() -> Vec<String> {
+    [
+        // rm -rf / -fr / -r -f / -Rf
+        r"\brm\s+(-\w+\s+)*-\w*[rR]\w*f|\brm\s+(-\w+\s+)*-\w*f\w*[rR]|\brm\s+(-\w+\s+)*-[rR]\s+(-\w+\s+)*-f|\brm\s+(-\w+\s+)*-f\s+(-\w+\s+)*-[rR]",
+        r"\bdel\s+/s",
+        r"\bformat\s+c:",
+        r"\bshutdown\b",
+        r"\bhalt\b",
+        r"\breboot\b",
+        r"\bkillall\b",
+        r"\btaskkill\b",
+        r"\bsudo\s+",
+        r"\bcurl\s+",
+        r"\bwget\s+",
+        r"\bnc\s+",
+        r"\bncat\s+",
+        r"\bscp\s+",
+        r"\bftp\s+",
+        r"\bpowershell\b",
+        r"\bchmod\s+777\b",
+        r"\bchown\s+",
+        r"\bdd\s+",
+        r"\bmkfs\b",
+        r"\bnetcat\b",
+        r"\bbase64\s+-d",
+        r"\bopenssl\s+",
+    ]
+    .iter()
+    .map(|p| p.to_string())
+    .collect()
+}
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AppSettings {
@@ -59,31 +106,7 @@ impl Default for AppSettings {
                     "format c:".to_string(),
                     "del /s /q".to_string(),
                 ],
-                suspicious_patterns: vec![
-                    r"rm\s+-rf".to_string(),
-                    r"del\s+/s".to_string(),
-                    r"format\s+c:".to_string(),
-                    r"shutdown".to_string(),
-                    r"halt".to_string(),
-                    r"reboot".to_string(),
-                    r"killall".to_string(),
-                    r"taskkill".to_string(),
-                    r"sudo\s+".to_string(),
-                    r"curl\s+".to_string(),
-                    r"wget\s+".to_string(),
-                    r"nc\s+".to_string(),
-                    r"ncat\s+".to_string(),
-                    r"scp\s+".to_string(),
-                    r"ftp\s+".to_string(),
-                    r"powershell".to_string(),
-                    r"chmod\s+777".to_string(),
-                    r"chown\s+".to_string(),
-                    r"dd\s+".to_string(),
-                    r"mkfs".to_string(),
-                    r"netcat".to_string(),
-                    r"base64\s+-d".to_string(),
-                    r"openssl\s+".to_string(),
-                ],
+                suspicious_patterns: default_suspicious_patterns(),
             },
         }
     }
@@ -100,7 +123,12 @@ impl AppSettings {
             merge_defaults(&mut value, &default);
             // Удаляем лишние поля
             remove_extra_fields(&mut value, &default);
-            let settings: AppSettings = serde_json::from_value(value)?;
+            let mut settings: AppSettings = serde_json::from_value(value)?;
+            if settings.security.suspicious_patterns == LEGACY_SUSPICIOUS_PATTERNS {
+                settings.security.suspicious_patterns = default_suspicious_patterns();
+                settings.save()?;
+            }
+            cache_security(&settings.security);
             Ok(settings)
         } else {
             let settings = AppSettings::default();
@@ -113,6 +141,7 @@ impl AppSettings {
         let settings_path = get_settings_path();
         let content = serde_json::to_string_pretty(self)?;
         fs::write(settings_path, content)?;
+        cache_security(&self.security);
         Ok(())
     }
 
@@ -422,6 +451,33 @@ pub fn get_settings_path() -> PathBuf {
 }
 
 /// Returns true when security checks are enabled and the command matches a blocklist or pattern.
+fn cache_security(security: &SecuritySettings) {
+    if let Ok(mut cache) = SECURITY_CACHE.write() {
+        *cache = Some(security.clone());
+    }
+}
+
+/// Первая заблокированная строка (сообщение для пользователя) или None.
+pub fn first_blocked_line(lines: &[String], security: &SecuritySettings) -> Option<String> {
+    lines
+        .iter()
+        .find(|line| command_is_blocked(line, security))
+        .map(|line| format!("Command blocked by security settings: {}", line))
+}
+
+/// Проверка по текущим сохранённым настройкам. Вызывается во всех точках запуска команд.
+pub fn ensure_lines_allowed(lines: &[String]) -> Result<(), String> {
+    let cached = SECURITY_CACHE.read().ok().and_then(|c| c.clone());
+    let security = match cached {
+        Some(security) => security,
+        None => AppSettings::load().unwrap_or_default().security,
+    };
+    match first_blocked_line(lines, &security) {
+        Some(msg) => Err(msg),
+        None => Ok(()),
+    }
+}
+
 pub fn command_is_blocked(command: &str, security: &SecuritySettings) -> bool {
     if !security.enable_security_checks {
         return false;
@@ -431,7 +487,12 @@ pub fn command_is_blocked(command: &str, security: &SecuritySettings) -> bool {
         return true;
     }
 
-    let lower = command.to_lowercase();
+    // Схлопываем пробелы, чтобы "rm  -rf /" не обходил литерал "rm -rf /"
+    let lower = command
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
+        .to_lowercase();
     for blocked in &security.blocked_commands {
         if !blocked.is_empty() && lower.contains(&blocked.to_lowercase()) {
             return true;
@@ -442,7 +503,7 @@ pub fn command_is_blocked(command: &str, security: &SecuritySettings) -> bool {
         if pattern.is_empty() {
             continue;
         }
-        match Regex::new(pattern) {
+        match Regex::new(&format!("(?i){}", pattern)) {
             Ok(re) if re.is_match(command) => return true,
             _ => {}
         }
@@ -507,6 +568,24 @@ mod tests {
             suspicious_patterns: vec![r"rm\s+-rf".into()],
         };
         assert!(!command_is_blocked("rm -rf /tmp", &security));
+    }
+
+    #[test]
+    fn default_patterns_match_whole_words_only() {
+        let security = AppSettings::default().security;
+        for ok in ["git add .", "yarn add x", "rsync -avz a b", "sftp host", "echo asphalt", "rm -r build", "rm -f file"] {
+            assert!(!command_is_blocked(ok, &security), "{:?} must be allowed", ok);
+        }
+        for bad in ["rm -rf /", "rm  -rf /", "rm -fr ~/x", "rm -r -f ~/x", "rm -Rf x", "sudo ls", "dd if=/dev/zero", "SHUTDOWN now"] {
+            assert!(command_is_blocked(bad, &security), "{:?} must be blocked", bad);
+        }
+    }
+
+    #[test]
+    fn legacy_patterns_are_recognized_for_migration() {
+        let legacy: Vec<String> = LEGACY_SUSPICIOUS_PATTERNS.iter().map(|p| p.to_string()).collect();
+        assert!(legacy == LEGACY_SUSPICIOUS_PATTERNS);
+        assert!(default_suspicious_patterns() != LEGACY_SUSPICIOUS_PATTERNS);
     }
 
     #[test]

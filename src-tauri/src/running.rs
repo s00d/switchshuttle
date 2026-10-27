@@ -62,6 +62,7 @@ impl ProcessRegistry {
         display_name: &str,
         shell_lines: &[String],
     ) -> Result<u64, String> {
+        crate::settings::ensure_lines_allowed(shell_lines)?;
         self.prune();
         if self.jobs.len() >= MAX_JOBS {
             return Err(format!(

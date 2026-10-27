@@ -11,7 +11,7 @@ use crate::menu_structure::SystemMenu;
 use crate::running::{
     self, parse_stop_menu_id, stop_menu_id, with_registry, ProcessRegistry, STOP_ALL_MENU_ID,
 };
-use crate::settings::{command_is_blocked, AppSettings};
+use crate::settings::{first_blocked_line, AppSettings};
 use once_cell::sync::Lazy;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
@@ -60,12 +60,7 @@ pub fn monitor_pause_resume_counts() -> (usize, usize) {
 }
 
 fn security_blocks_lines(lines: &[String], settings: &AppSettings) -> Option<String> {
-    for line in lines {
-        if command_is_blocked(line, &settings.security) {
-            return Some(format!("Command blocked by security settings: {}", line));
-        }
-    }
-    None
+    first_blocked_line(lines, &settings.security)
 }
 
 fn notify_error(app: &AppHandle<Wry>, body: &str) {
@@ -188,8 +183,7 @@ fn dispatch_user_command_inner(
                 &config.launch_in,
                 &config.theme,
                 &config.title,
-            );
-            Ok(())
+            )
         }
     }
 }

@@ -417,6 +417,7 @@ impl ConsoleInstance {
     /// Выполняет команду в постоянном инстансе консоли
     pub fn execute_command_silent(command: &str) -> Result<String, String> {
         info!("[Console] execute_command_silent: {}", command);
+        crate::settings::ensure_lines_allowed(&[command.to_string()])?;
         let mut console_guard = CONSOLE_INSTANCE.lock().unwrap();
         if let Some(ref mut console) = *console_guard {
             console.execute_command(command)
@@ -431,6 +432,7 @@ impl ConsoleInstance {
             "[Console] execute_command_via_pool: {} -> {}",
             command_id, command
         );
+        crate::settings::ensure_lines_allowed(&[command.to_string()])?;
         let mut pool_guard = CONSOLE_POOL.lock().unwrap();
         pool_guard.execute_command(command_id, command)
     }

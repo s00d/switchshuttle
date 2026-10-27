@@ -13,13 +13,17 @@ pub fn handle_cli_commands(matches: &Matches, config_manager: &Arc<Mutex<ConfigM
             if let Some((command_config, config)) = config_manager.find_command_by_id(command_value)
             {
                 // Command found by ID
-                execute_command(
+                if let Err(e) = execute_command(
                     command_config,
                     &config.terminal,
                     &config.launch_in,
                     &config.theme,
                     &config.title,
-                );
+                ) {
+                    error!("{}", e);
+                    eprintln!("{}", e);
+                    std::process::exit(1);
+                }
             } else {
                 // Try to find by name
                 let mut found = false;
@@ -33,13 +37,17 @@ pub fn handle_cli_commands(matches: &Matches, config_manager: &Arc<Mutex<ConfigM
 
                     for cmd in &config.commands {
                         if cmd.name.to_lowercase() == command_value.to_lowercase() {
-                            execute_command(
+                            if let Err(e) = execute_command(
                                 cmd,
                                 &config.terminal,
                                 &config.launch_in,
                                 &config.theme,
                                 &config.title,
-                            );
+                            ) {
+                                error!("{}", e);
+                                eprintln!("{}", e);
+                                std::process::exit(1);
+                            }
                             found = true;
                             break;
                         }

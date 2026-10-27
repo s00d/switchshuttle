@@ -689,7 +689,7 @@ pub fn execute_command(
     launch_in: &str,
     theme: &String,
     title: &String,
-) {
+) -> Result<(), String> {
     info!("=== execute_command called ===");
     info!("Command config: {:?}", command_config);
     info!("Terminal: '{}'", terminal);
@@ -713,10 +713,12 @@ pub fn execute_command(
     // Проверяем, что есть команды для выполнения
     if commands_to_execute.is_empty() {
         info!("No commands to execute, skipping");
-        return;
+        return Ok(());
     }
 
     info!("Commands to execute: {:?}", commands_to_execute);
+
+    crate::settings::ensure_lines_allowed(&commands_to_execute)?;
 
     let terminal = terminal.to_lowercase();
     let launch_in = launch_in.to_lowercase();
@@ -725,7 +727,7 @@ pub fn execute_command(
     if !is_terminal_supported(&terminal) {
         error!("Unsupported terminal: {}", terminal);
         error!("Available terminals: {:?}", get_available_terminals());
-        return;
+        return Err(format!("Unsupported terminal: {}", terminal));
     }
 
     if !is_launch_option_supported(&launch_in) {
@@ -734,12 +736,13 @@ pub fn execute_command(
             "Available launch options: {:?}",
             get_available_launch_options()
         );
-        return;
+        return Err(format!("Unsupported launch option: {}", launch_in));
     }
 
     info!("=== Calling execute_command_impl ===");
     execute_command_impl(&commands_to_execute, &terminal, &launch_in, theme, title);
     info!("=== execute_command completed ===");
+    Ok(())
 }
 
 #[cfg(test)]
@@ -829,7 +832,7 @@ mod tests {
         };
 
         let (_, launches) = with_mocked_terminal_launches(|| {
-            execute_command(
+            let _ = execute_command(
                 &config,
                 "terminal",
                 "current",
@@ -858,7 +861,7 @@ mod tests {
         };
 
         let (_, launches) = with_mocked_terminal_launches(|| {
-            execute_command(
+            let _ = execute_command(
                 &config,
                 "terminal",
                 "current",
@@ -896,7 +899,7 @@ mod tests {
         };
 
         let (_, launches) = with_mocked_terminal_launches(|| {
-            execute_command(
+            let _ = execute_command(
                 &config,
                 "terminal",
                 "current",
@@ -925,7 +928,7 @@ mod tests {
         };
 
         let (_, launches) = with_mocked_terminal_launches(|| {
-            execute_command(
+            let _ = execute_command(
                 &config,
                 "unsupported-terminal",
                 "current",
@@ -954,7 +957,7 @@ mod tests {
         };
 
         let (_, launches) = with_mocked_terminal_launches(|| {
-            execute_command(
+            let _ = execute_command(
                 &config,
                 "terminal",
                 "unsupported",
