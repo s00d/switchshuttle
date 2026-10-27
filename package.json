@@ -14,7 +14,6 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
-    "tauri:dev:fast": "CARGO_INCREMENTAL=1 RUSTFLAGS='-C target-cpu=native' tauri dev",
     "tauri:build": "tauri build",
     "test": "vitest",
     "test:ui": "vitest --ui",
