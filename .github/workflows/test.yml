@@ -1,0 +1,61 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macos-latest, ubuntu-22.04, windows-latest]
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 9.15.4
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install dependencies (Ubuntu only)
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Also produces ../dist, which tauri::generate_context! needs at compile time
+      - name: Build frontend (type-check + vite)
+        run: pnpm build
+
+      - name: Lint
+        if: matrix.platform == 'ubuntu-22.04'
+        run: pnpm lint
+
+      - name: Frontend tests
+        if: matrix.platform == 'ubuntu-22.04'
+        run: pnpm vitest run
+
+      - name: Rust tests
+        working-directory: src-tauri
+        run: cargo test

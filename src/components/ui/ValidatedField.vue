@@ -19,13 +19,11 @@ import { validatedFieldTv } from './themes';
 defineOptions({ name: 'ValidatedField' });
 
 export interface ValidationRule {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   test: (value: any) => boolean;
   message: string;
 }
 
 interface Props {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   modelValue: any;
   rules?: ValidationRule[];
   validateOnInput?: boolean;
@@ -39,7 +37,6 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (e: 'update:modelValue', value: any): void;
   (e: 'validation', result: { isValid: boolean; error: string }): void;
 }>();
@@ -47,7 +44,6 @@ const emit = defineEmits<{
 const ui = validatedFieldTv();
 const error = ref<string>('');
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const validate = (value: any): { isValid: boolean; error: string } => {
   for (const rule of props.rules) {
     if (!rule.test(value)) {
@@ -62,7 +58,6 @@ const validate = (value: any): { isValid: boolean; error: string } => {
 
 const isValid = computed(() => !error.value);
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const updateValue = (newValue: any) => {
   emit('update:modelValue', newValue);
 
