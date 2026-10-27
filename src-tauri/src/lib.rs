@@ -69,41 +69,32 @@ pub fn run() {
                     );
 
                     if event.state() == ShortcutState::Released {
-                        // Получаем зарегистрированные хоткеи
-                        let hotkey_manager = app.state::<Arc<Mutex<HotkeyManager>>>();
+                        // Сначала HotkeyManager (отпускаем), потом ConfigManager:
+                        // везде порядок ConfigManager → HotkeyManager, держать оба нельзя.
+                        let hotkey_str = app
+                            .state::<Arc<Mutex<HotkeyManager>>>()
+                            .lock()
+                            .unwrap()
+                            .hotkey_for_shortcut(shortcut);
+                        let Some(hotkey_str) = hotkey_str else {
+                            return;
+                        };
+
                         let config_manager = app.state::<Arc<Mutex<ConfigManager>>>();
-                        let hotkey_manager = hotkey_manager.lock().unwrap();
                         let config_manager = config_manager.lock().unwrap();
-
-                        // Ищем строку хоткея по shortcut
-                        let hotkey_str = hotkey_manager
-                            .registered_hotkeys
-                            .iter()
-                            .find(|(_, registered_shortcut)| *registered_shortcut == shortcut)
-                            .map(|(key, _)| key.as_str());
-
-                        if let Some(hotkey_str) = hotkey_str {
-                            // Ищем команду по хоткею
-                            if let Some((command, _config)) = hotkey_manager
-                                .find_command_by_hotkey(hotkey_str, &config_manager.configs)
-                            {
-                                if let Some(id) = &command.id {
-                                    info!(
-                                        "[Hotkeys] Executing command: {} (id: {})",
-                                        command.name, id
-                                    );
-
-                                    // Выполняем команду напрямую через единую функцию
-                                    if let Err(e) = execute_command_by_id(&app, id, &config_manager)
-                                    {
-                                        error!("[Hotkeys] Failed to execute command: {}", e);
-                                    } else {
-                                        info!("[Hotkeys] Successfully executed command: {}", id);
-                                    }
-                                } else {
-                                    error!("[Hotkeys] Command has no ID: {}", command.name);
-                                }
-                            }
+                        let Some((command, _config)) = crate::hotkeys::find_enabled_command_by_hotkey(
+                            &config_manager.configs,
+                            &hotkey_str,
+                        ) else {
+                            return;
+                        };
+                        let Some(id) = &command.id else {
+                            error!("[Hotkeys] Command has no ID: {}", command.name);
+                            return;
+                        };
+                        info!("[Hotkeys] Executing command: {} (id: {})", command.name, id);
+                        if let Err(e) = execute_command_by_id(&app, id, &config_manager) {
+                            error!("[Hotkeys] Failed to execute command: {}", e);
                         }
                     }
                 })
@@ -215,10 +206,10 @@ pub fn run() {
             // ПЕРВИЧНАЯ РЕГИСТРАЦИЯ ГЛОБАЛЬНЫХ ХОТКЕЕВ ПРИ ЗАПУСКЕ
             info!("[Hotkeys] PRIMARY registration of all hotkeys at app startup");
             {
+                // Копия конфигов до блокировки HotkeyManager — без вложенных блокировок
+                let configs = config_manager_clone.lock().unwrap().configs.clone();
                 let mut hotkey_manager = hotkey_manager_clone.lock().unwrap();
                 hotkey_manager.set_app_handle(app.handle().clone());
-                // Регистрируем все хоткеи из конфигураций
-                let configs = config_manager_clone.lock().unwrap().configs.clone();
                 if let Err(e) =
                     hotkey_manager.register_all_hotkeys(&configs, &app.handle(), &settings_clone)
                 {

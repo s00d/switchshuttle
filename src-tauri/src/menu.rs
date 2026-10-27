@@ -465,6 +465,7 @@ pub fn handle_system_tray_event(
                 .load_configs(Some(&app))
                 .expect("Failed to reload configs");
             update_system_tray_menu(app, &config_manager, TrayRefresh::Full);
+            crate::hotkeys::reregister_hotkeys(app, &config_manager.configs);
         }
         "edit_config" => open_in_default_editor(&config_path),
         "open_config_folder" => {

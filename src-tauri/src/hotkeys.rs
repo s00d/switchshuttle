@@ -2,7 +2,7 @@ use crate::config::{CommandConfig, Config};
 use crate::settings::AppSettings;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut};
 use log::{error, info};
 
@@ -13,13 +13,40 @@ pub struct HotkeyConflict {
     pub commands: Vec<String>,
 }
 
-/// Проверяет конфликты горячих клавиш между конфигурациями
+fn is_enabled(config: &Config) -> bool {
+    config.enabled != Some(false)
+}
+
+/// Перерегистрирует все хоткеи по текущим конфигам. Вызывать после каждой перезагрузки
+/// конфигов. Порядок блокировок: ConfigManager (у вызывающего) → HotkeyManager.
+pub fn reregister_hotkeys(app: &AppHandle, configs: &[Config]) {
+    let hotkey_state = app.state::<Arc<Mutex<HotkeyManager>>>();
+    let settings_state = app.state::<Arc<Mutex<AppSettings>>>();
+    let mut hotkey_manager = hotkey_state.lock().unwrap();
+    hotkey_manager.set_app_handle(app.clone());
+    if let Err(e) = hotkey_manager.register_all_hotkeys(configs, app, &settings_state) {
+        error!("[Hotkeys] Failed to re-register hotkeys: {}", e);
+    }
+}
+
+/// Команда с этим хоткеем во включённых конфигах.
+pub fn find_enabled_command_by_hotkey<'a>(
+    configs: &'a [Config],
+    hotkey: &str,
+) -> Option<(&'a CommandConfig, &'a Config)> {
+    configs
+        .iter()
+        .filter(|config| is_enabled(config))
+        .find_map(|config| find_command_by_hotkey(&config.commands, hotkey).map(|cmd| (cmd, config)))
+}
+
+/// Проверяет конфликты горячих клавиш между включёнными конфигурациями
 pub fn check_hotkey_conflicts(configs: &[Config]) -> Vec<HotkeyConflict> {
     let mut hotkey_map: HashMap<String, Vec<(String, String)>> = HashMap::new();
     let mut conflicts = Vec::new();
 
     // Собираем все горячие клавиши из всех конфигураций
-    for config in configs {
+    for config in configs.iter().filter(|config| is_enabled(config)) {
         let config_name = &config.title;
 
         // Проверяем hotkey в командах
@@ -220,12 +247,9 @@ impl HotkeyManager {
         }
 
         for config in configs {
-            // Пропускаем отключенные конфигурации
-            if let Some(enabled) = config.enabled {
-                if !enabled {
-                    info!("[Hotkeys] Skipping disabled config: {}", config.title);
-                    continue;
-                }
+            if !is_enabled(config) {
+                info!("[Hotkeys] Skipping disabled config: {}", config.title);
+                continue;
             }
 
             // Регистрируем хоткеи для команд
@@ -273,24 +297,12 @@ impl HotkeyManager {
         Ok(())
     }
 
-    /// Находит команду по хоткею в зарегистрированных хоткеях
-    pub fn find_command_by_hotkey<'a>(
-        &self,
-        hotkey_str: &str,
-        configs: &'a [Config],
-    ) -> Option<(&'a CommandConfig, &'a Config)> {
-        // Проверяем, есть ли этот хоткей в зарегистрированных
-        if !self.registered_hotkeys.contains_key(hotkey_str) {
-            return None;
-        }
-
-        // Ищем команду с этим хоткеем
-        for config in configs {
-            if let Some(command) = find_command_by_hotkey(&config.commands, hotkey_str) {
-                return Some((command, config));
-            }
-        }
-        None
+    /// Строка хоткея, под которой зарегистрирован shortcut
+    pub fn hotkey_for_shortcut(&self, shortcut: &Shortcut) -> Option<String> {
+        self.registered_hotkeys
+            .iter()
+            .find(|(_, registered)| *registered == shortcut)
+            .map(|(hotkey, _)| hotkey.clone())
     }
 
     /// Парсит строку хоткея в Shortcut
@@ -395,5 +407,61 @@ impl HotkeyManager {
 impl Default for HotkeyManager {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn command(name: &str, hotkey: &str) -> CommandConfig {
+        CommandConfig {
+            id: Some(format!("id_{}", name)),
+            name: name.into(),
+            inputs: None,
+            command: None,
+            commands: Some(vec!["true".into()]),
+            hotkey: Some(hotkey.into()),
+            submenu: None,
+            switch: None,
+            monitor: None,
+            icon: None,
+            scheduler: None,
+            background: None,
+        }
+    }
+
+    fn config(title: &str, enabled: Option<bool>, commands: Vec<CommandConfig>) -> Config {
+        Config {
+            terminal: "iterm".into(),
+            launch_in: "current".into(),
+            theme: "default".into(),
+            title: title.into(),
+            commands,
+            menu_hotkey: None,
+            enabled,
+        }
+    }
+
+    #[test]
+    fn disabled_config_is_ignored_for_lookup_and_conflicts() {
+        // Выключенный конфиг идёт первым и делит хоткей с включённым
+        let configs = vec![
+            config("a_off", Some(false), vec![command("old", "Ctrl+Shift+K")]),
+            config("b_on", None, vec![command("new", "Ctrl+Shift+K")]),
+        ];
+        let (found, owner) = find_enabled_command_by_hotkey(&configs, "Ctrl+Shift+K").unwrap();
+        assert_eq!(found.name, "new");
+        assert_eq!(owner.title, "b_on");
+        assert!(check_hotkey_conflicts(&configs).is_empty());
+    }
+
+    #[test]
+    fn conflicts_between_enabled_configs_are_reported() {
+        let configs = vec![
+            config("a", Some(true), vec![command("one", "Ctrl+Shift+K")]),
+            config("b", None, vec![command("two", "Ctrl+Shift+K")]),
+        ];
+        assert_eq!(check_hotkey_conflicts(&configs).len(), 1);
     }
 }

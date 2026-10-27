@@ -4,13 +4,12 @@ use serde::{Deserialize};
 use serde_json::json;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use tauri::{Manager, State};
+use tauri::State;
 use log::{error, info, warn};
 
 use crate::config::{config_file_path, CommandConfig, Config, ConfigManager};
 use crate::execute::{execute_command, get_terminals, TerminalConfig};
 use crate::helpers::{get_config_path, open_folder_in_default_explorer, open_in_default_editor};
-use crate::hotkeys::HotkeyManager;
 use crate::settings::AppSettings;
 
 #[derive(Deserialize)]
@@ -466,21 +465,8 @@ pub fn save_or_update_configuration(
         .load_configs(None)
         .map_err(|e| format!("Failed to reload configurations: {}", e))?;
 
-    // Обновляем меню в трее
-    update_tray_menu_from_commands(&app, &config_manager)?;
-
-    // Перерегистрируем хоткеи
-    let hotkey_manager = app.state::<Arc<Mutex<HotkeyManager>>>();
-    let settings_state = app.state::<Arc<Mutex<AppSettings>>>();
-    let mut hotkey_manager = hotkey_manager.lock().unwrap();
-    hotkey_manager.set_app_handle(app.clone());
-    if let Err(e) =
-        hotkey_manager.register_all_hotkeys(&config_manager.configs, &app, &settings_state)
-    {
-        error!("Failed to reregister hotkeys after save: {}", e);
-    }
-
-    Ok(())
+    // Обновляем меню в трее и хоткеи
+    update_tray_menu_from_commands(&app, &config_manager)
 }
 
 fn generate_unique_title(
@@ -745,6 +731,8 @@ fn update_tray_menu_from_commands(
     use crate::menu::{update_system_tray_menu, TrayRefresh};
 
     update_system_tray_menu(app, config_manager, TrayRefresh::Full);
+    // Конфиги перезагружены: хоткеи удалённых/выключенных команд освобождаем, новые — регистрируем
+    crate::hotkeys::reregister_hotkeys(app, &config_manager.configs);
     Ok(())
 }
 
