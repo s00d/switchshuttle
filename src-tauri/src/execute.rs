@@ -921,32 +921,49 @@ mod tests {
     #[cfg(target_os = "macos")]
     #[test]
     fn scripts_compile_with_tricky_command_and_title() {
-        let command = r#"echo "a\"b" 'c' $HOME {title} \t"#;
-        let title = r#"My "Dev" \ tools"#;
         let out = std::env::temp_dir().join("switchshuttle-script-check.scpt");
-        for file in SCRIPTS_DIR.files() {
-            let name = file.path().to_string_lossy();
-            if !name.ends_with(".scpt") {
-                continue;
-            }
-            let script = fill_template(
-                file.contents_utf8().unwrap(),
+        let compiles = |script: &str| {
+            std::process::Command::new("osacompile")
+                .arg("-o")
+                .arg(&out)
+                .arg("-e")
+                .arg(script)
+                .output()
+                .expect("osacompile")
+                .status
+                .success()
+        };
+        let fill = |content: &str, command: &str, title: &str| {
+            fill_template(
+                content,
                 &[
                     ("{command}", &applescript_escape(command)),
                     ("{theme}", &applescript_escape("default")),
                     ("{title}", &applescript_escape(title)),
                 ],
-            );
-            let status = std::process::Command::new("osacompile")
-                .arg("-o")
-                .arg(&out)
-                .arg("-e")
-                .arg(&script)
-                .status()
-                .expect("osacompile");
-            assert!(status.success(), "{} does not compile:\n{}", name, script);
+            )
+        };
+
+        let mut checked = 0;
+        for file in SCRIPTS_DIR.files() {
+            let name = file.path().to_string_lossy();
+            if !name.ends_with(".scpt") {
+                continue;
+            }
+            let content = file.contents_utf8().unwrap();
+            // Терминологию `tell application "iTerm"` даёт само приложение: без него
+            // (CI) скрипт не компилируется даже с безобидной командой — пропускаем
+            if !compiles(&fill(content, "echo ok", "ok")) {
+                eprintln!("skip {}: app not installed", name);
+                continue;
+            }
+            let script = fill(content, r#"echo "a\"b" 'c' $HOME {title} \t"#, r#"My "Dev" \ tools"#);
+            assert!(compiles(&script), "{} does not compile:\n{}", name, script);
+            checked += 1;
         }
         let _ = std::fs::remove_file(out);
+        // Terminal.app есть на любом macOS
+        assert!(checked >= 3, "only {} scripts checked", checked);
     }
 
     #[test]
