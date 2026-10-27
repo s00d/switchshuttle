@@ -22,7 +22,7 @@
                 :name="key"
                 :placeholder="`Enter ${String(key).toLowerCase()}`"
                 :class="ui.input()"
-                @keydown.enter="submitForm"
+                @keydown.enter.prevent="submitForm"
               />
               <div :class="ui.dotWrap()">
                 <div :class="ui.dot()" />
@@ -115,7 +115,8 @@ const previewCommand = computed(() => {
   let preview = commandTemplate.value;
 
   Object.entries(inputs.value).forEach(([key, value]) => {
-    const placeholder = `{${key}}`;
+    // Бэкенд подставляет [key] (apply_input_placeholders)
+    const placeholder = `[${key}]`;
     if (preview.includes(placeholder)) {
       preview = preview.replace(
         new RegExp(placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
