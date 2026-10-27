@@ -619,12 +619,14 @@ pub fn is_launch_option_supported(launch_in: &str) -> bool {
 }
 
 /// Экранирование для строкового литерала AppleScript ("...").
+#[cfg_attr(not(target_os = "macos"), allow(dead_code))]
 pub fn applescript_escape(value: &str) -> String {
     value.replace('\\', "\\\\").replace('"', "\\\"")
 }
 
 /// Подстановка `{key}` за один проход: значение не может подставиться повторно
 /// (`{title}` внутри команды остаётся как есть).
+#[cfg_attr(not(target_os = "macos"), allow(dead_code))]
 pub fn fill_template(template: &str, values: &[(&str, &str)]) -> String {
     let mut out = String::with_capacity(template.len());
     let mut rest = template;
