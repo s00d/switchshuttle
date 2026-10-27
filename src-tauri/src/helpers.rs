@@ -7,30 +7,30 @@ use tauri::path::BaseDirectory;
 use tauri::{AppHandle, Manager, WebviewWindowBuilder, Wry};
 use log::{error, info};
 
-pub fn open_in_default_editor(path: &PathBuf) {
+/// Открывает файл или папку в приложении по умолчанию (не ждёт, не паникует).
+fn open_with_system(path: &PathBuf) {
     #[cfg(target_os = "macos")]
-    {
-        Command::new("open")
-            .arg(path)
-            .spawn()
-            .expect("Failed to open file in default editor");
-    }
-
+    let opener = "open";
+    // explorer открывает и папки, и файлы (в связанном приложении); с `cmd /C start`
+    // путь с пробелами в кавычках становился заголовком окна
     #[cfg(target_os = "windows")]
-    {
-        Command::new("cmd")
-            .args(&["/C", "start", path.to_str().unwrap()])
-            .spawn()
-            .expect("Failed to open file in default editor");
-    }
+    let opener = "explorer";
+    #[cfg(not(any(target_os = "macos", target_os = "windows")))]
+    let opener = "xdg-open";
 
-    #[cfg(target_os = "linux")]
-    {
-        Command::new("xdg-open")
-            .arg(path)
-            .spawn()
-            .expect("Failed to open file in default editor");
+    match Command::new(opener).arg(path).spawn() {
+        Ok(mut child) => {
+            // Забираем код выхода, чтобы не копить зомби
+            std::thread::spawn(move || {
+                let _ = child.wait();
+            });
+        }
+        Err(e) => error!("Failed to open {} with {}: {}", path.display(), opener, e),
     }
+}
+
+pub fn open_in_default_editor(path: &PathBuf) {
+    open_with_system(path);
 }
 
 pub fn get_config_path() -> PathBuf {
@@ -42,29 +42,7 @@ pub fn get_config_path() -> PathBuf {
 }
 
 pub fn open_folder_in_default_explorer(path: &PathBuf) {
-    #[cfg(target_os = "macos")]
-    {
-        Command::new("open")
-            .arg(path)
-            .spawn()
-            .expect("Failed to open folder in default explorer");
-    }
-
-    #[cfg(target_os = "windows")]
-    {
-        Command::new("explorer")
-            .arg(path)
-            .spawn()
-            .expect("Failed to open folder in default explorer");
-    }
-
-    #[cfg(target_os = "linux")]
-    {
-        Command::new("xdg-open")
-            .arg(path)
-            .spawn()
-            .expect("Failed to open folder in default explorer");
-    }
+    open_with_system(path);
 }
 
 pub fn create_window(

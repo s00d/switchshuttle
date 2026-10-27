@@ -153,7 +153,7 @@ pub fn run() {
             }
 
             let autostart_manager = app.autolaunch();
-            let enabled = autostart_manager.is_enabled().unwrap();
+            let enabled = autostart_manager.is_enabled().unwrap_or(false);
             let system_tray_menu = create_system_tray_menu(
                 app.handle(),
                 enabled,

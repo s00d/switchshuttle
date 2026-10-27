@@ -103,14 +103,11 @@ fn dispatch_user_command_inner(
 
     match crate::config::execution_target(command) {
         crate::config::ExecutionTarget::OpenInputs => {
-            let label = if command.switch.is_some() {
-                "inputs"
-            } else {
-                "main"
-            };
+            // Своё окно: раньше обычные команды открывали inputs в окне редактора ("main")
+            // и затирали несохранённые правки
             create_window(
                 app,
-                label,
+                "inputs",
                 "SwitchShuttle - Provide Inputs",
                 &format!("/inputs/{}", command.id.as_ref().unwrap()),
                 400.0,
@@ -461,9 +458,9 @@ pub fn handle_system_tray_event(
         }
         "refresh_configurations" => {
             let mut config_manager = config_manager.lock().unwrap();
-            config_manager
-                .load_configs(Some(&app))
-                .expect("Failed to reload configs");
+            if let Err(e) = config_manager.load_configs(Some(&app)) {
+                notify_error(app, &format!("Failed to reload configs: {}", e));
+            }
             update_system_tray_menu(app, &config_manager, TrayRefresh::Full);
             crate::hotkeys::reregister_hotkeys(app, &config_manager.configs);
         }
@@ -486,18 +483,33 @@ pub fn handle_system_tray_event(
         }
         "toggle_launch_at_login" => {
             let autostart_manager = app.autolaunch();
-            let enabled = autostart_manager.is_enabled().unwrap();
-            if enabled {
-                autostart_manager.disable().unwrap();
+            let enable = !autostart_manager.is_enabled().unwrap_or(false);
+            let result = if enable {
+                autostart_manager.enable()
             } else {
-                autostart_manager.enable().unwrap();
+                autostart_manager.disable()
+            };
+            match result {
+                Ok(()) => {
+                    // Иначе при следующем запуске settings.apply() вернёт старое значение
+                    if let Some(state) = app.try_state::<Arc<Mutex<AppSettings>>>() {
+                        let mut settings = state.lock().unwrap();
+                        settings.general.auto_start = enable;
+                        if let Err(e) = settings.save() {
+                            error!("Failed to save auto_start setting: {}", e);
+                        }
+                    }
+                }
+                Err(e) => notify_error(app, &format!("Failed to change Launch at Login: {}", e)),
             }
             update_system_tray_menu(app, &config_manager.lock().unwrap(), TrayRefresh::Full);
         }
         "homepage" => {
             let homepage_url = "https://github.com/s00d/SwitchShuttle";
             let opener = app.opener();
-            opener.open_url(homepage_url, None::<&str>).unwrap();
+            if let Err(e) = opener.open_url(homepage_url, None::<&str>) {
+                error!("Failed to open homepage: {}", e);
+            }
         }
         "open_devtools" => {
             if cfg!(debug_assertions) {
