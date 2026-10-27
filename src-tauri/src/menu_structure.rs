@@ -315,30 +315,39 @@ impl MenuItem {
                 thread::spawn(move || {
                     error!("[Scheduler] Starting scheduler for item: {}", id);
 
-                    let cron_expr = match cron::Schedule::from_str(&schedule) {
-                        Ok(schedule) => schedule,
+                    let cron_expr = match parse_cron(&schedule) {
+                        Ok(expr) => expr,
                         Err(e) => {
-                            error!("[Scheduler] Failed to parse cron expression '{}': {}", schedule, e);
-                            cron::Schedule::from_str("0 * * * * *").unwrap()
+                            // Не подменяем на "каждую минуту": неверный cron не должен запускать команду.
+                            error!("[Scheduler] Invalid cron expression '{}': {} — scheduler disabled", schedule, e);
+                            return;
                         }
                     };
 
                     info!("[Scheduler] Parsed cron expression: {}", schedule);
 
+                    // Последний запуск: следующий ищем строго после него, чтобы не сработать дважды
+                    // на одну и ту же отметку времени, если проснулись чуть раньше.
+                    let mut last_fired: Option<chrono::DateTime<chrono::Local>> = None;
+
                     while !stop_flag.load(Ordering::Relaxed) {
-                        let now = chrono::Utc::now();
-                        let next = cron_expr.after(&now).next();
+                        let now = chrono::Local::now();
+                        let from = last_fired.map_or(now, |last| last.max(now));
+                        let next = cron_expr.after(&from).next();
 
                         if let Some(next_time) = next {
-                            let wait_duration = next_time.signed_duration_since(now);
-                            let wait_seconds = wait_duration.num_seconds().max(0) as u64;
+                            let wait = next_time
+                                .signed_duration_since(now)
+                                .to_std()
+                                .unwrap_or(Duration::ZERO);
 
-                            info!("[Scheduler] Next execution at: {}, waiting {} seconds", next_time, wait_seconds);
+                            info!("[Scheduler] Next execution at: {}, waiting {:?}", next_time, wait);
 
-                            thread::sleep(Duration::from_secs(wait_seconds));
+                            thread::sleep(wait);
                             if stop_flag.load(Ordering::Relaxed) {
                                 break;
                             }
+                            last_fired = Some(next_time);
 
                             if let Some(cmds) = &commands {
                                 if background == Some(true) {
@@ -880,6 +889,17 @@ fn collect_scheduler_command_ids(commands: &[crate::config::CommandConfig]) -> V
         .collect()
 }
 
+/// Парсит cron: 6/7 полей как есть (с секундами), классические 5 полей — с секундой 0.
+pub fn parse_cron(expr: &str) -> Result<cron::Schedule, String> {
+    let trimmed = expr.trim();
+    let normalized = if trimmed.split_whitespace().count() == 5 {
+        format!("0 {}", trimmed)
+    } else {
+        trimmed.to_string()
+    };
+    cron::Schedule::from_str(&normalized).map_err(|e| e.to_string())
+}
+
 /// Enum для представления различных типов элементов меню
 pub enum MenuItemOrSubmenu {
     Submenu(TauriSubmenu<Wry>),
@@ -919,6 +939,17 @@ mod tests {
         root.submenu = Some(vec![mid]);
         let ids = collect_scheduler_command_ids(&[root]);
         assert_eq!(ids, vec!["cmd_nested".to_string()]);
+    }
+
+    #[test]
+    fn parse_cron_accepts_five_and_six_fields() {
+        let five = parse_cron("0 2 * * *").unwrap();
+        let six = parse_cron("0 0 2 * * *").unwrap();
+        let base = chrono::Utc::now();
+        assert_eq!(five.after(&base).next(), six.after(&base).next());
+        assert!(parse_cron("*/5 * * * *").is_ok());
+        assert!(parse_cron("not a cron").is_err());
+        assert!(parse_cron("").is_err());
     }
 
     #[test]
