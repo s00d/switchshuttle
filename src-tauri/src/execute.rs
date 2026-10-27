@@ -17,7 +17,7 @@ pub struct TerminalLaunch {
 
 /// Runs a terminal helper (`osascript`, `cmd`, …). In unit tests this is mocked
 /// via [`with_mocked_terminal_launches`] so real apps never open.
-fn run_terminal_process(executable: &str, args: &[String]) -> Result<bool, String> {
+fn run_terminal_process(executable: &str, args: &[String]) -> Result<(), String> {
     #[cfg(test)]
     {
         let mocked = TEST_LAUNCH_HOOK.with(|hook| {
@@ -32,15 +32,36 @@ fn run_terminal_process(executable: &str, args: &[String]) -> Result<bool, Strin
             }
         });
         if mocked {
-            return Ok(true);
+            return Ok(());
         }
     }
 
-    let status = Command::new(executable)
-        .args(args)
-        .status()
+    let mut command = Command::new(executable);
+    #[cfg(windows)]
+    {
+        use std::os::windows::process::CommandExt;
+        if executable == "cmd" && args.first().map(String::as_str) == Some("/C") {
+            // cmd.exe разбирает строку сам; экранирование Rust (\") он не понимает
+            command.arg("/C").raw_arg(args[1..].join(" "));
+        } else {
+            command.args(args);
+        }
+    }
+    #[cfg(not(windows))]
+    command.args(args);
+
+    // Не ждём завершения: терминал (Linux) живёт, пока открыто окно, а osascript с delay
+    // блокировал бы главный поток. Код выхода забираем в фоне, чтобы не было зомби.
+    let mut child = command
+        .spawn()
         .map_err(|e| format!("Failed to execute {}: {}", executable, e))?;
-    Ok(status.success())
+    let executable = executable.to_string();
+    std::thread::spawn(move || match child.wait() {
+        Ok(status) if !status.success() => error!("{} exited with {}", executable, status),
+        Err(e) => error!("Failed to wait for {}: {}", executable, e),
+        _ => {}
+    });
+    Ok(())
 }
 
 #[cfg(test)]
@@ -191,8 +212,9 @@ fn get_windows_terminals() -> HashMap<&'static str, TerminalConfig> {
         "wsl",
         TerminalConfig {
             name: "WSL",
-            executable: "wsl",
-            current_args: vec!["-e", "bash", "-c", "{command}"],
+            // Через cmd во всех режимах: "/C start ..." — аргументы cmd.exe, не wsl.exe
+            executable: "cmd",
+            current_args: vec!["/C", "wsl -e bash -c \"{command}\""],
             new_tab_args: vec!["/C", "start wsl -e bash -c \"{command}\""],
             new_window_args: vec!["/C", "start wsl -e bash -c \"{command}\""],
             icon: "🐧",
@@ -204,8 +226,8 @@ fn get_windows_terminals() -> HashMap<&'static str, TerminalConfig> {
         "powershell",
         TerminalConfig {
             name: "PowerShell",
-            executable: "powershell",
-            current_args: vec!["-Command", "{command}"],
+            executable: "cmd",
+            current_args: vec!["/C", "powershell -Command \"{command}\""],
             new_tab_args: vec!["/C", "start powershell -Command \"{command}\""],
             new_window_args: vec!["/C", "start powershell -Command \"{command}\""],
             icon: "💻",
@@ -263,11 +285,11 @@ fn get_windows_terminals() -> HashMap<&'static str, TerminalConfig> {
             ],
             new_tab_args: vec![
                 "/C",
-                "start \"C:\\Program Files\\Git\\bin\\bash.exe\" -c \"{command}\"",
+                "start \"\" \"C:\\Program Files\\Git\\bin\\bash.exe\" -c \"{command}\"",
             ],
             new_window_args: vec![
                 "/C",
-                "start \"C:\\Program Files\\Git\\bin\\bash.exe\" -c \"{command}\"",
+                "start \"\" \"C:\\Program Files\\Git\\bin\\bash.exe\" -c \"{command}\"",
             ],
             icon: "🐧",
         },
@@ -357,7 +379,8 @@ fn get_linux_terminals() -> HashMap<&'static str, TerminalConfig> {
             executable: "konsole",
             current_args: vec!["-e", "bash", "-c", "{command}"],
             new_tab_args: vec!["--new-tab", "-e", "bash", "-c", "{command}"],
-            new_window_args: vec!["--new-window", "-e", "bash", "-c", "{command}"],
+            // У konsole нет --new-window: новое окно открывается по умолчанию
+            new_window_args: vec!["-e", "bash", "-c", "{command}"],
             icon: "💻",
         },
     );
@@ -368,9 +391,10 @@ fn get_linux_terminals() -> HashMap<&'static str, TerminalConfig> {
         TerminalConfig {
             name: "XFCE4 Terminal",
             executable: "xfce4-terminal",
-            current_args: vec!["-e", "bash", "-c", "{command}"],
-            new_tab_args: vec!["--tab", "-e", "bash", "-c", "{command}"],
-            new_window_args: vec!["--new-window", "-e", "bash", "-c", "{command}"],
+            // -e принимает одну строку; -x — «всё остальное и есть команда»
+            current_args: vec!["-x", "bash", "-c", "{command}"],
+            new_tab_args: vec!["--tab", "-x", "bash", "-c", "{command}"],
+            new_window_args: vec!["--window", "-x", "bash", "-c", "{command}"],
             icon: "🖥️",
         },
     );
@@ -381,9 +405,10 @@ fn get_linux_terminals() -> HashMap<&'static str, TerminalConfig> {
         TerminalConfig {
             name: "Alacritty",
             executable: "alacritty",
+            // У alacritty нет вкладок и флагов --new-tab/--new-window: всегда новое окно
             current_args: vec!["-e", "bash", "-c", "{command}"],
-            new_tab_args: vec!["--new-tab", "-e", "bash", "-c", "{command}"],
-            new_window_args: vec!["--new-window", "-e", "bash", "-c", "{command}"],
+            new_tab_args: vec!["-e", "bash", "-c", "{command}"],
+            new_window_args: vec!["-e", "bash", "-c", "{command}"],
             icon: "⚡",
         },
     );
@@ -395,7 +420,8 @@ fn get_linux_terminals() -> HashMap<&'static str, TerminalConfig> {
             name: "WezTerm",
             executable: "wezterm",
             current_args: vec!["cli", "spawn", "--", "bash", "-c", "{command}"],
-            new_tab_args: vec!["cli", "spawn", "--new-tab", "--", "bash", "-c", "{command}"],
+            // `cli spawn` по умолчанию открывает вкладку; флага --new-tab нет
+            new_tab_args: vec!["cli", "spawn", "--", "bash", "-c", "{command}"],
             new_window_args: vec![
                 "cli",
                 "spawn",
@@ -516,113 +542,57 @@ fn execute_command_impl(
     launch_in: &str,
     theme: &str,
     title: &str,
-) {
-    info!("=== execute_command_impl called ===");
-    info!("Commands to execute: {:?}", commands_to_execute);
-    info!("Terminal: '{}'", terminal);
-    info!("Launch in: '{}'", launch_in);
-    info!("Theme: '{}'", theme);
-    info!("Title: '{}'", title);
-    info!("================================");
+) -> Result<(), String> {
+    info!(
+        "[Execute] terminal='{}' launch_in='{}' theme='{}' title='{}' commands={:?}",
+        terminal, launch_in, theme, title, commands_to_execute
+    );
+
+    // Все строки — одна команда в одном терминале: иначе new_tab/new_window открывали
+    // по вкладке на строку и `cd` из первой строки терялся.
+    let command = crate::running::join_shell_lines(commands_to_execute)?;
 
     let terminals = get_terminals();
+    let terminal_config = terminals
+        .get(terminal)
+        .ok_or_else(|| format!("Unsupported terminal: {}", terminal))?;
 
-    for command in commands_to_execute {
-        info!("Executing command: {}", command);
+    #[cfg(target_os = "macos")]
+    let args = {
+        let script_path = get_script_path(terminal, launch_in).ok_or_else(|| {
+            format!(
+                "No script found for terminal: {} with launch_in: {}",
+                terminal, launch_in
+            )
+        })?;
+        let script_content = read_script(&script_path)
+            .ok_or_else(|| format!("Failed to read script: {}", script_path))?;
+        let script = fill_template(
+            &script_content,
+            &[
+                ("{command}", &applescript_escape(&command)),
+                ("{theme}", &applescript_escape(theme)),
+                ("{title}", &applescript_escape(title)),
+            ],
+        );
+        vec!["-e".to_string(), script]
+    };
 
-        #[cfg(target_os = "macos")]
-        {
-            // Для macOS используем скрипты
-            let terminal_config = match terminals.get(terminal) {
-                Some(config) => config,
-                None => {
-                    error!("Unsupported terminal: {}", terminal);
-                    return;
-                }
-            };
+    #[cfg(not(target_os = "macos"))]
+    let args = {
+        let template = match launch_in {
+            "current" => &terminal_config.current_args,
+            "new_tab" => &terminal_config.new_tab_args,
+            "new_window" => &terminal_config.new_window_args,
+            _ => return Err(format!("Unsupported launch option: {}", launch_in)),
+        };
+        template
+            .iter()
+            .map(|arg| process_command_placeholder(arg, &command))
+            .collect::<Vec<_>>()
+    };
 
-            if let Some(script_path) = get_script_path(terminal, launch_in) {
-                let script_content = match read_script(&script_path) {
-                    Some(content) => content,
-                    None => {
-                        error!("Failed to read script: {}", script_path);
-                        continue;
-                    }
-                };
-
-                let script = script_content
-                    .replace("{command}", &process_command_placeholder("{command}", command))
-                    .replace("{theme}", theme)
-                    .replace("{title}", title);
-
-                let args = vec!["-e".to_string(), script];
-                match run_terminal_process(terminal_config.executable, &args) {
-                    Ok(true) => info!("Command succeeded: {}", command),
-                    Ok(false) => {
-                        error!("Command failed: {}", command);
-                        break;
-                    }
-                    Err(e) => {
-                        error!("{}", e);
-                        break;
-                    }
-                }
-            } else {
-                error!(
-                    "No script found for terminal: {} with launch_in: {}",
-                    terminal, launch_in
-                );
-                break;
-            }
-        }
-
-        #[cfg(not(target_os = "macos"))]
-        {
-            // Для Windows и Linux используем прямые команды
-            let terminal_config = match terminals.get(terminal) {
-                Some(config) => config,
-                None => {
-                    error!("Unsupported terminal: {}", terminal);
-                    return;
-                }
-            };
-
-            let args = match launch_in {
-                "current" => &terminal_config.current_args,
-                "new_tab" => &terminal_config.new_tab_args,
-                "new_window" => &terminal_config.new_window_args,
-                _ => {
-                    error!("Unsupported launch_in option: {}", launch_in);
-                    return;
-                }
-            };
-
-            let mut cmd_args = Vec::new();
-            for arg in args {
-                // Заменяем {command} с правильной обработкой кавычек
-                let processed_arg = if arg.contains("{command}") {
-                    process_command_placeholder(arg, command)
-                } else {
-                    arg.to_string()
-                };
-                cmd_args.push(processed_arg);
-            }
-
-            match run_terminal_process(terminal_config.executable, &cmd_args) {
-                Ok(true) => info!("Command succeeded: {}", command),
-                Ok(false) => {
-                    error!("Command failed: {}", command);
-                    break;
-                }
-                Err(e) => {
-                    error!("{}", e);
-                    break;
-                }
-            }
-        }
-    }
-    
-    info!("=== execute_command_impl completed ===");
+    run_terminal_process(terminal_config.executable, &args)
 }
 
 /// Получает список доступных терминалов для текущей операционной системы
@@ -645,41 +615,56 @@ pub fn is_launch_option_supported(launch_in: &str) -> bool {
     matches!(launch_in, "current" | "new_tab" | "new_window")
 }
 
-/// Правильно обрабатывает плейсхолдер команды, экранируя кавычки для каждой ОС
-fn process_command_placeholder(template: &str, command: &str) -> String {
-    #[cfg(target_os = "macos")]
-    {
-        // На macOS команды передаются через AppleScript, поэтому нужно правильно экранировать
-        // В AppleScript нужно экранировать кавычки как \"
-        let escaped_command = command.replace('"', "\\\"");
-        template.replace("{command}", &escaped_command)
+/// Экранирование для строкового литерала AppleScript ("...").
+pub fn applescript_escape(value: &str) -> String {
+    value.replace('\\', "\\\\").replace('"', "\\\"")
+}
+
+/// Подстановка `{key}` за один проход: значение не может подставиться повторно
+/// (`{title}` внутри команды остаётся как есть).
+pub fn fill_template(template: &str, values: &[(&str, &str)]) -> String {
+    let mut out = String::with_capacity(template.len());
+    let mut rest = template;
+    'outer: while !rest.is_empty() {
+        for (key, value) in values {
+            if let Some(tail) = rest.strip_prefix(key) {
+                out.push_str(value);
+                rest = tail;
+                continue 'outer;
+            }
+        }
+        let ch = rest.chars().next().unwrap();
+        out.push(ch);
+        rest = &rest[ch.len_utf8()..];
     }
-    
+    out
+}
+
+/// Подставляет команду в аргумент шаблона терминала (Windows/Linux).
+#[cfg_attr(target_os = "macos", allow(dead_code))]
+fn process_command_placeholder(template: &str, command: &str) -> String {
     #[cfg(target_os = "windows")]
     {
-        // На Windows команды передаются через cmd.exe
-        // Если команда уже содержит кавычки, нужно удвоить их для cmd.exe
-        let escaped_command = if command.contains('"') {
-            command.replace('"', "\"\"")
-        } else {
-            command.to_string()
-        };
-        template.replace("{command}", &escaped_command)
+        // Внутри "..." для cmd.exe кавычка удваивается
+        template.replace("{command}", &command.replace('"', "\"\""))
     }
-    
+
     #[cfg(target_os = "linux")]
     {
-        // На Linux команды передаются через bash -c
-        // Экранirум кавычки в команде
-        let escaped_command = command.replace('"', "\\\"");
-        template.replace("{command}", &escaped_command)
+        // Аргументы уходят в execve как есть — экранировать нечего.
+        // `exec bash` оставляет окно открытым после команды, как в терминалах macOS.
+        template.replace("{command}", &linux_keep_open(command))
     }
-    
-    #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
+
+    #[cfg(not(any(target_os = "windows", target_os = "linux")))]
     {
-        // Fallback для других ОС - просто заменяем без экранирования
         template.replace("{command}", command)
     }
+}
+
+#[cfg_attr(not(target_os = "linux"), allow(dead_code))]
+fn linux_keep_open(command: &str) -> String {
+    format!("{}; exec bash", command)
 }
 
 /// Основная функция выполнения команд
@@ -739,10 +724,7 @@ pub fn execute_command(
         return Err(format!("Unsupported launch option: {}", launch_in));
     }
 
-    info!("=== Calling execute_command_impl ===");
-    execute_command_impl(&commands_to_execute, &terminal, &launch_in, theme, title);
-    info!("=== execute_command completed ===");
-    Ok(())
+    execute_command_impl(&commands_to_execute, &terminal, &launch_in, theme, title)
 }
 
 #[cfg(test)]
@@ -907,7 +889,58 @@ mod tests {
                 &"Test".to_string(),
             );
         });
-        assert_eq!(launches.len(), 2);
+        // Строки уходят одной командой в один терминал
+        assert_eq!(launches.len(), 1);
+        #[cfg(target_os = "macos")]
+        assert!(launches[0].args[1].contains("echo 'command1' && echo 'command2'"));
+    }
+
+    #[test]
+    fn applescript_escape_handles_backslash_and_quotes() {
+        assert_eq!(applescript_escape(r#"echo "a\"b""#), r#"echo \"a\\\"b\""#);
+        assert_eq!(applescript_escape(r"printf 'x\ty'"), r"printf 'x\\ty'");
+    }
+
+    /// Каждый скрипт после подстановки «злой» команды и заголовка — валидный AppleScript.
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn scripts_compile_with_tricky_command_and_title() {
+        let command = r#"echo "a\"b" 'c' $HOME {title} \t"#;
+        let title = r#"My "Dev" \ tools"#;
+        let out = std::env::temp_dir().join("switchshuttle-script-check.scpt");
+        for file in SCRIPTS_DIR.files() {
+            let name = file.path().to_string_lossy();
+            if !name.ends_with(".scpt") {
+                continue;
+            }
+            let script = fill_template(
+                file.contents_utf8().unwrap(),
+                &[
+                    ("{command}", &applescript_escape(command)),
+                    ("{theme}", &applescript_escape("default")),
+                    ("{title}", &applescript_escape(title)),
+                ],
+            );
+            let status = std::process::Command::new("osacompile")
+                .arg("-o")
+                .arg(&out)
+                .arg("-e")
+                .arg(&script)
+                .status()
+                .expect("osacompile");
+            assert!(status.success(), "{} does not compile:\n{}", name, script);
+        }
+        let _ = std::fs::remove_file(out);
+    }
+
+    #[test]
+    fn fill_template_is_single_pass() {
+        let out = fill_template(
+            "run {command} in {title}",
+            &[("{command}", "echo {title}"), ("{title}", "Dev")],
+        );
+        assert_eq!(out, "run echo {title} in Dev");
+        assert_eq!(fill_template("ünï {a}", &[("{a}", "б")]), "ünï б");
     }
 
     #[test]
@@ -1123,80 +1156,25 @@ mod tests {
     }
 
     #[test]
-    fn test_process_command_placeholder_with_quotes() {
-        // Тестируем обработку команд с кавычками
-        let command_with_quotes = r#"somecommand --someargs "anything""#;
-        let template = r#"hyper -e "{command}""#;
-        
-        let result = process_command_placeholder(template, command_with_quotes);
-        
-        #[cfg(target_os = "macos")]
-        {
-            // На macOS кавычки должны быть экранированы как \"
-            assert_eq!(result, r#"hyper -e "somecommand --someargs \"anything\"""#);
-        }
-        
+    fn process_command_placeholder_per_os() {
+        let command = r#"echo "Hello 'world'" --args='{"a": true}'"#;
+
         #[cfg(target_os = "windows")]
-        {
-            // На Windows кавычки должны быть удвоены
-            assert_eq!(result, r#"hyper -e "somecommand --someargs ""anything""""#);
-        }
-        
+        assert_eq!(
+            process_command_placeholder(r#"start hyper -e "{command}""#, command),
+            r#"start hyper -e "echo ""Hello 'world'"" --args='{""a"": true}'""#
+        );
+
+        // Linux: аргумент уходит в execve без экранирования, окно остаётся открытым
         #[cfg(target_os = "linux")]
-        {
-            // На Linux кавычки должны быть экранированы как \"
-            assert_eq!(result, r#"hyper -e "somecommand --someargs \"anything\"""#);
-        }
-    }
+        assert_eq!(
+            process_command_placeholder("{command}", command),
+            format!("{}; exec bash", command)
+        );
 
-    #[test]
-    fn test_process_command_placeholder_without_quotes() {
-        // Тестируем обработку команд без кавычек
-        let command_without_quotes = "simple_command";
-        let template = r#"hyper -e "{command}""#;
-        
-        let result = process_command_placeholder(template, command_without_quotes);
-        
-        // Для всех ОС результат должен быть одинаковым
-        assert_eq!(result, r#"hyper -e "simple_command""#);
-    }
+        #[cfg(not(any(target_os = "windows", target_os = "linux")))]
+        assert_eq!(process_command_placeholder("{command}", command), command);
 
-    #[test]
-    fn test_process_command_placeholder_with_json() {
-        // Тестируем обработку команд с JSON строками
-        let command_with_json = r#"somecommand --args='{"thing1": true}'"#;
-        let template = r#"hyper -e "{command}""#;
-        
-        let result = process_command_placeholder(template, command_with_json);
-        
-        // Команда не содержит двойных кавычек, поэтому должна остаться без изменений
-        assert_eq!(result, r#"hyper -e "somecommand --args='{\"thing1\": true}'""#);
-    }
-
-    #[test]
-    fn test_process_command_placeholder_with_mixed_quotes() {
-        // Тестируем обработку команд со смешанными кавычками
-        let command_mixed = r#"echo "Hello 'world'" and 'test "quotes"'"#;
-        let template = r#"bash -c "{command}""#;
-        
-        let result = process_command_placeholder(template, command_mixed);
-        
-        #[cfg(target_os = "macos")]
-        {
-            // На macOS только двойные кавычки должны быть экранированы
-            assert_eq!(result, r#"bash -c "echo \"Hello 'world'\" and 'test \"quotes\"'""#);
-        }
-        
-        #[cfg(target_os = "windows")]
-        {
-            // На Windows двойные кавычки должны быть удвоены
-            assert_eq!(result, r#"bash -c "echo ""Hello 'world'"" and 'test ""quotes""'""#);
-        }
-        
-        #[cfg(target_os = "linux")]
-        {
-            // На Linux двойные кавычки должны быть экранированы
-            assert_eq!(result, r#"bash -c "echo \"Hello 'world'\" and 'test \"quotes\"'""#);
-        }
+        assert_eq!(linux_keep_open("ls"), "ls; exec bash");
     }
 }

@@ -1,6 +1,6 @@
 on run
     set argsCmd to "{command}"
-    set argsTitle to "Custom title"
+    set argsTitle to "{title}"
     scriptRun(argsCmd, argsTitle)
 end run
 

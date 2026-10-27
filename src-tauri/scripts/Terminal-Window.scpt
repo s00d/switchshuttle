@@ -15,7 +15,7 @@ on CommandRun(withCmd, theTitle)
         if it is not running then
             --if this is the first time Terminal is running you have specify window 1
             --if you dont do this you will get two windows and the title wont be set
-            set newTerm to do script withCmd in window 0
+            set newTerm to do script withCmd in window 1
         else
             set newTerm to do script withCmd
         end if
