@@ -343,7 +343,7 @@ mod tests {
     fn start_list_stop_lifecycle() {
         let mut reg = ProcessRegistry::new();
         let sleep_cmd = if cfg!(windows) {
-            "timeout /T 30 /NOBREAK >NUL".to_string()
+            "ping -n 31 127.0.0.1 >NUL".to_string()
         } else {
             "sleep 30".to_string()
         };
@@ -404,7 +404,7 @@ mod tests {
     fn allows_duplicate_command_ids() {
         let mut reg = ProcessRegistry::new();
         let sleep_cmd = if cfg!(windows) {
-            "timeout /T 30 /NOBREAK >NUL".to_string()
+            "ping -n 31 127.0.0.1 >NUL".to_string()
         } else {
             "sleep 30".to_string()
         };
@@ -421,7 +421,7 @@ mod tests {
     fn enforces_max_jobs() {
         let mut reg = ProcessRegistry::new();
         let sleep_cmd = if cfg!(windows) {
-            "timeout /T 60 /NOBREAK >NUL".to_string()
+            "ping -n 61 127.0.0.1 >NUL".to_string()
         } else {
             "sleep 60".to_string()
         };
@@ -438,7 +438,7 @@ mod tests {
     fn prepare_quit_clears_global_registry() {
         with_registry(|reg| {
             let sleep_cmd = if cfg!(windows) {
-                "timeout /T 30 /NOBREAK >NUL".to_string()
+                "ping -n 31 127.0.0.1 >NUL".to_string()
             } else {
                 "sleep 30".to_string()
             };
@@ -452,7 +452,7 @@ mod tests {
     fn has_alive_for_command() {
         let mut reg = ProcessRegistry::new();
         let sleep_cmd = if cfg!(windows) {
-            "timeout /T 30 /NOBREAK >NUL".to_string()
+            "ping -n 31 127.0.0.1 >NUL".to_string()
         } else {
             "sleep 30".to_string()
         };
