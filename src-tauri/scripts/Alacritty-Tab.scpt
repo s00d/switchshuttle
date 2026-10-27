@@ -14,7 +14,7 @@ on CommandRun(withCmd)
   tell application "Alacritty"
     activate
     tell application "System Events"
-      key code 45 using {command down} -- Cmd + N
+      key code 17 using {command down} -- Cmd + T
       delay 0.1
       key code 9 using {command down} -- cmd + V
       delay 0.1

@@ -10,10 +10,11 @@ end scriptRun
 
 on CommandRun(withCmd)
   set currentClipboard to do shell script "pbpaste"
+  set the clipboard to withCmd
   tell application "Alacritty"
     activate
     tell application "System Events"
-      key code 17 using {command down} -- Cmd + T
+      key code 45 using {command down} -- Cmd + N
       delay 0.1
       key code 9 using {command down} -- cmd + V
       delay 0.1
