@@ -208,12 +208,15 @@ fn spawn_job_process(script: &str) -> Result<Child, String> {
     {
         use std::os::windows::process::CommandExt;
         const CREATE_NEW_PROCESS_GROUP: u32 = 0x00000200;
+        const CREATE_NO_WINDOW: u32 = 0x0800_0000;
         Command::new("cmd.exe")
-            .args(["/C", script])
+            .arg("/C")
+            // cmd.exe разбирает строку сам; экранирование Rust (\") он не понимает
+            .raw_arg(script)
             .stdin(Stdio::null())
             .stdout(Stdio::null())
             .stderr(Stdio::null())
-            .creation_flags(CREATE_NEW_PROCESS_GROUP)
+            .creation_flags(CREATE_NEW_PROCESS_GROUP | CREATE_NO_WINDOW)
             .spawn()
             .map_err(|e| format!("Failed to spawn background process: {}", e))
     }
