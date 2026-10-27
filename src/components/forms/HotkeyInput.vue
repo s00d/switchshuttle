@@ -207,6 +207,7 @@
 </template>
 
 <script setup lang="ts">
+import { hotkeyFromEvent } from '@/lib/hotkey';
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
 import { tv } from '@/lib/tv';
 import XIcon from '../icons/XIcon.vue';
@@ -524,42 +525,16 @@ const formatHotkey = (hotkey: string): string => {
 };
 
 const handleKeyDown = (event: KeyboardEvent) => {
+  if (!isRecording.value) return;
+  // Tab без модификаторов — уйти из поля, а не записать "tab"
+  if (event.code === 'Tab' && !event.ctrlKey && !event.altKey && !event.metaKey) return;
+
   event.preventDefault();
+  // null — пока нажаты только модификаторы: ждём основную клавишу
+  const combination = hotkeyFromEvent(event);
+  if (!combination) return;
 
-  const key = event.key.toLowerCase();
-  const modifiers = [];
-
-  if (event.ctrlKey) modifiers.push('ctrl');
-  if (event.altKey) modifiers.push('alt');
-  if (event.shiftKey) modifiers.push('shift');
-  if (event.metaKey) modifiers.push('meta');
-
-  // Ignore modifiers only
-  if (
-    modifiers.length === 0 &&
-    ['control', 'alt', 'shift', 'meta'].includes(key)
-  ) {
-    return;
-  }
-
-  // Add main key
-  if (!modifiers.includes(key)) {
-    modifiers.push(key);
-  }
-
-  // Handle special keys
-  if (key === 'escape') {
-    modifiers.splice(modifiers.indexOf(key), 1);
-    modifiers.push('esc');
-  } else if (key === ' ') {
-    modifiers.splice(modifiers.indexOf(key), 1);
-    modifiers.push('space');
-  }
-
-  const combination = modifiers.join('+');
   emit('update:modelValue', combination);
-
-  // Stop recording after getting full combination
   stopRecording();
 };
 
