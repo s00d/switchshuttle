@@ -109,7 +109,7 @@
                         :min="field.min"
                         :max="field.max"
                         @update:model-value="
-                          updateFieldValue(field.id, parseInt($event) || 0)
+                          (value: string) => updateNumberField(field, value)
                         "
                       />
                     </div>
@@ -266,6 +266,15 @@ const getFieldValue = (
     return sectionData[field];
   }
   return null;
+};
+
+// Пустое поле во время ввода не сохраняем как 0: max_command_length = 0 блокировал
+// бы все команды
+const updateNumberField = (field: { id: string; min?: number }, raw: string) => {
+  const value = parseInt(raw, 10);
+  if (Number.isNaN(value)) return;
+  if (field.min !== undefined && value < field.min) return;
+  updateFieldValue(field.id, value);
 };
 
 const updateFieldValue = (

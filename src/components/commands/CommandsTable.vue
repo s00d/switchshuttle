@@ -277,8 +277,9 @@ const closeTemplatesModal = () => {
 };
 
 const handleCommandsSelected = (selectedCommands: Command[]) => {
-  // Add selected commands to current commands list
-  commands.value.push(...selectedCommands);
+  // Копии: иначе правка добавленной команды меняла сам шаблон, а дважды добавленный
+  // шаблон давал две связанные команды
+  commands.value.push(...selectedCommands.map(cmd => JSON.parse(JSON.stringify(cmd)) as Command));
   closeTemplatesModal();
 };
 </script>

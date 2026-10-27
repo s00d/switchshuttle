@@ -126,12 +126,12 @@
         <div :class="ui.sectionInner()">
           <div :class="ui.checkboxRow()">
             <input
-              id="background"
+              :id="backgroundId"
               v-model="command.background"
               type="checkbox"
               :class="ui.checkbox()"
             />
-            <label for="background" :class="ui.checkboxLabel()">
+            <label :for="backgroundId" :class="ui.checkboxLabel()">
               Execute in background (tracked in tray)
             </label>
           </div>
@@ -245,7 +245,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, useId } from 'vue';
 import { PropType } from 'vue';
 import { Command } from '../../types';
 import Input from '../ui/Input.vue';
@@ -266,6 +266,10 @@ import { fieldRules } from '../../lib/validation-rules';
 import { commandCardTv } from './commandCardTheme';
 
 defineOptions({ name: 'CommandItem' });
+
+// Уникальный id на карточку: с общим id="background" клик по подписи
+// переключал чекбокс первой команды
+const backgroundId = useId();
 
 const props = defineProps({
   command: {

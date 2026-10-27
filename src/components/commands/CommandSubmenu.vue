@@ -97,7 +97,7 @@
             :parent-commands="command.submenu"
             @update:command="updateSubmenuCommand(subIndex, $event)"
             @remove="removeSubmenuCommand(subIndex)"
-            @move="moveSubmenuCommand(subIndex, $event)"
+            @move="(_index: number, direction: number) => moveSubmenuCommand(subIndex, direction)"
             @add-input="() => addSubmenuInput()"
             @remove-input="(_index, key) => removeSubmenuInput(key)"
             @update-input-key="

@@ -228,7 +228,9 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: string | undefined): void;
 }>();
 
-const cronExpression = ref<string>('* * * * * *');
+// Пусто = планировщик выключен. Раньше по умолчанию стояло '* * * * * *', и у каждой
+// команды показывалось «Enabled / every second»
+const cronExpression = ref<string>(props.modelValue ?? '');
 const editMode = ref(false);
 const schedulerEnabled = computed(
   () => cronExpression.value && cronExpression.value.trim() !== ''
@@ -374,15 +376,27 @@ const parseCronExpression = () => {
 
 // Инициализируем из props
 if (props.modelValue) {
-  cronExpression.value = props.modelValue;
   parseCronExpression();
 }
+
+// Список команд рендерится по индексу: после удаления/перестановки компонент получает
+// другую команду — подхватываем её расписание
+watch(
+  () => props.modelValue,
+  value => {
+    if ((value ?? '') !== cronExpression.value) {
+      cronExpression.value = value ?? '';
+      parseCronExpression();
+    }
+  }
+);
 
 const toggleScheduler = () => {
   if (schedulerEnabled.value) {
     cronExpression.value = '';
   } else {
-    cronExpression.value = '* * * * * *';
+    // Каждую минуту, не каждую секунду
+    cronExpression.value = '0 * * * * *';
     parseCronExpression();
   }
   updateScheduler();

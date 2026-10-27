@@ -387,7 +387,8 @@ const createNewConfig = async () => {
 };
 
 const editConfig = (config: Config) => {
-  currentConfig.value = { ...config };
+  // Глубокая копия: при Cancel правки команд не должны попадать в список
+  currentConfig.value = JSON.parse(JSON.stringify(config)) as Config;
   editingConfig.value = config;
   const originalTitle = config.title;
   originalFileName.value = config.title;
