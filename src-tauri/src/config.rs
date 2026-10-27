@@ -150,6 +150,8 @@ impl ConfigManager {
         self.config_paths.clear();
 
         let mut has_configs = false;
+        // Есть ли вообще json-файлы: битый конфиг пользователя нельзя затирать дефолтом.
+        let mut has_json_files = false;
 
         if let Ok(entries) = fs::read_dir(&config_dir) {
             let mut paths: Vec<_> = entries
@@ -168,6 +170,7 @@ impl ConfigManager {
                 .collect();
 
             paths.sort();
+            has_json_files = !paths.is_empty();
 
             for path in paths {
                 match Config::load(&path) {
@@ -209,10 +212,13 @@ impl ConfigManager {
             }
         }
 
-        if !has_configs {
+        if !has_configs && !has_json_files {
             let mut default_config = Config::default_config();
             let default_config_path = config_dir.join("default_config.json");
             default_config.save(&default_config_path)?;
+            default_config.title = "default_config".to_string();
+            default_config.enabled.get_or_insert(true);
+            default_config.assign_ids(&self.counter);
             self.config_paths.push(default_config_path);
             self.configs.push(default_config);
         }
