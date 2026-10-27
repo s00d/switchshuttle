@@ -40,11 +40,13 @@ fn run_terminal_process(executable: &str, args: &[String]) -> Result<(), String>
     #[cfg(windows)]
     {
         use std::os::windows::process::CommandExt;
-        if executable == "cmd" && args.first().map(String::as_str) == Some("/C") {
-            // cmd.exe разбирает строку сам; экранирование Rust (\") он не понимает
-            command.arg("/C").raw_arg(args[1..].join(" "));
-        } else {
-            command.args(args);
+        match windows_cmd_raw_line(executable, args) {
+            Some(line) => {
+                command.arg("/C").raw_arg(line);
+            }
+            None => {
+                command.args(args);
+            }
         }
     }
     #[cfg(not(windows))]
@@ -190,7 +192,8 @@ fn get_macos_terminals() -> HashMap<&'static str, TerminalConfig> {
 }
 
 /// Конфигурации терминалов для Windows
-#[cfg(target_os = "windows")]
+// Без cfg: таблица проверяется тестами на любой ОС
+#[cfg_attr(not(target_os = "windows"), allow(dead_code))]
 fn get_windows_terminals() -> HashMap<&'static str, TerminalConfig> {
     let mut terminals = HashMap::new();
 
@@ -341,7 +344,7 @@ fn get_windows_terminals() -> HashMap<&'static str, TerminalConfig> {
 }
 
 /// Конфигурации терминалов для Linux
-#[cfg(target_os = "linux")]
+#[cfg_attr(not(target_os = "linux"), allow(dead_code))]
 fn get_linux_terminals() -> HashMap<&'static str, TerminalConfig> {
     let mut terminals = HashMap::new();
 
@@ -645,15 +648,12 @@ pub fn fill_template(template: &str, values: &[(&str, &str)]) -> String {
 fn process_command_placeholder(template: &str, command: &str) -> String {
     #[cfg(target_os = "windows")]
     {
-        // Внутри "..." для cmd.exe кавычка удваивается
-        template.replace("{command}", &command.replace('"', "\"\""))
+        windows_fill(template, command)
     }
 
     #[cfg(target_os = "linux")]
     {
-        // Аргументы уходят в execve как есть — экранировать нечего.
-        // `exec bash` оставляет окно открытым после команды, как в терминалах macOS.
-        template.replace("{command}", &linux_keep_open(command))
+        linux_fill(template, command)
     }
 
     #[cfg(not(any(target_os = "windows", target_os = "linux")))]
@@ -662,9 +662,25 @@ fn process_command_placeholder(template: &str, command: &str) -> String {
     }
 }
 
+/// Windows: шаблон — часть строки cmd /C, команда стоит внутри "..." — кавычка удваивается.
+#[cfg_attr(not(target_os = "windows"), allow(dead_code))]
+fn windows_fill(template: &str, command: &str) -> String {
+    template.replace("{command}", &command.replace('"', "\"\""))
+}
+
+/// Linux: аргументы уходят в execve как есть — экранировать нечего.
+/// `exec bash` оставляет окно открытым после команды, как в терминалах macOS.
 #[cfg_attr(not(target_os = "linux"), allow(dead_code))]
-fn linux_keep_open(command: &str) -> String {
-    format!("{}; exec bash", command)
+fn linux_fill(template: &str, command: &str) -> String {
+    template.replace("{command}", &format!("{}; exec bash", command))
+}
+
+/// Windows: `cmd /C <строка>` передаётся одной сырой строкой (raw_arg) — экранирование
+/// аргументов Rust (\") cmd.exe не понимает. None — обычная передача аргументов.
+#[cfg_attr(not(target_os = "windows"), allow(dead_code))]
+fn windows_cmd_raw_line(executable: &str, args: &[String]) -> Option<String> {
+    (executable == "cmd" && args.first().map(String::as_str) == Some("/C"))
+        .then(|| args[1..].join(" "))
 }
 
 /// Основная функция выполнения команд
@@ -816,7 +832,7 @@ mod tests {
         let (_, launches) = with_mocked_terminal_launches(|| {
             let _ = execute_command(
                 &config,
-                "terminal",
+                "hyper",
                 "current",
                 &"default".to_string(),
                 &"Test".to_string(),
@@ -845,7 +861,7 @@ mod tests {
         let (_, launches) = with_mocked_terminal_launches(|| {
             let _ = execute_command(
                 &config,
-                "terminal",
+                "hyper",
                 "current",
                 &"default".to_string(),
                 &"Test".to_string(),
@@ -883,7 +899,7 @@ mod tests {
         let (_, launches) = with_mocked_terminal_launches(|| {
             let _ = execute_command(
                 &config,
-                "terminal",
+                "hyper",
                 "current",
                 &"default".to_string(),
                 &"Test".to_string(),
@@ -1161,20 +1177,115 @@ mod tests {
 
         #[cfg(target_os = "windows")]
         assert_eq!(
-            process_command_placeholder(r#"start hyper -e "{command}""#, command),
-            r#"start hyper -e "echo ""Hello 'world'"" --args='{""a"": true}'""#
+            process_command_placeholder("{command}", command),
+            windows_fill("{command}", command)
         );
 
         // Linux: аргумент уходит в execve без экранирования, окно остаётся открытым
         #[cfg(target_os = "linux")]
         assert_eq!(
             process_command_placeholder("{command}", command),
-            format!("{}; exec bash", command)
+            linux_fill("{command}", command)
         );
 
         #[cfg(not(any(target_os = "windows", target_os = "linux")))]
         assert_eq!(process_command_placeholder("{command}", command), command);
 
-        assert_eq!(linux_keep_open("ls"), "ls; exec bash");
+        assert_eq!(linux_fill("{command}", "ls"), "ls; exec bash");
+    }
+
+    // ---- Таблицы Windows/Linux проверяются на любой ОС ----
+
+    fn all_modes(config: &TerminalConfig) -> [&Vec<&'static str>; 3] {
+        [&config.current_args, &config.new_tab_args, &config.new_window_args]
+    }
+
+    #[test]
+    fn windows_templates_go_through_cmd_with_one_raw_string() {
+        for (name, config) in get_windows_terminals() {
+            assert_eq!(config.executable, "cmd", "{name}: \"/C ...\" are cmd.exe arguments");
+            for args in all_modes(&config) {
+                assert_eq!(args.len(), 2, "{name}: {args:?}");
+                assert_eq!(args[0], "/C", "{name}");
+                assert!(args[1].contains("\"{command}\""), "{name}: command must be quoted: {}", args[1]);
+                // `start "x"` берёт первую строку в кавычках как заголовок окна
+                if let Some(rest) = args[1].strip_prefix("start \"") {
+                    assert!(rest.starts_with('"'), "{name}: use start \"\" \"...\": {}", args[1]);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn windows_fill_doubles_quotes_inside_cmd_string() {
+        assert_eq!(
+            windows_fill(r#"start wt "{command}""#, r#"echo "a b""#),
+            r#"start wt "echo ""a b""""#
+        );
+    }
+
+    #[test]
+    fn windows_cmd_raw_line_only_for_cmd_c() {
+        let args = vec!["/C".to_string(), r#"start wt "x""#.to_string()];
+        assert_eq!(windows_cmd_raw_line("cmd", &args).as_deref(), Some(r#"start wt "x""#));
+        assert_eq!(windows_cmd_raw_line("wsl", &args), None);
+        assert_eq!(windows_cmd_raw_line("cmd", &["-x".to_string()]), None);
+    }
+
+    #[test]
+    fn linux_templates_use_only_real_flags() {
+        let forbidden: &[(&str, &[&str])] = &[
+            ("alacritty", &["--new-tab", "--new-window"]),
+            ("konsole", &["--new-window"]),
+            ("wezterm", &["--new-tab"]),
+            ("xfce4-terminal", &["-e"]),
+        ];
+        let terminals = get_linux_terminals();
+        for (name, flags) in forbidden {
+            let config = &terminals[name];
+            for args in all_modes(config) {
+                for flag in *flags {
+                    assert!(!args.contains(flag), "{name} has no {flag}: {args:?}");
+                }
+            }
+        }
+    }
+
+    /// Аргументы после `bash -c` реально выполняются bash'ем: кавычки доходят как есть.
+    #[cfg(unix)]
+    #[test]
+    fn linux_command_argument_runs_unchanged_in_bash() {
+        let command = r#"printf '%s|' "a b" 'c"d' $((1+1))"#;
+        for (name, config) in get_linux_terminals() {
+            for args in all_modes(&config) {
+                let Some(pos) = args.iter().position(|a| *a == "-c") else {
+                    continue;
+                };
+                assert_eq!(args[pos - 1], "bash", "{name}");
+                let script = linux_fill(args[pos + 1], command);
+                // stdin закрыт — `exec bash` сразу выходит по EOF
+                let output = std::process::Command::new("bash")
+                    .arg("-c")
+                    .arg(&script)
+                    .stdin(std::process::Stdio::null())
+                    .output()
+                    .expect("bash");
+                assert_eq!(String::from_utf8_lossy(&output.stdout), r#"a b|c"d|2|"#, "{name}: {script}");
+            }
+        }
+    }
+
+    /// Реальный cmd.exe: строка из шаблона через raw_arg разбирается так, как написано.
+    #[cfg(windows)]
+    #[test]
+    fn windows_raw_cmd_line_keeps_quotes() {
+        use std::os::windows::process::CommandExt;
+        let line = windows_fill(r#"echo "{command}""#, r#"say "hi""#);
+        let output = std::process::Command::new("cmd")
+            .arg("/C")
+            .raw_arg(&line)
+            .output()
+            .expect("cmd");
+        assert_eq!(String::from_utf8_lossy(&output.stdout).trim(), r#""say ""hi""""#);
     }
 }

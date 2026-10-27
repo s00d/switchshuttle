@@ -226,3 +226,39 @@ mod tests {
         assert!(!is_switch_enabled("false"));
     }
 }
+
+/// Те же гарантии на настоящем cmd.exe (запускаются в CI на windows-latest).
+#[cfg(all(test, windows))]
+mod windows_tests {
+    use super::*;
+
+    #[test]
+    fn returns_stdout() {
+        assert_eq!(query("echo hello").unwrap(), "hello");
+    }
+
+    #[test]
+    fn quotes_reach_cmd_unchanged() {
+        // raw_arg: без него Rust превратил бы кавычки в \"
+        assert_eq!(query(r#"echo "a b""#).unwrap(), r#""a b""#);
+    }
+
+    #[test]
+    fn nonzero_exit_is_error() {
+        assert!(query("exit /b 3").is_err());
+    }
+
+    #[test]
+    fn timeout_kill_returns() {
+        let start = Instant::now();
+        let err = run("ping -n 6 127.0.0.1", Duration::from_millis(300), OnTimeout::Kill).unwrap_err();
+        assert!(err.starts_with("Timeout"), "{}", err);
+        assert!(start.elapsed() < Duration::from_secs(3));
+    }
+
+    #[test]
+    fn switch_state_parsing() {
+        assert!(is_switch_enabled("echo true"));
+        assert!(!is_switch_enabled("echo false"));
+    }
+}
