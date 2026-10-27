@@ -21,13 +21,7 @@ jobs:
 
     steps:
       - name: Checkout SwitchShuttle repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
+        uses: actions/checkout@v7
 
       - name: Get version
         id: version
@@ -41,7 +35,7 @@ jobs:
             VERSION=${VERSION#app-v}
             echo "Using release version: $VERSION"
           else
-            VERSION=$(node -p "require('./package.json').version")
+            VERSION=$(jq -r .version package.json)
             echo "Using version from package.json: $VERSION"
           fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
@@ -72,7 +66,7 @@ jobs:
           echo "universal_sha256=$UNIVERSAL_SHA256" >> $GITHUB_OUTPUT
 
       - name: Checkout homebrew-switchshuttle repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: s00d/homebrew-switchshuttle
           token: ${{ secrets.HOMEBREW_TOKEN }}
