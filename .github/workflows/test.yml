@@ -41,7 +41,7 @@ jobs:
       - name: Use main Ubuntu mirror
         if: matrix.platform == 'ubuntu-22.04'
         run: |
-          for f in /etc/apt/sources.list /etc/apt/sources.list.d/*.sources; do
+          for f in /etc/apt/apt-mirrors.txt /etc/apt/sources.list /etc/apt/sources.list.d/*.sources; do
             [ -f "$f" ] && sudo sed -i 's|http://azure.archive.ubuntu.com|http://archive.ubuntu.com|g' "$f"
           done
           printf 'Acquire::Retries "5";\nAcquire::http::Timeout "30";\nAcquire::https::Timeout "30";\n' \
