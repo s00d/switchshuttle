@@ -51,13 +51,11 @@
     "dialog:default",
     "log:default",
     "notification:default",
-    "store:default",
     "global-shortcut:default",
     "global-shortcut:allow-unregister",
     "global-shortcut:allow-register",
     "updater:default",
     "process:default",
-    "opener:default",
-    "os:default"
+    "opener:default"
   ]
 }

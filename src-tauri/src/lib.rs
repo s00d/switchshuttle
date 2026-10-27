@@ -55,7 +55,6 @@ pub fn run() {
     let hotkey_manager = Arc::new(Mutex::new(HotkeyManager::new()));
 
     let app = tauri::Builder::default()
-        .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
@@ -100,11 +99,9 @@ pub fn run() {
                 })
                 .build(),
         )
-        .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_log::Builder::new().build())
-        .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_cli::init())
         .plugin(tauri_plugin_autostart::init(
