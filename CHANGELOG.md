@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.1](https://github.com/s00d/switchshuttle/compare/app-v2.3.0...app-v2.3.1) (2026-10-27)
+
+### Fixes
+
+- security: blocklist enforced on every execution path; path traversal rejected in config commands; webview loses fs/shell-execute access, CSP set.
+- tray: no deadlock when running commands from the webview; Launch at Login persists; inputs window runs the command once.
+- hotkeys: re-registered on every reload, disabled configs ignored, full key combinations recorded.
+- execution: correct escaping, one terminal launch per command; silent commands run in their own shell; Windows background jobs passed to `cmd.exe` verbatim.
+- scheduler: no double-firing, invalid cron disables the job instead of falling back.
+- config: stable command ids across reloads; a broken config is never overwritten with the default.
+- macOS: Alacritty new window no longer pastes the old clipboard.
+
+### Chore
+
+- tests on macOS, Linux and Windows in CI.
+- unused dependencies and Tauri plugins removed.
+
 ## [2.3.0](https://github.com/s00d/switchshuttle/compare/v2.2.0...v2.3.0) (2026-09-15)
 
 ### Features
