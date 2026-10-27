@@ -105,8 +105,11 @@ pub fn get_terminals_list() -> HashMap<String, TerminalConfig> {
         .collect()
 }
 
+// Не async: dispatch держит lock ConfigManager и перестраивает меню трея; из tokio-потока
+// это ждёт главный поток, который сам может ждать этот lock (клик по трею, хоткей) — deadlock.
+// Синхронные команды Tauri выполняются в главном потоке, как и остальные пути dispatch.
 #[tauri::command]
-pub async fn execute(
+pub fn execute(
     state: State<'_, Arc<Mutex<ConfigManager>>>,
     command: String,
     app: tauri::AppHandle,
@@ -196,8 +199,9 @@ pub async fn execute_raw_command(
     Ok("Command executed successfully".to_string())
 }
 
+// Не async — см. `execute`.
 #[tauri::command]
-pub async fn execute_command_with_inputs(
+pub fn execute_command_with_inputs(
     state: State<'_, Arc<Mutex<ConfigManager>>>,
     settings_state: State<'_, Arc<Mutex<AppSettings>>>,
     inputs: HashMap<String, String>,
