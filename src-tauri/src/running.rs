@@ -239,7 +239,7 @@ fn spawn_job_process(script: &str) -> Result<Child, String> {
     }
 }
 
-fn kill_process_tree(child: &mut Child) {
+pub(crate) fn kill_process_tree(child: &mut Child) {
     let pid = child.id();
 
     #[cfg(unix)]

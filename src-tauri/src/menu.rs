@@ -128,7 +128,7 @@ fn dispatch_user_command_inner(
                 notify_error(app, &msg);
                 return Err(msg);
             }
-            match console::ConsoleInstance::execute_command_silent(toggle) {
+            match console::run_silent(toggle) {
                 Ok(_) => {
                     notify_success(
                         app,
@@ -268,8 +268,6 @@ pub fn create_system_tray_menu(
             }
         }
     }
-
-    SystemMenu::cleanup_console_pool_periodically();
 
     *CURRENT_MENU.lock().unwrap() = Some(system_menu);
 

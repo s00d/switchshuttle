@@ -126,7 +126,7 @@ impl MenuItem {
                 );
 
                 // Выполняем команду мониторинга
-                match console::ConsoleInstance::execute_command_silent(monitor_command) {
+                match console::query(monitor_command) {
                     Ok(output) => {
                         let result = output.trim();
                         if !result.is_empty() {
@@ -210,10 +210,7 @@ impl MenuItem {
                                 );
                                 // Используем пул соединений для выполнения команды
                                 let new_text =
-                                    match console::ConsoleInstance::execute_command_via_pool(
-                                        &id,
-                                        &monitor_command,
-                                    ) {
+                                    match console::query(&monitor_command) {
                                         Ok(output) => {
                                             let result = output.trim();
                                             if !result.is_empty() {
@@ -376,7 +373,7 @@ impl MenuItem {
                                 } else {
                                     for cmd in cmds {
                                         info!("[Scheduler] Executing scheduled command: {}", cmd);
-                                        match console::ConsoleInstance::execute_command_silent(cmd)
+                                        match console::run_silent(cmd)
                                         {
                                             Ok(_) => {
                                                 info!("[Scheduler] Command executed successfully")
@@ -408,14 +405,14 @@ impl MenuItem {
     }
 
     /// Получает состояние переключателя
-    pub fn get_switch_state(&self, app: Option<&AppHandle<Wry>>) -> bool {
+    pub fn get_switch_state(&self, _app: Option<&AppHandle<Wry>>) -> bool {
         if self.is_switch() {
             if let Some(switch_command) = &self.config.switch {
                 info!(
                     "[Switch] get_switch_state: switch_command = '{}'",
                     switch_command
                 );
-                console::ConsoleInstance::is_switch_enabled(switch_command, app)
+                console::is_switch_enabled(switch_command)
             } else {
                 info!("[Switch] No switch command found for: {}", self.config.name);
                 false
@@ -790,20 +787,6 @@ impl SystemMenu {
         }
     }
 
-    /// Периодически очищает неактивные соединения в пуле (один раз на процесс)
-    pub fn cleanup_console_pool_periodically() {
-        static STARTED: AtomicBool = AtomicBool::new(false);
-        if !claim_periodic_cleanup_start(&STARTED) {
-            return;
-        }
-        thread::spawn(|| {
-            loop {
-                thread::sleep(Duration::from_secs(60));
-                console::ConsoleInstance::cleanup_console_pool();
-            }
-        });
-    }
-
     /// Создает Tauri меню из SystemMenu
     pub fn create_tauri_menu(&mut self, app: &AppHandle<Wry>) -> tauri::menu::Menu<Wry> {
         let mut tray_menu_builder = MenuBuilder::new(app);
@@ -849,11 +832,6 @@ impl Default for SystemMenu {
     fn default() -> Self {
         Self::new()
     }
-}
-
-/// Claim the right to start the periodic cleanup thread. First call true, later false.
-pub fn claim_periodic_cleanup_start(started: &AtomicBool) -> bool {
-    !started.swap(true, Ordering::SeqCst)
 }
 
 /// DFS: collect every command that has a scheduler (any nesting depth).
@@ -952,11 +930,4 @@ mod tests {
         assert!(parse_cron("").is_err());
     }
 
-    #[test]
-    fn claim_periodic_cleanup_only_once() {
-        let flag = AtomicBool::new(false);
-        assert!(claim_periodic_cleanup_start(&flag));
-        assert!(!claim_periodic_cleanup_start(&flag));
-        assert!(!claim_periodic_cleanup_start(&flag));
-    }
 }

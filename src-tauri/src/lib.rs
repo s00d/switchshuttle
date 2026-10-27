@@ -22,7 +22,6 @@ use crate::commands::{
     save_configuration_by_id, save_or_update_configuration, save_settings,
     show_notification, validate_configuration,
 };
-use crate::console::ConsolePool;
 use crate::hotkeys::HotkeyManager;
 use crate::menu::{create_system_tray_menu, execute_command_by_id, handle_system_tray_event};
 use crate::settings::AppSettings;
@@ -130,10 +129,6 @@ pub fn run() {
                 app.set_activation_policy(tauri::ActivationPolicy::Accessory);
             }
 
-            // Инициализируем постоянный инстанс консоли
-            if let Err(e) = ConsolePool::init_console() {
-                error!("Failed to initialize console: {}", e);
-            }
 
             crate::menu::set_running_app_handle(app.handle().clone());
 
