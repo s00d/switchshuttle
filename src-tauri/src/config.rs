@@ -502,6 +502,19 @@ impl CommandConfig {
     }
 }
 
+/// Путь `<dir>/<name>.json`, где `name` — ровно одно обычное имя файла
+/// (без `/`, `\\`, `..`, абсолютных путей и префиксов дисков).
+pub fn config_file_path(dir: &std::path::Path, name: &str) -> Result<PathBuf, String> {
+    use std::path::Component;
+    let mut components = std::path::Path::new(name).components();
+    match (components.next(), components.next()) {
+        (Some(Component::Normal(_)), None) if !name.contains(['/', '\\', '\0']) => {
+            Ok(dir.join(format!("{}.json", name)))
+        }
+        _ => Err(format!("Invalid configuration name: '{}'", name)),
+    }
+}
+
 pub fn get_config_path() -> PathBuf {
     let mut config_path = dirs::config_dir().unwrap();
     config_path.push("switch-shuttle");
@@ -512,6 +525,19 @@ pub fn get_config_path() -> PathBuf {
 
 #[cfg(test)]
 mod tests {
+
+    #[test]
+    fn config_file_path_rejects_traversal() {
+        let dir = std::path::Path::new("/cfg");
+        assert_eq!(
+            config_file_path(dir, "My Tools").unwrap(),
+            std::path::PathBuf::from("/cfg/My Tools.json")
+        );
+        for bad in ["", ".", "..", "../x", "a/b", "a/", "/etc/x", "a\\b", "a\0b"] {
+            assert!(config_file_path(dir, bad).is_err(), "{:?} must be rejected", bad);
+        }
+    }
+
     use super::*;
 
     fn base_cmd(name: &str) -> CommandConfig {

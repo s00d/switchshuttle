@@ -7,7 +7,7 @@ use std::sync::{Arc, Mutex};
 use tauri::{Manager, State};
 use log::{error, info, warn};
 
-use crate::config::{CommandConfig, Config, ConfigManager};
+use crate::config::{config_file_path, CommandConfig, Config, ConfigManager};
 use crate::execute::{execute_command, get_terminals, TerminalConfig};
 use crate::helpers::{get_config_path, open_folder_in_default_explorer, open_in_default_editor};
 use crate::hotkeys::HotkeyManager;
@@ -37,7 +37,7 @@ pub fn create_new_config(file_name: String) -> Result<(), String> {
     let config_path = get_config_path();
     let config_dir = config_path.parent().unwrap().to_path_buf();
 
-    let new_config_path = config_dir.join(format!("{}.json", file_name));
+    let new_config_path = config_file_path(&config_dir, &file_name)?;
 
     if new_config_path.exists() {
         return Err("File already exists".into());
@@ -379,9 +379,19 @@ pub fn save_or_update_configuration(
         original_title, config.title
     );
 
+    // Имена приходят из webview: путь должен остаться внутри папки конфигов
+    let original_config_file = original_title
+        .as_deref()
+        .map(|title| config_file_path(&config_dir, title))
+        .transpose()?;
+    if !config.title.trim().is_empty() {
+        config_file_path(&config_dir, config.title.trim())?;
+    }
+
     // Для обновления: проверяем что старый файл существует
-    if let Some(ref original_title) = original_title {
-        let original_config_file = config_dir.join(format!("{}.json", original_title));
+    if let (Some(original_title), Some(original_config_file)) =
+        (&original_title, &original_config_file)
+    {
         if !original_config_file.exists() {
             return Err(format!("Configuration file not found: {}", original_title));
         }
@@ -403,8 +413,7 @@ pub fn save_or_update_configuration(
 
     if original_title.is_some() && !title_changed {
         // Заголовок не изменился при обновлении - сохраняем в тот же файл
-        let original_title = original_title.unwrap(); // Safe unwrap, так как мы знаем что original_title.is_some()
-        let config_file = config_dir.join(format!("{}.json", original_title));
+        let config_file = original_config_file.expect("set when original_title is Some");
         info!("[Save] Saving to existing file: {}", config_file.display());
         config
             .save(&config_file)
@@ -416,7 +425,7 @@ pub fn save_or_update_configuration(
         info!("[Save] Generated unique title: {}", unique_title);
         config.title = unique_title.clone();
 
-        let new_config_file = config_dir.join(format!("{}.json", unique_title));
+        let new_config_file = config_file_path(&config_dir, &unique_title)?;
         info!("[Save] Saving to new file: {}", new_config_file.display());
 
         // Если новый файл уже существует, удаляем его
@@ -435,8 +444,7 @@ pub fn save_or_update_configuration(
             .map_err(|e| format!("Failed to save configuration: {}", e))?;
 
         // Удаляем старый файл если это обновление с измененным именем
-        if let Some(original_title) = original_title {
-            let original_config_file = config_dir.join(format!("{}.json", original_title));
+        if let Some(original_config_file) = original_config_file {
             if original_config_file.exists() {
                 info!(
                     "[Save] Removing old file: {}",
@@ -549,7 +557,7 @@ pub fn save_configuration_by_id(
 ) -> Result<(), String> {
     let config_path = get_config_path();
     let config_dir = config_path.parent().unwrap().to_path_buf();
-    let config_file = config_dir.join(format!("{}.json", id));
+    let config_file = config_file_path(&config_dir, &id)?;
 
     // Очищаем ID перед сохранением
     config.clear_ids();
@@ -701,6 +709,19 @@ pub fn get_config_files() -> Result<Vec<serde_json::Value>, String> {
 #[tauri::command]
 pub fn load_config(path: String) -> Result<Config, String> {
     let config_path = std::path::PathBuf::from(path);
+
+    // Читаем только файлы из папки конфигов
+    let config_dir = get_config_path().parent().unwrap().to_path_buf();
+    let inside_config_dir = match (config_path.canonicalize(), config_dir.canonicalize()) {
+        (Ok(file), Ok(dir)) => file.parent() == Some(dir.as_path()),
+        _ => false,
+    };
+    if !inside_config_dir {
+        return Err(format!(
+            "Configuration file not found: {}",
+            config_path.display()
+        ));
+    }
 
     if config_path.exists() {
         Config::load(&config_path).map_err(|e| format!("Failed to load configuration: {}", e))
